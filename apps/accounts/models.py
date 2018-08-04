@@ -24,6 +24,9 @@ class UserEmotion(BaseModel):
     lower_bound = models.FloatField()
     upper_bound = models.FloatField()
 
+    def __str__(self):
+        return '{} - {}'.format(self.user, self.emotion)
+
     def save(self, *args, **kwargs):
         # Set lower_bound and upper_bound to emotion defaults
         if not self.lower_bound:
@@ -55,6 +58,9 @@ class UserSongVote(BaseModel):
     song = models.ForeignKey('tunes.Song', on_delete=models.CASCADE)
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
     vote = models.BooleanField()
+
+    def __str__(self):
+        return '{} - {} - {}'.format(self.user, self.song, self.emotion)
 
     def save(self, *args, **kwargs):
         # TODO: Update UserEmotion record if song was upvoted
