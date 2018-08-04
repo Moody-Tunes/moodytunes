@@ -52,13 +52,6 @@ class Emotion(BaseModel):
         (EXCITED, 'Excited'),
     ]
 
-    EMOTION_NAME_MAP = {
-        MELANCHOLY: 'Melancholy',
-        CALM: 'Calm',
-        HAPPY: 'Happy',
-        EXCITED: 'Excited'
-    }
-
     lower_bound = models.DecimalField(max_digits=3, decimal_places=2)
     upper_bound = models.DecimalField(max_digits=3, decimal_places=2)
     name = models.CharField(
@@ -97,4 +90,4 @@ class Emotion(BaseModel):
     @property
     def full_name(self):
         # TODO: Is there a more DRY way to get the full name of the Emotion?
-        return self.EMOTION_NAME_MAP.get(self.name)
+        return self.get_name_display()
