@@ -5,10 +5,20 @@ from base.models import BaseModel
 
 
 class MoodyUser(BaseModel, AbstractUser):
+    """
+    Represents a user in our system. Extends Django auth features and includes
+    logic needed in course of site flow.
+    """
     pass
 
 
 class UserEmotion(BaseModel):
+    """
+    Represents a mapping between a particular user and an emotion. This allows
+    us to store separate boundaries for each user for each emotion. Unless
+    values are specified upon creation, the boundaries will be set to the
+    defaults defined in the `Emotion` table.
+    """
     user = models.ManyToManyField(MoodyUser)
     emotion = models.ManyToManyField('tunes.Emotion')
     lower_bound = models.FloatField()
@@ -25,6 +35,11 @@ class UserEmotion(BaseModel):
 
 
 class UserSongVote(BaseModel):
+    """
+    Represents a mapping between a user and a song denoting whether or not the
+    song made the user feel the linked emotion. This table will be used to
+    track what songs a user associates with a particular emotion.
+    """
     user = models.ManyToManyField(MoodyUser)
     song = models.ManyToManyField('tunes.Song')
     emotion = models.ManyToManyField('tunes.Emotion')
