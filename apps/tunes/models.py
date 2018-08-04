@@ -89,5 +89,4 @@ class Emotion(BaseModel):
 
     @property
     def full_name(self):
-        # TODO: Is there a more DRY way to get the full name of the Emotion?
         return self.get_name_display()
