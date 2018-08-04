@@ -97,7 +97,7 @@ class Song(BaseModel):
     artist = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=36, db_index=True, unique=True)
-    sentiment = models.FloatField(validators=[validate_decimal_value])
+    valence = models.FloatField(validators=[validate_decimal_value])
     energy = models.FloatField(validators=[validate_decimal_value])
 
     def __str__(self):

@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('artist', models.CharField(max_length=200)),
                 ('name', models.CharField(max_length=200)),
                 ('code', models.CharField(db_index=True, max_length=36, unique=True)),
-                ('sentiment', models.FloatField(validators=[tunes.models.validate_decimal_value])),
+                ('valence', models.FloatField(validators=[tunes.models.validate_decimal_value])),
                 ('energy', models.FloatField(validators=[tunes.models.validate_decimal_value])),
             ],
             options={
