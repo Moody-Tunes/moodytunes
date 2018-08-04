@@ -85,3 +85,28 @@ class Emotion(BaseModel):
     @property
     def full_name(self):
         return self.get_name_display()
+
+
+class Song(BaseModel):
+    """
+    Represents a song retrieved from the Spotify API. The code attribute is
+    the unique identifier for the song in Spotify's database. `sentiment` and
+    `energy` are measures of the song's mood, with lower values being more
+    negative/down and higher values being more positive/upbeat.
+    """
+    artist = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+    code = models.CharField(max_length=36, db_index=True, unique=True)
+    sentiment = models.FloatField(validators=[validate_decimal_value])
+    energy = models.FloatField(validators=[validate_decimal_value])
+
+    def __str__(self):
+        return '{}: {}'.format(self.artist, self.name)
+
+    def __repr__(self):
+        return self.code
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        super().save(*args, **kwargs)
