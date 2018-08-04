@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
 
 
 class TestEmotion(TestCase):
@@ -48,4 +48,26 @@ class TestEmotion(TestCase):
                 name=Emotion.HAPPY,
                 upper_bound=.5,
                 lower_bound=.5
+            )
+
+
+class TestSong(TestCase):
+    def test_uniqueness_on_code(self):
+        song_code = 'spotify:track:something-or-other'
+
+        Song.objects.create(
+            artist='J-Dilla',
+            name='Donuts',
+            code=song_code,
+            valence=.5,
+            energy=.5
+        )
+
+        with self.assertRaises(ValidationError):
+            Song.objects.create(
+                artist='J-Dilla',
+                name='Waves',
+                code=song_code,
+                valence=.5,
+                energy=.5
             )
