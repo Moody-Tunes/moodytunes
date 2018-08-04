@@ -5,6 +5,16 @@ from django.utils.translation import gettext_lazy as _
 from base.models import BaseModel
 
 
+def validate_decimal_value(value):
+    """Validate `value` is between 0 <= value <= 1"""
+    if value < 0 or value > 1:
+        raise ValidationError(
+            _('{} must be between 0 and 1'.format(value)),
+            params={'value': value}
+
+    )
+
+
 class Emotion(BaseModel):
     """
     Represents an "emotion" in the context of our offered moods we allow users
@@ -52,8 +62,8 @@ class Emotion(BaseModel):
         (EXCITED, 'Excited'),
     ]
 
-    lower_bound = models.DecimalField(max_digits=3, decimal_places=2)
-    upper_bound = models.DecimalField(max_digits=3, decimal_places=2)
+    lower_bound = models.FloatField(validators=[validate_decimal_value])
+    upper_bound = models.FloatField(validators=[validate_decimal_value])
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,
@@ -71,21 +81,6 @@ class Emotion(BaseModel):
         self.full_clean()
 
         super().save(*args, **kwargs)
-
-    def clean(self, *args, **kwargs):
-        # Validate that boundaries are 0 < `value` < 1
-        # TODO: Is this the best way to do this?
-        if self.lower_bound < 0 or self.lower_bound > 1:
-            raise ValidationError(
-                {'lower_bound': _('lower_bound must be between 0 and 1')}
-            )
-
-        if self.upper_bound < 0 or self.upper_bound > 1:
-            raise ValidationError(
-                {'upper_bound': _('upper_bound must be between 0 and 1')}
-            )
-
-        super().clean(*args, **kwargs)
 
     @property
     def full_name(self):
