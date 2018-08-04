@@ -30,10 +30,10 @@ def unload_emotion_data(apps, schema_editor):
     Emotion = apps.get_model('tunes', 'Emotion')
     db_alias = schema_editor.connection.alias
     initial_emotions = [
-        Emotion.MELCANCHOLY,
-        Emotion.CALM,
-        Emotion.HAPPY,
-        Emontion.EXCITED,
+        'MEL',
+        'CLM',
+        'HPY',
+        'EXC',
     ]
 
     Emotion.objects.using(db_alias).filter(name__in=initial_emotions).delete()
