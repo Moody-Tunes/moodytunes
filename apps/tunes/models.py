@@ -84,6 +84,7 @@ class Emotion(BaseModel):
 
     @property
     def full_name(self):
+        """Return human readable name of emotion"""
         return self.get_name_display()
 
 
