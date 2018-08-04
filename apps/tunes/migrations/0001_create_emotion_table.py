@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+import tunes.models
 
 class Migration(migrations.Migration):
 
@@ -17,9 +18,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(choices=[('MEL', 'Melancholy'), ('CLM', 'Calm'), ('HPY', 'Happy'), ('EXC', 'Excited')], db_index=True, max_length=3)),
-                ('lower_bound', models.DecimalField(decimal_places=2, max_digits=3)),
-                ('upper_bound', models.DecimalField(decimal_places=2, max_digits=3)),
+                ('name', models.CharField(choices=[('MEL', 'Melancholy'), ('CLM', 'Calm'), ('HPY', 'Happy'), ('EXC', 'Excited')], db_index=True, max_length=3, unique=True)),
+                ('lower_bound', models.FloatField(validators=[tunes.models.validate_decimal_value])),
+                ('upper_bound', models.FloatField(validators=[tunes.models.validate_decimal_value])),
             ],
             options={
                 'abstract': False,

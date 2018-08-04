@@ -41,7 +41,7 @@ def unload_emotion_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tunes', '0002_make_emotion_name_unique'),
+        ('tunes', '0001_create_emotion_table'),
     ]
 
     operations = [
