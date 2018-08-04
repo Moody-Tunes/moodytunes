@@ -34,10 +34,15 @@ class UserEmotion(BaseModel):
 
         super().save(*args, **kwargs)
 
-    def update_emotion_boundaries(self, emotion_name, song_name):
-        # TODO: Figure out what to do about updating the boundaries given a
-        # song the user votes makes them feel a given emotion
-        pass
+    def update_emotion_boundaries(self, valence, energy):
+        """
+        Given a valence and energy, recompute boundaries for the given emotion
+        box. `valence` governs the upper_bound values while energy determines
+        the lower_bound values.
+        """
+        self.upper_bound = (self.upper_bound + valence) / 2
+        self.lower_bound = (self.lower_bound + energy) / 2
+        self.save()
 
 
 class UserSongVote(BaseModel):
