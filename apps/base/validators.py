@@ -8,5 +8,4 @@ def validate_decimal_value(value):
         raise ValidationError(
             _('{} must be between 0 and 1'.format(value)),
             params={'value': value}
-
-    )
+        )

@@ -14,7 +14,7 @@ class TestEmotion(TestCase):
 
     def test_invalid_choice(self):
         with self.assertRaises(ValidationError):
-            emotion = Emotion.objects.create(
+            Emotion.objects.create(
                 name='Im Not Real!',
                 upper_bound=.5,
                 lower_bound=.5,
@@ -22,7 +22,7 @@ class TestEmotion(TestCase):
 
     def test_invalid_boundary_negative(self):
         with self.assertRaises(ValidationError):
-            emotion = Emotion.objects.create(
+            Emotion.objects.create(
                 name=Emotion.HAPPY,
                 upper_bound=-.5,
                 lower_bound=.5,
@@ -30,7 +30,7 @@ class TestEmotion(TestCase):
 
     def test_invalid_boundary_beyond_range(self):
         with self.assertRaises(ValidationError):
-            emotion = Emotion.objects.create(
+            Emotion.objects.create(
                 name=Emotion.HAPPY,
                 upper_bound=2,
                 lower_bound=.5,

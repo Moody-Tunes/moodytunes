@@ -13,11 +13,13 @@ def create_user_emotion_records(sender, instance, created, *args, **kwargs):
                 emotion=emotion
             )
 
+
 post_save.connect(
     create_user_emotion_records,
     sender=MoodyUser,
     dispatch_uid='user_post_save_create_useremotion_records'
 )
+
 
 def update_user_boundaries(sender, instance, created, *args, **kwargs):
     # If vote is positive (song makes user feel emotion) update the
@@ -35,6 +37,7 @@ def update_user_boundaries(sender, instance, created, *args, **kwargs):
             instance.song.valence,
             instance.song.energy
         )
+
 
 post_save.connect(
     update_user_boundaries,
