@@ -29,6 +29,7 @@ THIRD_PARTY_APPS = [
 
 OUR_APPS = [
     'base',
+    'tunes',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
