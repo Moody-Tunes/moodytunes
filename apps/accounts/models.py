@@ -61,20 +61,3 @@ class UserSongVote(BaseModel):
 
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
-
-    def save(self, *args, **kwargs):
-        # If vote is positive (song makes user feel emotion) update the
-        # boundaries for the given emotion with the song attributes
-        if self.vote:
-            user_emot, _ = self.user.useremotion_set.get_or_create(
-                emotion__name=self.emotion.name,
-                defaults={
-                    'user': self.user,
-                    'emotion': self.emotion
-                }
-            )
-
-            user_emot.update_emotion_boundaries(
-                self.song.valence,
-                self.song.energy
-            )
