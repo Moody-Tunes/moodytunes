@@ -24,6 +24,8 @@ class UserEmotion(BaseModel):
     lower_bound = models.FloatField()
     upper_bound = models.FloatField()
 
+    class Meta:
+        unique_together = ('user', 'emotion')
     def __str__(self):
         return '{} - {}'.format(self.user, self.emotion)
 
