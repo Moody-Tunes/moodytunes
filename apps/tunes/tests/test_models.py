@@ -52,6 +52,27 @@ class TestEmotion(TestCase):
 
 
 class TestSong(TestCase):
+
+    def test_invalid_boundary_negative(self):
+        with self.assertRaises(ValidationError):
+            Song.objects.create(
+                artist='J-Dilla',
+                name='Donuts',
+                code='spotify:track:something-or-other',
+                valence=-.5,
+                energy=-.5
+            )
+
+    def test_invalid_boundary_beyond_range(self):
+        with self.assertRaises(ValidationError):
+            Song.objects.create(
+                artist='J-Dilla',
+                name='Donuts',
+                code='spotify:track:something-or-other',
+                valence=2,
+                energy=5
+            )
+
     def test_uniqueness_on_code(self):
         song_code = 'spotify:track:something-or-other'
 
