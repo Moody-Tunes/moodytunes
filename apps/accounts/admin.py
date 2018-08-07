@@ -14,6 +14,7 @@ class MoodyUserAdmin(admin.ModelAdmin):
 class UserEmotionAdmin(admin.ModelAdmin):
     list_display = ('user', 'emotion', 'lower_bound', 'upper_bound')
     readonly_fields = ('user', 'emotion', 'lower_bound', 'upper_bound')
+    list_filter = ('emotion',)
 
     def has_add_permission(self, request):
         return False
@@ -22,6 +23,7 @@ class UserEmotionAdmin(admin.ModelAdmin):
 class UserSongVoteAdmin(admin.ModelAdmin):
     list_display = ('user', 'song', 'emotion', 'vote')
     readonly_fields = ('user', 'song', 'emotion', 'vote')
+    list_filter = ('emotion', 'vote')
 
     def has_add_permission(self, request):
         return False
