@@ -28,7 +28,9 @@ THIRD_PARTY_APPS = [
 ]
 
 OUR_APPS = [
-
+    'accounts',
+    'base',
+    'tunes',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
@@ -69,6 +71,8 @@ DATABASES = env.json('DJANGO_DATABASES', default={
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 })
+
+AUTH_USER_MODEL = 'accounts.MoodyUser'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -1,0 +1,38 @@
+[
+{
+  "model": "tunes.emotion",
+  "pk": 1,
+  "fields": {
+    "lower_bound": "0",
+    "upper_bound": "0.25",
+    "name": "MEL"
+  }
+},
+{
+  "model": "tunes.emotion",
+  "pk": 2,
+  "fields": {
+    "lower_bound": "0.25",
+    "upper_bound": "0.50",
+    "name": "CLM"
+  }
+},
+{
+  "model": "tunes.emotion",
+  "pk": 3,
+  "fields": {
+    "lower_bound": "0.50",
+    "upper_bound": "0.75",
+    "name": "HPY"
+  }
+},
+{
+  "model": "tunes.emotion",
+  "pk": 4,
+  "fields": {
+    "lower_bound": "0.75",
+    "upper_bound": "1",
+    "name": "EXC"
+  }
+}
+]
