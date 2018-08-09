@@ -1,5 +1,5 @@
 Django==2.1
 django-extensions==2.1.0
+envparse==0.2.0
 pytz==2018.5
 six==1.11.0
-envparse==0.2.0
