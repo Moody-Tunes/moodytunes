@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.utils import IntegrityError
 from django.db.models.signals import post_save
 from django.test import TestCase
@@ -12,7 +13,7 @@ class TestUserEmot(TestCase):
     def test_uniqueness_on_user_emot_fields(self):
         dispatch_uid = 'user_post_save_create_useremotion_records'
         with SignalDisconnect(post_save, create_user_emotion_records,
-                              MoodyUser, dispatch_uid):
+                              settings.AUTH_USER_MODEL, dispatch_uid):
             user = MoodyUser.objects.create(username='test_user')
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         UserEmotion.objects.create(user=user, emotion=emotion)
