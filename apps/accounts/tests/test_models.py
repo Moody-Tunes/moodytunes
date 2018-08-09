@@ -10,13 +10,18 @@ from libs.tests_helpers import SignalDisconnect
 
 
 class TestUserEmot(TestCase):
-    def test_uniqueness_on_user_emot_fields(self):
+    @classmethod
+    def setUpTestData(cls):
+        # Disable signal that creates UserEmotion records on user creation
+        # so we can create ones during testing
         dispatch_uid = 'user_post_save_create_useremotion_records'
         with SignalDisconnect(post_save, create_user_emotion_records,
                               settings.AUTH_USER_MODEL, dispatch_uid):
-            user = MoodyUser.objects.create(username='test_user')
+            cls.user = MoodyUser.objects.create(username='test_user')
+
+    def test_uniqueness_on_user_emot_fields(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        UserEmotion.objects.create(user=user, emotion=emotion)
+        UserEmotion.objects.create(user=self.user, emotion=emotion)
 
         with self.assertRaises(IntegrityError):
-            UserEmotion.objects.create(user=user, emotion=emotion)
+            UserEmotion.objects.create(user=self.user, emotion=emotion)
