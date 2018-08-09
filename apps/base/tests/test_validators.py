@@ -6,7 +6,7 @@ from base.validators import validate_decimal_value
 
 class TestDecimalValidator(TestCase):
 
-    def test_valid_values(self):
+    def test_valid_value(self):
         try:
             validate_decimal_value(.5)
         except ValidationError:
