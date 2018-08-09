@@ -25,3 +25,17 @@ class TestUserEmot(TestCase):
 
         with self.assertRaises(IntegrityError):
             UserEmotion.objects.create(user=self.user, emotion=emotion)
+
+    def test_update_emotion_boundaries(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
+
+        valence = .5
+        energy = .5
+
+        expected_new_upper_bound = (emotion.upper_bound + valence) / 2
+        expected_new_lower_bound = (emotion.lower_bound + energy) / 2
+
+        user_emot.update_emotion_boundaries(valence, energy)
+        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
+        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
