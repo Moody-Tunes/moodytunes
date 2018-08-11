@@ -13,9 +13,12 @@ class MoodyBaseCommand(BaseCommand):
 
     """Override Django core command class to add hooks for our own logic"""
     def execute(self, *args, **options):
-        logger.info('Command {name} about to run with {options}'.format(
-            name=self.__class__.__name__,
-            options=options
+        logger.info(
+            'Command {name} about to run with {options}. '
+            'Identifier: {id}'.format(
+            name=self.__class__,
+            options=options,
+            id=self._unique_id
         ))
 
         return super().execute(*args, **options)
