@@ -24,14 +24,14 @@ class SpotifyClient(object):
     def __init__(self, command_id=None):
         self._unique_id = command_id
 
-        access_token = cache.get(settings.SPOTIFY_AUTH_CACHE_KEY)
+        access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
         if not access_token:
             logger.info('{} - Cache miss for auth access token'.format(self._unique_id))
             access_token = self._get_auth_access_token()
 
             if access_token:
-                cache.set(settings.SPOTIFY_AUTH_CACHE_KEY, access_token, settings.SPOTIFY_AUTH_CACHE_TTL)
+                cache.set(settings.SPOTIFY['auth_cache_key'], access_token, settings.SPOTIFY['auth_cache_key_timeout'])
             else:
                 logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
 
@@ -82,8 +82,8 @@ class SpotifyClient(object):
         @return access_token: Token used for authentication with Spotify (str)
         """
         auth_val = '{client_id}:{secret_key}'.format(
-            client_id=settings.SPOTIFY_CLIENT_ID,
-            secret_key=settings.SPOTIFY_SECRET_KEY
+            client_id=settings.SPOTIFY['client_id'],
+            secret_key=settings.SPOTIFY['secret_key']
         )
         auth_val = bytes(auth_val, encoding='utf-8')
         auth_header = b64encode(auth_val)
@@ -96,7 +96,7 @@ class SpotifyClient(object):
 
         resp = self._make_spotify_request(
             'POST',
-            settings.SPOTIFY_AUTH_URL,
+            settings.SPOTIFY['auth_url'],
             data=data,
             headers=headers
         )
@@ -114,7 +114,7 @@ class SpotifyClient(object):
             - user (str): Spotify ID for the playlist owner
         """
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
-            api_url=settings.SPOTIFY_API_URL,
+            api_url=settings.SPOTIFY['api_url'],
             category_id=category
         )
 
@@ -158,15 +158,12 @@ class SpotifyClient(object):
             - uri (str): Spotify ID of the song
         """
         url = '{api_url}/users/{user_id}/playlists/{playlist_id}'.format(
-            api_url=settings.SPOTIFY_API_URL,
+            api_url=settings.SPOTIFY['api_url'],
             user_id=playlist['user'],
             playlist_id=playlist['uri']
         )
 
-        response = self._make_spotify_request(
-            'GET',
-            url,
-        )
+        response = self._make_spotify_request('GET', url)
 
         if not response:
             logger.warning('{} - Failed to get songs from playlist {}'.format(self._unique_id, playlist['uri']))

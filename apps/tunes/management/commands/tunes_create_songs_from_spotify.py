@@ -19,14 +19,14 @@ class Command(MoodyBaseCommand):
         # TODO: Read these values from options
         num_playlists = 10
         total_songs = 0
-        max_tracks_from_playlist = settings.SPOTIFY_MAX_SONGS_FROM_LIST
-        max_tracks_from_category = settings.SPOTIFY_MAX_SONGS_FROM_CATEGORY
+        max_tracks_from_playlist = settings.SPOTIFY['max_songs_from_list']
+        max_tracks_from_category = settings.SPOTIFY['max_songs_from_category']
 
         spotify = SpotifyClient(command_id=self._unique_id)
 
         tracks = []
 
-        for category in settings.SPOTIFY_CATEGORIES:
+        for category in settings.SPOTIFY['categories']:
             songs_from_category = 0
 
             playlists = spotify.get_playlists_for_category(category, num_playlists)
