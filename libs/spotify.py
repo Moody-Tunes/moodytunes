@@ -37,7 +37,6 @@ class SpotifyClient(object):
 
             raise SpotifyException('Unable to retrieve Spotify access token')
 
-
         self.access_token = access_token
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
@@ -185,8 +184,8 @@ class SpotifyClient(object):
         # to return the full amount we can return what we get
         while processed_tracks < num_songs and tracks:
             payload = {
-                'name': tracks[idx]['track']['name'].encode('ascii','ignore'),
-                'artist': tracks[idx]['track']['artists'][0]['name'].encode('ascii','ignore'),
+                'name': tracks[idx]['track']['name'].encode('ascii', 'ignore'),
+                'artist': tracks[idx]['track']['artists'][0]['name'].encode('ascii', 'ignore'),
                 'uri': tracks[idx]['track']['uri']
             }
 
