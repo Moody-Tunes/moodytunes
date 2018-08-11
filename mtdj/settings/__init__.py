@@ -18,5 +18,10 @@ LIBS_DIR = '{}/{}'.format(BASE_DIR, 'libs')
 sys.path.append(APPS_DIR)
 sys.path.append(LIBS_DIR)
 
-
-from .common import *
+if ENV == 'dev':
+    try:
+        from .local_personal import *
+    except ImportError:
+        from .local import *
+else:
+    from .common import *
