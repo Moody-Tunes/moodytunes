@@ -32,4 +32,3 @@ class SignalDisconnect(object):
             sender=self.sender,
             dispatch_uid=self.dispatch_uid
         )
-

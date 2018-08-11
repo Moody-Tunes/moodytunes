@@ -17,20 +17,14 @@ class Command(MoodyBaseCommand):
     """Management command to fetch and create songs from Spotify API"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO: Cache this value with a timeout as long as Spotify honours
-        # a token for
+        # TODO: Cache this value with a timeout as long as Spotify honours a token for
         self.access_token = self._get_auth_access_token()
         if not self.access_token:
-            logger.warning(
-                '{id} - Unable to retrieve access token from Spotify'.format(
-                    id=self._unique_id
-                )
-            )
+            logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
 
             raise CommandError('Unable to retrieve Spotify access token')
 
-    def _make_spotify_request(self, method, url, params=None, data=None,
-                              headers=None):
+    def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
         Make a request to the Spotify API and return the JSON response
         :param method: HTTP method to use when sending request (str)
@@ -40,13 +34,7 @@ class Command(MoodyBaseCommand):
         :param headers: Headers to include in request (dict)
         @return response: Dictionary containg response content
         """
-        logger.info(
-            '{id} - Making {method} request to Spotify URL: {url}'.format(
-                id=self._unique_id,
-                method=method,
-                url=url
-            )
-        )
+        logger.info('{} - Making {} request to Spotify URL: {}'.format(id=self._unique_id, method=method, url=url))
 
         if not headers:
             # We have already authenticated, include the `access_token`
@@ -64,21 +52,11 @@ class Command(MoodyBaseCommand):
             response = response.json()
 
         except HTTPError:
-            logger.warning(
-                '{id} - Received HTTPError requesting {url}'.format(
-                    id=self._unique_id,
-                    url=url
-                ), exc_info=True
-            )
+            logger.warning('{} - Received HTTPError requesting {}'.format(self._unique_id, url), exc_info=True)
             response = {}
 
         except Exception:
-            logger.error(
-                '{id} - Received unhandle exception requesting {url}'.format(
-                    id=self._unique_id,
-                    url=url
-                ), exc_info=True
-            )
+            logger.error('{} - Received unhandle exception requesting {}'.format(self._unique_id, url), exc_info=True)
             response = {}
 
         return response
@@ -120,10 +98,7 @@ class Command(MoodyBaseCommand):
             - uri (str): Spotiy ID for the playlist
             - user (str): Spotify ID for the playlist owner
         """
-        logger.info('{} - Making request to /browse/category for {}'.format(
-                self._unique_id,
-                category
-        ))
+        logger.info('{} - Making request to /browse/category for {}'.format(self._unique_id, category))
 
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
             api_url=settings.SPOTIFY_API_URL,
@@ -142,16 +117,9 @@ class Command(MoodyBaseCommand):
         )
 
         if not response:
-            logger.warning(
-                '{} - Failed to fetch playlists for category {}'.format(
-                    self._unique_id,
-                    category
-                )
-            )
+            logger.warning('{} - Failed to fetch playlists for category {}'.format(self._unique_id, category))
 
-            raise CommandError('Unable to fetch playlists for {}'.format(
-                category
-            ))
+            raise CommandError('Unable to fetch playlists for {}'.format(category))
 
         retrieved_playlists = []
         for playlist in response['playlists']['items']:
@@ -166,10 +134,8 @@ class Command(MoodyBaseCommand):
         return retrieved_playlists
 
     def handle(self, *args, **options):
-        logger.info('{} - Starting run to create songs from Spotify'.format(
-            self._unique_id
-        ))
+        logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
         category = settings.SPOTIFY_CATEGORIES[0]
         num_playlists = 10
-        playlists = self._get_playlists_for_category(category, num_playlists)
+        self._get_playlists_for_category(category, num_playlists)
