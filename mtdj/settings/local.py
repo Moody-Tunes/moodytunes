@@ -28,7 +28,7 @@ LOGGING['handlers'].update({
 LOGGING['loggers'].update({
     'django': {
         'handlers': ['console'],
-       'propagate': True,
+        'propagate': True,
     },
 })
 
