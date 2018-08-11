@@ -17,7 +17,7 @@ class TestFormatModuleName(TestCase):
         module_name = format_module_name_with_project_prefix(name)
 
         self.assertTrue(module_name.startswith(settings.PROJECT_PREFIX))
-        self.assertTrue(settings.APPS_DIR in module_name)
+        self.assertTrue('apps' in module_name)
 
     def test_bad_module_path(self):
         name = 'this-dont-look-like-a-module'

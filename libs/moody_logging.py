@@ -16,7 +16,7 @@ def format_module_name_with_project_prefix(name):
     # If name contains a module defined in apps, prepend 'apps' to the name
     if start_module in settings.INSTALLED_APPS:
         name = '{apps_dir}.{module_name}'.format(
-            apps_dir=settings.APPS_DIR,
+            apps_dir='apps',
             module_name=name,
         )
 
