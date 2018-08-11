@@ -92,3 +92,49 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname}|{asctime}|{pathname}@{lineno}|{name} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname}: {name} - {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+        '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': env.str('DJANGO_LOG_FILENAME', default=os.path.join(BASE_DIR, 'dev.log')),
+            'formatter': 'verbose',
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'mtdj': {
+            'handlers': ['mail_admins', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
