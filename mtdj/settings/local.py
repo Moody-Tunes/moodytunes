@@ -32,6 +32,4 @@ LOGGING['loggers'].update({
     },
 })
 
-LOGGING['loggers']['mtdj'].update({
-    'handlers': ['file', 'console'],
-})
+LOGGING['loggers']['mtdj']['handlers'].append('console')

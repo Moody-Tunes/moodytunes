@@ -118,10 +118,16 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        'file': {
+        'app_file': {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': env.str('DJANGO_LOG_FILENAME', default=os.path.join(BASE_DIR, 'dev.log')),
+            'filename': env.str('DJANGO_LOG_APP_FILENAME', default=os.path.join(BASE_DIR, 'dev_app.log')),
+            'formatter': 'verbose',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': env.str('DJANGO_LOG_ERROR_FILENAME', default=os.path.join(BASE_DIR, 'dev_err.log')),
             'formatter': 'verbose',
         }
     },
@@ -132,7 +138,7 @@ LOGGING = {
             'propagate': False,
         },
         'mtdj': {
-            'handlers': ['mail_admins', 'file'],
+            'handlers': ['mail_admins', 'app_file', 'error_file'],
             'level': 'INFO',
             'propagate': True,
         },
