@@ -82,7 +82,10 @@ class Command(MoodyBaseCommand):
         return response
 
     def _get_auth_access_token(self):
-        """Get an access token from Spotify for authentication"""
+        """
+        Get an access token from Spotify for authentication
+        @return access_token: Token used for authentication with Spotify (str)
+        """
         auth_val = '{client_id}:{secret_key}'.format(
             client_id=settings.SPOTIFY_CLIENT_ID,
             secret_key=settings.SPOTIFY_SECRET_KEY
