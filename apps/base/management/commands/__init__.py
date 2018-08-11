@@ -19,9 +19,10 @@ class MoodyBaseCommand(BaseCommand):
         logger.info(
             'Command {name} about to run with {options}. '
             'Identifier: {id}'.format(
-            name=self.__class__,
-            options=options,
-            id=self._unique_id
-        ))
+                name=self.__class__,
+                options=options,
+                id=self._unique_id
+            )
+        )
 
         return super().execute(*args, **options)
