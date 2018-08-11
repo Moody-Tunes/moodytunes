@@ -1,11 +1,13 @@
 from base64 import b64encode
 import logging
-import requests
-from requests.exceptions import HTTPError
+import random
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.management.base import CommandError
+
+import requests
+from requests.exceptions import HTTPError
 
 from base.management.commands import MoodyBaseCommand
 from libs.moody_logging import format_module_name_with_project_prefix
@@ -104,13 +106,11 @@ class Command(MoodyBaseCommand):
         Get a number of playlists from Spotify for a given category
         :param category: Category ID of a genre in Spotify (str)
         :param num_playlists: Number of playlists to return (int)
-        @return playlists: List of playlist dictionaries for the category
+        @return retrieved_playlists: List of playlist dictionaries for the category
             - name (str): Name of the playlist
             - uri (str): Spotiy ID for the playlist
             - user (str): Spotify ID for the playlist owner
         """
-        logger.info('{} - Making request to /browse/category for {}'.format(self._unique_id, category))
-
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
             api_url=settings.SPOTIFY_API_URL,
             category_id=category
@@ -144,12 +144,81 @@ class Command(MoodyBaseCommand):
 
         return retrieved_playlists
 
-    def handle(self, *args, **options):
-        self.stdout.write('hello')
+    def _get_songs_from_playlist(self, playlist, num_songs):
         """
+        Get a number of songs randomly from the given playlist.
+        List of songs is shuffled and the number of desired tracks are returned.
+        :param playlist: Mapping of values needed to retrieve playlist tracks (dict)
+        :param num_songs: Number of songs to return from this playlist (int)
+        @return retrieved_tracks: List of track dictionaries
+            - name (str): Name of the song
+            - artist (str): Name of the artist
+            - uri (str): Spotify ID of the song
+        """
+        url = '{api_url}/users/{user_id}/playlists/{playlist_id}'.format(
+            api_url=settings.SPOTIFY_API_URL,
+            user_id=playlist['user'],
+            playlist_id=playlist['uri']
+        )
+
+        response = self._make_spotify_request(
+            'GET',
+            url,
+        )
+
+        if not response:
+            logger.warning('{} - Failed to get songs from playlist {}'.format(self._unique_id, playlist['uri']))
+
+            raise CommandError('Unable to fetch songs from playlist {}'.format(playlist['name']))
+
+        processed_tracks = 0
+        idx = 0
+        retrieved_tracks = []
+
+        tracks = response['tracks']['items']
+        random.shuffle(tracks)
+
+        # Process number of tracks requested, but if playlist does not have enough
+        # to return the full amount we can return what we get
+        while processed_tracks < num_songs and tracks:
+            payload = {
+                'name': tracks[idx]['track']['name'].encode('ascii','ignore'),
+                'artist': tracks[idx]['track']['artists'][0]['name'].encode('ascii','ignore'),
+                'uri': tracks[idx]['track']['uri']
+            }
+
+            retrieved_tracks.append(payload)
+            processed_tracks += 1
+
+            tracks.pop(idx)  # Remove track from list
+            idx += 1
+
+        return retrieved_tracks
+
+    def handle(self, *args, **options):
         logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
-        category = settings.SPOTIFY_CATEGORIES[0]
+        # TODO: Read these values from options
         num_playlists = 10
-        self._get_playlists_for_category(category, num_playlists)
-        """
+        total_songs = 0
+        max_tracks_from_playlist = settings.SPOTIFY_MAX_SONGS_FROM_LIST
+        max_tracks_from_category = settings.SPOTIFY_MAX_SONGS_FROM_CATEGORY
+
+
+        tracks = []
+
+        for category in settings.SPOTIFY_CATEGORIES:
+            songs_from_category = 0
+
+            playlists = self._get_playlists_for_category(category, num_playlists)
+
+            for playlist in playlists:
+                new_tracks = self._get_songs_from_playlist(playlist, max_tracks_from_playlist)
+                songs_from_category += len(new_tracks)
+                total_songs += len(new_tracks)
+                tracks.extend(new_tracks)
+
+                if songs_from_category >= max_tracks_from_category:
+                    break
+
+        logger.info('Got {} tracks from categories'.format(total_songs))
