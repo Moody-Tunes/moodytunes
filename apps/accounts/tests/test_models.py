@@ -6,7 +6,7 @@ from django.test import TestCase
 from accounts.models import MoodyUser, UserEmotion
 from accounts.signals import create_user_emotion_records
 from tunes.models import Emotion
-from libs.tests_helpers import SignalDisconnect
+from libs.tests.helpers import SignalDisconnect
 
 
 class TestUserEmot(TestCase):
