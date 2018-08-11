@@ -1,11 +1,10 @@
 import logging
 
 from django.conf import settings
-from django.core.cache import cache
 
 from base.management.commands import MoodyBaseCommand
 from libs.moody_logging import format_module_name_with_project_prefix
-from libs.spotify import SpotifyClient, SpotifyException
+from libs.spotify import SpotifyClient
 
 module_name = format_module_name_with_project_prefix(__name__)
 logger = logging.getLogger(module_name)
@@ -24,7 +23,6 @@ class Command(MoodyBaseCommand):
         max_tracks_from_category = settings.SPOTIFY_MAX_SONGS_FROM_CATEGORY
 
         spotify = SpotifyClient(command_id=self._unique_id)
-
 
         tracks = []
 
