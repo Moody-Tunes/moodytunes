@@ -1,5 +1,6 @@
-import os
 from envparse import env
+import os
+import tempfile
 
 from . import BASE_DIR
 from .common_api import *
@@ -66,6 +67,20 @@ DATABASES = env.json('DJANGO_DATABASES', default={
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+})
+
+CACHES = env.json('DJANGO_CACHES', default={
+    'default': {
+        'VERSION': 1,
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir()),
+    }
+})
+
+CACHES.update({
+    'dummy': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 })
 

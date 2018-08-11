@@ -9,3 +9,5 @@ SPOTIFY_SECRET_KEY = env.str('MTDJ_SPOTIFY_SECRET_KEY', default='__spotify_secre
 SPOTIFY_CATEGORIES = env.list('MTDJ_SPOTIFY_CATEGORIES', default=['hiphop', 'rock', 'alternative'])
 SPOTIFY_MAX_SONGS_FROM_LIST = env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_LIST', default=10)
 SPOTIFY_MAX_SONGS_FROM_CATEGORY = env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_CATEGORY', default=20)
+SPOTIFY_AUTH_CACHE_KEY = env.str('MTDJ_SPOTIFY_AUTH_CACHE_KEY', default='mtdj:spotify-auth-token')
+SPOTIFY_AUTH_CACHE_TTL = 60 * 60  # Authorization token is good for one hour

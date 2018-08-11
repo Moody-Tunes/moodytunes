@@ -10,11 +10,12 @@ logger = logging.getLogger(module_name)
 
 
 class MoodyBaseCommand(BaseCommand):
+    """Override Django core command class to add hooks for our own logic"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._unique_id = uuid.uuid4()  # Include in logs for audit trail
 
-    """Override Django core command class to add hooks for our own logic"""
     def execute(self, *args, **options):
         logger.info(
             'Command {name} about to run with {options}. '

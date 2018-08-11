@@ -4,6 +4,7 @@ import requests
 from requests.exceptions import HTTPError
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.management.base import CommandError
 
 from base.management.commands import MoodyBaseCommand
@@ -17,12 +18,22 @@ class Command(MoodyBaseCommand):
     """Management command to fetch and create songs from Spotify API"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO: Cache this value with a timeout as long as Spotify honours a token for
-        self.access_token = self._get_auth_access_token()
-        if not self.access_token:
-            logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
+
+        access_token = cache.get(settings.SPOTIFY_AUTH_CACHE_KEY)
+
+        if not access_token:
+            logger.info('{} - Cache miss for auth access token'.format(self._unique_id))
+            access_token = self._get_auth_access_token()
+
+            if access_token:
+                cache.set(settings.SPOTIFY_AUTH_CACHE_KEY, access_token, settings.SPOTIFY_AUTH_CACHE_TTL)
+            else:
+                logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
 
             raise CommandError('Unable to retrieve Spotify access token')
+
+
+        self.access_token = access_token
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
@@ -34,7 +45,7 @@ class Command(MoodyBaseCommand):
         :param headers: Headers to include in request (dict)
         @return response: Dictionary containg response content
         """
-        logger.info('{} - Making {} request to Spotify URL: {}'.format(id=self._unique_id, method=method, url=url))
+        logger.info('{} - Making {} request to Spotify URL: {}'.format(self._unique_id, method, url))
 
         if not headers:
             # We have already authenticated, include the `access_token`
@@ -134,8 +145,11 @@ class Command(MoodyBaseCommand):
         return retrieved_playlists
 
     def handle(self, *args, **options):
+        self.stdout.write('hello')
+        """
         logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
         category = settings.SPOTIFY_CATEGORIES[0]
         num_playlists = 10
         self._get_playlists_for_category(category, num_playlists)
+        """
