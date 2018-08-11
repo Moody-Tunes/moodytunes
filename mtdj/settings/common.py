@@ -2,6 +2,7 @@ import os
 from envparse import env
 
 from . import BASE_DIR
+from .common_api import *
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
