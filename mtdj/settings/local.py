@@ -19,7 +19,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # Add ability to log messages to console
 LOGGING['handlers'].update({
     'console': {
-        'level': 'INFO',
+        'level': 'DEBUG',
         'class': 'logging.StreamHandler',
         'formatter': 'simple',
     }
@@ -33,3 +33,4 @@ LOGGING['loggers'].update({
 })
 
 LOGGING['loggers']['mtdj']['handlers'].append('console')
+LOGGING['loggers']['mtdj']['level'] = 'DEBUG'
