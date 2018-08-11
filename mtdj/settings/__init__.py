@@ -8,6 +8,7 @@ env_file = os.environ.get('MTDJ_ENV_FILE', '.dev')
 env.read_envfile(env_file)
 
 ENV = env.str('ENV', default='dev')
+PROJECT_PREFIX = 'mtdj'
 
 # Add apps/ and libs/ directory to Python path
 parent_dir = os.path.dirname  # For better readability
