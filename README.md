@@ -36,7 +36,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-logger.info('Hello world!')
+logger.debug('Hello world!')  # Only prints to the console in local development
+logger.info('I saw 14,000,605 futures')
 logger.warning('Mr Stark I dont feel so good')
 logger.critical('Really? Tears?')
 logger.error('You should have gone for the head')
