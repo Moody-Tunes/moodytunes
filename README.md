@@ -26,3 +26,18 @@ Install dependencies
 2) You can run unit tests using tox
 
 `tox -r`
+
+3) Log files are written to the files defined by the `DJANGO_LOG_APP_FILENAME` and `DJANGO_LOG_ERROR_FILENAME` environment variables.
+By default they go to `dev_app.log` and `dev_err.log` in the project root directory.
+
+To use logging in your module import `logging`, get a logger, and log away!
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.info('Hello world!')
+logger.warning('Mr Stark I dont feel so good')
+logger.critical('Really? Tears?')
+logger.error('You should have gone for the head')
+```
