@@ -92,3 +92,55 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname}|{asctime}|{pathname}@{lineno}|{name} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname}: {name} - {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+        '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'app_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': env.str('DJANGO_LOG_APP_FILENAME', default=os.path.join(BASE_DIR, 'dev_app.log')),
+            'formatter': 'verbose',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': env.str('DJANGO_LOG_ERROR_FILENAME', default=os.path.join(BASE_DIR, 'dev_err.log')),
+            'formatter': 'verbose',
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'mtdj': {
+            'handlers': ['mail_admins', 'app_file', 'error_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
