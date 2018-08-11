@@ -1,1 +1,3 @@
--r common.txt
+-rcommon.txt
+
+ipython==6.5.0

@@ -1,11 +1,7 @@
 import os
 from envparse import env
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Load env file
-env_file = os.environ.get('MTDJ_ENV_FILE', 'dev.env')
-env.read_envfile(env_file)
+from . import BASE_DIR
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
