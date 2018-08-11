@@ -17,6 +17,8 @@ class Command(MoodyBaseCommand):
     """Management command to fetch and create songs from Spotify API"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # TODO: Cache this value with a timeout as long as Spotify honours
+        # a token for
         self.access_token = self._get_auth_access_token()
         if not self.access_token:
             logger.warning(
@@ -108,5 +110,66 @@ class Command(MoodyBaseCommand):
 
         return resp.get('access_token')
 
+    def _get_playlists_for_category(self, category, num_playlists):
+        """
+        Get a number of playlists from Spotify for a given category
+        :param category: Category ID of a genre in Spotify (str)
+        :param num_playlists: Number of playlists to return (int)
+        @return playlists: List of playlist dictionaries for the category
+            - name (str): Name of the playlist
+            - uri (str): Spotiy ID for the playlist
+            - user (str): Spotify ID for the playlist owner
+        """
+        logger.info('{} - Making request to /browse/category for {}'.format(
+                self._unique_id,
+                category
+        ))
+
+        url = '{api_url}/browse/categories/{category_id}/playlists'.format(
+            api_url=settings.SPOTIFY_API_URL,
+            category_id=category
+        )
+
+        params = {
+            'country': settings.COUNTRY_CODE,
+            'limit': num_playlists
+        }
+
+        response = self._make_spotify_request(
+            'GET',
+            url,
+            params=params
+        )
+
+        if not response:
+            logger.warning(
+                '{} - Failed to fetch playlists for category {}'.format(
+                    self._unique_id,
+                    category
+                )
+            )
+
+            raise CommandError('Unable to fetch playlists for {}'.format(
+                category
+            ))
+
+        retrieved_playlists = []
+        for playlist in response['playlists']['items']:
+            payload = {
+                'name': playlist['name'].encode('ascii', 'ignore'),
+                'uri': playlist['id'],
+                'user': playlist['owner']['id']
+            }
+
+            retrieved_playlists.append(payload)
+
+        return retrieved_playlists
+
     def handle(self, *args, **options):
-        pass
+        logger.info('{} - Starting run to create songs from Spotify'.format(
+            self._unique_id
+        ))
+
+        category = settings.SPOTIFY_CATEGORIES[0]
+        num_playlists = 10
+        playlists = self._get_playlists_for_category(category, num_playlists)
