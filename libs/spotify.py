@@ -49,7 +49,13 @@ class SpotifyClient(object):
         :param headers: Headers to include in request (dict)
         @return response: Dictionary containg response content
         """
-        logger.info('{} - Making {} request to Spotify URL: {}'.format(self._unique_id, method, url))
+        logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET} . POST data: {POST}'.format(
+            id=self._unique_id,
+            method=method,
+            url=url,
+            GET=params,
+            POST=data
+        ))
 
         if not headers:
             # We have already authenticated, include the `access_token`
