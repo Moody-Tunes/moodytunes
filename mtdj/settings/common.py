@@ -2,7 +2,7 @@ from envparse import env
 import os
 import tempfile
 
-from . import BASE_DIR
+from . import BASE_DIR, PROJECT_PREFIX
 from .common_api import *
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
@@ -155,7 +155,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'mtdj': {
+        PROJECT_PREFIX: {
             'handlers': ['mail_admins', 'app_file', 'error_file'],
             'level': 'INFO',
             'propagate': True,
