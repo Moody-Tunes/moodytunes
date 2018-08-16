@@ -197,6 +197,7 @@ class SpotifyClient(object):
             if uri in self.seen_songs or is_explicit:
                 continue
 
+            # TODO: Also get genre for track, add column in Song model to hold information on it
             payload = {
                 'name': track['track']['name'].encode('ascii', 'ignore'),
                 'artist': track['track']['artists'][0]['name'].encode('ascii', 'ignore'),
@@ -212,3 +213,14 @@ class SpotifyClient(object):
 
 
         return retrieved_tracks
+
+    def get_audio_features_for_tracks(self, tracks):
+        """
+        Get audio features for a number of tracks. Currently returns sentiment and valence data for the track from
+        Spotify. Will update the track in place, each track in the list is a dictionary of values needed to create a
+        Song object. This track returns the list with the dictionaries updated with the `valence` and `energy` values.
+
+        :param tracks: List of dictionaries representing tracks in Spotify
+        @return tracks: Same list before updated with audio feature data included
+        """
+        pass
