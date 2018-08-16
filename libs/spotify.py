@@ -162,7 +162,7 @@ class SpotifyClient(object):
         @return retrieved_tracks: List of track dictionaries
             - name (str): Name of the song
             - artist (str): Name of the artist
-            - uri (str): Spotify ID of the song
+            - code (str): Spotify ID of the song
         """
         url = '{api_url}/users/{user_id}/playlists/{playlist_id}'.format(
             api_url=settings.SPOTIFY['api_url'],
@@ -185,11 +185,9 @@ class SpotifyClient(object):
         tracks = response['tracks']['items']
         random.shuffle(tracks)
 
-        # Process number of tracks requested, but if playlist does not have enough
-        # to return the full amount we return what we get
-        #
-        # Skip tracks that have already been seen (in another playlist)
-        # or have explicit lyrics (I want my Mom to use this site)
+        # Process number of tracks requested, but if playlist does not have enough to return the full
+        # amount we return what we get
+        # Skip tracks that have already been seen or have explicit lyrics (I want my Mom to use this site)
         for track in tracks:
             uri = track['track']['uri']
             is_explicit = track['track']['name']
@@ -201,7 +199,7 @@ class SpotifyClient(object):
             payload = {
                 'name': track['track']['name'].encode('ascii', 'ignore'),
                 'artist': track['track']['artists'][0]['name'].encode('ascii', 'ignore'),
-                'uri': uri
+                'code': uri
             }
 
             retrieved_tracks.append(payload)
