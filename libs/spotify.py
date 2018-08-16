@@ -170,6 +170,8 @@ class SpotifyClient(object):
             playlist_id=playlist['uri']
         )
 
+        params = {'fields': 'tracks(items(track(id,uri,name,artists)))'}
+
         response = self._make_spotify_request('GET', url)
 
         if not response:
@@ -184,11 +186,16 @@ class SpotifyClient(object):
         random.shuffle(tracks)
 
         # Process number of tracks requested, but if playlist does not have enough
-        # to return the full amount we can return what we get
+        # to return the full amount we return what we get
+        #
+        # Skip tracks that have already been seen (in another playlist)
+        # or have explicit lyrics (I want my Mom to use this site)
         for track in tracks:
             uri = track['track']['uri']
-            if uri in self.seen_songs:
-                continue  # Ignore tracks we've already seen (one song could be in multiple playlists, for example)
+            is_explicit = track['track']['name']
+
+            if uri in self.seen_songs or is_explicit:
+                continue
 
             payload = {
                 'name': track['track']['name'].encode('ascii', 'ignore'),
