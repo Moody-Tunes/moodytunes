@@ -38,6 +38,7 @@ class SpotifyClient(object):
             raise SpotifyException('Unable to retrieve Spotify access token')
 
         self.access_token = access_token
+        self.seen_songs = []
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
@@ -177,7 +178,6 @@ class SpotifyClient(object):
             raise SpotifyException('Unable to fetch songs from playlist {}'.format(playlist['name']))
 
         processed_tracks = 0
-        idx = 0
         retrieved_tracks = []
 
         tracks = response['tracks']['items']
@@ -185,17 +185,23 @@ class SpotifyClient(object):
 
         # Process number of tracks requested, but if playlist does not have enough
         # to return the full amount we can return what we get
-        while processed_tracks < num_songs and tracks:
+        for track in tracks:
+            uri = track['track']['uri']
+            if uri in self.seen_songs:
+                continue  # Ignore tracks we've already seen (one song could be in multiple playlists, for example)
+
             payload = {
-                'name': tracks[idx]['track']['name'].encode('ascii', 'ignore'),
-                'artist': tracks[idx]['track']['artists'][0]['name'].encode('ascii', 'ignore'),
-                'uri': tracks[idx]['track']['uri']
+                'name': track['track']['name'].encode('ascii', 'ignore'),
+                'artist': track['track']['artists'][0]['name'].encode('ascii', 'ignore'),
+                'uri': uri
             }
 
             retrieved_tracks.append(payload)
+            self.seen_songs.append(uri)
             processed_tracks += 1
 
-            tracks.pop(idx)  # Remove track from list
-            idx += 1
+            if processed_tracks < num_songs:
+                break
+
 
         return retrieved_tracks
