@@ -32,10 +32,12 @@ class Command(MoodyBaseCommand):
             playlists = spotify.get_playlists_for_category(category, num_playlists)
 
             for playlist in playlists:
-                new_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
+                raw_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
+                new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
+
+                tracks.extend(new_tracks)
                 songs_from_category += len(new_tracks)
                 total_songs += len(new_tracks)
-                tracks.extend(new_tracks)
 
                 if songs_from_category >= max_tracks_from_category:
                     break

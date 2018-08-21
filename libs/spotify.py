@@ -220,4 +220,44 @@ class SpotifyClient(object):
         :param tracks: List of dictionaries representing tracks in Spotify
         @return tracks: Same list before updated with audio feature data included
         """
-        pass
+        batch_size = 100
+        idx = 0
+
+        # Create a list of lists of tracks, each one being at most batch_size length
+        # Spotify allows up to 100 songs to be processed at once
+        batched_tracks = [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
+
+        for batch in batched_tracks:
+            # Construct query params list from track ids in batch
+            url = '{api_url}/audio-features'.format(
+                api_url=settings.SPOTIFY['api_url']
+            )
+
+            # Strip spotify:track: from the uri (Spotify just wants the id)
+            track_ids = [track['code'].split(':')[2] for track in batch]
+            params = {'ids': ','.join([track_id for track_id in track_ids])}
+
+            response = self._make_spotify_request(
+                'GET',
+                url,
+                params=params
+            )
+
+            # Response is returned in the order requested (req:[1,2,3] -> res:[1,2,3])
+            # If an object is not found, a null value is returned in the appropriate position
+            for track, track_data in zip(batch, response['audio_features']):
+                # If a song is not found, Spotify returns `None`
+                if track_data:
+                    valence = track_data.get('valence')
+                    energy = track_data.get('energy')
+
+                    # Skip tracks that don't have both attributes we're looking for
+                    if not all([valence, energy]):
+                        continue
+
+                    track.update({
+                        'valence': valence,
+                        'energy': energy
+                    })
+
+        return tracks
