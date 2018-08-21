@@ -170,7 +170,7 @@ class SpotifyClient(object):
             playlist_id=playlist['uri']
         )
 
-        params = {'fields': 'tracks(items(track(id,uri,name,artists)))'}
+        params = {'fields': 'tracks(items(track(id,uri,name,artists,explicit)))'}
 
         response = self._make_spotify_request('GET', url)
 
@@ -190,7 +190,7 @@ class SpotifyClient(object):
         # Skip tracks that have already been seen or have explicit lyrics (I want my Mom to use this site)
         for track in tracks:
             uri = track['track']['uri']
-            is_explicit = track['track']['name']
+            is_explicit = track['track']['explicit']
 
             if uri in self.seen_songs or is_explicit:
                 continue
@@ -206,9 +206,8 @@ class SpotifyClient(object):
             self.seen_songs.append(uri)
             processed_tracks += 1
 
-            if processed_tracks < num_songs:
+            if processed_tracks >= num_songs:
                 break
-
 
         return retrieved_tracks
 
