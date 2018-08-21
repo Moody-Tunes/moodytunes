@@ -10,7 +10,15 @@ logger = logging.getLogger(module_name)
 
 
 class MoodyBaseCommand(BaseCommand):
-    """Override Django core command class to add hooks for our own logic"""
+    """
+    Override Django core command class to add hooks for our own logic.
+
+    Each management command in this project should extend this base class and
+    take advantage of the unique id instance variable for logging purposes.
+
+    Override the handle() method of your command class to implement your own logic.
+    Method signature is `def handle(self, *args, **options)`
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
