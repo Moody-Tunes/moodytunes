@@ -86,6 +86,7 @@ class Song(BaseModel):
     """
     artist = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
+    genre = models.CharField(max_length=20, default=None)
     code = models.CharField(max_length=36, db_index=True, unique=True)
     valence = models.FloatField(validators=[validate_decimal_value])
     energy = models.FloatField(validators=[validate_decimal_value])
