@@ -11,14 +11,25 @@ logger = logging.getLogger(module_name)
 
 
 class Command(MoodyBaseCommand):
-    """Management command to fetch and create songs from Spotify API"""
+    help = 'Management command to fetch and create songs from Spotify API'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--total_songs',
+            dest='total_songs',
+            default=10,
+            help='''
+            Total number of songs to process during run of this script.
+            Note that it is possible to process FEWER than number specified
+            if this script runs into any issues processing tracks.
+            '''
+        )
 
     def handle(self, *args, **options):
         logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
-        # TODO: Read these values from options
+        total_songs = options.get('total_songs')
         num_playlists = 10
-        total_songs = 0
         max_tracks_from_playlist = settings.SPOTIFY['max_songs_from_list']
         max_tracks_from_category = settings.SPOTIFY['max_songs_from_category']
 
@@ -37,9 +48,12 @@ class Command(MoodyBaseCommand):
 
                 tracks.extend(new_tracks)
                 songs_from_category += len(new_tracks)
-                total_songs += len(new_tracks)
 
                 if songs_from_category >= max_tracks_from_category:
                     break
 
-        logger.info('Got {} tracks from categories'.format(total_songs))
+                if len(tracks) < total_songs:
+                    break
+
+        print(tracks)
+        logger.info('Got {} tracks from categories'.format(len(tracks)))
