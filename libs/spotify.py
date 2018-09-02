@@ -195,11 +195,9 @@ class SpotifyClient(object):
             if uri in self.seen_songs or is_explicit:
                 continue
 
-            # TODO: Also get genre for track, add column in Song model to hold information on it
-            # TODO: How can we store these in utf-8? Stripping characters isn't good
             payload = {
-                'name': track['track']['name'].encode('ascii', 'ignore'),
-                'artist': track['track']['artists'][0]['name'].encode('ascii', 'ignore'),
+                'name': track['track']['name'].encode('utf-8'),
+                'artist': track['track']['artists'][0]['name'].encode('utf-8'),
                 'code': uri
             }
 
