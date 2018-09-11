@@ -1,8 +1,11 @@
 import logging
 
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.conf import settings
 
 from base.management.commands import MoodyBaseCommand
+from tunes.models import Song
 from libs.moody_logging import format_module_name_with_project_prefix
 from libs.spotify import SpotifyClient
 
@@ -25,6 +28,28 @@ class Command(MoodyBaseCommand):
             if this script runs into any issues processing tracks.
             '''
         )
+
+    def save_songs_to_database(self, tracks):
+        """
+        Given a list of parameters for Song records, create the objects in the database.
+        :tracks: (list) List of dictionaries containing data to store for Song objects
+        @return: Two tuple of amount of tracks that successfully processed and how many failed to process
+        """
+        success, fail = 0, 0
+        for track in tracks:
+            try:
+                song = Song.objects.create(**track)
+                msg = 'Created song with code {}'.format(song.code)
+                logger.info(msg)
+                self.stdout.write(msg)
+                success += 1
+            except (ValidationError, IntegrityError):
+                msg = 'Could not create song with code {}'.format(track['code'])
+                logger.warning(msg)
+                self.stderr.write(msg)
+                fail += 1
+
+        return success, fail
 
     def handle(self, *args, **options):
         logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
@@ -56,5 +81,12 @@ class Command(MoodyBaseCommand):
                 if len(tracks) >= total_songs:
                     break
 
-        print(tracks)
+        self.stdout.write('Got {} tracks from categories'.format(len(tracks)))
         logger.info('Got {} tracks from categories'.format(len(tracks)))
+
+        succeeded, failed = self.save_songs_to_database(tracks)
+
+        self.stdout.write('Saved {} songs to database'.format(succeeded))
+        self.stdout.write('Failed to process {} songs'.format(failed))
+
+        self.stdout.write('Done!')
