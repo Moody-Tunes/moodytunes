@@ -17,6 +17,7 @@ class Command(MoodyBaseCommand):
         parser.add_argument(
             '--total_songs',
             dest='total_songs',
+            type=int,
             default=10,
             help='''
             Total number of songs to process during run of this script.
@@ -52,7 +53,7 @@ class Command(MoodyBaseCommand):
                 if songs_from_category >= max_tracks_from_category:
                     break
 
-                if len(tracks) < total_songs:
+                if len(tracks) >= total_songs:
                     break
 
         print(tracks)
