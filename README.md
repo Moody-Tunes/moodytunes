@@ -5,6 +5,7 @@ The REAL Pandora of emotions
 Install python3 virtual environment
 
 `sudo apt-get install python3-venv  # Linux based systems`
+
 `brew install python3-venv  # Mac base systems`
 
 Setup python3 virtual environment and activate

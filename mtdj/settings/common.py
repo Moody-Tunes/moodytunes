@@ -1,7 +1,9 @@
-import os
 from envparse import env
+import os
+import tempfile
 
 from . import BASE_DIR
+from .common_api import *
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
@@ -68,6 +70,20 @@ DATABASES = env.json('DJANGO_DATABASES', default={
     }
 })
 
+CACHES = env.json('DJANGO_CACHES', default={
+    'default': {
+        'VERSION': 1,
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir()),
+    }
+})
+
+CACHES.update({
+    'dummy': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+})
+
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -86,6 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
+COUNTRY_CODE = env.str('MTDJ_COUNTRY_CODE', default='US')  # ISO 3166-1 alpha-2 code
+
 TIME_ZONE = 'EST'
 USE_I18N = True
 USE_L10N = True
@@ -137,10 +155,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'mtdj': {
-            'handlers': ['mail_admins', 'app_file', 'error_file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
+    },
+    'root': {
+        'handlers': ['mail_admins', 'app_file', 'error_file'],
+        'level': 'INFO',
+        'propagate': False,
     },
 }
