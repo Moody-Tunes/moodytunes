@@ -3,10 +3,7 @@ import uuid
 
 from django.core.management.base import BaseCommand
 
-from libs.moody_logging import format_module_name_with_project_prefix
-
-module_name = format_module_name_with_project_prefix(__name__)
-logger = logging.getLogger(module_name)
+logger = logging.getLogger(__name__)
 
 
 class MoodyBaseCommand(BaseCommand):

@@ -35,10 +35,7 @@ To use logging in your module import `logging`, get a logger, and log away!
 ```python
 import logging
 
-from libs.moody_logging import format_module_name_with_project_prefix
-
-module_name = format_module_name_with_project_prefix(__name__)
-logger = logging.getLogger(module_name)
+logger = logging.getLogger(__name__)
 
 logger.debug('Hello world!')  # Only prints to the console in local development
 logger.info('I saw 14,000,605 futures')

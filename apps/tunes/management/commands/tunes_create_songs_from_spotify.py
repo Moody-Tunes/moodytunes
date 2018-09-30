@@ -6,11 +6,9 @@ from django.conf import settings
 
 from base.management.commands import MoodyBaseCommand
 from tunes.models import Song
-from libs.moody_logging import format_module_name_with_project_prefix
 from libs.spotify import SpotifyClient
 
-module_name = format_module_name_with_project_prefix(__name__)
-logger = logging.getLogger(module_name)
+logger = logging.getLogger(__name__)
 
 
 class Command(MoodyBaseCommand):
