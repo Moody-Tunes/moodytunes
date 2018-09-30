@@ -66,26 +66,24 @@ class SpotifyClient(object):
 
         return response
 
-
     def _get_auth_access_token(self):
         """
         Return the access token we need to make requests to Spotify. Will either hit the cache for the key,
         or make a request to Spotify if the token in the cache is invalid
         @return access_token: (str) Key needed to authenticate with Spotify API
         """
-
         access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
         if not access_token:
             logger.info('{} - Cache miss for auth access token'.format(self._unique_id))
-            access_token = self._get_auth_access_token()
+            access_token = self._make_auth_access_token_request()
 
             if access_token:
                 cache.set(settings.SPOTIFY['auth_cache_key'], access_token, settings.SPOTIFY['auth_cache_key_timeout'])
             else:
                 logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
 
-            raise SpotifyException('Unable to retrieve Spotify access token')
+                raise SpotifyException('Unable to retrieve Spotify access token')
 
         return access_token
 
