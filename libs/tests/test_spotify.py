@@ -81,3 +81,69 @@ class TestSpotifyClient(TestCase):
         response = self.spotify_client._make_spotify_request('GET', '/dummy_endpoint')
 
         self.assertDictEqual(response, {})
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_songs_from_playlist_happy_path(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [{
+                    'track': {
+                        'uri': 'song-uri',
+                        'explicit': False,
+                        'name': 'Glazed',
+                        'artists': [{
+                            'name': 'J Dilla'
+                        }],
+                    }
+                }]
+            }
+        }
+
+        expected_return = {
+            'name': 'Glazed'.encode('utf-8'),
+            'artist': 'J Dilla'.encode('utf-8'),
+            'code': 'song-uri'
+        }
+
+        actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertDictEqual(expected_return, actual_return[0])
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_songs_from_playlist_excludes_song_already_seen(self, mock_request):
+        self.spotify_client.seen_songs = ['already-seen-code']
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [{
+                    'track': {
+                        'uri': 'already-seen-code',
+                        'explicit': False,
+                    }
+                }]
+            }
+        }
+
+        actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertFalse(actual_return)
+        self.spotify_client.seen_songs = []
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_songs_from_playlist_excludes_song_is_explicit(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [{
+                    'track': {
+                        'uri': 'song-uri',
+                        'explicit': True,
+                    }
+                }]
+            }
+        }
+
+        actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertFalse(actual_return)
