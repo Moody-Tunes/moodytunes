@@ -1,7 +1,5 @@
 import logging
 
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.conf import settings
 
 from base.management.commands import MoodyBaseCommand
@@ -35,15 +33,17 @@ class Command(MoodyBaseCommand):
         """
         success, fail = 0, 0
         for track in tracks:
-            try:
-                song = Song.objects.create(**track)
+
+            song, created = Song.objects.get_or_create(code=track['code'], defaults=track)
+
+            if created:
                 msg = 'Created song with code {}'.format(song.code)
                 logger.info(msg)
                 self.stdout.write(msg)
                 success += 1
-            except (ValidationError, IntegrityError):
-                msg = 'Could not create song with code {}'.format(track['code'])
-                logger.warning(msg)
+            else:
+                msg = 'Song with code {} already exists'.format(song.code)
+                logger.info(msg)
                 self.stderr.write(msg)
                 fail += 1
 
