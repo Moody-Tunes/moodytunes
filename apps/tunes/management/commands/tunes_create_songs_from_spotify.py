@@ -6,11 +6,13 @@ from base.management.commands import MoodyBaseCommand
 from tunes.models import Song
 from libs.spotify import SpotifyClient
 
-logger = logging.getLogger(__name__)
-
 
 class Command(MoodyBaseCommand):
     help = 'Management command to fetch and create songs from Spotify API'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.logger = logging.getLogger(__name__)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -19,7 +21,7 @@ class Command(MoodyBaseCommand):
             type=int,
             default=10,
             help='''
-            Total number of songs to process during run of this script.
+            Total number of songs to process during run of this script (default 10).
             Note that it is possible to process FEWER than number specified
             if this script runs into any issues processing tracks.
             '''
@@ -38,19 +40,17 @@ class Command(MoodyBaseCommand):
 
             if created:
                 msg = 'Created song with code {}'.format(song.code)
-                logger.info(msg)
-                self.stdout.write(msg)
+                self.write_to_log_and_output(msg)
                 success += 1
             else:
                 msg = 'Song with code {} already exists'.format(song.code)
-                logger.info(msg)
-                self.stderr.write(msg)
+                self.write_to_log_and_output(msg, output_stream='stderr')
                 fail += 1
 
         return success, fail
 
     def handle(self, *args, **options):
-        logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
+        self.logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
         total_songs = options.get('total_songs')
         num_playlists = 10
@@ -79,8 +79,7 @@ class Command(MoodyBaseCommand):
                 if len(tracks) >= total_songs:
                     break
 
-        self.stdout.write('Got {} tracks from categories'.format(len(tracks)))
-        logger.info('Got {} tracks from categories'.format(len(tracks)))
+        self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
 
         succeeded, failed = self.save_songs_to_database(tracks)
 
