@@ -32,5 +32,5 @@ LOGGING['loggers'].update({
     },
 })
 
-LOGGING['loggers']['root']['handlers'].append('console')
-LOGGING['loggers']['root']['level'] = 'DEBUG'
+LOGGING['root']['handlers'].append('console')
+LOGGING['root']['level'] = 'DEBUG'

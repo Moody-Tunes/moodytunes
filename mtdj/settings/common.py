@@ -155,10 +155,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'root': {
-            'handlers': ['mail_admins', 'app_file', 'error_file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
+    },
+    'root': {
+        'handlers': ['mail_admins', 'app_file', 'error_file'],
+        'level': 'INFO',
+        'propagate': False,
     },
 }
