@@ -15,14 +15,20 @@ class TestSpotifyClient(TestCase):
         cls.spotify_client = SpotifyClient()
         cls.auth_code = 'some-auth-code'
 
+    @mock.patch('django.core.cache.cache.set')
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
-    def test_get_auth_token_not_in_cache(self, mock_access_request, mock_cache):
-        mock_cache.return_value = None
+    def test_get_auth_token_not_in_cache(self, mock_access_request, mock_cache_get, mock_cache_set):
+        mock_cache_get.return_value = None
         mock_access_request.return_value = self.auth_code
 
         self.spotify_client._get_auth_access_token()
         mock_access_request.assert_called_with()
+        mock_cache_set.assert_called_with(
+            settings.SPOTIFY['auth_cache_key'],
+            self.auth_code,
+            settings.SPOTIFY['auth_cache_key_timeout']
+        )
 
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
