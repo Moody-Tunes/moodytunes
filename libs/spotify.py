@@ -176,7 +176,7 @@ class SpotifyClient(object):
 
         params = {'fields': 'tracks(items(track(id,uri,name,artists,explicit)))'}
 
-        response = self._make_spotify_request('GET', url)
+        response = self._make_spotify_request('GET', url, params=params)
 
         if not response:
             logger.warning('{} - Failed to get songs from playlist {}'.format(self._unique_id, playlist['uri']))
@@ -224,7 +224,6 @@ class SpotifyClient(object):
         @return tracks: Same list before updated with audio feature data included
         """
         batch_size = 100
-        idx = 0
 
         # Create a list of lists of tracks, each one being at most batch_size length
         # Spotify allows up to 100 songs to be processed at once
