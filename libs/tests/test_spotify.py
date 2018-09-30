@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings
 
 from requests.exceptions import HTTPError
 
-from libs.spotify import SpotifyClient
+from libs.spotify import SpotifyClient, SpotifyException
 
 
 @override_settings(CACHE={'default': settings.CACHES['dummy']})
@@ -37,6 +37,15 @@ class TestSpotifyClient(TestCase):
 
         self.spotify_client._get_auth_access_token()
         mock_access_request.assert_not_called()
+
+    @mock.patch('django.core.cache.cache.get')
+    @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
+    def test_get_auth_token_fails(self, mock_access_request, mock_cache_get):
+        mock_cache_get.return_value = None
+        mock_access_request.return_value = None
+
+        with self.assertRaises(SpotifyException):
+            self.spotify_client._get_auth_access_token()
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
