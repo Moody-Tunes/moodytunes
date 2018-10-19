@@ -9,8 +9,6 @@ class UpdateUserInfoForm(forms.Form):
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
 
     def clean_password(self):
-        import pdb; pdb.set_trace()
-
         new_password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
