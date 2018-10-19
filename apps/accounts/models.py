@@ -9,7 +9,22 @@ class MoodyUser(BaseModel, AbstractUser):
     Represents a user in our system. Extends Django auth features and includes
     logic needed in course of site flow.
     """
-    pass
+    def update_information(self, data):
+        """
+        Given a dictionary of CLEAN DATA, update the user information accordingly.
+        This method must ONLY be used with clean data and should have keys tied to a Django user model
+        like username, email, password, and the like.
+        :@ param data: (dict) Dictionary of data to update for user
+        """
+        for key, value in data.items():
+            if value:
+                if key == 'password':
+                    # Need to use helper method to set user password
+                    self.set_password(value)
+                elif getattr(self, key, False):
+                    setattr(self, key, value)
+
+        self.save()
 
 
 class UserEmotion(BaseModel):
