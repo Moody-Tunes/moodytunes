@@ -4,5 +4,6 @@
 <h1>Profile</h1>
 {% if user.is_authenticated %}
 	<p>Hello {{ user.username }}!</p>
+	<a href="{% url 'accounts:logout' %}">Logout</a>
 {% endif %}
 {% endblock %}
