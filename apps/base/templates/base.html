@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Language" value="en-US">
+		<meta name="description" content="Site that generates playlists to influence your mood">
+		<meta name="author" content="DiBari">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{% block title %}MoodyTunes{% endblock %}</title>
 		<link rel="icon" href="{{ STATIC_URL }}base/images/favicon.ico" type="image/png">
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta http-equiv="Content-Language" value="en-US">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		{# TODO: When base.css is defined, include here #}
 		{% block superhead %}
 		{% end block %}
