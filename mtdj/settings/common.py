@@ -11,6 +11,8 @@ DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
 
+APPEND_SLASH = True
+
 # App definitions
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -85,6 +87,7 @@ CACHES.update({
 })
 
 AUTH_USER_MODEL = 'accounts.MoodyUser'
+LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
