@@ -39,3 +39,19 @@ class TestUserEmot(TestCase):
         user_emot.update_emotion_boundaries(valence, energy)
         self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
         self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+
+
+class TestMoodyUser(TestCase):
+    def test_update_information(self):
+        user = MoodyUser.objects.create(username='test_user')
+        data = {
+            'username': 'new_name',
+            'email': 'foo@example.com',
+            'foo': 'bar'  # Invalid value, just to ensure method doesn't blow up
+        }
+
+        user.update_information(data)
+        user.refresh_from_db()
+
+        self.assertEqual(user.username, data['username'])
+        self.assertEqual(user.email, data['email'])
