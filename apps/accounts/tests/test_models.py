@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.db.models.signals import post_save
@@ -42,11 +44,13 @@ class TestUserEmot(TestCase):
 
 
 class TestMoodyUser(TestCase):
-    def test_update_information(self):
+    @mock.patch('django.contrib.auth.base_user.AbstractBaseUser.set_password')
+    def test_update_information(self, mock_password_update):
         user = MoodyUser.objects.create(username='test_user')
         data = {
             'username': 'new_name',
             'email': 'foo@example.com',
+            'password': '12345',
             'foo': 'bar'  # Invalid value, just to ensure method doesn't blow up
         }
 
@@ -55,3 +59,4 @@ class TestMoodyUser(TestCase):
 
         self.assertEqual(user.username, data['username'])
         self.assertEqual(user.email, data['email'])
+        mock_password_update.assert_called_with(data['password'])
