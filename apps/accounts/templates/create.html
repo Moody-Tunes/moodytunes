@@ -4,7 +4,9 @@
 <h1>Create User</h1>
 <form method="post">
 	{% csrf_token %}
-	{{ form.as_p }}
+	<p>Username: {{ form.username }}</p>
+	<p>Password: {{ form.password }}</p>
+	<p>Confirm password: {{ form.confirm_password }}</p>
 	<button type="submit">Submit</button>
 </form>
 {% endblock %}

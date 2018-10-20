@@ -4,7 +4,10 @@
 <h1>Update</h1>
 <form method="post">
 	{% csrf_token %}
-	{{ form.as_p }}
+	<p>Username: {{ form.username }}</p>
+	<p>Email: {{ form.email }}</p>
+	<p>Password: {{ form.password }}</p>
+	<p>Confirm password: {{ form.confirm_password }}</p>
 	<button type="submit">Update</button>
 </form>
 {% endblock %}
