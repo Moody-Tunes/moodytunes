@@ -22,10 +22,10 @@ class MoodyUser(BaseModel, AbstractUser):
                     # Need to use helper method to set user password
                     self.set_password(value)
                 else:
-                    # Need to be careful about setting blank values. For example, if a user has no email set then
-                    # getattr() will return '' because it defaults to an empty string. So if you try check for
-                    # existence of that attribute it will be "falsey".
-                    # Explicitly comparing against False will catch this condition.
+                    # Need to be careful about dealing with blank values. If we get an attribute that is blank for this
+                    # instance (like setting an email for the first time), the value will be "falsey". If we were to do
+                    # check like `if attr` it would be False and the attribute not updated. We need to do a direct
+                    # comparison to False in order to be sure that the attribute does NOT exist on the MoodyUser model.
                     attr = getattr(self, key, False)
                     if attr is not False:
                         setattr(self, key, value)
