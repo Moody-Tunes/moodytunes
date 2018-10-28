@@ -34,10 +34,9 @@ class UpdateInfoView(View):
 
         if form.is_valid():
             request.user.update_information(form.cleaned_data)
-            return HttpResponseRedirect(reverse('accounts:update'))
+            return HttpResponseRedirect(reverse('accounts:profile'))
         else:
-            # TODO: Handle errors raised by form
-            return HttpResponseRedirect(reverse('accounts:update'))
+            return render(request, self.template_name, {'form': form})
 
 
 class CreateUserView(View):
@@ -58,5 +57,4 @@ class CreateUserView(View):
 
             return HttpResponseRedirect(reverse('accounts:login'))
         else:
-            # TODO: Handle errors raised by form
-            return HttpResponseRedirect(reverse('accounts:create'))
+            return render(request, self.template_name, {'form': form})

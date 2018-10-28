@@ -4,6 +4,11 @@
 <h1>Update</h1>
 <form method="post">
 	{% csrf_token %}
+	{% if form.errors %}
+		{% for error in form.errors.values %}
+			{{ error }}
+		{% endfor %}
+	{% endif %}
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
 	<p>Password: {{ form.password }}</p>
