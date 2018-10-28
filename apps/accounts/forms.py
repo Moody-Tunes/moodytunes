@@ -4,6 +4,20 @@ from django.core.exceptions import ValidationError
 from accounts.models import MoodyUser
 
 
+def validate_matching_passwords(password, confirm_password):
+    """
+    Validate that a new password equals the confirmation password
+    :return: Two-tuple of field and ValidationError to add to the form errors field
+    """
+    if password != confirm_password:
+        return (
+            'password',
+            ValidationError('Please double check your entered password matches your confirmation password')
+        )
+
+    return None
+
+
 class UpdateUserInfoForm(forms.Form):
     username = forms.CharField(max_length=150, required=False)
     email = forms.EmailField(required=False)
@@ -14,11 +28,11 @@ class UpdateUserInfoForm(forms.Form):
         new_password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
-        if new_password and new_password != confirm_password:
-            self.add_error(
-                'password',
-                ValidationError('Please double check your entered password matches your confirmation password')
-            )
+        if new_password:
+            error = validate_matching_passwords(new_password, confirm_password)
+
+            if error:
+                self.add_error(*error)
 
         return new_password
 
@@ -32,11 +46,12 @@ class CreateUserForm(forms.Form):
         new_password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
-        if new_password != confirm_password:
-            self.add_error(
-                'password',
-                ValidationError('Please double check your entered password matches your confirmation password')
-            )
+        validate_matching_passwords(new_password, confirm_password)
+
+        error = validate_matching_passwords(new_password, confirm_password)
+
+        if error:
+            self.add_error(*error)
 
         return new_password
 
