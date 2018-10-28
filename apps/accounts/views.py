@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -34,6 +35,12 @@ class UpdateInfoView(View):
 
         if form.is_valid():
             request.user.update_information(form.cleaned_data)
+            messages.info(request, 'Your account information has been updated.')
+
+            # If user changed their password, they need to re-authenticate
+            if form.cleaned_data.get('password'):
+                messages.info(request, 'Please login with your new password.')
+
             return HttpResponseRedirect(reverse('accounts:profile'))
         else:
             return render(request, self.template_name, {'form': form})
@@ -54,6 +61,8 @@ class CreateUserView(View):
             user = MoodyUser.objects.create(username=form.cleaned_data['username'])
             user.set_password(form.cleaned_data['password'])
             user.save()
+
+            messages.info(request, 'Your account has been created.')
 
             return HttpResponseRedirect(reverse('accounts:login'))
         else:
