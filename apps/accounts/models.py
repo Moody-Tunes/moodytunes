@@ -1,10 +1,10 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
 from base.models import BaseModel
 
 
-class UserEmotionPrefetchManager(models.Manager):
+class UserEmotionPrefetchManager(BaseUserManager):
     """Manager to automatically add `prefetch_related` to the useremotion_set for a given user"""
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
