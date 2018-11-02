@@ -1,5 +1,4 @@
 Django==2.1.2
-django-extensions==2.1.0
 envparse==0.2.0
-requests==2.19.1
+requests==2.20.0
 tox==3.2.1
