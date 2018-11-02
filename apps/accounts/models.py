@@ -7,7 +7,9 @@ from base.models import BaseModel
 class UserEmotionPrefetchManager(models.Manager):
     """Manager to automatically add `prefetch_related` to the useremotion_set for a given user"""
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('useremotion_set')
+        return super().get_queryset().prefetch_related(
+            'useremotion_emotion',
+        )
 
 
 class MoodyUser(BaseModel, AbstractUser):
@@ -17,6 +19,22 @@ class MoodyUser(BaseModel, AbstractUser):
     """
     cached_emotions = UserEmotionPrefetchManager()
 
+    def get_user_emotion_record(self, emotion_name):
+        """
+        Return the UserEmotion record for a given name. This is done in Python to take advantage of `prefetch_related`
+        caching. Note that you would need to prefetch the `useremotion_set` related manager; this will happen for you
+        if you call the `MoodyUser.cached_emotions` manager.
+
+        :@ param emotion_name: (str) `Emotion.name` constant to retrive
+        :> return:
+            - `UserEmotion` record for the given `emotion_name`
+            - `None` if `emotion_name` is not valid
+        """
+        for user_emotion in self.useremotion_set.all():
+            if user_emotion.emotion.name == emotion_name:
+                return user_emotion
+
+        return None
 
     def update_information(self, data):
         """
