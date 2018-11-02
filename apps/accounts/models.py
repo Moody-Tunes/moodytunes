@@ -8,7 +8,7 @@ class UserEmotionPrefetchManager(models.Manager):
     """Manager to automatically add `prefetch_related` to the useremotion_set for a given user"""
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
-            'useremotion_emotion',
+            'useremotion_set__emotion',
         )
 
 
