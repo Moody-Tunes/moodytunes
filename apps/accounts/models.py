@@ -4,11 +4,20 @@ from django.db import models
 from base.models import BaseModel
 
 
+class UserEmotionPrefetchManager(models.Manager):
+    """Manager to automatically add `prefetch_related` to the useremotion_set for a given user"""
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('useremotion_set')
+
+
 class MoodyUser(BaseModel, AbstractUser):
     """
     Represents a user in our system. Extends Django auth features and includes
     logic needed in course of site flow.
     """
+    cached_emotions = UserEmotionPrefetchManager()
+
+
     def update_information(self, data):
         """
         Given a dictionary of CLEAN DATA, update the user information accordingly.
