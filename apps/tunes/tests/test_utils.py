@@ -24,7 +24,7 @@ class TestGenerateBrowsePlaylist(TestCase):
             energy=.30
         )
 
-        playlist = generate_browse_playlist(.5, .75, [])
+        playlist = generate_browse_playlist(.5, .75)
 
         self.assertIn(song, playlist)
         self.assertNotIn(outlier_song, playlist)
@@ -46,7 +46,7 @@ class TestGenerateBrowsePlaylist(TestCase):
             energy=.65
         )
 
-        playlist = generate_browse_playlist(.5, .75, [out_song.id])
+        playlist = generate_browse_playlist(.5, .75, exclude_ids=[out_song.id])
 
         self.assertIn(in_song, playlist)
         self.assertNotIn(out_song, playlist)
@@ -60,7 +60,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         upper_bound = .75
         jitter = .2
 
-        generate_browse_playlist(lower_bound, upper_bound, [], jitter=jitter)
+        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter)
 
         expected_lower_bound = lower_bound - jitter
         expected_upper_bound = upper_bound + jitter
@@ -81,7 +81,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         upper_bound = .75
         jitter = .2
 
-        generate_browse_playlist(lower_bound, upper_bound, [], jitter=jitter)
+        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter)
 
         expected_lower_bound = lower_bound + jitter
         expected_upper_bound = upper_bound - jitter
@@ -103,6 +103,6 @@ class TestGenerateBrowsePlaylist(TestCase):
                 energy=1.0
             )
 
-        playlist = generate_browse_playlist(.75, 1.0, [], limit=5)
+        playlist = generate_browse_playlist(.75, 1.0, limit=5)
 
         self.assertEqual(playlist.count(), 5)
