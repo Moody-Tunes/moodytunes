@@ -24,7 +24,7 @@ class TestGenerateBrowsePlaylist(TestCase):
             energy=.30
         )
 
-        playlist = generate_browse_playlist(.5, .75)
+        playlist = generate_browse_playlist(song.valence, song.energy)
 
         self.assertIn(song, playlist)
         self.assertNotIn(outlier_song, playlist)
@@ -46,7 +46,7 @@ class TestGenerateBrowsePlaylist(TestCase):
             energy=.65
         )
 
-        playlist = generate_browse_playlist(.5, .75, exclude_ids=[out_song.id])
+        playlist = generate_browse_playlist(in_song.valence, in_song.energy, exclude_ids=[out_song.id])
 
         self.assertIn(in_song, playlist)
         self.assertNotIn(out_song, playlist)
