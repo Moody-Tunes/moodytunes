@@ -25,7 +25,6 @@ def generate_browse_playlist(lower_bound, upper_bound, exclude_ids, limit=None, 
             lower_bound += jitter
             upper_bound -= jitter
 
-
     playlist = Song.objects.filter(
         valence__gte=lower_bound,
         valence__lte=upper_bound,
