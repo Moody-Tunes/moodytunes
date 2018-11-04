@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block superhead %}
+<script src="{% static 'base/js/password_confirmation.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <h1>Create User</h1>
 <form method="post">
@@ -12,6 +18,7 @@
 	<p>Username: {{ form.username }}</p>
 	<p>Password: {{ form.password }}</p>
 	<p>Confirm password: {{ form.confirm_password }}</p>
-	<button type="submit">Submit</button>
+	<button id="submit-button" type="submit">Submit</button>
 </form>
+<p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 {% endblock %}
