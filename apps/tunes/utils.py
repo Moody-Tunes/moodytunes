@@ -15,9 +15,6 @@ def generate_browse_playlist(lower_bound, upper_bound, exclude_ids=None, limit=N
     :@ param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
     :> return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
     """
-    if not exclude_ids:
-        exclude_ids = []
-
     if jitter:
         # Flip a coin to determine which attribute we should add jitter to and which one
         # we should subtract the jitter from
@@ -33,9 +30,12 @@ def generate_browse_playlist(lower_bound, upper_bound, exclude_ids=None, limit=N
         valence__lte=upper_bound,
         energy__gte=lower_bound,
         energy__lte=upper_bound
-    ).exclude(
-        id__in=exclude_ids
     )
+
+    if exclude_ids:
+        playlist = playlist.exclude(
+            id__in=exclude_ids
+        )
 
     if limit:
         playlist = playlist[:limit]
