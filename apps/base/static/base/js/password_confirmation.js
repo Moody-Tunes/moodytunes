@@ -1,7 +1,7 @@
 'use strict';
 
 (function IIFE(){
-    var form = document.getElementsByTagName('form')[0];  // There's only the one form on these pages
+    var form = document.getElementById('password-form');
     form.addEventListener('submit', validateMatchingPassword);
 
     function validateMatchingPassword(evt) {

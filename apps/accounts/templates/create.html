@@ -8,7 +8,7 @@
 
 {% block content %}
 <h1>Create User</h1>
-<form method="post">
+<form id="password-form" method="post">
 	{% csrf_token %}
 	{% if form.errors %}
 		{% for error in form.errors.values %}
