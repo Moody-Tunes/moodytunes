@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block superhead %}
+<script src="{% static 'base/js/password_confirmation.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <h1>Update</h1>
-<form method="post">
+<form id="password-form" method="post">
 	{% csrf_token %}
 	{% if form.errors %}
 		{% for error in form.errors.values %}
@@ -13,6 +19,7 @@
 	<p>Email: {{ form.email }}</p>
 	<p>Password: {{ form.password }}</p>
 	<p>Confirm password: {{ form.confirm_password }}</p>
-	<button type="submit">Update</button>
+	<button id="submit-button" type="submit">Update</button>
 </form>
+<p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 {% endblock %}
