@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser
@@ -29,6 +30,9 @@ class UpdateUserInfoForm(forms.Form):
         confirm_password = self.cleaned_data.get('confirm_password')
 
         if new_password:
+            # Call settings.AUTH_PASSWORD_VALIDATORS on supplied password
+            validate_password(new_password)
+
             error = validate_matching_passwords(new_password, confirm_password)
 
             if error:
@@ -45,6 +49,9 @@ class CreateUserForm(forms.Form):
     def clean_password(self):
         new_password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
+
+        # Call settings.AUTH_PASSWORD_VALIDATORS on supplied password
+        validate_password(new_password)
 
         validate_matching_passwords(new_password, confirm_password)
 
