@@ -1,4 +1,9 @@
-language: generic
+language: python
+python:
+  - "3.5"
+
+install:
+  pip install -r requirements/common.txt
 
 script:
-  tox --recreate
+  python manage.py test --verbosity=2
