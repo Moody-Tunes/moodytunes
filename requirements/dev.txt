@@ -1,3 +1,4 @@
 -rcommon.txt
 
 ipython==6.5.0
+tox==3.2.1
