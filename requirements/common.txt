@@ -2,4 +2,3 @@ Django==2.1.2
 envparse==0.2.0
 django-extensions==2.1.0
 requests==2.20.0
-tox==3.2.1
