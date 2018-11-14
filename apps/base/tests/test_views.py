@@ -21,7 +21,7 @@ class TestHomePageView(TestCase):
 
         self.assertRedirects(resp, reverse('accounts:profile'))
 
-    def test_anonymous_user_reirect(self):
+    def test_anonymous_user_redirect(self):
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, reverse('accounts:login'))
