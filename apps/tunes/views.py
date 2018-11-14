@@ -2,6 +2,7 @@ from rest_framework import generics
 
 from base.views import LoginRequiredMixin
 from tunes.serializers import SongSerializer
+from tunes.models import Song
 from tunes.utils import generate_browse_playlist
 
 
@@ -15,7 +16,7 @@ class BrowseView(generics.ListView, LoginRequiredMixin):
 
     def get_queryset(self):
         user = self.request.user
-        emotion = self.request.GET('emotion_name'):
+        emotion = self.request.GET('emotion_name')
 
         user_emotion = user.get_user_emotion_record(emotion)
 
