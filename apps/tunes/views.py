@@ -6,7 +6,7 @@ from tunes.models import Song
 from tunes.utils import generate_browse_playlist
 
 
-class BrowseView(generics.ListView, LoginRequiredMixin):
+class BrowseView(generics.ListAPIView, LoginRequiredMixin):
     """
     Return a JSON response of Song records that match a given inout query params.
     The main thing that should be passed is an `emotion_name`, which denotes the emotion
