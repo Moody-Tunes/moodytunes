@@ -16,7 +16,7 @@ class BrowseView(generics.ListAPIView, LoginRequiredMixin):
 
     def get_queryset(self):
         user = self.request.user
-        emotion = self.request.GET('emotion_name')
+        emotion = self.request.GET.get('emotion_name')
 
         user_emotion = user.get_user_emotion_record(emotion)
 
