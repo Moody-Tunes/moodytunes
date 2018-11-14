@@ -16,6 +16,7 @@ class BrowseView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         emotion = self.request.GET.get('emotion_name')
+        jitter = self.request.GET.get('jitter', .25)  # TODO: Get rid of magic number
 
         user_emotion = user.get_user_emotion_record(emotion)
 
@@ -25,13 +26,13 @@ class BrowseView(generics.ListAPIView):
         # TODO: Refactor to use prefetch helper when we create one
         previously_seen_song_ids = user.usersongvote_set.all().values_list('song__id', flat=True)
 
-        # TODO: Get rid of magic numbers
+        # TODO: Get rid of magic number
         playlist = generate_browse_playlist(
             user_emotion.lower_bound,
             user_emotion.upper_bound,
             exclude_ids=previously_seen_song_ids,
             limit=10,
-            jitter=.25
+            jitter=jitter
         )
 
         return playlist
