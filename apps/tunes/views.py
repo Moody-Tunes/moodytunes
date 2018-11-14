@@ -15,6 +15,8 @@ class BrowseView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
+
+        # TODO: Validation on this input
         emotion = self.request.GET.get('emotion_name')
         jitter = self.request.GET.get('jitter', .25)  # TODO: Get rid of magic number
 
@@ -32,7 +34,7 @@ class BrowseView(generics.ListAPIView):
             user_emotion.upper_bound,
             exclude_ids=previously_seen_song_ids,
             limit=10,
-            jitter=jitter
+            jitter=float(jitter)
         )
 
         return playlist
