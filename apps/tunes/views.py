@@ -6,7 +6,6 @@ from rest_framework import status
 
 from tunes.forms import BrowseSongsForm
 from tunes.serializers import SongSerializer
-from tunes.models import Song
 from tunes.utils import generate_browse_playlist
 
 
