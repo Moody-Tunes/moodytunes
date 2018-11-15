@@ -26,16 +26,17 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_unknown_emotion_passed_returns_empty_response(self):
+    def test_unknown_emotion_passed_returns_bad_request(self):
         params = {
             'emotion_name': 'unknown'
         }
+        expected_message = 'Invalid data'
 
         resp = self.client.get(self.url, data=params)
         resp_data = resp.json()
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertFalse(resp_data)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp_data['error'], expected_message)
 
     def test_happy_path(self):
         song = Song.objects.create(
@@ -46,7 +47,7 @@ class TestBrowseView(TestCase):
             energy=.75
         )
         params = {
-            'emotion_name': Emotion.HAPPY,
+            'emotion': Emotion.HAPPY,
             'jitter': 0
         }
 
