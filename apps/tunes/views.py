@@ -18,25 +18,26 @@ class BrowseView(generics.ListAPIView):
     """
     serializer_class = SongSerializer
     logger = logging.getLogger(__name__)
+    default_jitter = .25
+    default_limit = 10
 
     def get_queryset(self):
         user = self.request.user
 
         # Note: This data has already been cleaned in `get`
         emotion = self.request.GET['emotion']
-        jitter = self.request.GET.get('jitter', .25)  # TODO: Get rid of magic number
+        jitter = self.request.GET.get('jitter', self.default_jitter)
 
         user_emotion = user.get_user_emotion_record(emotion)
 
         # TODO: Refactor to use prefetch helper when we create one
         previously_seen_song_ids = user.usersongvote_set.all().values_list('song__id', flat=True)
 
-        # TODO: Get rid of magic number
         playlist = generate_browse_playlist(
             user_emotion.lower_bound,
             user_emotion.upper_bound,
             exclude_ids=previously_seen_song_ids,
-            limit=10,
+            limit=self.default_limit,
             jitter=float(jitter)
         )
 
