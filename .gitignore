@@ -105,3 +105,4 @@ venv.bak/
 
 # developer specific configurations
 local_personal.py
+.idea
