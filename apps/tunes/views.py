@@ -20,12 +20,15 @@ class BrowseView(generics.ListAPIView):
     default_jitter = .25
     default_limit = 10
 
+    def __init__(self):
+        self.cleaned_data = {}  # Cleaned GET data for query
+        super(BrowseView, self).__init__()
+
     def get_queryset(self):
         user = self.request.user
 
-        # Note: This data has already been cleaned in `get`
-        emotion = self.request.GET['emotion']
-        jitter = self.request.GET.get('jitter', self.default_jitter)
+        emotion = self.cleaned_data['emotion']
+        jitter = self.cleaned_data.get('jitter', self.default_jitter)
 
         user_emotion = user.get_user_emotion_record(emotion)
 
@@ -46,6 +49,7 @@ class BrowseView(generics.ListAPIView):
         form = BrowseSongsForm(request.GET)
 
         if form.is_valid():
+            self.cleaned_data = form.cleaned_data
             return super().get(request, *args, **kwargs)
 
         else:
