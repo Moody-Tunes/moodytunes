@@ -1,8 +1,7 @@
 import logging
 
+from django.core.exceptions import SuspiciousOperation
 from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework import status
 
 from tunes.forms import BrowseSongsForm
 from tunes.serializers import SongSerializer
@@ -55,4 +54,4 @@ class BrowseView(generics.ListAPIView):
         else:
             self.logger.warning('Invalid data supplied to BrowseView.get: {}'.format(request.GET))
 
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Invalid data'})
+            raise SuspiciousOperation('Invalid GET data supplied to {}'.format(self.__class__.__name__))

@@ -30,13 +30,10 @@ class TestBrowseView(TestCase):
         params = {
             'emotion_name': 'unknown'
         }
-        expected_message = 'Invalid data'
 
         resp = self.client.get(self.url, data=params)
-        resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(resp_data['error'], expected_message)
 
     def test_happy_path(self):
         song = Song.objects.create(
