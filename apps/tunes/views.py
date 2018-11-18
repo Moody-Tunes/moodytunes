@@ -27,7 +27,10 @@ class BrowseView(generics.ListAPIView):
         user = self.request.user
 
         emotion = self.cleaned_data['emotion']
-        jitter = self.cleaned_data.get('jitter', self.default_jitter)
+        jitter = self.cleaned_data['jitter']
+
+        if jitter is None:
+            jitter = self.default_jitter
 
         user_emotion = user.get_user_emotion_record(emotion)
 
