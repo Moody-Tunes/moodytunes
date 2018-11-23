@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import MoodyUser
+from libs.tests.helpers import MoodyUtil
 
 
 class TestProfileView(TestCase):
@@ -23,11 +24,7 @@ class TestUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('accounts:update')
-        cls.password = 'foobar'
-
-        cls.user = MoodyUser.objects.create(username='chester_mctester')
-        cls.user.set_password(cls.password)
-        cls.user.save()
+        cls.user = MoodyUtil.create_user()
 
     def test_login_required(self):
         resp = self.client.get(self.url)
@@ -37,7 +34,7 @@ class TestUpdateView(TestCase):
         self.assertRedirects(resp, expected_rediect)
 
     def test_happy_path(self):
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         update_data = {
             'username': 'my_new_user',

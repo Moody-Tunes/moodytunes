@@ -1,6 +1,7 @@
 import random
 import string
 
+from accounts.models import MoodyUser
 from tunes.models import Song
 
 
@@ -45,6 +46,8 @@ class MoodyUtil(object):
     """
     Helper class to create and return instances of various model objects
     """
+    DEFAULT_USER_PASSWORD = 'test'
+
     @staticmethod
     def create_song(name='Test Song', artist='Test Artist', genre='Test Genre', energy=.5, valence=.5):
         def generate_song_code():
@@ -65,3 +68,11 @@ class MoodyUtil(object):
         song, _ = Song.objects.get_or_create(**params)
 
         return song
+
+    @staticmethod
+    def create_user(username='test', password=DEFAULT_USER_PASSWORD):
+        user, _ = MoodyUser.objects.get_or_create(username=username)
+        user.set_password(password)
+        user.save()
+
+        return user

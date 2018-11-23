@@ -8,7 +8,7 @@ from django.test import TestCase
 from accounts.models import MoodyUser, UserEmotion
 from accounts.signals import create_user_emotion_records
 from tunes.models import Emotion
-from libs.tests.helpers import SignalDisconnect
+from libs.tests.helpers import SignalDisconnect, MoodyUtil
 
 
 class TestUserEmot(TestCase):
@@ -19,7 +19,7 @@ class TestUserEmot(TestCase):
         dispatch_uid = 'user_post_save_create_useremotion_records'
         with SignalDisconnect(post_save, create_user_emotion_records,
                               settings.AUTH_USER_MODEL, dispatch_uid):
-            cls.user = MoodyUser.objects.create(username='test_user')
+            cls.user = MoodyUtil.create_user(username='test_user')
 
     def test_uniqueness_on_user_emot_fields(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)

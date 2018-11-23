@@ -1,21 +1,17 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.models import MoodyUser
+from libs.tests.helpers import MoodyUtil
 
 
 class TestHomePageView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('homepage')
-        cls.password = 'foobar'
-
-        cls.user = MoodyUser.objects.create(username='chester_mctester')
-        cls.user.set_password(cls.password)
-        cls.user.save()
+        cls.user = MoodyUtil.create_user()
 
     def test_authenticated_user_redirect(self):
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         resp = self.client.get(self.url)
 

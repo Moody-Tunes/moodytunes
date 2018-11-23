@@ -3,7 +3,6 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from accounts.models import MoodyUser
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
 
@@ -12,14 +11,10 @@ class TestBrowseView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('tunes:browse')
-        cls.password = 'admin'
-
-        cls.user = MoodyUser.objects.create(username='moody')
-        cls.user.set_password(cls.password)
-        cls.user.save()
+        cls.user = MoodyUtil.create_user()
 
     def setUp(self):
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
