@@ -5,12 +5,13 @@ class SignalDisconnect(object):
 
     Example:
     ```
-    with SignalDisconnect(post_save, my_signal_method, myModel):
+    with SignalDisconnect(post_save, my_signal_method, myModel, my_dispatch_uid):
         # Do work without the signal
 
     `signal` is a Django Signal objects (post_save, pre_init)
     `method` is the method connected to the signal
     `sender` is the model that calls the connected method
+    `my_dispatch_uid` is the unique id attached to the signal
     """
 
     def __init__(self, signal, method, sender, dispatch_uid):
