@@ -28,7 +28,7 @@ class TestBrowseView(TestCase):
 
     def test_unknown_emotion_passed_returns_bad_request(self):
         params = {
-            'emotion_name': 'unknown'
+            'emotion': 'unknown'
         }
 
         resp = self.client.get(self.url, data=params)

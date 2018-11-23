@@ -28,7 +28,9 @@ class BrowseView(generics.ListAPIView):
 
         emotion = self.cleaned_data['emotion']
         jitter = self.cleaned_data['jitter']
+        limit = self.cleaned_data['limit'] or self.default_limit
 
+        # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
             jitter = self.default_jitter
 
@@ -41,7 +43,7 @@ class BrowseView(generics.ListAPIView):
             user_emotion.lower_bound,
             user_emotion.upper_bound,
             exclude_ids=previously_seen_song_ids,
-            limit=self.default_limit,
+            limit=limit,
             jitter=float(jitter)
         )
 
