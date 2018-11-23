@@ -4,7 +4,8 @@ from django.urls import reverse
 from rest_framework import status
 
 from accounts.models import MoodyUser
-from tunes.models import Emotion, Song
+from tunes.models import Emotion
+from libs.tests.helpers import MoodyUtil
 
 
 class TestBrowseView(TestCase):
@@ -36,13 +37,7 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
-        song = Song.objects.create(
-            name='Happy Song',
-            artist='Pop Singer',
-            code='abc:123',
-            valence=.75,
-            energy=.75
-        )
+        song = MoodyUtil.create_song(energy=.75, valence=.75)
         params = {
             'emotion': Emotion.HAPPY,
             'jitter': 0

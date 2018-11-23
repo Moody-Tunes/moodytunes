@@ -1,3 +1,9 @@
+import random
+import string
+
+from tunes.models import Song
+
+
 class SignalDisconnect(object):
     """
     Context manager to disable a signal for a given context. Userful for unit
@@ -33,3 +39,29 @@ class SignalDisconnect(object):
             sender=self.sender,
             dispatch_uid=self.dispatch_uid
         )
+
+
+class MoodyUtil(object):
+    """
+    Helper class to create and return instances of various model objects
+    """
+    @staticmethod
+    def create_song(name='Test Song', artist='Test Artist', genre='Test Genre', energy=.5, valence=.5):
+        def generate_song_code():
+            """Return a mocked Spotify song code"""
+            sample = [random.choice(string.ascii_letters) for _ in range(22)]
+            code = ''.join(sample)
+            return 'spotify:track:{}'.format(code)
+
+        params = {
+            'code': generate_song_code(),
+            'name': name,
+            'genre': genre,
+            'artist': artist,
+            'energy': energy,
+            'valence': valence,
+        }
+
+        song, _ = Song.objects.get_or_create(**params)
+
+        return song
