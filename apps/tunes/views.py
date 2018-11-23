@@ -7,6 +7,8 @@ from tunes.forms import BrowseSongsForm
 from tunes.serializers import SongSerializer
 from tunes.utils import generate_browse_playlist
 
+logger = logging.getLogger(__name__)
+
 
 class BrowseView(generics.ListAPIView):
     """
@@ -15,7 +17,6 @@ class BrowseView(generics.ListAPIView):
     of the songs that should be returned.
     """
     serializer_class = SongSerializer
-    logger = logging.getLogger(__name__)
     default_jitter = .25
     default_limit = 10
 
@@ -57,6 +58,6 @@ class BrowseView(generics.ListAPIView):
             return super().get(request, *args, **kwargs)
 
         else:
-            self.logger.warning('Invalid data supplied to BrowseView.get: {}'.format(request.GET))
+            logger.warning('Invalid data supplied to BrowseView.get: {}'.format(request.GET))
 
             raise SuspiciousOperation('Invalid GET data supplied to {}'.format(self.__class__.__name__))
