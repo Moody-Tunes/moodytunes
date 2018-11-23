@@ -7,7 +7,7 @@ from tunes.models import Song
 
 class SignalDisconnect(object):
     """
-    Context manager to disable a signal for a given context. Userful for unit
+    Context manager to disable a signal for a given context. Useful for unit
     testing if you want to test behavior independently of a models signals.
 
     Example:
