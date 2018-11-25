@@ -2,27 +2,14 @@ from unittest import mock
 
 from django.test import TestCase
 
-from tunes.models import Song
 from tunes.utils import generate_browse_playlist
+from libs.tests.helpers import MoodyUtil
 
 
 class TestGenerateBrowsePlaylist(TestCase):
     def test_happy_path(self):
-        song = Song.objects.create(
-            name='Smile Good',
-            artist='Jay Prince',
-            code='12345',
-            valence=.5,
-            energy=.75
-        )
-
-        outlier_song = Song.objects.create(
-            name='Jesus Christ',
-            artist='Brand New',
-            code='67890',
-            valence=.25,
-            energy=.30
-        )
+        song = MoodyUtil.create_song(valence=.5, energy=.75)
+        outlier_song = MoodyUtil.create_song(valence=.25, energy=.30)
 
         playlist = generate_browse_playlist(song.valence, song.energy)
 
@@ -30,21 +17,8 @@ class TestGenerateBrowsePlaylist(TestCase):
         self.assertNotIn(outlier_song, playlist)
 
     def test_exclude_behavior(self):
-        in_song = Song.objects.create(
-            name='Smile Good',
-            artist='Jay Prince',
-            code='12345',
-            valence=.5,
-            energy=.75
-        )
-
-        out_song = Song.objects.create(
-            name='Real Friends',
-            artist='Kanye West',
-            code='67890',
-            valence=.6,
-            energy=.65
-        )
+        in_song = MoodyUtil.create_song(valence=.5, energy=.75)
+        out_song = MoodyUtil.create_song(valence=.6, energy=.65)
 
         playlist = generate_browse_playlist(in_song.valence, in_song.energy, exclude_ids=[out_song.id])
 
@@ -94,14 +68,8 @@ class TestGenerateBrowsePlaylist(TestCase):
         )
 
     def test_limit_on_playlist(self):
-        for i in range(10):
-            Song.objects.create(
-                name='Best Day Ever',
-                artist='Spongebob Squarepants',
-                code='12345-{}'.format(i),
-                valence=.75,
-                energy=1.0
-            )
+        for _ in range(10):
+            MoodyUtil.create_song(valence=.75, energy=1.0)
 
         playlist = generate_browse_playlist(.75, 1.0, limit=5)
 
