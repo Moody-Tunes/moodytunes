@@ -136,11 +136,7 @@ class SpotifyClient(object):
             'limit': num_playlists
         }
 
-        response = self._make_spotify_request(
-            'GET',
-            url,
-            params=params
-        )
+        response = self._make_spotify_request('GET', url, params=params)
 
         if not response:
             logger.warning('{} - Failed to fetch playlists for category {}'.format(self._unique_id, category))
@@ -247,11 +243,7 @@ class SpotifyClient(object):
             track_ids = [track['code'].split(':')[2] for track in batch]
             params = {'ids': ','.join([track_id for track_id in track_ids])}
 
-            response = self._make_spotify_request(
-                'GET',
-                url,
-                params=params
-            )
+            response = self._make_spotify_request('GET', url, params=params)
 
             # Response is returned in the order requested (req:[1,2,3] -> res:[1,2,3])
             # If an object is not found, a null value is returned in the appropriate position
