@@ -30,9 +30,9 @@ class SpotifyClient(object):
         :param params: GET query params to add to URL (dict)
         :param data: POST data to send in request (dict)
         :param headers: Headers to include in request (dict)
-        @return response: Dictionary containg response content
+        @return response: Response content (dict)
         """
-        logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET} . POST data: {POST}'.format(
+        logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET}. POST data: {POST}'.format(
             id=self._unique_id,
             method=method,
             url=url,
