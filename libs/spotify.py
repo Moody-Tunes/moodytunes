@@ -56,12 +56,14 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
+            logger.info('{} - Successful request made to {}. Response: {}'.format(self._unique_id, url, response))
+
         except HTTPError:
             logger.warning('{} - Received HTTPError requesting {}'.format(self._unique_id, url), exc_info=True)
             response = {}
 
         except Exception:
-            logger.error('{} - Received unhandle exception requesting {}'.format(self._unique_id, url), exc_info=True)
+            logger.error('{} - Received unhandled exception requesting {}'.format(self._unique_id, url), exc_info=True)
             response = {}
 
         return response
