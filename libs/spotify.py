@@ -193,6 +193,12 @@ class SpotifyClient(object):
         # amount we return what we get
         # Skip tracks that have already been seen or have explicit lyrics (I want my Mom to use this site)
         for track in tracks:
+
+            if not track['track']:
+                # Sometimes Spotify doesn't return anything for a track. Unsure why, but if the track is None
+                # we should just skip it and keep going
+                continue
+
             uri = track['track']['uri']
             is_explicit = track['track']['explicit']
 
