@@ -18,7 +18,7 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
-    def __init__(self, command_id=None):
+    def __init__(self, command_id='SpotifyClient'):
         self._unique_id = command_id
         self.seen_songs = []
 
