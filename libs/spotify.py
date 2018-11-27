@@ -6,7 +6,6 @@ from django.conf import settings
 from django.core.cache import cache
 
 import requests
-from requests.exceptions import HTTPError
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +57,7 @@ class SpotifyClient(object):
 
             logger.info('{} - Successful request made to {}. Response: {}'.format(self._unique_id, url, response))
 
-        except HTTPError:
+        except requests.exceptions.HTTPError:
             logger.warning('{} - Received HTTPError requesting {}'.format(self._unique_id, url), exc_info=True)
             response = {}
 
