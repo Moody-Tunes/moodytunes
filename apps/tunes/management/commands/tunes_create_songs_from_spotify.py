@@ -4,7 +4,7 @@ from django.conf import settings
 
 from base.management.commands import MoodyBaseCommand
 from tunes.models import Song
-from libs.spotify import SpotifyClient
+from libs.spotify import SpotifyClient, SpotifyException
 
 
 class Command(MoodyBaseCommand):
@@ -64,20 +64,30 @@ class Command(MoodyBaseCommand):
         for category in settings.SPOTIFY['categories']:
             songs_from_category = 0
 
-            playlists = spotify.get_playlists_for_category(category, num_playlists)
+            try:
+                playlists = spotify.get_playlists_for_category(category, num_playlists)
 
-            for playlist in playlists:
-                raw_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
-                new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
+                for playlist in playlists:
+                    raw_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
+                    new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
-                tracks.extend(new_tracks)
-                songs_from_category += len(new_tracks)
+                    tracks.extend(new_tracks)
+                    songs_from_category += len(new_tracks)
 
-                if songs_from_category >= max_tracks_from_category:
-                    break
+                    if songs_from_category >= max_tracks_from_category:
+                        break
 
-                if len(tracks) >= total_songs:
-                    break
+                    if len(tracks) >= total_songs:
+                        break
+
+            except SpotifyException as exc:
+                self.write_to_log_and_output(
+                    'Error connecting to Spotify! Exception detail: {}. Proceeding to second phase...'.format(exc),
+                    output_stream='stderr',
+                    log_level='warning'
+                )
+
+                break
 
         self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
 
