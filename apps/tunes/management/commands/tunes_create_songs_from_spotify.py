@@ -92,6 +92,9 @@ class Command(MoodyBaseCommand):
 
                 break
 
+            if len(tracks) >= total_songs:
+                break
+
         self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
 
         succeeded, failed = self.save_songs_to_database(tracks)

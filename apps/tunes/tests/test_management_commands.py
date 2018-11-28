@@ -51,7 +51,7 @@ class TestSpotifyCommand(TestCase):
     def test_spotify_exception_raised_with_some_tracks(self, mock_features, _, mock_playlists):
         # If one category returns some tracks and the next one raises an exception, we should
         # still process the songs we got
-        mock_playlists.return_value = [{'user': 'two-tone-killer', 'playlist': 'Beetz.remote'}]
+        mock_playlists.return_value = [{'user': 'two-tone-killer', 'name': 'Beetz.remote'}]
 
         mock_features.side_effect = [
             [self.track_data],
