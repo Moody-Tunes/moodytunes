@@ -18,7 +18,7 @@ class SpotifyException(Exception):
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
     def __init__(self, command_id='SpotifyClient'):
-        self._unique_id = command_id
+        self.fingerprint = command_id
         self.seen_songs = []
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
@@ -32,7 +32,7 @@ class SpotifyClient(object):
         @return response: Response content (dict)
         """
         logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET}. POST data: {POST}'.format(
-            id=self._unique_id,
+            id=self.fingerprint,
             method=method,
             url=url,
             GET=params,
@@ -55,14 +55,14 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
-            logger.info('{} - Successful request made to {}. Response: {}'.format(self._unique_id, url, response))
+            logger.info('{} - Successful request made to {}. Response: {}'.format(self.fingerprint, url, response))
 
         except requests.exceptions.HTTPError:
-            logger.warning('{} - Received HTTPError requesting {}'.format(self._unique_id, url), exc_info=True)
+            logger.warning('{} - Received HTTPError requesting {}'.format(self.fingerprint, url), exc_info=True)
             response = {}
 
         except Exception:
-            logger.error('{} - Received unhandled exception requesting {}'.format(self._unique_id, url), exc_info=True)
+            logger.error('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url), exc_info=True)
             response = {}
 
         return response
@@ -76,13 +76,13 @@ class SpotifyClient(object):
         access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
         if not access_token:
-            logger.info('{} - Cache miss for auth access token'.format(self._unique_id))
+            logger.info('{} - Cache miss for auth access token'.format(self.fingerprint))
             access_token = self._make_auth_access_token_request()
 
             if access_token:
                 cache.set(settings.SPOTIFY['auth_cache_key'], access_token, settings.SPOTIFY['auth_cache_key_timeout'])
             else:
-                logger.warning('{} - Unable to retrieve access token from Spotify'.format(self._unique_id))
+                logger.warning('{} - Unable to retrieve access token from Spotify'.format(self.fingerprint))
 
                 raise SpotifyException('Unable to retrieve Spotify access token')
 
@@ -138,7 +138,7 @@ class SpotifyClient(object):
         response = self._make_spotify_request('GET', url, params=params)
 
         if not response:
-            logger.warning('{} - Failed to fetch playlists for category {}'.format(self._unique_id, category))
+            logger.warning('{} - Failed to fetch playlists for category {}'.format(self.fingerprint, category))
 
             raise SpotifyException('Unable to fetch playlists for {}'.format(category))
 
@@ -176,7 +176,7 @@ class SpotifyClient(object):
         response = self._make_spotify_request('GET', url, params=params)
 
         if not response:
-            logger.warning('{} - Failed to get songs from playlist {}'.format(self._unique_id, playlist['uri']))
+            logger.warning('{} - Failed to get songs from playlist {}'.format(self.fingerprint, playlist['uri']))
 
             raise SpotifyException('Unable to fetch songs from playlist {}'.format(playlist['name']))
 
