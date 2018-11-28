@@ -19,16 +19,28 @@ Install dependencies
 `pip install -r requirements/dev.text`
 
 
-## Handy Commands
-1) You can run a Django shell with all the project's model already imported with shell_plus
+## Handy Tips/Tricks
+You can start the development server by using the Django `runserver` command. By default this runs on 127.0.0.1:8000
+
+`python manage.py runserver`
+
+You can load test songs into your database by loading the fixture file in the tunes app.
+You will need to run the migrations first to create the tables
+
+```
+python manage.py migrate
+python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
+```
+
+You can run a Django shell with all the project's model already imported with shell_plus
 
 `python manage.py shell_plus`
 
-2) You can run unit tests using tox
+You can run unit tests using tox. This will invoke the Django test runner with the settings we use for running unit tests
 
-`tox -r`
+`tox`
 
-3) Log files are written to the files defined by the `DJANGO_LOG_APP_FILENAME` and `DJANGO_LOG_ERROR_FILENAME` environment variables.
+Log files are written to the files defined by the `DJANGO_LOG_APP_FILENAME` and `DJANGO_LOG_ERROR_FILENAME` environment variables.
 By default they go to `dev_app.log` and `dev_err.log` in the project root directory.
 
 To use logging in your module import `logging`, get a logger, and log away!
