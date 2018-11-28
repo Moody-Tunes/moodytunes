@@ -70,6 +70,11 @@ class Command(MoodyBaseCommand):
                     raw_tracks = spotify.get_songs_from_playlist(playlist, settings.SPOTIFY['max_songs_from_list'])
                     new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
+                    # Add genre information to each track. We can use the category search term as the genre
+                    # for songs found for that category
+                    for track in new_tracks:
+                        track.update({'genre': category})
+
                     self.write_to_log_and_output('Got {} tracks from {}'.format(len(new_tracks), playlist['name']))
 
                     tracks.extend(new_tracks)
