@@ -54,8 +54,6 @@ class Command(MoodyBaseCommand):
 
         total_songs = options.get('total_songs')
         num_playlists = 10
-        max_tracks_from_playlist = settings.SPOTIFY['max_songs_from_list']
-        max_tracks_from_category = settings.SPOTIFY['max_songs_from_category']
 
         spotify = SpotifyClient(command_id=self._unique_id)
 
@@ -69,7 +67,7 @@ class Command(MoodyBaseCommand):
                 self.write_to_log_and_output('Got {} playlists for category {}'.format(len(playlists), category))
 
                 for playlist in playlists:
-                    raw_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
+                    raw_tracks = spotify.get_songs_from_playlist(playlist, settings.SPOTIFY['max_songs_from_list'])
                     new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
                     self.write_to_log_and_output('Got {} tracks from {}'.format(len(new_tracks), playlist['name']))
@@ -77,7 +75,7 @@ class Command(MoodyBaseCommand):
                     tracks.extend(new_tracks)
                     songs_from_category += len(new_tracks)
 
-                    if songs_from_category >= max_tracks_from_category:
+                    if songs_from_category >= settings.SPOTIFY['max_songs_from_category']:
                         break
 
                     if len(tracks) >= total_songs:
