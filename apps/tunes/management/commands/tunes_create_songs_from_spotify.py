@@ -66,10 +66,13 @@ class Command(MoodyBaseCommand):
 
             try:
                 playlists = spotify.get_playlists_for_category(category, num_playlists)
+                self.write_to_log_and_output('Got {} playlists for category {}'.format(len(playlists), category))
 
                 for playlist in playlists:
                     raw_tracks = spotify.get_songs_from_playlist(playlist, max_tracks_from_playlist)
                     new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
+
+                    self.write_to_log_and_output('Got {} tracks from {}'.format(len(new_tracks), playlist['name']))
 
                     tracks.extend(new_tracks)
                     songs_from_category += len(new_tracks)
