@@ -14,19 +14,6 @@ class Command(MoodyBaseCommand):
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--total_songs',
-            dest='total_songs',
-            type=int,
-            default=10,
-            help='''
-            Total number of songs to process during run of this script (default 10).
-            Note that it is possible to process FEWER than number specified
-            if this script runs into any issues processing tracks.
-            '''
-        )
-
     def save_songs_to_database(self, tracks):
         """
         Given a list of parameters for Song records, create the objects in the database.
@@ -52,11 +39,8 @@ class Command(MoodyBaseCommand):
     def handle(self, *args, **options):
         self.logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
 
-        total_songs = options.get('total_songs')
         num_playlists = 10
-
         spotify = SpotifyClient(command_id=self._unique_id)
-
         tracks = []
 
         for category in settings.SPOTIFY['categories']:
@@ -83,9 +67,6 @@ class Command(MoodyBaseCommand):
                     if songs_from_category >= settings.SPOTIFY['max_songs_from_category']:
                         break
 
-                    if len(tracks) >= total_songs:
-                        break
-
             except SpotifyException as exc:
                 self.write_to_log_and_output(
                     'Error connecting to Spotify! Exception detail: {}. Proceeding to second phase...'.format(exc),
@@ -93,9 +74,6 @@ class Command(MoodyBaseCommand):
                     log_level='warning'
                 )
 
-                break
-
-            if len(tracks) >= total_songs:
                 break
 
         self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
