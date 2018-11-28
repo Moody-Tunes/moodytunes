@@ -152,6 +152,9 @@ class SpotifyClient(object):
 
             retrieved_playlists.append(payload)
 
+        # Shuffle playlists to ensure freshness
+        random.shuffle(retrieved_playlists)
+
         return retrieved_playlists
 
     def get_songs_from_playlist(self, playlist, num_songs):
@@ -184,6 +187,8 @@ class SpotifyClient(object):
         retrieved_tracks = []
 
         tracks = response['tracks']['items']
+
+        # Shuffle tracks to ensure freshness
         random.shuffle(tracks)
 
         # Process number of tracks requested, but if playlist does not have enough to return the full
