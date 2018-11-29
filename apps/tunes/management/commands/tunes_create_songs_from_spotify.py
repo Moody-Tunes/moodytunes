@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from base.management.commands import MoodyBaseCommand
 from tunes.models import Song
@@ -23,15 +24,20 @@ class Command(MoodyBaseCommand):
         success, fail = 0, 0
         for track in tracks:
 
-            song, created = Song.objects.get_or_create(code=track['code'], defaults=track)
+            try:
+                song, created = Song.objects.get_or_create(code=track['code'], defaults=track)
 
-            if created:
-                msg = 'Created song with code {}'.format(song.code)
-                self.write_to_log_and_output(msg)
-                success += 1
-            else:
-                msg = 'Song with code {} already exists'.format(song.code)
-                self.write_to_log_and_output(msg)
+                if created:
+                    msg = 'Created song with code {}'.format(song.code)
+                    self.write_to_log_and_output(msg)
+                    success += 1
+                else:
+                    msg = 'Song with code {} already exists'.format(song.code)
+                    self.write_to_log_and_output(msg)
+                    fail += 1
+            except ValidationError:
+                msg = 'ERROR: Could not create song with data: {}'.format(track)
+                self.write_to_log_and_output(msg, output_stream='stderr', log_level='warning')
                 fail += 1
 
         return success, fail

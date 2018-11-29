@@ -36,6 +36,18 @@ class TestSpotifyCommand(TestCase):
         self.assertEqual(success, 0)
         self.assertEqual(fail, 1)
 
+    def test_save_songs_to_database_invalid_song_data(self):
+        # Missing certain fields
+        bad_track_data = {
+            'code': 'bad-code',
+            'name': 'Kiara',
+            'artist': 'Bonobo',
+        }
+
+        success, fail = self.command.save_songs_to_database([bad_track_data])
+        self.assertEqual(success, 0)
+        self.assertEqual(fail, 1)
+
     @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
     def test_spotify_exception_raised_with_no_tracks(self, mock_spotify_request):
         # This test ensures that having Spotify raise an Exception does not blow up the command
