@@ -42,9 +42,11 @@ class Command(MoodyBaseCommand):
 
         return success, fail
 
-    def handle(self, *args, **options):
-        self.logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
-
+    def get_tracks_from_spotify(self):
+        """
+        Request, format, and return tracks from Spotify's API
+        :return: (list[dict]) Track data for saving as Song records
+        """
         num_playlists = 10
         spotify = SpotifyClient(command_id=self._unique_id)
         tracks = []
@@ -83,6 +85,13 @@ class Command(MoodyBaseCommand):
                 )
 
                 break
+
+        return tracks
+
+    def handle(self, *args, **options):
+        self.logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
+
+        tracks = self.get_tracks_from_spotify()
 
         self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
 
