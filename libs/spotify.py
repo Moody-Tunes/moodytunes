@@ -24,12 +24,14 @@ class SpotifyClient(object):
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
         Make a request to the Spotify API and return the JSON response
-        :param method: HTTP method to use when sending request (str)
-        :param url: URL to send request to (str)
-        :param params: GET query params to add to URL (dict)
-        :param data: POST data to send in request (dict)
-        :param headers: Headers to include in request (dict)
-        @return response: Response content (dict)
+
+        :param method: (str) HTTP method to use when sending request
+        :param url: (str) URL to send request to
+        :param params: (dict) GET query params to add to URL
+        :param data: (dict) POST data to send in request
+        :param headers: (dict) Headers to include in request
+
+        :return (dict) Response content
         """
         logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET}. POST data: {POST}'.format(
             id=self.fingerprint,
@@ -71,7 +73,10 @@ class SpotifyClient(object):
         """
         Return the access token we need to make requests to Spotify. Will either hit the cache for the key,
         or make a request to Spotify if the token in the cache is invalid
-        @return access_token: (str) Key needed to authenticate with Spotify API
+
+        :return: (str) Key needed to authenticate with Spotify API
+
+        :raises: `SpotifyException` if access token not retrieved
         """
         access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
@@ -91,7 +96,8 @@ class SpotifyClient(object):
     def _make_auth_access_token_request(self):
         """
         Get an access token from Spotify for authentication
-        @return access_token: Token used for authentication with Spotify (str)
+
+        :return: (str) Token used for authentication with Spotify
         """
         auth_val = '{client_id}:{secret_key}'.format(
             client_id=settings.SPOTIFY['client_id'],
@@ -118,12 +124,15 @@ class SpotifyClient(object):
     def get_playlists_for_category(self, category, num_playlists):
         """
         Get a number of playlists from Spotify for a given category
-        :param category: Category ID of a genre in Spotify (str)
-        :param num_playlists: Number of playlists to return (int)
-        @return retrieved_playlists: List of playlist dictionaries for the category
+
+        :param category: (str) Category ID of a genre in Spotify
+        :param num_playlists: (int) Number of playlists to return
+        :return: (list[dict]) Playlist mappings for the given category
             - name (str): Name of the playlist
             - uri (str): Spotiy ID for the playlist
             - user (str): Spotify ID for the playlist owner
+
+        :raises: `SpotifyException` if unable to retrieve playlists for category
         """
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
             api_url=settings.SPOTIFY['api_url'],
@@ -161,9 +170,10 @@ class SpotifyClient(object):
         """
         Get a number of songs randomly from the given playlist.
         List of songs is shuffled and the number of desired tracks are returned.
-        :param playlist: Mapping of values needed to retrieve playlist tracks (dict)
-        :param num_songs: Number of songs to return from this playlist (int)
-        @return retrieved_tracks: List of track dictionaries
+        :param playlist: (dict) Mapping of values needed to retrieve playlist tracks
+        :param num_songs: (int) Number of songs to return from this playlist
+
+        :return: (list[dict]) Song mappings from the given playlist
             - name (str): Name of the song
             - artist (str): Name of the artist
             - code (str): Spotify ID of the song
@@ -227,8 +237,9 @@ class SpotifyClient(object):
         Spotify. Will update the track in place, each track in the list is a dictionary of values needed to create a
         Song object. This track returns the list with the dictionaries updated with the `valence` and `energy` values.
 
-        :param tracks: List of dictionaries representing tracks in Spotify
-        @return tracks: Same list before updated with audio feature data included
+        :param tracks: (list[dict]) Song mappings
+
+        :return: (list[dict]) Song mappings + (energy, valence)
         """
         batch_size = 100
 

@@ -18,8 +18,9 @@ class Command(MoodyBaseCommand):
     def save_songs_to_database(self, tracks):
         """
         Given a list of parameters for Song records, create the objects in the database.
-        :tracks: (list) List of dictionaries containing data to store for Song objects
-        @return: Two tuple of amount of tracks that successfully processed and how many failed to process
+
+        :param tracks: (list) List of dictionaries containing data to store for Song objects
+        :return: Two tuple of amount of tracks that successfully processed and how many failed to process
         """
         success, fail = 0, 0
         for track in tracks:
@@ -45,6 +46,7 @@ class Command(MoodyBaseCommand):
     def get_tracks_from_spotify(self):
         """
         Request, format, and return tracks from Spotify's API
+
         :return: (list[dict]) Track data for saving as Song records
         """
         num_playlists = 10
