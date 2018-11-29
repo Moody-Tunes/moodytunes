@@ -8,15 +8,18 @@ Install python3 virtual environment
 
 `brew install python3-venv  # Mac base systems`
 
-Setup python3 virtual environment and activate
+Setup python3 virtual environment and activate. You might need to update the `pip` package manager in a newly created
+virtual environment.
 
-`python3 -m venv venv`
+```
+python3 -m venv venv
+source venv/bin/activate
+(venv) pip install --upgrade pip
+```
 
-`source venv/bin/activate`
+Install dependencies.
 
-Install dependencies
-
-`pip install -r requirements/dev.text`
+`(venv) pip install -r requirements/dev.text`
 
 
 ## Handy Tips/Tricks
@@ -25,18 +28,18 @@ You can start the development server by using the Django `runserver` command. By
 `python manage.py runserver`
 
 You can load test songs into your database by loading the fixture file in the tunes app.
-You will need to run the migrations first to create the tables
+You will need to run the migrations first to create the tables.
 
 ```
 python manage.py migrate
 python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
 ```
 
-You can run a Django shell with all the project's model already imported with shell_plus
+You can run a Django shell with all the project's model already imported with shell_plus.
 
 `python manage.py shell_plus`
 
-You can run unit tests using tox. This will invoke the Django test runner with the settings we use for running unit tests
+You can run unit tests using tox. This will invoke the Django test runner with the settings we use for running unit tests.
 
 `tox`
 
