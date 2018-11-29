@@ -70,7 +70,8 @@ class Command(MoodyBaseCommand):
 
             except SpotifyException as exc:
                 self.write_to_log_and_output(
-                    'Error connecting to Spotify! Exception detail: {}. Proceeding to second phase...'.format(exc),
+                    'Error connecting to Spotify! Exception detail: {}. '
+                    'Got {} track(s) successfully. Proceeding to second phase...'.format(exc, len(tracks)),
                     output_stream='stderr',
                     log_level='warning'
                 )
