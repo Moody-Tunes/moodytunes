@@ -96,7 +96,7 @@ class Command(MoodyBaseCommand):
         return tracks
 
     def handle(self, *args, **options):
-        self.logger.info('{} - Starting run to create songs from Spotify'.format(self._unique_id))
+        self.write_to_log_and_output('Starting run to create songs from Spotify')
 
         tracks = self.get_tracks_from_spotify()
 
@@ -104,7 +104,7 @@ class Command(MoodyBaseCommand):
 
         succeeded, failed = self.save_songs_to_database(tracks)
 
-        self.stdout.write('Saved {} songs to database'.format(succeeded))
-        self.stdout.write('Failed to process {} songs'.format(failed))
+        self.write_to_log_and_output('Saved {} songs to database'.format(succeeded))
+        self.write_to_log_and_output('Failed to process {} songs'.format(failed))
 
         self.stdout.write('Done!')
