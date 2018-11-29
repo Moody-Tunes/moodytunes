@@ -45,7 +45,7 @@ class Command(MoodyBaseCommand):
 
     def get_tracks_from_spotify(self):
         """
-        Request, format, and return tracks from Spotify's API
+        Request, format, and return tracks from Spotify's API.
 
         :return: (list[dict]) Track data for saving as Song records
         """
