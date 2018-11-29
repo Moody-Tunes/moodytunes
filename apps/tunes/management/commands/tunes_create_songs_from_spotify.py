@@ -49,7 +49,6 @@ class Command(MoodyBaseCommand):
 
         :return: (list[dict]) Track data for saving as Song records
         """
-        num_playlists = 10
         spotify = SpotifyClient(command_id=self._unique_id)
         tracks = []
 
@@ -57,7 +56,7 @@ class Command(MoodyBaseCommand):
             songs_from_category = 0
 
             try:
-                playlists = spotify.get_playlists_for_category(category, num_playlists)
+                playlists = spotify.get_playlists_for_category(category, settings.SPOTIFY['max_playlist_from_category'])
                 self.write_to_log_and_output('Got {} playlists for category: {}'.format(len(playlists), category))
 
                 for playlist in playlists:

@@ -10,6 +10,7 @@ SPOTIFY = {
     'categories': env.list('MTDJ_SPOTIFY_CATEGORIES', default=['hiphop', 'rock', 'chill']),
     'max_songs_from_list': env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_LIST', default=10),
     'max_songs_from_category': env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_CATEGORY', default=25),
+    'max_playlist_from_category': env.int('MTDJ_SPOTIFY_MAX_PLAYLISTS_FROM_CATEGORY', default=10),
     'auth_cache_key': env.str('MTDJ_SPOTIFY_AUTH_CACHE_KEY', default='mtdj:spotify-auth-token'),
     'auth_cache_key_timeout': 60 * 60,  # Authorization token is good for one hour
 }
