@@ -39,7 +39,7 @@ class TestSpotifyCommand(TestCase):
     @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
     def test_spotify_exception_raised_with_no_tracks(self, mock_spotify_request):
         # This test ensures that having Spotify raise an Exception does not blow up the command
-        mock_spotify_request.side_effect = SpotifyException
+        mock_spotify_request.side_effect = SpotifyException('Test Spotify Exception')
 
         call_command('tunes_create_songs_from_spotify')
 
@@ -55,7 +55,7 @@ class TestSpotifyCommand(TestCase):
 
         mock_features.side_effect = [
             [self.track_data],
-            SpotifyException
+            SpotifyException('Test Spotify Exception')
         ]
 
         call_command('tunes_create_songs_from_spotify')

@@ -31,7 +31,7 @@ class Command(MoodyBaseCommand):
                 success += 1
             else:
                 msg = 'Song with code {} already exists'.format(song.code)
-                self.write_to_log_and_output(msg, output_stream='stderr')
+                self.write_to_log_and_output(msg)
                 fail += 1
 
         return success, fail
