@@ -61,27 +61,33 @@ class Command(MoodyBaseCommand):
                 self.write_to_log_and_output('Got {} playlists for category: {}'.format(len(playlists), category))
 
                 for playlist in playlists:
-                    raw_tracks = spotify.get_songs_from_playlist(playlist, settings.SPOTIFY['max_songs_from_list'])
-                    new_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
+                    if songs_from_category < settings.SPOTIFY['max_songs_from_category']:
+                        num_tracks = settings.SPOTIFY['max_songs_from_category'] - songs_from_category
+                        raw_tracks = spotify.get_songs_from_playlist(playlist, num_tracks)
+                        complete_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
-                    # Add genre information to each track. We can use the category search term as the genre
-                    # for songs found for that category
-                    for track in new_tracks:
-                        track.update({'genre': category})
+                        # Add genre information to each track. We can use the category search term as the genre
+                        # for songs found for that category
+                        for track in complete_tracks:
+                            track.update({'genre': category})
 
-                    self.write_to_log_and_output('Got {} tracks from {}'.format(len(new_tracks), playlist['name']))
+                        self.write_to_log_and_output('Got {} tracks from {}'.format(
+                            len(complete_tracks),
+                            playlist['name']
+                        ))
 
-                    tracks.extend(new_tracks)
-                    songs_from_category += len(new_tracks)
+                        tracks.extend(complete_tracks)
+                        songs_from_category += len(complete_tracks)
 
-                    if songs_from_category >= settings.SPOTIFY['max_songs_from_category']:
-                        self.write_to_log_and_output('Retrieved max tracks for category: {}'.format(category))
-                        break
+                self.write_to_log_and_output('Finished processing {} tracks for category: {}'.format(
+                    songs_from_category,
+                    category
+                ))
 
             except SpotifyException as exc:
                 self.write_to_log_and_output(
                     'Error connecting to Spotify! Exception detail: {}. '
-                    'Got {} track(s) successfully. Proceeding to second phase...'.format(exc, len(tracks)),
+                    'Got {} track(s) successfully. Proceeding to save phase...'.format(exc, len(tracks)),
                     output_stream='stderr',
                     log_level='warning'
                 )
