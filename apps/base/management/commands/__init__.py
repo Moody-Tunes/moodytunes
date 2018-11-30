@@ -31,7 +31,7 @@ class MoodyBaseCommand(BaseCommand):
         stream.write(msg)
 
         log = getattr(self.logger, log_level)
-        log(msg)
+        log('{} - {}'.format(self._unique_id, msg))
 
     def execute(self, *args, **options):
         self.logger.info(

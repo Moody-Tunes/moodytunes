@@ -1,0 +1,5126 @@
+[
+{
+    "model": "tunes.song",
+    "pk": 1,
+    "fields": {
+        "created": "2018-11-28T03:54:35.276Z",
+        "updated": "2018-11-28T03:54:35.276Z",
+        "artist": "b'DaniLeigh'",
+        "name": "b'Lil Bebe'",
+        "genre": "hiphop",
+        "code": "spotify:track:7esO3L3DP7bM2OOd0Rdb4W",
+        "valence": 0.0721,
+        "energy": 0.485
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 2,
+    "fields": {
+        "created": "2018-11-28T03:54:35.351Z",
+        "updated": "2018-11-28T03:54:35.351Z",
+        "artist": "b'Bad Bunny'",
+        "name": "b'MIA (feat. Drake)'",
+        "genre": "hiphop",
+        "code": "spotify:track:116H0KvKr2Zl4RPuVBruDO",
+        "valence": 0.158,
+        "energy": 0.539
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 3,
+    "fields": {
+        "created": "2018-11-28T03:54:35.451Z",
+        "updated": "2018-11-28T03:54:35.451Z",
+        "artist": "b'Desiigner'",
+        "name": "b'Shoot'",
+        "genre": "hiphop",
+        "code": "spotify:track:7obgTzX2scK82GZOD3MFbg",
+        "valence": 0.193,
+        "energy": 0.421
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 4,
+    "fields": {
+        "created": "2018-11-28T03:54:35.530Z",
+        "updated": "2018-11-28T03:54:35.530Z",
+        "artist": "b'Kodie Shane'",
+        "name": "b'End Like That'",
+        "genre": "hiphop",
+        "code": "spotify:track:7m60tOsgFlWoLTk1Y8zAHJ",
+        "valence": 0.18,
+        "energy": 0.478
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 5,
+    "fields": {
+        "created": "2018-11-28T03:54:35.610Z",
+        "updated": "2018-11-28T03:54:35.610Z",
+        "artist": "b'Translee'",
+        "name": "b'Catch This Wave (feat. T.I.)'",
+        "genre": "hiphop",
+        "code": "spotify:track:6mPPHDxDEcqn6JAlpqhkog",
+        "valence": 0.793,
+        "energy": 0.657
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 6,
+    "fields": {
+        "created": "2018-11-28T03:54:35.708Z",
+        "updated": "2018-11-28T03:54:35.708Z",
+        "artist": "b'Amir Obe'",
+        "name": "b'Famous'",
+        "genre": "hiphop",
+        "code": "spotify:track:33C9eAG5R6Brjf16jxCnA2",
+        "valence": 0.244,
+        "energy": 0.699
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 7,
+    "fields": {
+        "created": "2018-11-28T03:54:35.786Z",
+        "updated": "2018-11-28T03:54:35.786Z",
+        "artist": "b'Matt Ox'",
+        "name": "b'Zero Degrees'",
+        "genre": "hiphop",
+        "code": "spotify:track:3DOXk5K0B0AZYpdhtTzLMp",
+        "valence": 0.438,
+        "energy": 0.658
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 8,
+    "fields": {
+        "created": "2018-11-28T03:54:35.876Z",
+        "updated": "2018-11-28T03:54:35.877Z",
+        "artist": "b'XXXTENTACION'",
+        "name": "b'BAD!'",
+        "genre": "hiphop",
+        "code": "spotify:track:4CH66Rxcjcj3VBHwmIBj4T",
+        "valence": 0.385,
+        "energy": 0.493
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 9,
+    "fields": {
+        "created": "2018-11-28T03:54:35.975Z",
+        "updated": "2018-11-28T03:54:35.975Z",
+        "artist": "b'Jaden Smith'",
+        "name": "b'GOKU'",
+        "genre": "hiphop",
+        "code": "spotify:track:3BgL0IcxKAd0sukooPIVhA",
+        "valence": 0.268,
+        "energy": 0.887
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 10,
+    "fields": {
+        "created": "2018-11-28T03:54:36.052Z",
+        "updated": "2018-11-28T03:54:36.052Z",
+        "artist": "b'Masego'",
+        "name": "b'Old Age'",
+        "genre": "hiphop",
+        "code": "spotify:track:1nMULe4EavfF8SZHQ3Pag9",
+        "valence": 0.551,
+        "energy": 0.458
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 11,
+    "fields": {
+        "created": "2018-11-28T03:54:36.128Z",
+        "updated": "2018-11-28T03:54:36.129Z",
+        "artist": "b'Wale'",
+        "name": "b'Right Here (feat. Eric Bellinger)'",
+        "genre": "hiphop",
+        "code": "spotify:track:1jtT12YjJchXSnKFiFZRLG",
+        "valence": 0.405,
+        "energy": 0.736
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 12,
+    "fields": {
+        "created": "2018-11-28T03:54:36.229Z",
+        "updated": "2018-11-28T03:54:36.229Z",
+        "artist": "b'H.E.R.'",
+        "name": "b\"Could've Been (feat. Bryson Tiller)\"",
+        "genre": "hiphop",
+        "code": "spotify:track:6lzLjIOyWTyTJvk0jraYee",
+        "valence": 0.399,
+        "energy": 0.33
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 13,
+    "fields": {
+        "created": "2018-11-28T03:54:36.308Z",
+        "updated": "2018-11-28T03:54:36.308Z",
+        "artist": "b'Amber Mark'",
+        "name": "b'Put You On'",
+        "genre": "hiphop",
+        "code": "spotify:track:59nJ265OcQ7Rrms09xk8LO",
+        "valence": 0.764,
+        "energy": 0.827
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 14,
+    "fields": {
+        "created": "2018-11-28T03:54:36.396Z",
+        "updated": "2018-11-28T03:54:36.396Z",
+        "artist": "b'Summer Walker'",
+        "name": "b'CPR'",
+        "genre": "hiphop",
+        "code": "spotify:track:5pBniJ3qGel8RWK4PAu9Gy",
+        "valence": 0.191,
+        "energy": 0.389
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 15,
+    "fields": {
+        "created": "2018-11-28T03:54:36.486Z",
+        "updated": "2018-11-28T03:54:36.486Z",
+        "artist": "b'Ella Mai'",
+        "name": "b'Trip'",
+        "genre": "hiphop",
+        "code": "spotify:track:7noud145AHZGg74vpWOsCa",
+        "valence": 0.387,
+        "energy": 0.605
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 16,
+    "fields": {
+        "created": "2018-11-28T03:54:36.552Z",
+        "updated": "2018-11-28T03:54:36.552Z",
+        "artist": "b'Childish Gambino'",
+        "name": "b'Summertime Magic'",
+        "genre": "hiphop",
+        "code": "spotify:track:4j3GWI86JvSaF0BLdmgcfF",
+        "valence": 0.125,
+        "energy": 0.579
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 17,
+    "fields": {
+        "created": "2018-11-28T03:54:36.651Z",
+        "updated": "2018-11-28T03:54:36.651Z",
+        "artist": "b'Khalid'",
+        "name": "b'Better'",
+        "genre": "hiphop",
+        "code": "spotify:track:2OpBganfGk2GVdSlRdxzaX",
+        "valence": 0.112,
+        "energy": 0.586
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 18,
+    "fields": {
+        "created": "2018-11-28T03:54:36.729Z",
+        "updated": "2018-11-28T03:54:36.729Z",
+        "artist": "b'Leven Kali'",
+        "name": "b'NunWrong'",
+        "genre": "hiphop",
+        "code": "spotify:track:708tNyhEmoEsAqD6lux7gz",
+        "valence": 0.149,
+        "energy": 0.475
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 19,
+    "fields": {
+        "created": "2018-11-28T03:54:36.810Z",
+        "updated": "2018-11-28T03:54:36.810Z",
+        "artist": "b'Lucky Daye'",
+        "name": "b'Roll Some Mo'",
+        "genre": "hiphop",
+        "code": "spotify:track:5ym4GENsMc7VbZVYyulq84",
+        "valence": 0.371,
+        "energy": 0.508
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 20,
+    "fields": {
+        "created": "2018-11-28T03:54:36.929Z",
+        "updated": "2018-11-28T03:54:36.929Z",
+        "artist": "b'Leikeli47'",
+        "name": "b'Hoyt And Schermerhorn'",
+        "genre": "hiphop",
+        "code": "spotify:track:2w0MQLbRvPICGEy83Cmogc",
+        "valence": 0.82,
+        "energy": 0.86
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 21,
+    "fields": {
+        "created": "2018-11-28T03:54:37.018Z",
+        "updated": "2018-11-28T03:54:37.018Z",
+        "artist": "b'DaVido'",
+        "name": "b'Fall'",
+        "genre": "hiphop",
+        "code": "spotify:track:4ou5xyFUJX4VwX76tw1qb1",
+        "valence": 0.794,
+        "energy": 0.675
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 22,
+    "fields": {
+        "created": "2018-11-28T03:54:37.295Z",
+        "updated": "2018-11-28T03:54:37.295Z",
+        "artist": "b'GASHI'",
+        "name": "b'Creep On Me'",
+        "genre": "hiphop",
+        "code": "spotify:track:1MUL6DO2gVimj2YrVedubd",
+        "valence": 0.505,
+        "energy": 0.597
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 23,
+    "fields": {
+        "created": "2018-11-28T03:54:37.607Z",
+        "updated": "2018-11-28T03:54:37.607Z",
+        "artist": "b'Lil Wayne'",
+        "name": "b'What About Me (feat. Post Malone)'",
+        "genre": "hiphop",
+        "code": "spotify:track:6lTLgWznUomxzmQpkqGPdF",
+        "valence": 0.183,
+        "energy": 0.458
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 24,
+    "fields": {
+        "created": "2018-11-28T03:54:37.898Z",
+        "updated": "2018-11-28T03:54:37.898Z",
+        "artist": "b'Tyla Yaweh'",
+        "name": "b'She Bad'",
+        "genre": "hiphop",
+        "code": "spotify:track:7Im9JRMR5HVp9PmHjCsv75",
+        "valence": 0.231,
+        "energy": 0.526
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 25,
+    "fields": {
+        "created": "2018-11-28T03:54:37.988Z",
+        "updated": "2018-11-28T03:54:37.988Z",
+        "artist": "b'Lil Wayne'",
+        "name": "b'Dark Side Of The Moon (feat. Nicki Minaj)'",
+        "genre": "hiphop",
+        "code": "spotify:track:5IvdLxVB8gwwcgnEkXSSW2",
+        "valence": 0.458,
+        "energy": 0.457
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 26,
+    "fields": {
+        "created": "2018-11-28T03:54:38.076Z",
+        "updated": "2018-11-28T03:54:38.076Z",
+        "artist": "b'Khalid'",
+        "name": "b'Better'",
+        "genre": "hiphop",
+        "code": "spotify:track:4T3fNx3CgwDRRYgmFCbD4J",
+        "valence": 0.116,
+        "energy": 0.585
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 27,
+    "fields": {
+        "created": "2018-11-28T03:54:38.156Z",
+        "updated": "2018-11-28T03:54:38.156Z",
+        "artist": "b'KYLE'",
+        "name": "b'Playinwitme (Remix) [feat. Logic and Kehlani]'",
+        "genre": "hiphop",
+        "code": "spotify:track:4g5IWycTaExrzYZFynV9vs",
+        "valence": 0.672,
+        "energy": 0.593
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 28,
+    "fields": {
+        "created": "2018-11-28T03:54:38.256Z",
+        "updated": "2018-11-28T03:54:38.256Z",
+        "artist": "b'Post Malone'",
+        "name": "b'Sunflower - Spider-Man: Into the Spider-Verse'",
+        "genre": "hiphop",
+        "code": "spotify:track:1A6OTy97kk0mMdm78rHsm8",
+        "valence": 0.927,
+        "energy": 0.498
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 29,
+    "fields": {
+        "created": "2018-11-28T03:54:38.334Z",
+        "updated": "2018-11-28T03:54:38.334Z",
+        "artist": "b'Masego'",
+        "name": "b'Old Age'",
+        "genre": "hiphop",
+        "code": "spotify:track:1gWL7x24c5s7q97b3yFeyi",
+        "valence": 0.551,
+        "energy": 0.458
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 30,
+    "fields": {
+        "created": "2018-11-28T03:54:38.415Z",
+        "updated": "2018-11-28T03:54:38.415Z",
+        "artist": "b'The Verve'",
+        "name": "b'Bitter Sweet Symphony'",
+        "genre": "rock",
+        "code": "spotify:track:5yEPxDjbbzUzyauGtnmVEC",
+        "valence": 0.524,
+        "energy": 0.889
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 31,
+    "fields": {
+        "created": "2018-11-28T03:54:38.513Z",
+        "updated": "2018-11-28T03:54:38.513Z",
+        "artist": "b'Soundgarden'",
+        "name": "b'Black Hole Sun'",
+        "genre": "rock",
+        "code": "spotify:track:2EoOZnxNgtmZaD8uUmz2nD",
+        "valence": 0.16,
+        "energy": 0.825
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 32,
+    "fields": {
+        "created": "2018-11-28T03:54:38.596Z",
+        "updated": "2018-11-28T03:54:38.596Z",
+        "artist": "b'Pearl Jam'",
+        "name": "b'Alive'",
+        "genre": "rock",
+        "code": "spotify:track:4Qbjmdlv1eZDD1u8SWe1pt",
+        "valence": 0.54,
+        "energy": 0.825
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 33,
+    "fields": {
+        "created": "2018-11-28T03:54:38.681Z",
+        "updated": "2018-11-28T03:54:38.681Z",
+        "artist": "b'Nada Surf'",
+        "name": "b'Popular'",
+        "genre": "rock",
+        "code": "spotify:track:48sJGpBLqQTs0sZ2ImHJof",
+        "valence": 0.296,
+        "energy": 0.884
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 34,
+    "fields": {
+        "created": "2018-11-28T03:54:38.779Z",
+        "updated": "2018-11-28T03:54:38.780Z",
+        "artist": "b'R.E.M.'",
+        "name": "b'Losing My Religion'",
+        "genre": "rock",
+        "code": "spotify:track:4d9RTWdrFLVAGhdzvqxkwn",
+        "valence": 0.815,
+        "energy": 0.686
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 35,
+    "fields": {
+        "created": "2018-11-28T03:54:38.870Z",
+        "updated": "2018-11-28T03:54:38.870Z",
+        "artist": "b'Lenny Kravitz'",
+        "name": "b'Are You Gonna Go My Way'",
+        "genre": "rock",
+        "code": "spotify:track:45Ia1U4KtIjAPPU7Wv1Sea",
+        "valence": 0.777,
+        "energy": 0.67
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 36,
+    "fields": {
+        "created": "2018-11-28T03:54:38.958Z",
+        "updated": "2018-11-28T03:54:38.958Z",
+        "artist": "b'Bush'",
+        "name": "b'Glycerine - Remastered'",
+        "genre": "rock",
+        "code": "spotify:track:2nzlgHTbUDzuRtTFoX3qfJ",
+        "valence": 0.0849,
+        "energy": 0.337
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 37,
+    "fields": {
+        "created": "2018-11-28T03:54:39.068Z",
+        "updated": "2018-11-28T03:54:39.068Z",
+        "artist": "b'Semisonic'",
+        "name": "b'Closing Time'",
+        "genre": "rock",
+        "code": "spotify:track:4EnkwZd0UJAuHpNMMemQaA",
+        "valence": 0.241,
+        "energy": 0.865
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 38,
+    "fields": {
+        "created": "2018-11-28T03:54:39.139Z",
+        "updated": "2018-11-28T03:54:39.139Z",
+        "artist": "b'Third Eye Blind'",
+        "name": "b'Semi-Charmed Life'",
+        "genre": "rock",
+        "code": "spotify:track:42et6fnHCw1HIPSrdPprMl",
+        "valence": 0.7,
+        "energy": 0.864
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 39,
+    "fields": {
+        "created": "2018-11-28T03:54:39.229Z",
+        "updated": "2018-11-28T03:54:39.229Z",
+        "artist": "b'Placebo'",
+        "name": "b'Every You Every Me'",
+        "genre": "rock",
+        "code": "spotify:track:3tRv4ZYZimrL27flnjgeR6",
+        "valence": 0.165,
+        "energy": 0.923
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 40,
+    "fields": {
+        "created": "2018-11-28T03:54:39.333Z",
+        "updated": "2018-11-28T03:54:39.334Z",
+        "artist": "b'Nirvana'",
+        "name": "b'Come As You Are'",
+        "genre": "rock",
+        "code": "spotify:track:4P5KoWXOxwuobLmHXLMobV",
+        "valence": 0.541,
+        "energy": 0.825
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 41,
+    "fields": {
+        "created": "2018-11-28T03:54:39.413Z",
+        "updated": "2018-11-28T03:54:39.414Z",
+        "artist": "b'Blind Melon'",
+        "name": "b'No Rain'",
+        "genre": "rock",
+        "code": "spotify:track:6txWz9UapYHVxEd7dDIHXT",
+        "valence": 0.566,
+        "energy": 0.476
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 42,
+    "fields": {
+        "created": "2018-11-28T03:54:39.489Z",
+        "updated": "2018-11-28T03:54:39.489Z",
+        "artist": "b'The Cranberries'",
+        "name": "b'Zombie'",
+        "genre": "rock",
+        "code": "spotify:track:2IZZqH4K02UIYg5EohpNHF",
+        "valence": 0.306,
+        "energy": 0.613
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 43,
+    "fields": {
+        "created": "2018-11-28T03:54:39.589Z",
+        "updated": "2018-11-28T03:54:39.589Z",
+        "artist": "b'The Presidents Of The United States Of America'",
+        "name": "b'Lump'",
+        "genre": "rock",
+        "code": "spotify:track:2JdzB67NvIa90K4gEZPLeX",
+        "valence": 0.864,
+        "energy": 0.873
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 44,
+    "fields": {
+        "created": "2018-11-28T03:54:39.674Z",
+        "updated": "2018-11-28T03:54:39.674Z",
+        "artist": "b'The Smashing Pumpkins'",
+        "name": "b'Bullet With Butterfly Wings'",
+        "genre": "rock",
+        "code": "spotify:track:1EzeXGaZdqsA4Nst1AIAL2",
+        "valence": 0.555,
+        "energy": 0.705
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 45,
+    "fields": {
+        "created": "2018-11-28T03:54:39.765Z",
+        "updated": "2018-11-28T03:54:39.766Z",
+        "artist": "b'Oasis'",
+        "name": "b\"Don't Look Back In Anger - Remastered\"",
+        "genre": "rock",
+        "code": "spotify:track:7CVYxHq1L0Z4G84jTDS6Jl",
+        "valence": 0.335,
+        "energy": 0.922
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 46,
+    "fields": {
+        "created": "2018-11-28T03:54:39.867Z",
+        "updated": "2018-11-28T03:54:39.867Z",
+        "artist": "b'Smash Mouth'",
+        "name": "b'All Star'",
+        "genre": "rock",
+        "code": "spotify:track:7ntXYU4zboGuq5ZunkrXRB",
+        "valence": 0.776,
+        "energy": 0.867
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 47,
+    "fields": {
+        "created": "2018-11-28T03:54:39.946Z",
+        "updated": "2018-11-28T03:54:39.946Z",
+        "artist": "b'Green Day'",
+        "name": "b'Basket Case'",
+        "genre": "rock",
+        "code": "spotify:track:6L89mwZXSOwYl76YXfX13s",
+        "valence": 0.781,
+        "energy": 0.943
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 48,
+    "fields": {
+        "created": "2018-11-28T03:54:40.029Z",
+        "updated": "2018-11-28T03:54:40.029Z",
+        "artist": "b'Garbage'",
+        "name": "b'Stupid Girl'",
+        "genre": "rock",
+        "code": "spotify:track:0h4fRpHrxBeR3XWHmcolaU",
+        "valence": 0.736,
+        "energy": 0.804
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 49,
+    "fields": {
+        "created": "2018-11-28T03:54:40.140Z",
+        "updated": "2018-11-28T03:54:40.140Z",
+        "artist": "b'Beck'",
+        "name": "b'Loser'",
+        "genre": "rock",
+        "code": "spotify:track:5PntSbMHC1ud6Vvl8x56qd",
+        "valence": 0.789,
+        "energy": 0.627
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 50,
+    "fields": {
+        "created": "2018-11-28T03:54:40.231Z",
+        "updated": "2018-11-28T03:54:40.231Z",
+        "artist": "b'Incubus'",
+        "name": "b'Drive'",
+        "genre": "rock",
+        "code": "spotify:track:73fzhVcs7n1wZz84eoE2vs",
+        "valence": 0.682,
+        "energy": 0.793
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 51,
+    "fields": {
+        "created": "2018-11-28T03:54:40.315Z",
+        "updated": "2018-11-28T03:54:40.315Z",
+        "artist": "b'No Doubt'",
+        "name": "b\"Don't Speak\"",
+        "genre": "rock",
+        "code": "spotify:track:5PsUB0ISfQxRLhF5DmI5Ks",
+        "valence": 0.572,
+        "energy": 0.707
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 52,
+    "fields": {
+        "created": "2018-11-28T03:54:40.389Z",
+        "updated": "2018-11-28T03:54:40.389Z",
+        "artist": "b'The Offspring'",
+        "name": "b'Self Esteem'",
+        "genre": "rock",
+        "code": "spotify:track:1FkoVC85Ds3mFoK0fVqEqP",
+        "valence": 0.706,
+        "energy": 0.862
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 53,
+    "fields": {
+        "created": "2018-11-28T03:54:40.489Z",
+        "updated": "2018-11-28T03:54:40.489Z",
+        "artist": "b'Blur'",
+        "name": "b'Song 2 - 2012 Remastered Version'",
+        "genre": "rock",
+        "code": "spotify:track:1FTSo4v6BOZH9QxKc3MbVM",
+        "valence": 0.918,
+        "energy": 0.789
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 54,
+    "fields": {
+        "created": "2018-11-28T03:54:40.567Z",
+        "updated": "2018-11-28T03:54:40.567Z",
+        "artist": "b'Sublime'",
+        "name": "b'Santeria'",
+        "genre": "rock",
+        "code": "spotify:track:6cJqlSO19vsfCsH1FeFI35",
+        "valence": 0.585,
+        "energy": 0.772
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 55,
+    "fields": {
+        "created": "2018-11-28T03:54:40.646Z",
+        "updated": "2018-11-28T03:54:40.646Z",
+        "artist": "b'M\\xc5\\x8dzi'",
+        "name": "b'Honey + Tea'",
+        "genre": "chill",
+        "code": "spotify:track:7t9rZKKU43qcg5oyUEp4XL",
+        "valence": 0.344,
+        "energy": 0.398
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 56,
+    "fields": {
+        "created": "2018-11-28T03:54:40.752Z",
+        "updated": "2018-11-28T03:54:40.752Z",
+        "artist": "b'Akurei'",
+        "name": "b'August'",
+        "genre": "chill",
+        "code": "spotify:track:7g1BY9DxCoF440qgBWBZYN",
+        "valence": 0.358,
+        "energy": 0.565
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 57,
+    "fields": {
+        "created": "2018-11-28T03:54:40.823Z",
+        "updated": "2018-11-28T03:54:40.823Z",
+        "artist": "b'Elise Davis'",
+        "name": "b'Last Laugh'",
+        "genre": "chill",
+        "code": "spotify:track:68AvSj8Ndds28An5ZZSdVy",
+        "valence": 0.133,
+        "energy": 0.244
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 58,
+    "fields": {
+        "created": "2018-11-28T03:54:40.926Z",
+        "updated": "2018-11-28T03:54:40.926Z",
+        "artist": "b'Juke Ross'",
+        "name": "b'Fresh Roses'",
+        "genre": "chill",
+        "code": "spotify:track:05RmevbSKDvHHKpYBoXYfR",
+        "valence": 0.206,
+        "energy": 0.296
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 59,
+    "fields": {
+        "created": "2018-11-28T03:54:41.013Z",
+        "updated": "2018-11-28T03:54:41.013Z",
+        "artist": "b'Ed Sheeran'",
+        "name": "b\"Hearts Don't Break Around Here\"",
+        "genre": "chill",
+        "code": "spotify:track:2dfHh7ECGxfNqZTQno09Vk",
+        "valence": 0.181,
+        "energy": 0.366
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 60,
+    "fields": {
+        "created": "2018-11-28T03:54:41.102Z",
+        "updated": "2018-11-28T03:54:41.102Z",
+        "artist": "b'Lo Moon'",
+        "name": "b\"For Me, It's You\"",
+        "genre": "chill",
+        "code": "spotify:track:2odYUJ9LhwDVVPxXL3NxuB",
+        "valence": 0.199,
+        "energy": 0.46
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 61,
+    "fields": {
+        "created": "2018-11-28T03:54:41.178Z",
+        "updated": "2018-11-28T03:54:41.178Z",
+        "artist": "b'Gavin James'",
+        "name": "b'Strangers'",
+        "genre": "chill",
+        "code": "spotify:track:00u9VXj7jnmE60OUtFkZpr",
+        "valence": 0.293,
+        "energy": 0.425
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 62,
+    "fields": {
+        "created": "2018-11-28T03:54:41.265Z",
+        "updated": "2018-11-28T03:54:41.266Z",
+        "artist": "b'Ray LaMontagne'",
+        "name": "b'Such A Simple Thing'",
+        "genre": "chill",
+        "code": "spotify:track:1fYouLdK3PkOMPnx4CPxTY",
+        "valence": 0.13,
+        "energy": 0.256
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 63,
+    "fields": {
+        "created": "2018-11-28T03:54:41.370Z",
+        "updated": "2018-11-28T03:54:41.370Z",
+        "artist": "b'Zoelly'",
+        "name": "b'Blowing Smoke'",
+        "genre": "chill",
+        "code": "spotify:track:0x3yozQ8ntRKUr01fuUOPb",
+        "valence": 0.304,
+        "energy": 0.416
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 64,
+    "fields": {
+        "created": "2018-11-28T03:54:41.445Z",
+        "updated": "2018-11-28T03:54:41.445Z",
+        "artist": "b'Jordy Searcy'",
+        "name": "b'Love & War in Your Twenties'",
+        "genre": "chill",
+        "code": "spotify:track:2NU2U0wWzGtZtuu1QsacOb",
+        "valence": 0.529,
+        "energy": 0.525
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 65,
+    "fields": {
+        "created": "2018-11-28T03:54:41.530Z",
+        "updated": "2018-11-28T03:54:41.530Z",
+        "artist": "b'The Dryes'",
+        "name": "b'War'",
+        "genre": "chill",
+        "code": "spotify:track:1UxeYs0x9oyJtCpmH0QbvL",
+        "valence": 0.32,
+        "energy": 0.244
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 66,
+    "fields": {
+        "created": "2018-11-28T03:54:41.633Z",
+        "updated": "2018-11-28T03:54:41.633Z",
+        "artist": "b'Rob Baird'",
+        "name": "b'I Tried'",
+        "genre": "chill",
+        "code": "spotify:track:5TODWaaMr4UqqcMkd6z2GX",
+        "valence": 0.247,
+        "energy": 0.656
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 67,
+    "fields": {
+        "created": "2018-11-28T03:54:41.714Z",
+        "updated": "2018-11-28T03:54:41.714Z",
+        "artist": "b'Kayden'",
+        "name": "b'Home'",
+        "genre": "chill",
+        "code": "spotify:track:4ObiNqaVaTUPTUf447GOWn",
+        "valence": 0.305,
+        "energy": 0.46
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 68,
+    "fields": {
+        "created": "2018-11-28T03:54:41.798Z",
+        "updated": "2018-11-28T03:54:41.798Z",
+        "artist": "b'Lake Street Dive'",
+        "name": "b'Musta Been Something'",
+        "genre": "chill",
+        "code": "spotify:track:0Vr6vFlxGoAMs6RPA5vJZY",
+        "valence": 0.235,
+        "energy": 0.16
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 69,
+    "fields": {
+        "created": "2018-11-28T03:54:41.908Z",
+        "updated": "2018-11-28T03:54:41.908Z",
+        "artist": "b'Miya Folick'",
+        "name": "b'Thingamajig'",
+        "genre": "chill",
+        "code": "spotify:track:4YAflff8SUwLLPIUIFlfBL",
+        "valence": 0.0727,
+        "energy": 0.224
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 70,
+    "fields": {
+        "created": "2018-11-28T03:54:41.980Z",
+        "updated": "2018-11-28T03:54:41.980Z",
+        "artist": "b'Mark Knopfler'",
+        "name": "b'Every Heart In The Room'",
+        "genre": "chill",
+        "code": "spotify:track:2mOl7hHENoE6P4VooQw7BK",
+        "valence": 0.479,
+        "energy": 0.279
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 71,
+    "fields": {
+        "created": "2018-11-28T03:54:42.062Z",
+        "updated": "2018-11-28T03:54:42.062Z",
+        "artist": "b'Esperanza Spalding'",
+        "name": "b'Thang'",
+        "genre": "chill",
+        "code": "spotify:track:45NhEzSuvE5M5i3cYwphuL",
+        "valence": 0.142,
+        "energy": 0.375
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 72,
+    "fields": {
+        "created": "2018-11-28T03:54:42.165Z",
+        "updated": "2018-11-28T03:54:42.165Z",
+        "artist": "b'Lord Huron'",
+        "name": "b'The Night We Met (feat. Phoebe Bridgers)'",
+        "genre": "chill",
+        "code": "spotify:track:0jZO7p0nBUi9VHedWUBS9l",
+        "valence": 0.131,
+        "energy": 0.437
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 73,
+    "fields": {
+        "created": "2018-11-28T03:54:42.251Z",
+        "updated": "2018-11-28T03:54:42.251Z",
+        "artist": "b'Kirk Fletcher'",
+        "name": "b'Hold On'",
+        "genre": "chill",
+        "code": "spotify:track:6PU1z9E6qNZcN4qzB7vTqf",
+        "valence": 0.154,
+        "energy": 0.473
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 74,
+    "fields": {
+        "created": "2018-11-28T03:54:42.329Z",
+        "updated": "2018-11-28T03:54:42.329Z",
+        "artist": "b'Shawn Mendes'",
+        "name": "b'Like To Be You (feat. Julia Michaels)'",
+        "genre": "chill",
+        "code": "spotify:track:2IssBpPtHcViZL5vYQNHhA",
+        "valence": 0.664,
+        "energy": 0.451
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 75,
+    "fields": {
+        "created": "2018-11-28T03:54:42.401Z",
+        "updated": "2018-11-28T03:54:42.401Z",
+        "artist": "b'Noah Gundersen'",
+        "name": "b'Wrong Side'",
+        "genre": "chill",
+        "code": "spotify:track:4w7aZWX1LkjnU0JdJsbtL6",
+        "valence": 0.452,
+        "energy": 0.482
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 76,
+    "fields": {
+        "created": "2018-11-28T03:54:42.502Z",
+        "updated": "2018-11-28T03:54:42.502Z",
+        "artist": "b'Alice Pisano'",
+        "name": "b'Celebrate Life'",
+        "genre": "chill",
+        "code": "spotify:track:7qoJwPYtnQUEmltftJc7Id",
+        "valence": 0.247,
+        "energy": 0.39
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 77,
+    "fields": {
+        "created": "2018-11-28T03:54:42.579Z",
+        "updated": "2018-11-28T03:54:42.579Z",
+        "artist": "b'Black Joe Lewis & The Honeybears'",
+        "name": "b'Face in the Scene'",
+        "genre": "chill",
+        "code": "spotify:track:1oSxWP7C3ChpUzAGicKX0N",
+        "valence": 0.499,
+        "energy": 0.471
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 78,
+    "fields": {
+        "created": "2018-11-28T03:54:42.656Z",
+        "updated": "2018-11-28T03:54:42.656Z",
+        "artist": "b'Durand Jones & The Indications'",
+        "name": "b'Put a Smile on Your Face'",
+        "genre": "chill",
+        "code": "spotify:track:1yLbnUcF6VkwYx4vNcM8se",
+        "valence": 0.641,
+        "energy": 0.498
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 79,
+    "fields": {
+        "created": "2018-11-28T03:54:42.776Z",
+        "updated": "2018-11-28T03:54:42.776Z",
+        "artist": "b'Patrick Droney'",
+        "name": "b'High Hope'",
+        "genre": "chill",
+        "code": "spotify:track:5MYYZbWQURrLcgim1jGvm6",
+        "valence": 0.455,
+        "energy": 0.451
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 80,
+    "fields": {
+        "created": "2018-11-28T03:55:28.472Z",
+        "updated": "2018-11-28T03:55:28.472Z",
+        "artist": "b'oofoe'",
+        "name": "b'whereucomefrom.'",
+        "genre": "hiphop",
+        "code": "spotify:track:4tukb1DUFeq8YjydJE8UVA",
+        "valence": 0.961,
+        "energy": 0.207
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 81,
+    "fields": {
+        "created": "2018-11-28T03:55:28.556Z",
+        "updated": "2018-11-28T03:55:28.557Z",
+        "artist": "b'Leavv'",
+        "name": "b'balcony view'",
+        "genre": "hiphop",
+        "code": "spotify:track:62qhlMjSdV2xzmYrzlBgSe",
+        "valence": 0.751,
+        "energy": 0.202
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 82,
+    "fields": {
+        "created": "2018-11-28T03:55:28.660Z",
+        "updated": "2018-11-28T03:55:28.660Z",
+        "artist": "b'Harris Cole'",
+        "name": "b'Blue and Green'",
+        "genre": "hiphop",
+        "code": "spotify:track:5kJAk6KD2SH3Dz8K3EfIhc",
+        "valence": 0.48,
+        "energy": 0.0389
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 83,
+    "fields": {
+        "created": "2018-11-28T03:55:28.742Z",
+        "updated": "2018-11-28T03:55:28.742Z",
+        "artist": "b'7apes'",
+        "name": "b'Cereal Keef'",
+        "genre": "hiphop",
+        "code": "spotify:track:5Im6v7WQdNsp7KNWeKSHTy",
+        "valence": 0.79,
+        "energy": 0.386
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 84,
+    "fields": {
+        "created": "2018-11-28T03:55:28.834Z",
+        "updated": "2018-11-28T03:55:28.834Z",
+        "artist": "b'Jinsang'",
+        "name": "b'Midnight.'",
+        "genre": "hiphop",
+        "code": "spotify:track:23Ozuv5K6NSgg3bx38aGf0",
+        "valence": 0.0743,
+        "energy": 0.242
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 85,
+    "fields": {
+        "created": "2018-11-28T03:55:28.936Z",
+        "updated": "2018-11-28T03:55:28.936Z",
+        "artist": "b'Chris Keys'",
+        "name": "b'Loss'",
+        "genre": "hiphop",
+        "code": "spotify:track:3EosD4gp9RdgkemwbuQdaO",
+        "valence": 0.805,
+        "energy": 0.187
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 86,
+    "fields": {
+        "created": "2018-11-28T03:55:29.019Z",
+        "updated": "2018-11-28T03:55:29.019Z",
+        "artist": "b'Smartface'",
+        "name": "b'The Writer'",
+        "genre": "hiphop",
+        "code": "spotify:track:4L8JbzUItzpwaFX7IZlhtT",
+        "valence": 0.773,
+        "energy": 0.338
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 87,
+    "fields": {
+        "created": "2018-11-28T03:55:29.091Z",
+        "updated": "2018-11-28T03:55:29.091Z",
+        "artist": "b'Snaer.'",
+        "name": "b'Circles'",
+        "genre": "hiphop",
+        "code": "spotify:track:2fmcciVsc7IEKTFGWZcyB1",
+        "valence": 0.158,
+        "energy": 0.336
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 88,
+    "fields": {
+        "created": "2018-11-28T03:55:29.191Z",
+        "updated": "2018-11-28T03:55:29.191Z",
+        "artist": "b'.Sinh'",
+        "name": "b'Bridges'",
+        "genre": "hiphop",
+        "code": "spotify:track:6wkTnl4q7qznX2JG0ZDlkg",
+        "valence": 0.207,
+        "energy": 0.258
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 89,
+    "fields": {
+        "created": "2018-11-28T03:55:29.270Z",
+        "updated": "2018-11-28T03:55:29.270Z",
+        "artist": "b'Imfinenow'",
+        "name": "b'I Loved You but I Will Never Know'",
+        "genre": "hiphop",
+        "code": "spotify:track:2g3BIC46FGQm3xeZHNs5tc",
+        "valence": 0.0838,
+        "energy": 0.185
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 90,
+    "fields": {
+        "created": "2018-11-28T03:55:29.366Z",
+        "updated": "2018-11-28T03:55:29.367Z",
+        "artist": "b'Flynn'",
+        "name": "b'The Road'",
+        "genre": "hiphop",
+        "code": "spotify:track:6A30LeQiZ781ATWscFIJo3",
+        "valence": 0.669,
+        "energy": 0.345
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 91,
+    "fields": {
+        "created": "2018-11-28T03:55:29.469Z",
+        "updated": "2018-11-28T03:55:29.470Z",
+        "artist": "b'Wun Two'",
+        "name": "b'Village'",
+        "genre": "hiphop",
+        "code": "spotify:track:1igeI0Dv9OWFjshEH05A1R",
+        "valence": 0.972,
+        "energy": 0.216
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 92,
+    "fields": {
+        "created": "2018-11-28T03:55:29.553Z",
+        "updated": "2018-11-28T03:55:29.553Z",
+        "artist": "b'miska.'",
+        "name": "b'night skye'",
+        "genre": "hiphop",
+        "code": "spotify:track:3gBPlwx0OKSfwa8TfBMJiI",
+        "valence": 0.346,
+        "energy": 0.3
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 93,
+    "fields": {
+        "created": "2018-11-28T03:55:29.646Z",
+        "updated": "2018-11-28T03:55:29.646Z",
+        "artist": "b'Toonorth'",
+        "name": "b'NGC 6236'",
+        "genre": "hiphop",
+        "code": "spotify:track:6Ditgndq8NnRVJf8K3hs7W",
+        "valence": 0.705,
+        "energy": 0.254
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 94,
+    "fields": {
+        "created": "2018-11-28T03:55:29.727Z",
+        "updated": "2018-11-28T03:55:29.727Z",
+        "artist": "b'luvwn'",
+        "name": "b'sky to you'",
+        "genre": "hiphop",
+        "code": "spotify:track:2tz8CiWo4VEwNbgyOsHsoY",
+        "valence": 0.744,
+        "energy": 0.252
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 95,
+    "fields": {
+        "created": "2018-11-28T03:55:29.812Z",
+        "updated": "2018-11-28T03:55:29.812Z",
+        "artist": "b'Brenky'",
+        "name": "b'Fuse'",
+        "genre": "hiphop",
+        "code": "spotify:track:3TlFxsF7d3hNGgRMUEWxSB",
+        "valence": 0.664,
+        "energy": 0.209
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 96,
+    "fields": {
+        "created": "2018-11-28T03:55:29.914Z",
+        "updated": "2018-11-28T03:55:29.914Z",
+        "artist": "b'[bsd.u]'",
+        "name": "b'pook'",
+        "genre": "hiphop",
+        "code": "spotify:track:1BcPkOdJHPy2NuVPOaFAD1",
+        "valence": 0.335,
+        "energy": 0.458
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 97,
+    "fields": {
+        "created": "2018-11-28T03:55:29.993Z",
+        "updated": "2018-11-28T03:55:29.993Z",
+        "artist": "b'Joe Nora'",
+        "name": "b\"hope I'm never like that\"",
+        "genre": "hiphop",
+        "code": "spotify:track:0QCOwHLaeAUZjQFDYvZvvj",
+        "valence": 0.43,
+        "energy": 0.58
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 98,
+    "fields": {
+        "created": "2018-11-28T03:55:30.088Z",
+        "updated": "2018-11-28T03:55:30.088Z",
+        "artist": "b'chief.'",
+        "name": "b'Green Tea'",
+        "genre": "hiphop",
+        "code": "spotify:track:3O8wVPwskB1ZdoSRiwaAak",
+        "valence": 0.0392,
+        "energy": 0.223
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 99,
+    "fields": {
+        "created": "2018-11-28T03:55:30.163Z",
+        "updated": "2018-11-28T03:55:30.163Z",
+        "artist": "b'Wun Two'",
+        "name": "b'savacu'",
+        "genre": "hiphop",
+        "code": "spotify:track:4cRtsgJHnz4UaUnHGfDrxB",
+        "valence": 0.565,
+        "energy": 0.148
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 100,
+    "fields": {
+        "created": "2018-11-28T03:55:30.258Z",
+        "updated": "2018-11-28T03:55:30.258Z",
+        "artist": "b'Misc.Inc'",
+        "name": "b'Panacea.'",
+        "genre": "hiphop",
+        "code": "spotify:track:3julkyNbFWkLu9geA2CB8K",
+        "valence": 0.142,
+        "energy": 0.211
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 101,
+    "fields": {
+        "created": "2018-11-28T03:55:30.335Z",
+        "updated": "2018-11-28T03:55:30.335Z",
+        "artist": "b'Chill Children'",
+        "name": "b'night time'",
+        "genre": "hiphop",
+        "code": "spotify:track:0FuBfmT5QuCZFBjGVpAyek",
+        "valence": 0.733,
+        "energy": 0.111
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 102,
+    "fields": {
+        "created": "2018-11-28T03:55:30.426Z",
+        "updated": "2018-11-28T03:55:30.426Z",
+        "artist": "b'Smeyeul.'",
+        "name": "b'bedroom'",
+        "genre": "hiphop",
+        "code": "spotify:track:5BEX5jMEkOB8Zr1dUft3Mg",
+        "valence": 0.7,
+        "energy": 0.0161
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 103,
+    "fields": {
+        "created": "2018-11-28T03:55:30.534Z",
+        "updated": "2018-11-28T03:55:30.534Z",
+        "artist": "b'Dontcry'",
+        "name": "b'Echoes'",
+        "genre": "hiphop",
+        "code": "spotify:track:6j7fobMzagIA3dIr8bzY0J",
+        "valence": 0.456,
+        "energy": 0.242
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 104,
+    "fields": {
+        "created": "2018-11-28T03:55:30.621Z",
+        "updated": "2018-11-28T03:55:30.621Z",
+        "artist": "b'memory'",
+        "name": "b'outerspace'",
+        "genre": "hiphop",
+        "code": "spotify:track:34wlgETfevjrvjRTxSFYDc",
+        "valence": 0.183,
+        "energy": 0.238
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 105,
+    "fields": {
+        "created": "2018-11-28T03:55:30.708Z",
+        "updated": "2018-11-28T03:55:30.708Z",
+        "artist": "b'Cero Ismael'",
+        "name": "b'Insane'",
+        "genre": "hiphop",
+        "code": "spotify:track:2DN7uf0CYLtvbzEFLWPMWq",
+        "valence": 0.572,
+        "energy": 0.428
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 106,
+    "fields": {
+        "created": "2018-11-28T03:55:30.819Z",
+        "updated": "2018-11-28T03:55:30.819Z",
+        "artist": "b'Lithe'",
+        "name": "b'Pictures on My Wall'",
+        "genre": "hiphop",
+        "code": "spotify:track:3XtztP3l3Y7mYFA2ZGMJ1J",
+        "valence": 0.0383,
+        "energy": 0.298
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 107,
+    "fields": {
+        "created": "2018-11-28T03:55:30.902Z",
+        "updated": "2018-11-28T03:55:30.902Z",
+        "artist": "b'On The Fence'",
+        "name": "b'Need It'",
+        "genre": "hiphop",
+        "code": "spotify:track:7Ku3gNZLSTdayCm8wdbvBO",
+        "valence": 0.276,
+        "energy": 0.494
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 108,
+    "fields": {
+        "created": "2018-11-28T03:55:30.991Z",
+        "updated": "2018-11-28T03:55:30.992Z",
+        "artist": "b'Mick Jenkins'",
+        "name": "b'Consensual Seduction (feat. Corinne Bailey Rae)'",
+        "genre": "hiphop",
+        "code": "spotify:track:29vSGhUXfghuZTOUrIw8zf",
+        "valence": 0.567,
+        "energy": 0.61
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 109,
+    "fields": {
+        "created": "2018-11-28T03:55:31.079Z",
+        "updated": "2018-11-28T03:55:31.079Z",
+        "artist": "b'Phora'",
+        "name": "b'Come Thru'",
+        "genre": "hiphop",
+        "code": "spotify:track:1BSMGMoPK6UnK6hfY4gMMp",
+        "valence": 0.179,
+        "energy": 0.425
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 110,
+    "fields": {
+        "created": "2018-11-28T03:55:31.188Z",
+        "updated": "2018-11-28T03:55:31.188Z",
+        "artist": "b'Blood Orange'",
+        "name": "b'Runnin\\xe2\\x80\\x99'",
+        "genre": "hiphop",
+        "code": "spotify:track:7eCJ3bONwNeNDViF383s1E",
+        "valence": 0.388,
+        "energy": 0.414
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 111,
+    "fields": {
+        "created": "2018-11-28T03:55:31.270Z",
+        "updated": "2018-11-28T03:55:31.270Z",
+        "artist": "b'emawk'",
+        "name": "b'18'",
+        "genre": "hiphop",
+        "code": "spotify:track:4IT7xj4YZX18jz4esFlUVe",
+        "valence": 0.273,
+        "energy": 0.305
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 112,
+    "fields": {
+        "created": "2018-11-28T03:55:31.371Z",
+        "updated": "2018-11-28T03:55:31.371Z",
+        "artist": "b'RealLiveAnimals'",
+        "name": "b'More Than Friends'",
+        "genre": "hiphop",
+        "code": "spotify:track:01pmPw3Tfm08YF1rRdTcv6",
+        "valence": 0.268,
+        "energy": 0.301
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 113,
+    "fields": {
+        "created": "2018-11-28T03:55:31.460Z",
+        "updated": "2018-11-28T03:55:31.460Z",
+        "artist": "b'Full Crate'",
+        "name": "b'Lights Went Down'",
+        "genre": "hiphop",
+        "code": "spotify:track:2i3h4TjB4UnWrWhdprbtOW",
+        "valence": 0.335,
+        "energy": 0.349
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 114,
+    "fields": {
+        "created": "2018-11-28T03:55:31.558Z",
+        "updated": "2018-11-28T03:55:31.558Z",
+        "artist": "b'Vancouver Sleep Clinic'",
+        "name": "b'Closure'",
+        "genre": "hiphop",
+        "code": "spotify:track:0jBU9PMcOpikb0kUtDQiJm",
+        "valence": 0.154,
+        "energy": 0.444
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 115,
+    "fields": {
+        "created": "2018-11-28T03:55:31.644Z",
+        "updated": "2018-11-28T03:55:31.644Z",
+        "artist": "b'Joshua J'",
+        "name": "b'Lock My Door'",
+        "genre": "hiphop",
+        "code": "spotify:track:0UeHMHVqM0eesT4f984vCP",
+        "valence": 0.627,
+        "energy": 0.739
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 116,
+    "fields": {
+        "created": "2018-11-28T03:55:31.729Z",
+        "updated": "2018-11-28T03:55:31.729Z",
+        "artist": "b'Anfa Rose'",
+        "name": "b'Come Clean'",
+        "genre": "hiphop",
+        "code": "spotify:track:5jRSCdszeggflE0vSMXhzd",
+        "valence": 0.554,
+        "energy": 0.416
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 117,
+    "fields": {
+        "created": "2018-11-28T03:55:31.834Z",
+        "updated": "2018-11-28T03:55:31.835Z",
+        "artist": "b'Wale'",
+        "name": "b'3 Days 3 Hours'",
+        "genre": "hiphop",
+        "code": "spotify:track:1X1VvOK7yydUSqfzzd7dbH",
+        "valence": 0.487,
+        "energy": 0.391
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 118,
+    "fields": {
+        "created": "2018-11-28T03:55:31.919Z",
+        "updated": "2018-11-28T03:55:31.919Z",
+        "artist": "b'Riz La Vie'",
+        "name": "b'Napkins'",
+        "genre": "hiphop",
+        "code": "spotify:track:37b1KAbfOZeBzeMB0LGO3g",
+        "valence": 0.66,
+        "energy": 0.444
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 119,
+    "fields": {
+        "created": "2018-11-28T03:55:32.005Z",
+        "updated": "2018-11-28T03:55:32.005Z",
+        "artist": "b'Doley Bernays'",
+        "name": "b'We All Sin Here'",
+        "genre": "hiphop",
+        "code": "spotify:track:7qsM9aMNYPQyxbRGFnpNh9",
+        "valence": 0.255,
+        "energy": 0.556
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 120,
+    "fields": {
+        "created": "2018-11-28T03:55:32.114Z",
+        "updated": "2018-11-28T03:55:32.114Z",
+        "artist": "b'K. Forest'",
+        "name": "b'Blue Moon'",
+        "genre": "hiphop",
+        "code": "spotify:track:4OZIJ9o0cBCvDyN8YsXVoN",
+        "valence": 0.312,
+        "energy": 0.523
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 121,
+    "fields": {
+        "created": "2018-11-28T03:55:32.198Z",
+        "updated": "2018-11-28T03:55:32.198Z",
+        "artist": "b'Sean Sison'",
+        "name": "b'Tonight'",
+        "genre": "hiphop",
+        "code": "spotify:track:4pd9DUftP3IdGk8fXlx48F",
+        "valence": 0.0817,
+        "energy": 0.324
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 122,
+    "fields": {
+        "created": "2018-11-28T03:55:32.284Z",
+        "updated": "2018-11-28T03:55:32.284Z",
+        "artist": "b'Myke Bogan'",
+        "name": "b'Take the Nite Off'",
+        "genre": "hiphop",
+        "code": "spotify:track:6wYd6681drKBuC6MZU5lN9",
+        "valence": 0.452,
+        "energy": 0.603
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 123,
+    "fields": {
+        "created": "2018-11-28T03:55:32.404Z",
+        "updated": "2018-11-28T03:55:32.404Z",
+        "artist": "b'LL Cool J'",
+        "name": "b'Hey Lover'",
+        "genre": "hiphop",
+        "code": "spotify:track:64gaTolmXymtP6AA5urDWd",
+        "valence": 0.528,
+        "energy": 0.423
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 124,
+    "fields": {
+        "created": "2018-11-28T03:55:32.479Z",
+        "updated": "2018-11-28T03:55:32.479Z",
+        "artist": "b'House Of Pain'",
+        "name": "b'Jump Around'",
+        "genre": "hiphop",
+        "code": "spotify:track:2oTDOIAdsxPTE7yAp4YOcv",
+        "valence": 0.818,
+        "energy": 0.71
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 125,
+    "fields": {
+        "created": "2018-11-28T03:55:32.558Z",
+        "updated": "2018-11-28T03:55:32.558Z",
+        "artist": "b'Pete Rock & C.L. Smooth'",
+        "name": "b'They Reminisce Over You'",
+        "genre": "hiphop",
+        "code": "spotify:track:2Mb3zpobD0CvJGWv6NpsPy",
+        "valence": 0.671,
+        "energy": 0.683
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 126,
+    "fields": {
+        "created": "2018-11-28T03:55:32.634Z",
+        "updated": "2018-11-28T03:55:32.635Z",
+        "artist": "b'Will Smith'",
+        "name": "b'Miami'",
+        "genre": "hiphop",
+        "code": "spotify:track:5n276uEKrEFohrt42pP8Tf",
+        "valence": 0.896,
+        "energy": 0.538
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 127,
+    "fields": {
+        "created": "2018-11-28T03:55:32.734Z",
+        "updated": "2018-11-28T03:55:32.734Z",
+        "artist": "b'Big Pun'",
+        "name": "b'Still Not a Player (feat. Joe) - Radio Version'",
+        "genre": "hiphop",
+        "code": "spotify:track:3GKL13lkM5nRc4zC1lIOrR",
+        "valence": 0.864,
+        "energy": 0.619
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 128,
+    "fields": {
+        "created": "2018-11-28T03:55:32.818Z",
+        "updated": "2018-11-28T03:55:32.818Z",
+        "artist": "b'Diddy'",
+        "name": "b\"I'll Be Missing You (feat. Faith Evans & 112)\"",
+        "genre": "hiphop",
+        "code": "spotify:track:1yy2DlSDtEt90d54rPDPXz",
+        "valence": 0.901,
+        "energy": 0.619
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 129,
+    "fields": {
+        "created": "2018-11-28T03:55:32.902Z",
+        "updated": "2018-11-28T03:55:32.902Z",
+        "artist": "b'DJ Jazzy Jeff & The Fresh Prince'",
+        "name": "b'Summertime'",
+        "genre": "hiphop",
+        "code": "spotify:track:20XdEFyaUR9C7aDIdq2OAd",
+        "valence": 0.469,
+        "energy": 0.54
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 130,
+    "fields": {
+        "created": "2018-11-28T03:55:33.009Z",
+        "updated": "2018-11-28T03:55:33.009Z",
+        "artist": "b'Naughty By Nature'",
+        "name": "b'Hip Hop Hooray'",
+        "genre": "hiphop",
+        "code": "spotify:track:6MszGZxe52sc4owTmjp0O9",
+        "valence": 0.765,
+        "energy": 0.642
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 131,
+    "fields": {
+        "created": "2018-11-28T03:55:33.093Z",
+        "updated": "2018-11-28T03:55:33.093Z",
+        "artist": "b'A Tribe Called Quest'",
+        "name": "b'Electric Relaxation'",
+        "genre": "hiphop",
+        "code": "spotify:track:0eEXcw3JLVXcRxYrVYMy68",
+        "valence": 0.841,
+        "energy": 0.534
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 132,
+    "fields": {
+        "created": "2018-11-28T03:55:33.177Z",
+        "updated": "2018-11-28T03:55:33.178Z",
+        "artist": "b'Rakim'",
+        "name": "b\"Guess Who's Back\"",
+        "genre": "hiphop",
+        "code": "spotify:track:5czjjnbTatyFal33a9h1aN",
+        "valence": 0.664,
+        "energy": 0.799
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 133,
+    "fields": {
+        "created": "2018-11-28T03:55:33.265Z",
+        "updated": "2018-11-28T03:55:33.265Z",
+        "artist": "b'KRS-One'",
+        "name": "b'Sound of da Police'",
+        "genre": "hiphop",
+        "code": "spotify:track:3Y6XWs8xMlCngyIxNOFnsp",
+        "valence": 0.324,
+        "energy": 0.95
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 134,
+    "fields": {
+        "created": "2018-11-28T03:55:33.376Z",
+        "updated": "2018-11-28T03:55:33.376Z",
+        "artist": "b'Ms. Lauryn Hill'",
+        "name": "b'Doo Wop (That Thing)'",
+        "genre": "hiphop",
+        "code": "spotify:track:2bZfoRmADhlF5gMCSZ4pDS",
+        "valence": 0.495,
+        "energy": 0.505
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 135,
+    "fields": {
+        "created": "2018-11-28T03:55:33.458Z",
+        "updated": "2018-11-28T03:55:33.458Z",
+        "artist": "b'Eric B. & Rakim'",
+        "name": "b\"Don't Sweat The Technique\"",
+        "genre": "hiphop",
+        "code": "spotify:track:3YXlTtlYDXI2SyofNm1ccg",
+        "valence": 0.777,
+        "energy": 0.908
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 136,
+    "fields": {
+        "created": "2018-11-28T03:55:33.536Z",
+        "updated": "2018-11-28T03:55:33.536Z",
+        "artist": "b'A Tribe Called Quest'",
+        "name": "b'Can I Kick It?'",
+        "genre": "hiphop",
+        "code": "spotify:track:3Ti0GdlrotgwsAVBBugv0I",
+        "valence": 0.744,
+        "energy": 0.666
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 137,
+    "fields": {
+        "created": "2018-11-28T03:55:33.619Z",
+        "updated": "2018-11-28T03:55:33.619Z",
+        "artist": "b'Naughty By Nature'",
+        "name": "b'Feel Me Flow'",
+        "genre": "hiphop",
+        "code": "spotify:track:6Kp8tQd95YPSrSUTkll2Of",
+        "valence": 0.844,
+        "energy": 0.754
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 138,
+    "fields": {
+        "created": "2018-11-28T03:55:33.725Z",
+        "updated": "2018-11-28T03:55:33.725Z",
+        "artist": "b'Fugees'",
+        "name": "b'Nappy Heads - Remix'",
+        "genre": "hiphop",
+        "code": "spotify:track:0hKr166QnNZ0a37G4UO0VY",
+        "valence": 0.642,
+        "energy": 0.456
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 139,
+    "fields": {
+        "created": "2018-11-28T03:55:33.819Z",
+        "updated": "2018-11-28T03:55:33.819Z",
+        "artist": "b'The Pharcyde'",
+        "name": "b'Passing Me By'",
+        "genre": "hiphop",
+        "code": "spotify:track:6enXeBnLnyjfweN6VWcIoh",
+        "valence": 0.599,
+        "energy": 0.76
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 140,
+    "fields": {
+        "created": "2018-11-28T03:55:33.909Z",
+        "updated": "2018-11-28T03:55:33.909Z",
+        "artist": "b'Luniz'",
+        "name": "b'I Got 5 On It'",
+        "genre": "hiphop",
+        "code": "spotify:track:4IYKjN1DrYzxKXt0umJqsG",
+        "valence": 0.58,
+        "energy": 0.706
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 141,
+    "fields": {
+        "created": "2018-11-28T03:55:34.022Z",
+        "updated": "2018-11-28T03:55:34.022Z",
+        "artist": "b'Souls Of Mischief'",
+        "name": "b\"93 'Til Infinity\"",
+        "genre": "hiphop",
+        "code": "spotify:track:0PV1TFUMTBrDETzW6KQulB",
+        "valence": 0.688,
+        "energy": 0.672
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 142,
+    "fields": {
+        "created": "2018-11-28T03:55:34.102Z",
+        "updated": "2018-11-28T03:55:34.102Z",
+        "artist": "b'Smif-N-Wessun'",
+        "name": "b'Wreckonize - Remix Vocal'",
+        "genre": "hiphop",
+        "code": "spotify:track:22Yq5tkMN8JE7h1Bq3pWHS",
+        "valence": 0.559,
+        "energy": 0.451
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 143,
+    "fields": {
+        "created": "2018-11-28T03:55:34.182Z",
+        "updated": "2018-11-28T03:55:34.182Z",
+        "artist": "b'Blackstreet'",
+        "name": "b'No Diggity'",
+        "genre": "hiphop",
+        "code": "spotify:track:0AvV49z4EPz5ocYN7eKGAK",
+        "valence": 0.67,
+        "energy": 0.646
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 144,
+    "fields": {
+        "created": "2018-11-28T03:55:34.268Z",
+        "updated": "2018-11-28T03:55:34.268Z",
+        "artist": "b'Beastie Boys'",
+        "name": "b'Intergalactic - Remastered'",
+        "genre": "hiphop",
+        "code": "spotify:track:5fpizYGbi5IQoEraj6FP0R",
+        "valence": 0.47,
+        "energy": 0.864
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 145,
+    "fields": {
+        "created": "2018-11-28T03:55:34.375Z",
+        "updated": "2018-11-28T03:55:34.375Z",
+        "artist": "b'Coolio'",
+        "name": "b\"Gangsta's Paradise\"",
+        "genre": "hiphop",
+        "code": "spotify:track:7lQWRAjyhTpCWFC0jmclT4",
+        "valence": 0.387,
+        "energy": 0.514
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 146,
+    "fields": {
+        "created": "2018-11-28T03:55:34.466Z",
+        "updated": "2018-11-28T03:55:34.466Z",
+        "artist": "b'Queen Latifah'",
+        "name": "b'U.N.I.T.Y.'",
+        "genre": "hiphop",
+        "code": "spotify:track:3mmbJnh1L94Zl8QZcUTq39",
+        "valence": 0.493,
+        "energy": 0.758
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 147,
+    "fields": {
+        "created": "2018-11-28T03:55:34.768Z",
+        "updated": "2018-11-28T03:55:34.768Z",
+        "artist": "b'Salt-N-Pepa'",
+        "name": "b'Shoop'",
+        "genre": "hiphop",
+        "code": "spotify:track:0ipLnUeK5PODrTKyT3wVGT",
+        "valence": 0.81,
+        "energy": 0.68
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 148,
+    "fields": {
+        "created": "2018-11-28T03:55:34.859Z",
+        "updated": "2018-11-28T03:55:34.859Z",
+        "artist": "b'blackwave.'",
+        "name": "b'GoodEnough'",
+        "genre": "hiphop",
+        "code": "spotify:track:6R8YNdqZntFupGut94mauB",
+        "valence": 0.609,
+        "energy": 0.483
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 149,
+    "fields": {
+        "created": "2018-11-28T03:55:34.947Z",
+        "updated": "2018-11-28T03:55:34.948Z",
+        "artist": "b'Dream Easy Collective'",
+        "name": "b'Sunrise Love'",
+        "genre": "hiphop",
+        "code": "spotify:track:04SOsj1h4TCNSuGk8Fbl14",
+        "valence": 0.776,
+        "energy": 0.582
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 150,
+    "fields": {
+        "created": "2018-11-28T03:55:35.057Z",
+        "updated": "2018-11-28T03:55:35.057Z",
+        "artist": "b'Square One'",
+        "name": "b'Knowledge is Knowledge'",
+        "genre": "hiphop",
+        "code": "spotify:track:44CJqtyqr3CjK8zTHbHaNv",
+        "valence": 0.502,
+        "energy": 0.661
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 151,
+    "fields": {
+        "created": "2018-11-28T03:55:35.140Z",
+        "updated": "2018-11-28T03:55:35.140Z",
+        "artist": "b'Blackalicious'",
+        "name": "b'Make You Feel That Way'",
+        "genre": "hiphop",
+        "code": "spotify:track:4TlYG3mKosVWfGbb9VfDh3",
+        "valence": 0.665,
+        "energy": 0.513
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 152,
+    "fields": {
+        "created": "2018-11-28T03:55:35.223Z",
+        "updated": "2018-11-28T03:55:35.223Z",
+        "artist": "b'Panacea'",
+        "name": "b'Walk In The Park (Damu Remix)'",
+        "genre": "hiphop",
+        "code": "spotify:track:6SR2BDLHM7A0SDcnGznSnk",
+        "valence": 0.857,
+        "energy": 0.752
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 153,
+    "fields": {
+        "created": "2018-11-28T03:55:35.323Z",
+        "updated": "2018-11-28T03:55:35.323Z",
+        "artist": "b'Nujabes'",
+        "name": "b'Blessing It -remix (feat. Substantial & Pase Rock from Five Deez)'",
+        "genre": "hiphop",
+        "code": "spotify:track:4MbUcaX58NkUmKXe6FuBaV",
+        "valence": 0.568,
+        "energy": 0.726
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 154,
+    "fields": {
+        "created": "2018-11-28T03:55:35.427Z",
+        "updated": "2018-11-28T03:55:35.427Z",
+        "artist": "b'Ezra Collective'",
+        "name": "b'Chapter 7 (feat. Ty)'",
+        "genre": "hiphop",
+        "code": "spotify:track:04fnzAJxtQZFVbn8N3XrQm",
+        "valence": 0.803,
+        "energy": 0.523
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 155,
+    "fields": {
+        "created": "2018-11-28T03:55:35.509Z",
+        "updated": "2018-11-28T03:55:35.509Z",
+        "artist": "b'Jazz Liberatorz'",
+        "name": "b'Ease My Mind - Feat. Tre Hardson, Fat Lip & Omni'",
+        "genre": "hiphop",
+        "code": "spotify:track:0FMMLKHb74VB0H5u2fP6xo",
+        "valence": 0.609,
+        "energy": 0.567
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 156,
+    "fields": {
+        "created": "2018-11-28T03:55:35.630Z",
+        "updated": "2018-11-28T03:55:35.630Z",
+        "artist": "b'Handsome Boy Modeling School'",
+        "name": "b'The Truth'",
+        "genre": "hiphop",
+        "code": "spotify:track:2C0Y5RUvreuiElhHuce9Rv",
+        "valence": 0.477,
+        "energy": 0.393
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 157,
+    "fields": {
+        "created": "2018-11-28T03:55:35.714Z",
+        "updated": "2018-11-28T03:55:35.715Z",
+        "artist": "b'blackwave.'",
+        "name": "b'Elusive (feat. David Ngyah)'",
+        "genre": "hiphop",
+        "code": "spotify:track:4mbOTHs6heygME9uDHg0mf",
+        "valence": 0.651,
+        "energy": 0.675
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 158,
+    "fields": {
+        "created": "2018-11-28T03:55:35.815Z",
+        "updated": "2018-11-28T03:55:35.815Z",
+        "artist": "b'Lone Catalysts'",
+        "name": "b'Renaissance'",
+        "genre": "hiphop",
+        "code": "spotify:track:2PX1rx4zRjvHPb8AA5D57Z",
+        "valence": 0.476,
+        "energy": 0.759
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 159,
+    "fields": {
+        "created": "2018-11-28T03:55:35.893Z",
+        "updated": "2018-11-28T03:55:35.894Z",
+        "artist": "b'Tom Misch'",
+        "name": "b'It Runs Through Me'",
+        "genre": "hiphop",
+        "code": "spotify:track:0p92TJPcRHCbcSk3wCwWBz",
+        "valence": 0.274,
+        "energy": 0.607
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 160,
+    "fields": {
+        "created": "2018-11-28T03:55:35.977Z",
+        "updated": "2018-11-28T03:55:35.978Z",
+        "artist": "b'Genra'",
+        "name": "b'Zoe'",
+        "genre": "hiphop",
+        "code": "spotify:track:7AdvTJBXmJ3WhedAQGrS9D",
+        "valence": 0.884,
+        "energy": 0.762
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 161,
+    "fields": {
+        "created": "2018-11-28T03:55:36.079Z",
+        "updated": "2018-11-28T03:55:36.079Z",
+        "artist": "b'Nujabes'",
+        "name": "b'Feather (feat. Cise Starr & Akin from CYNE)'",
+        "genre": "hiphop",
+        "code": "spotify:track:2ej1A2Ze6P2EOW7KfIosZR",
+        "valence": 0.881,
+        "energy": 0.749
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 162,
+    "fields": {
+        "created": "2018-11-28T03:55:36.162Z",
+        "updated": "2018-11-28T03:55:36.162Z",
+        "artist": "b'The RH Factor'",
+        "name": "b'Poetry'",
+        "genre": "hiphop",
+        "code": "spotify:track:3nSECoLmCiUbpQVJtpmS1I",
+        "valence": 0.4,
+        "energy": 0.501
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 163,
+    "fields": {
+        "created": "2018-11-28T03:55:36.252Z",
+        "updated": "2018-11-28T03:55:36.252Z",
+        "artist": "b'One Be Lo'",
+        "name": "b'True Love feat. Decompoze'",
+        "genre": "hiphop",
+        "code": "spotify:track:25AAoZeYdLXiL7LzkAcKPG",
+        "valence": 0.898,
+        "energy": 0.827
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 164,
+    "fields": {
+        "created": "2018-11-28T03:55:36.363Z",
+        "updated": "2018-11-28T03:55:36.363Z",
+        "artist": "b'Alliance Ethnik'",
+        "name": "b'Respect (feat. Vinia Mojica)'",
+        "genre": "hiphop",
+        "code": "spotify:track:2uMb8n60MeFa6bjjjCzL49",
+        "valence": 0.761,
+        "energy": 0.47
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 165,
+    "fields": {
+        "created": "2018-11-28T03:55:36.448Z",
+        "updated": "2018-11-28T03:55:36.448Z",
+        "artist": "b'Summers Sons'",
+        "name": "b'Call It Love'",
+        "genre": "hiphop",
+        "code": "spotify:track:7ckK9JSAnCWy0m1fm1JBud",
+        "valence": 0.359,
+        "energy": 0.48
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 166,
+    "fields": {
+        "created": "2018-11-28T03:55:36.538Z",
+        "updated": "2018-11-28T03:55:36.538Z",
+        "artist": "b'Nubiyan Twist'",
+        "name": "b'Figure Numatic'",
+        "genre": "hiphop",
+        "code": "spotify:track:3cC4TINErPyxCWtSN9w32h",
+        "valence": 0.417,
+        "energy": 0.675
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 167,
+    "fields": {
+        "created": "2018-11-28T03:55:36.658Z",
+        "updated": "2018-11-28T03:55:36.658Z",
+        "artist": "b'Common'",
+        "name": "b'Invocation'",
+        "genre": "hiphop",
+        "code": "spotify:track:1zS4PMsHfkSXPkzrEkCkC6",
+        "valence": 0.78,
+        "energy": 0.539
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 168,
+    "fields": {
+        "created": "2018-11-28T03:55:36.742Z",
+        "updated": "2018-11-28T03:55:36.742Z",
+        "artist": "b'ZZ Top'",
+        "name": "b'Cheap Sunglasses'",
+        "genre": "rock",
+        "code": "spotify:track:30jsPpxLvSCYTTTtdjRzBp",
+        "valence": 0.828,
+        "energy": 0.461
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 169,
+    "fields": {
+        "created": "2018-11-28T03:55:36.847Z",
+        "updated": "2018-11-28T03:55:36.847Z",
+        "artist": "b'The Doors'",
+        "name": "b'L.A. Woman'",
+        "genre": "rock",
+        "code": "spotify:track:6DmfWj5kOa1fX8AwN9byOn",
+        "valence": 0.698,
+        "energy": 0.731
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 170,
+    "fields": {
+        "created": "2018-11-28T03:55:36.927Z",
+        "updated": "2018-11-28T03:55:36.927Z",
+        "artist": "b'Thin Lizzy'",
+        "name": "b'The Boys Are Back in Town'",
+        "genre": "rock",
+        "code": "spotify:track:43DeSV93pJPT4lCZaWZ6b1",
+        "valence": 0.768,
+        "energy": 0.706
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 171,
+    "fields": {
+        "created": "2018-11-28T03:55:37.004Z",
+        "updated": "2018-11-28T03:55:37.005Z",
+        "artist": "b'Van Morrison'",
+        "name": "b'Caravan'",
+        "genre": "rock",
+        "code": "spotify:track:1US01PIcb3RFVrcN8mO8CS",
+        "valence": 0.57,
+        "energy": 0.397
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 172,
+    "fields": {
+        "created": "2018-11-28T03:55:37.103Z",
+        "updated": "2018-11-28T03:55:37.103Z",
+        "artist": "b'The Knack'",
+        "name": "b'My Sharona'",
+        "genre": "rock",
+        "code": "spotify:track:1HOMkjp0nHMaTnfAkslCQj",
+        "valence": 0.897,
+        "energy": 0.7
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 173,
+    "fields": {
+        "created": "2018-11-28T03:55:37.180Z",
+        "updated": "2018-11-28T03:55:37.180Z",
+        "artist": "b'KISS'",
+        "name": "b'Black Diamond'",
+        "genre": "rock",
+        "code": "spotify:track:6PmckFG2BhEELc5OM7O7DS",
+        "valence": 0.141,
+        "energy": 0.627
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 174,
+    "fields": {
+        "created": "2018-11-28T03:55:37.266Z",
+        "updated": "2018-11-28T03:55:37.266Z",
+        "artist": "b'Eagles'",
+        "name": "b'Life In The Fast Lane - Remastered'",
+        "genre": "rock",
+        "code": "spotify:track:6gXrEUzibufX9xYPk3HD5p",
+        "valence": 0.883,
+        "energy": 0.755
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 175,
+    "fields": {
+        "created": "2018-11-28T03:55:37.370Z",
+        "updated": "2018-11-28T03:55:37.370Z",
+        "artist": "b'Pink Floyd'",
+        "name": "b'Another Brick in the Wall, Pt. 1'",
+        "genre": "rock",
+        "code": "spotify:track:7K6xMPtAjTuLPNlJMLf5bS",
+        "valence": 0.0967,
+        "energy": 0.0457
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 176,
+    "fields": {
+        "created": "2018-11-28T03:55:37.453Z",
+        "updated": "2018-11-28T03:55:37.453Z",
+        "artist": "b'Sweet'",
+        "name": "b'Ballroom Blitz'",
+        "genre": "rock",
+        "code": "spotify:track:3Pu3IChaAoa5EjgUBv5F6x",
+        "valence": 0.889,
+        "energy": 0.799
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 177,
+    "fields": {
+        "created": "2018-11-28T03:55:37.536Z",
+        "updated": "2018-11-28T03:55:37.537Z",
+        "artist": "b'The Rolling Stones'",
+        "name": "b'Brown Sugar'",
+        "genre": "rock",
+        "code": "spotify:track:61UuPxxYUvacEH6SHIK3sU",
+        "valence": 0.966,
+        "energy": 0.927
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 178,
+    "fields": {
+        "created": "2018-11-28T03:55:37.612Z",
+        "updated": "2018-11-28T03:55:37.612Z",
+        "artist": "b'Peter Frampton'",
+        "name": "b'Do You Feel Like We Do'",
+        "genre": "rock",
+        "code": "spotify:track:3rHHxve6ZpvjRM9bqTu4tL",
+        "valence": 0.384,
+        "energy": 0.568
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 179,
+    "fields": {
+        "created": "2018-11-28T03:55:37.720Z",
+        "updated": "2018-11-28T03:55:37.720Z",
+        "artist": "b'The Police'",
+        "name": "b'Roxanne - Remastered 2003'",
+        "genre": "rock",
+        "code": "spotify:track:0SYRVn2YF7HBscQEmlkpTI",
+        "valence": 0.745,
+        "energy": 0.746
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 180,
+    "fields": {
+        "created": "2018-11-28T03:55:37.810Z",
+        "updated": "2018-11-28T03:55:37.810Z",
+        "artist": "b'Blue \\xc3\\x96yster Cult'",
+        "name": "b\"(Don't Fear) The Reaper\"",
+        "genre": "rock",
+        "code": "spotify:track:5QTxFnGygVM4jFQiBovmRo",
+        "valence": 0.382,
+        "energy": 0.927
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 181,
+    "fields": {
+        "created": "2018-11-28T03:55:37.891Z",
+        "updated": "2018-11-28T03:55:37.891Z",
+        "artist": "b'Van Halen'",
+        "name": "b\"Runnin' With The Devil - 2015 Remastered Version\"",
+        "genre": "rock",
+        "code": "spotify:track:3KhF2YiNpJvGpfiCW45R6D",
+        "valence": 0.42,
+        "energy": 0.9
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 182,
+    "fields": {
+        "created": "2018-11-28T03:55:37.980Z",
+        "updated": "2018-11-28T03:55:37.980Z",
+        "artist": "b'Bob Dylan'",
+        "name": "b\"Knockin' On Heaven's Door - Remastered\"",
+        "genre": "rock",
+        "code": "spotify:track:6HSXNV0b4M4cLJ7ljgVVeh",
+        "valence": 0.229,
+        "energy": 0.396
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 183,
+    "fields": {
+        "created": "2018-11-28T03:55:38.080Z",
+        "updated": "2018-11-28T03:55:38.081Z",
+        "artist": "b'Lynyrd Skynyrd'",
+        "name": "b'Free Bird'",
+        "genre": "rock",
+        "code": "spotify:track:5EWPGh7jbTNO2wakv8LjUI",
+        "valence": 0.351,
+        "energy": 0.844
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 184,
+    "fields": {
+        "created": "2018-11-28T03:55:38.164Z",
+        "updated": "2018-11-28T03:55:38.164Z",
+        "artist": "b'Led Zeppelin'",
+        "name": "b'Stairway To Heaven'",
+        "genre": "rock",
+        "code": "spotify:track:5CQ30WqJwcep0pYcV4AMNc",
+        "valence": 0.197,
+        "energy": 0.34
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 185,
+    "fields": {
+        "created": "2018-11-28T03:55:38.251Z",
+        "updated": "2018-11-28T03:55:38.251Z",
+        "artist": "b'The Who'",
+        "name": "b\"Baba O'Riley\"",
+        "genre": "rock",
+        "code": "spotify:track:3qiyyUfYe7CRYLucrPmulD",
+        "valence": 0.156,
+        "energy": 0.722
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 186,
+    "fields": {
+        "created": "2018-11-28T03:55:38.357Z",
+        "updated": "2018-11-28T03:55:38.357Z",
+        "artist": "b'Blondie'",
+        "name": "b'Heart Of Glass - Special Mix'",
+        "genre": "rock",
+        "code": "spotify:track:0a4agFmqHXxcZl1nho1BxM",
+        "valence": 0.845,
+        "energy": 0.577
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 187,
+    "fields": {
+        "created": "2018-11-28T03:55:38.435Z",
+        "updated": "2018-11-28T03:55:38.435Z",
+        "artist": "b'Rush'",
+        "name": "b'2112: Overture / The Temples Of Syrinx / Discovery / Presentation / Oracle / Soliloquy / Grand Finale - Medley'",
+        "genre": "rock",
+        "code": "spotify:track:5H8xFHau0x3PI1CssO6EaX",
+        "valence": 0.189,
+        "energy": 0.795
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 188,
+    "fields": {
+        "created": "2018-11-28T03:55:38.512Z",
+        "updated": "2018-11-28T03:55:38.512Z",
+        "artist": "b'The Allman Brothers Band'",
+        "name": "b\"Ramblin' Man\"",
+        "genre": "rock",
+        "code": "spotify:track:2Q7LpkYrS0PBpoq3iCqypa",
+        "valence": 0.934,
+        "energy": 0.831
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 189,
+    "fields": {
+        "created": "2018-11-28T03:55:38.612Z",
+        "updated": "2018-11-28T03:55:38.612Z",
+        "artist": "b'Fleetwood Mac'",
+        "name": "b'Dreams - 2004 Remaster For Digital; 2004 Remaster'",
+        "genre": "rock",
+        "code": "spotify:track:0ofHAoxe9vBkTCp2UQIavz",
+        "valence": 0.789,
+        "energy": 0.492
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 190,
+    "fields": {
+        "created": "2018-11-28T03:55:38.696Z",
+        "updated": "2018-11-28T03:55:38.696Z",
+        "artist": "b'Eagles'",
+        "name": "b'Hotel California - Remastered'",
+        "genre": "rock",
+        "code": "spotify:track:40riOy7x9W7GXjyGp4pjAv",
+        "valence": 0.609,
+        "energy": 0.508
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 191,
+    "fields": {
+        "created": "2018-11-28T03:55:38.780Z",
+        "updated": "2018-11-28T03:55:38.780Z",
+        "artist": "b'Led Zeppelin'",
+        "name": "b'Black Dog'",
+        "genre": "rock",
+        "code": "spotify:track:3qT4bUD1MaWpGrTwcvguhb",
+        "valence": 0.749,
+        "energy": 0.864
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 192,
+    "fields": {
+        "created": "2018-11-28T03:55:38.880Z",
+        "updated": "2018-11-28T03:55:38.880Z",
+        "artist": "b'The Doors'",
+        "name": "b'Riders On The Storm'",
+        "genre": "rock",
+        "code": "spotify:track:14XWXWv5FoCbFzLksawpEe",
+        "valence": 0.716,
+        "energy": 0.722
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 193,
+    "fields": {
+        "created": "2018-11-28T03:55:38.959Z",
+        "updated": "2018-11-28T03:55:38.959Z",
+        "artist": "b'Des Rocs'",
+        "name": "b'Used to the Darkness'",
+        "genre": "rock",
+        "code": "spotify:track:5xlUcf5txiXDgPleHzkm8s",
+        "valence": 0.449,
+        "energy": 0.747
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 194,
+    "fields": {
+        "created": "2018-11-28T03:55:39.035Z",
+        "updated": "2018-11-28T03:55:39.035Z",
+        "artist": "b'Pop Evil'",
+        "name": "b'Be Legendary'",
+        "genre": "rock",
+        "code": "spotify:track:2mVFo8BJ6ZPh82QAOpCUbT",
+        "valence": 0.364,
+        "energy": 0.944
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 195,
+    "fields": {
+        "created": "2018-11-28T03:55:39.135Z",
+        "updated": "2018-11-28T03:55:39.135Z",
+        "artist": "b'Arrested Youth'",
+        "name": "b'Black X White'",
+        "genre": "rock",
+        "code": "spotify:track:7jmu6smJmTbwuos76ncNZ8",
+        "valence": 0.485,
+        "energy": 0.599
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 196,
+    "fields": {
+        "created": "2018-11-28T03:55:39.221Z",
+        "updated": "2018-11-28T03:55:39.221Z",
+        "artist": "b'The Struts'",
+        "name": "b'Body Talks'",
+        "genre": "rock",
+        "code": "spotify:track:4ikBDu58f3peRVRsXxuP2Q",
+        "valence": 0.62,
+        "energy": 0.859
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 197,
+    "fields": {
+        "created": "2018-11-28T03:55:39.309Z",
+        "updated": "2018-11-28T03:55:39.309Z",
+        "artist": "b'Panic! At The Disco'",
+        "name": "b'High Hopes'",
+        "genre": "rock",
+        "code": "spotify:track:1rqqCSm0Qe4I9rUvWncaom",
+        "valence": 0.681,
+        "energy": 0.904
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 198,
+    "fields": {
+        "created": "2018-11-28T03:55:39.419Z",
+        "updated": "2018-11-28T03:55:39.419Z",
+        "artist": "b'Liily'",
+        "name": "b'Sold'",
+        "genre": "rock",
+        "code": "spotify:track:1YFxTkX1asVS76GynrhCjO",
+        "valence": 0.461,
+        "energy": 0.865
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 199,
+    "fields": {
+        "created": "2018-11-28T03:55:39.501Z",
+        "updated": "2018-11-28T03:55:39.501Z",
+        "artist": "b'Greta Van Fleet'",
+        "name": "b\"You're The One\"",
+        "genre": "rock",
+        "code": "spotify:track:3hQyytc08DLPP6vh7BX89p",
+        "valence": 0.575,
+        "energy": 0.807
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 200,
+    "fields": {
+        "created": "2018-11-28T03:55:39.586Z",
+        "updated": "2018-11-28T03:55:39.586Z",
+        "artist": "b'DREAMERS'",
+        "name": "b'All Washed Out'",
+        "genre": "rock",
+        "code": "spotify:track:03kgiS0813IuHfVMZix7hT",
+        "valence": 0.362,
+        "energy": 0.7
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 201,
+    "fields": {
+        "created": "2018-11-28T03:55:39.966Z",
+        "updated": "2018-11-28T03:55:39.967Z",
+        "artist": "b'Three Days Grace'",
+        "name": "b'Infra-Red'",
+        "genre": "rock",
+        "code": "spotify:track:6oe2HcrgnNU66Eyq8BY45Z",
+        "valence": 0.337,
+        "energy": 0.907
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 202,
+    "fields": {
+        "created": "2018-11-28T03:55:40.054Z",
+        "updated": "2018-11-28T03:55:40.054Z",
+        "artist": "b'Atreyu'",
+        "name": "b'The Time Is Now'",
+        "genre": "rock",
+        "code": "spotify:track:6wpHmxmxPa3N3Gi3aGdTJL",
+        "valence": 0.396,
+        "energy": 0.944
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 203,
+    "fields": {
+        "created": "2018-11-28T03:55:40.136Z",
+        "updated": "2018-11-28T03:55:40.136Z",
+        "artist": "b'Coheed and Cambria'",
+        "name": "b'Old Flames'",
+        "genre": "rock",
+        "code": "spotify:track:0FGlRz0U160ypVQs5Ltfth",
+        "valence": 0.174,
+        "energy": 0.897
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 204,
+    "fields": {
+        "created": "2018-11-28T03:55:40.219Z",
+        "updated": "2018-11-28T03:55:40.219Z",
+        "artist": "b'Royal Tusk'",
+        "name": "b'Aftermath'",
+        "genre": "rock",
+        "code": "spotify:track:40n8ZJVmwkdNAUBZSv8Xhg",
+        "valence": 0.431,
+        "energy": 0.934
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 205,
+    "fields": {
+        "created": "2018-11-28T03:55:40.330Z",
+        "updated": "2018-11-28T03:55:40.330Z",
+        "artist": "b'Stand Atlantic'",
+        "name": "b'Lavender Bones'",
+        "genre": "rock",
+        "code": "spotify:track:27wvnSTpsyS9k06aDtXvt8",
+        "valence": 0.767,
+        "energy": 0.936
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 206,
+    "fields": {
+        "created": "2018-11-28T03:55:40.409Z",
+        "updated": "2018-11-28T03:55:40.409Z",
+        "artist": "b'Tom Morello'",
+        "name": "b'Every Step That I Take (feat. Portugal The Man & Whethan)'",
+        "genre": "rock",
+        "code": "spotify:track:6u4IPQPDP1sJMEUA4xqIi5",
+        "valence": 0.53,
+        "energy": 0.765
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 207,
+    "fields": {
+        "created": "2018-11-28T03:55:40.493Z",
+        "updated": "2018-11-28T03:55:40.493Z",
+        "artist": "b'Ghost'",
+        "name": "b'Dance Macabre'",
+        "genre": "rock",
+        "code": "spotify:track:3ZZKg4Xt5PNtihSJS722JS",
+        "valence": 0.727,
+        "energy": 0.696
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 208,
+    "fields": {
+        "created": "2018-11-28T03:55:40.608Z",
+        "updated": "2018-11-28T03:55:40.608Z",
+        "artist": "b'Papa Roach'",
+        "name": "b'Who Do You Trust?'",
+        "genre": "rock",
+        "code": "spotify:track:7kJkTFmKYHrp9LT8w0oqpG",
+        "valence": 0.312,
+        "energy": 0.885
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 209,
+    "fields": {
+        "created": "2018-11-28T03:55:40.690Z",
+        "updated": "2018-11-28T03:55:40.690Z",
+        "artist": "b'Goodbye June'",
+        "name": "b'Secrets In The Sunset'",
+        "genre": "rock",
+        "code": "spotify:track:2sHPKFtVy4Etpumo9Z9psd",
+        "valence": 0.52,
+        "energy": 0.916
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 210,
+    "fields": {
+        "created": "2018-11-28T03:55:40.770Z",
+        "updated": "2018-11-28T03:55:40.770Z",
+        "artist": "b'Imagine Dragons'",
+        "name": "b'Natural'",
+        "genre": "rock",
+        "code": "spotify:track:4zIO3ilp5HvTeK3HJHxhMP",
+        "valence": 0.213,
+        "energy": 0.612
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 211,
+    "fields": {
+        "created": "2018-11-28T03:55:40.852Z",
+        "updated": "2018-11-28T03:55:40.852Z",
+        "artist": "b'The Score'",
+        "name": "b'Stronger'",
+        "genre": "rock",
+        "code": "spotify:track:2gLkzq894rt2gR4lvZpqE5",
+        "valence": 0.134,
+        "energy": 0.677
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 212,
+    "fields": {
+        "created": "2018-11-28T03:55:40.948Z",
+        "updated": "2018-11-28T03:55:40.948Z",
+        "artist": "b'Disturbed'",
+        "name": "b'Are You Ready'",
+        "genre": "rock",
+        "code": "spotify:track:4Q5uB9p1o0DfjdVtkODhvL",
+        "valence": 0.511,
+        "energy": 0.976
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 213,
+    "fields": {
+        "created": "2018-11-28T03:55:41.042Z",
+        "updated": "2018-11-28T03:55:41.042Z",
+        "artist": "b'grandson'",
+        "name": "b'Blood / / Water'",
+        "genre": "rock",
+        "code": "spotify:track:1rFAG22RkvaM6BlpWQoZ47",
+        "valence": 0.649,
+        "energy": 0.884
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 214,
+    "fields": {
+        "created": "2018-11-28T03:55:41.129Z",
+        "updated": "2018-11-28T03:55:41.129Z",
+        "artist": "b'Palaye Royale'",
+        "name": "b\"You'll Be Fine\"",
+        "genre": "rock",
+        "code": "spotify:track:3ZCTAoFsYaWTWGX8IH07Cf",
+        "valence": 0.446,
+        "energy": 0.931
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 215,
+    "fields": {
+        "created": "2018-11-28T03:55:41.204Z",
+        "updated": "2018-11-28T03:55:41.204Z",
+        "artist": "b'You Me At Six'",
+        "name": "b'I O U'",
+        "genre": "rock",
+        "code": "spotify:track:1JGu6CJfwKTqJCvkyCUPII",
+        "valence": 0.558,
+        "energy": 0.817
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 216,
+    "fields": {
+        "created": "2018-11-28T03:55:41.301Z",
+        "updated": "2018-11-28T03:55:41.301Z",
+        "artist": "b'Slash'",
+        "name": "b'Mind Your Manners (feat. Myles Kennedy and The Conspirators)'",
+        "genre": "rock",
+        "code": "spotify:track:5Li5c2RcVgeN7wc1C0BqmI",
+        "valence": 0.45,
+        "energy": 0.98
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 217,
+    "fields": {
+        "created": "2018-11-28T03:55:41.386Z",
+        "updated": "2018-11-28T03:55:41.386Z",
+        "artist": "b'cleopatrick'",
+        "name": "b'bernard trigger'",
+        "genre": "rock",
+        "code": "spotify:track:7KLmBGIrxaOaoTcUQrLKub",
+        "valence": 0.338,
+        "energy": 0.792
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 218,
+    "fields": {
+        "created": "2018-11-28T03:55:41.470Z",
+        "updated": "2018-11-28T03:55:41.470Z",
+        "artist": "b'Foo Fighters'",
+        "name": "b'Best of You'",
+        "genre": "rock",
+        "code": "spotify:track:4nUM7pGcTUK2pY1d2LybrT",
+        "valence": 0.345,
+        "energy": 0.944
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 219,
+    "fields": {
+        "created": "2018-11-28T03:55:41.574Z",
+        "updated": "2018-11-28T03:55:41.574Z",
+        "artist": "b'Queens of the Stone Age'",
+        "name": "b'No One Knows'",
+        "genre": "rock",
+        "code": "spotify:track:5VVuxxuQIJD0pjjFls1DKL",
+        "valence": 0.687,
+        "energy": 0.538
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 220,
+    "fields": {
+        "created": "2018-11-28T03:55:41.653Z",
+        "updated": "2018-11-28T03:55:41.653Z",
+        "artist": "b'Kings of Leon'",
+        "name": "b'Sex on Fire'",
+        "genre": "rock",
+        "code": "spotify:track:0ntQJM78wzOLVeCUAW7Y45",
+        "valence": 0.374,
+        "energy": 0.905
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 221,
+    "fields": {
+        "created": "2018-11-28T03:55:41.731Z",
+        "updated": "2018-11-28T03:55:41.731Z",
+        "artist": "b'Three Days Grace'",
+        "name": "b'I Hate Everything About You'",
+        "genre": "rock",
+        "code": "spotify:track:6rUp7v3l8yC4TKxAAR5Bmx",
+        "valence": 0.453,
+        "energy": 0.83
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 222,
+    "fields": {
+        "created": "2018-11-28T03:55:41.835Z",
+        "updated": "2018-11-28T03:55:41.835Z",
+        "artist": "b'Breaking Benjamin'",
+        "name": "b'The Diary of Jane - Single Version'",
+        "genre": "rock",
+        "code": "spotify:track:5pvJ59i7JxylN8VB24xdMs",
+        "valence": 0.357,
+        "energy": 0.961
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 223,
+    "fields": {
+        "created": "2018-11-28T03:55:41.914Z",
+        "updated": "2018-11-28T03:55:41.914Z",
+        "artist": "b'Arctic Monkeys'",
+        "name": "b'I Bet You Look Good On The Dancefloor'",
+        "genre": "rock",
+        "code": "spotify:track:29EkMZmUNz1WsuzaMtVo1i",
+        "valence": 0.778,
+        "energy": 0.948
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 224,
+    "fields": {
+        "created": "2018-11-28T03:55:42.003Z",
+        "updated": "2018-11-28T03:55:42.003Z",
+        "artist": "b'Evanescence'",
+        "name": "b'Bring Me To Life'",
+        "genre": "rock",
+        "code": "spotify:track:0COqiPhxzoWICwFCS4eZcp",
+        "valence": 0.32,
+        "energy": 0.945
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 225,
+    "fields": {
+        "created": "2018-11-28T03:55:42.107Z",
+        "updated": "2018-11-28T03:55:42.108Z",
+        "artist": "b'Drowning Pool'",
+        "name": "b'Bodies'",
+        "genre": "rock",
+        "code": "spotify:track:7CpbhqKUedOIrcvc94p60Y",
+        "valence": 0.544,
+        "energy": 0.932
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 226,
+    "fields": {
+        "created": "2018-11-28T03:55:42.185Z",
+        "updated": "2018-11-28T03:55:42.185Z",
+        "artist": "b'Muse'",
+        "name": "b'Plug In Baby'",
+        "genre": "rock",
+        "code": "spotify:track:2UKARCqDrhkYDoVR4FN5Wi",
+        "valence": 0.349,
+        "energy": 0.965
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 227,
+    "fields": {
+        "created": "2018-11-28T03:55:42.274Z",
+        "updated": "2018-11-28T03:55:42.274Z",
+        "artist": "b'Rise Against'",
+        "name": "b'Savior'",
+        "genre": "rock",
+        "code": "spotify:track:3asFGFY3uLjMDmML1p0tYm",
+        "valence": 0.526,
+        "energy": 0.93
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 228,
+    "fields": {
+        "created": "2018-11-28T03:55:42.371Z",
+        "updated": "2018-11-28T03:55:42.371Z",
+        "artist": "b'Muse'",
+        "name": "b'Uprising'",
+        "genre": "rock",
+        "code": "spotify:track:4VqPOruhp5EdPBeR92t6lQ",
+        "valence": 0.411,
+        "energy": 0.905
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 229,
+    "fields": {
+        "created": "2018-11-28T03:55:42.446Z",
+        "updated": "2018-11-28T03:55:42.446Z",
+        "artist": "b'U2'",
+        "name": "b'Vertigo'",
+        "genre": "rock",
+        "code": "spotify:track:57ZXcBtCZXSg9TVV5xRdnR",
+        "valence": 0.683,
+        "energy": 0.831
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 230,
+    "fields": {
+        "created": "2018-11-28T03:55:42.527Z",
+        "updated": "2018-11-28T03:55:42.527Z",
+        "artist": "b'AFI'",
+        "name": "b'Miss Murder'",
+        "genre": "rock",
+        "code": "spotify:track:0Ti2dlF2xLjXblvdU5fCxM",
+        "valence": 0.725,
+        "energy": 0.875
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 231,
+    "fields": {
+        "created": "2018-11-28T03:55:42.620Z",
+        "updated": "2018-11-28T03:55:42.620Z",
+        "artist": "b'The White Stripes'",
+        "name": "b'Seven Nation Army'",
+        "genre": "rock",
+        "code": "spotify:track:7i6r9KotUPQg3ozKKgEPIN",
+        "valence": 0.324,
+        "energy": 0.463
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 232,
+    "fields": {
+        "created": "2018-11-28T03:55:42.707Z",
+        "updated": "2018-11-28T03:55:42.707Z",
+        "artist": "b'Foo Fighters'",
+        "name": "b'All My Life'",
+        "genre": "rock",
+        "code": "spotify:track:5vMDvp6nUnTYhl5NMpgOnL",
+        "valence": 0.674,
+        "energy": 0.597
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 233,
+    "fields": {
+        "created": "2018-11-28T03:55:42.779Z",
+        "updated": "2018-11-28T03:55:42.779Z",
+        "artist": "b'blink-182'",
+        "name": "b'I Miss You'",
+        "genre": "rock",
+        "code": "spotify:track:1oTo3ijRbaDAtrjJrGAPSw",
+        "valence": 0.623,
+        "energy": 0.778
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 234,
+    "fields": {
+        "created": "2018-11-28T03:55:42.885Z",
+        "updated": "2018-11-28T03:55:42.885Z",
+        "artist": "b'Jet'",
+        "name": "b'Are You Gonna Be My Girl'",
+        "genre": "rock",
+        "code": "spotify:track:305WCRhhS10XUcH6AEwZk6",
+        "valence": 0.537,
+        "energy": 0.953
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 235,
+    "fields": {
+        "created": "2018-11-28T03:55:42.959Z",
+        "updated": "2018-11-28T03:55:42.959Z",
+        "artist": "b'Wolfmother'",
+        "name": "b'Woman'",
+        "genre": "rock",
+        "code": "spotify:track:3CkjLJYnnyOtGk4Jx4iYS4",
+        "valence": 0.172,
+        "energy": 0.952
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 236,
+    "fields": {
+        "created": "2018-11-28T03:55:43.035Z",
+        "updated": "2018-11-28T03:55:43.035Z",
+        "artist": "b'The Strokes'",
+        "name": "b'Last Nite'",
+        "genre": "rock",
+        "code": "spotify:track:3SUusuA9jH1v6PVwtYMbdv",
+        "valence": 0.797,
+        "energy": 0.899
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 237,
+    "fields": {
+        "created": "2018-11-28T03:55:43.135Z",
+        "updated": "2018-11-28T03:55:43.135Z",
+        "artist": "b'Nickelback'",
+        "name": "b'How You Remind Me'",
+        "genre": "rock",
+        "code": "spotify:track:0F2nGhgFNlkVHm81zNEvW6",
+        "valence": 0.574,
+        "energy": 0.766
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 238,
+    "fields": {
+        "created": "2018-11-28T03:55:43.219Z",
+        "updated": "2018-11-28T03:55:43.219Z",
+        "artist": "b'Red Hot Chili Peppers'",
+        "name": "b\"Can't Stop\"",
+        "genre": "rock",
+        "code": "spotify:track:3ZOEytgrvLwQaqXreDs2Jx",
+        "valence": 0.875,
+        "energy": 0.938
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 239,
+    "fields": {
+        "created": "2018-11-28T03:55:43.290Z",
+        "updated": "2018-11-28T03:55:43.290Z",
+        "artist": "b'The Raconteurs'",
+        "name": "b'Steady, As She Goes'",
+        "genre": "rock",
+        "code": "spotify:track:19iqWNzp5LwEdvntpEK8MP",
+        "valence": 0.537,
+        "energy": 0.578
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 240,
+    "fields": {
+        "created": "2018-11-28T03:55:43.390Z",
+        "updated": "2018-11-28T03:55:43.390Z",
+        "artist": "b'P.O.D.'",
+        "name": "b'Youth Of The Nation'",
+        "genre": "rock",
+        "code": "spotify:track:0UrWr7Jnu1heq1o99ZwUd0",
+        "valence": 0.517,
+        "energy": 0.86
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 241,
+    "fields": {
+        "created": "2018-11-28T03:55:43.471Z",
+        "updated": "2018-11-28T03:55:43.471Z",
+        "artist": "b'Kings of Leon'",
+        "name": "b'Use Somebody'",
+        "genre": "rock",
+        "code": "spotify:track:5VGlqQANWDKJFl0MBG3sg2",
+        "valence": 0.173,
+        "energy": 0.715
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 242,
+    "fields": {
+        "created": "2018-11-28T03:55:43.549Z",
+        "updated": "2018-11-28T03:55:43.549Z",
+        "artist": "b'Jimmy Eat World'",
+        "name": "b'The Middle'",
+        "genre": "rock",
+        "code": "spotify:track:3mcG2NI5G5vhrQtRda1YnA",
+        "valence": 0.93,
+        "energy": 0.897
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 243,
+    "fields": {
+        "created": "2018-11-28T03:55:43.646Z",
+        "updated": "2018-11-28T03:55:43.646Z",
+        "artist": "b'Soft Cell'",
+        "name": "b'Tainted Love'",
+        "genre": "rock",
+        "code": "spotify:track:44hOGg1uFg1XJZGZYNwYmM",
+        "valence": 0.696,
+        "energy": 0.402
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 244,
+    "fields": {
+        "created": "2018-11-28T03:55:43.730Z",
+        "updated": "2018-11-28T03:55:43.730Z",
+        "artist": "b'Prince'",
+        "name": "b'When Doves Cry'",
+        "genre": "rock",
+        "code": "spotify:track:51H2y6YrNNXcy3dfc3qSbA",
+        "valence": 0.84,
+        "energy": 0.989
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 245,
+    "fields": {
+        "created": "2018-11-28T03:55:43.801Z",
+        "updated": "2018-11-28T03:55:43.801Z",
+        "artist": "b'DEVO'",
+        "name": "b'Whip It'",
+        "genre": "rock",
+        "code": "spotify:track:6QG0wcgoCsa9pqFyTg0rRO",
+        "valence": 0.961,
+        "energy": 0.716
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 246,
+    "fields": {
+        "created": "2018-11-28T03:55:43.907Z",
+        "updated": "2018-11-28T03:55:43.908Z",
+        "artist": "b'Quiet Riot'",
+        "name": "b'Cum on Feel the Noize'",
+        "genre": "rock",
+        "code": "spotify:track:6FBmHx1FuaSnTnnnaThgbF",
+        "valence": 0.632,
+        "energy": 0.908
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 247,
+    "fields": {
+        "created": "2018-11-28T03:55:43.982Z",
+        "updated": "2018-11-28T03:55:43.982Z",
+        "artist": "b'Depeche Mode'",
+        "name": "b'Personal Jesus - Single Version'",
+        "genre": "rock",
+        "code": "spotify:track:4UCTgh5jvtqoaMX6MAhUNn",
+        "valence": 0.793,
+        "energy": 0.899
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 248,
+    "fields": {
+        "created": "2018-11-28T03:55:44.057Z",
+        "updated": "2018-11-28T03:55:44.057Z",
+        "artist": "b'Talking Heads'",
+        "name": "b'Once In A Lifetime - 2005 Remastered Version'",
+        "genre": "rock",
+        "code": "spotify:track:38Ngied9rBORlAbLYNCl4k",
+        "valence": 0.871,
+        "energy": 0.919
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 249,
+    "fields": {
+        "created": "2018-11-28T03:55:44.163Z",
+        "updated": "2018-11-28T03:55:44.163Z",
+        "artist": "b'Iron Maiden'",
+        "name": "b'Run to the Hills - 1998 Remastered Version'",
+        "genre": "rock",
+        "code": "spotify:track:2JS1iE5A5RHvUPH5Zl9jlF",
+        "valence": 0.432,
+        "energy": 0.956
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 250,
+    "fields": {
+        "created": "2018-11-28T03:55:44.254Z",
+        "updated": "2018-11-28T03:55:44.254Z",
+        "artist": "b'Queen'",
+        "name": "b'Another One Bites The Dust - Remastered 2011'",
+        "genre": "rock",
+        "code": "spotify:track:57JVGBtBLCfHw2muk5416J",
+        "valence": 0.699,
+        "energy": 0.53
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 251,
+    "fields": {
+        "created": "2018-11-28T03:55:44.326Z",
+        "updated": "2018-11-28T03:55:44.326Z",
+        "artist": "b'Aerosmith'",
+        "name": "b'Dude (Looks Like A Lady)'",
+        "genre": "rock",
+        "code": "spotify:track:6gQUbFwwdYXlKdmqRoWKJe",
+        "valence": 0.931,
+        "energy": 0.978
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 252,
+    "fields": {
+        "created": "2018-11-28T03:55:44.425Z",
+        "updated": "2018-11-28T03:55:44.425Z",
+        "artist": "b'Loverboy'",
+        "name": "b'Working for the Weekend'",
+        "genre": "rock",
+        "code": "spotify:track:0sgDEFq9oeC8ueOK0mR5IA",
+        "valence": 0.793,
+        "energy": 0.924
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 253,
+    "fields": {
+        "created": "2018-11-28T03:55:44.501Z",
+        "updated": "2018-11-28T03:55:44.501Z",
+        "artist": "b'U2'",
+        "name": "b\"I Still Haven't Found What I'm Looking For - Remastered 2007\"",
+        "genre": "rock",
+        "code": "spotify:track:3MRQ3CSjoiV1HFil8ykM9M",
+        "valence": 0.686,
+        "energy": 0.764
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 254,
+    "fields": {
+        "created": "2018-11-28T03:55:44.579Z",
+        "updated": "2018-11-28T03:55:44.579Z",
+        "artist": "b'Dexys Midnight Runners'",
+        "name": "b'Come On Eileen'",
+        "genre": "rock",
+        "code": "spotify:track:0EMmVUYs9ZZRHtlADB88uz",
+        "valence": 0.781,
+        "energy": 0.658
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 255,
+    "fields": {
+        "created": "2018-11-28T03:55:44.684Z",
+        "updated": "2018-11-28T03:55:44.684Z",
+        "artist": "b'Dead Or Alive'",
+        "name": "b'You Spin Me Round (Like a Record)'",
+        "genre": "rock",
+        "code": "spotify:track:7uHO4AmKtyGa5v5fsElGoC",
+        "valence": 0.965,
+        "energy": 0.943
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 256,
+    "fields": {
+        "created": "2018-11-28T03:55:44.757Z",
+        "updated": "2018-11-28T03:55:44.757Z",
+        "artist": "b'Journey'",
+        "name": "b\"Don't Stop Believin'\"",
+        "genre": "rock",
+        "code": "spotify:track:77NNZQSqzLNqh2A9JhLRkg",
+        "valence": 0.472,
+        "energy": 0.802
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 257,
+    "fields": {
+        "created": "2018-11-28T03:55:44.837Z",
+        "updated": "2018-11-28T03:55:44.837Z",
+        "artist": "b'R.E.M.'",
+        "name": "b\"It's The End Of The World As We Know It (And I Feel Fine)\"",
+        "genre": "rock",
+        "code": "spotify:track:2abfaXRfvXr9ErmI8oqz4g",
+        "valence": 0.774,
+        "energy": 0.893
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 258,
+    "fields": {
+        "created": "2018-11-28T03:55:44.946Z",
+        "updated": "2018-11-28T03:55:44.946Z",
+        "artist": "b'The Cure'",
+        "name": "b'Pictures Of You - Remastered'",
+        "genre": "rock",
+        "code": "spotify:track:72gg0bqrLCCyomkfunyiuU",
+        "valence": 0.546,
+        "energy": 0.764
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 259,
+    "fields": {
+        "created": "2018-11-28T03:55:45.023Z",
+        "updated": "2018-11-28T03:55:45.023Z",
+        "artist": "b'Iggy Pop'",
+        "name": "b'Real Wild Child (Wild One)'",
+        "genre": "rock",
+        "code": "spotify:track:4blsgJTKfFehcYdPvPkNoM",
+        "valence": 0.963,
+        "energy": 0.926
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 260,
+    "fields": {
+        "created": "2018-11-28T03:55:45.110Z",
+        "updated": "2018-11-28T03:55:45.110Z",
+        "artist": "b'George Michael'",
+        "name": "b'Faith - Remastered'",
+        "genre": "rock",
+        "code": "spotify:track:0HEmnAUT8PHznIAAmVXqFJ",
+        "valence": 0.607,
+        "energy": 0.48
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 261,
+    "fields": {
+        "created": "2018-11-28T03:55:45.185Z",
+        "updated": "2018-11-28T03:55:45.185Z",
+        "artist": "b'Whitesnake'",
+        "name": "b'Here I Go Again 87 - 2007 Remastered Version'",
+        "genre": "rock",
+        "code": "spotify:track:3rdxvEfBp86WNcRDLaFEk9",
+        "valence": 0.204,
+        "energy": 0.898
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 262,
+    "fields": {
+        "created": "2018-11-28T03:55:45.285Z",
+        "updated": "2018-11-28T03:55:45.285Z",
+        "artist": "b'Scorpions'",
+        "name": "b'Rock You Like A Hurricane'",
+        "genre": "rock",
+        "code": "spotify:track:0XIvZ82aDF7JiSi3ZE320u",
+        "valence": 0.774,
+        "energy": 0.601
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 263,
+    "fields": {
+        "created": "2018-11-28T03:55:45.359Z",
+        "updated": "2018-11-28T03:55:45.359Z",
+        "artist": "b'Run\\xe2\\x80\\x93D.M.C.'",
+        "name": "b'Walk This Way'",
+        "genre": "rock",
+        "code": "spotify:track:4lRdpZYTwaPpuKpquO6bo3",
+        "valence": 0.946,
+        "energy": 0.651
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 264,
+    "fields": {
+        "created": "2018-11-28T03:55:45.435Z",
+        "updated": "2018-11-28T03:55:45.435Z",
+        "artist": "b'Warrant'",
+        "name": "b'Cherry Pie'",
+        "genre": "rock",
+        "code": "spotify:track:7LygtNjQ65PSdzVjUnHXQb",
+        "valence": 0.486,
+        "energy": 0.946
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 265,
+    "fields": {
+        "created": "2018-11-28T03:55:45.535Z",
+        "updated": "2018-11-28T03:55:45.535Z",
+        "artist": "b'Bon Jovi'",
+        "name": "b'Bad Medicine'",
+        "genre": "rock",
+        "code": "spotify:track:72hcFp4tYkd3dbNA9dZ3Pv",
+        "valence": 0.805,
+        "energy": 0.973
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 266,
+    "fields": {
+        "created": "2018-11-28T03:55:45.621Z",
+        "updated": "2018-11-28T03:55:45.622Z",
+        "artist": "b'Van Halen'",
+        "name": "b'Jump - 2015 Remastered Version'",
+        "genre": "rock",
+        "code": "spotify:track:7N3PAbqfTjSEU1edb2tY8j",
+        "valence": 0.796,
+        "energy": 0.835
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 267,
+    "fields": {
+        "created": "2018-11-28T03:55:45.690Z",
+        "updated": "2018-11-28T03:55:45.690Z",
+        "artist": "b'A Flock Of Seagulls'",
+        "name": "b'I Ran'",
+        "genre": "rock",
+        "code": "spotify:track:1kDWbI0qgA2a11idtF2xNx",
+        "valence": 0.669,
+        "energy": 0.858
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 268,
+    "fields": {
+        "created": "2018-11-28T03:55:45.790Z",
+        "updated": "2018-11-28T03:55:45.790Z",
+        "artist": "b'Declan J Donovan'",
+        "name": "b'Better'",
+        "genre": "chill",
+        "code": "spotify:track:2cJS4uSqiNCeH4CgOt9LNA",
+        "valence": 0.309,
+        "energy": 0.425
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 269,
+    "fields": {
+        "created": "2018-11-28T03:55:45.871Z",
+        "updated": "2018-11-28T03:55:45.871Z",
+        "artist": "b'JP Cooper'",
+        "name": "b'September Song - Guitar Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:4LTOzL6JsnQBifmpsbo9a5",
+        "valence": 0.526,
+        "energy": 0.428
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 270,
+    "fields": {
+        "created": "2018-11-28T03:55:45.949Z",
+        "updated": "2018-11-28T03:55:45.949Z",
+        "artist": "b'Joseph'",
+        "name": "b'Honest'",
+        "genre": "chill",
+        "code": "spotify:track:0WIzzUh0vzPHk58d3e8sXJ",
+        "valence": 0.304,
+        "energy": 0.44
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 271,
+    "fields": {
+        "created": "2018-11-28T03:55:46.055Z",
+        "updated": "2018-11-28T03:55:46.055Z",
+        "artist": "b'Ed Sheeran'",
+        "name": "b'Castle on the Hill - Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:5X6TnKT37TaSDkFm0598Uo",
+        "valence": 0.616,
+        "energy": 0.26
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 272,
+    "fields": {
+        "created": "2018-11-28T03:55:46.130Z",
+        "updated": "2018-11-28T03:55:46.130Z",
+        "artist": "b'Josh Ritter'",
+        "name": "b'Miles Away'",
+        "genre": "chill",
+        "code": "spotify:track:1iy9FLjmcGQdjAXWi1y4D1",
+        "valence": 0.196,
+        "energy": 0.592
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 273,
+    "fields": {
+        "created": "2018-11-28T03:55:46.201Z",
+        "updated": "2018-11-28T03:55:46.201Z",
+        "artist": "b'Ben Howard'",
+        "name": "b'Only Love'",
+        "genre": "chill",
+        "code": "spotify:track:2uhEKg8kIzpdvz4gyy6x8W",
+        "valence": 0.341,
+        "energy": 0.485
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 274,
+    "fields": {
+        "created": "2018-11-28T03:55:46.301Z",
+        "updated": "2018-11-28T03:55:46.301Z",
+        "artist": "b'Jamie Lawson'",
+        "name": "b\"Can't See Straight - Acoustic\"",
+        "genre": "chill",
+        "code": "spotify:track:68xnGmup4wL7Ie4vhy5SOs",
+        "valence": 0.647,
+        "energy": 0.38
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 275,
+    "fields": {
+        "created": "2018-11-28T03:55:46.370Z",
+        "updated": "2018-11-28T03:55:46.371Z",
+        "artist": "b'Barns Courtney'",
+        "name": "b'Little Boy'",
+        "genre": "chill",
+        "code": "spotify:track:19LehejAStoSf4Hj3Tim1M",
+        "valence": 0.393,
+        "energy": 0.608
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 276,
+    "fields": {
+        "created": "2018-11-28T03:55:46.458Z",
+        "updated": "2018-11-28T03:55:46.458Z",
+        "artist": "b'Matt Maeson'",
+        "name": "b'Cringe - Stripped'",
+        "genre": "chill",
+        "code": "spotify:track:6TpowNTagUJ7f8ctFFCVN8",
+        "valence": 0.222,
+        "energy": 0.263
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 277,
+    "fields": {
+        "created": "2018-11-28T03:55:46.557Z",
+        "updated": "2018-11-28T03:55:46.557Z",
+        "artist": "b'Mako'",
+        "name": "b'Smoke Filled Room - Acoustic Session'",
+        "genre": "chill",
+        "code": "spotify:track:0ncp94ULTBgS0U3GZD80AC",
+        "valence": 0.522,
+        "energy": 0.43
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 278,
+    "fields": {
+        "created": "2018-11-28T03:55:46.644Z",
+        "updated": "2018-11-28T03:55:46.644Z",
+        "artist": "b'Langhorne Slim'",
+        "name": "b'Life Is Confusing'",
+        "genre": "chill",
+        "code": "spotify:track:4sYjFmNN8Vv2Rjg8jhwrSX",
+        "valence": 0.496,
+        "energy": 0.216
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 279,
+    "fields": {
+        "created": "2018-11-28T03:55:46.723Z",
+        "updated": "2018-11-28T03:55:46.724Z",
+        "artist": "b'Halsey'",
+        "name": "b'Ghost - Live From Spotify NYC'",
+        "genre": "chill",
+        "code": "spotify:track:2ndJQ968H7uRS2rrYdEaQ3",
+        "valence": 0.164,
+        "energy": 0.553
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 280,
+    "fields": {
+        "created": "2018-11-28T03:55:46.823Z",
+        "updated": "2018-11-28T03:55:46.824Z",
+        "artist": "b'Lissie'",
+        "name": "b'Best Days - Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:38sCPCcv3QjWl0NslC5KtW",
+        "valence": 0.436,
+        "energy": 0.127
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 281,
+    "fields": {
+        "created": "2018-11-28T03:55:46.903Z",
+        "updated": "2018-11-28T03:55:46.904Z",
+        "artist": "b'The Lumineers'",
+        "name": "b'Ophelia'",
+        "genre": "chill",
+        "code": "spotify:track:3qhobDAfBcVoOWZP8Ck8R2",
+        "valence": 0.566,
+        "energy": 0.573
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 282,
+    "fields": {
+        "created": "2018-11-28T03:55:46.992Z",
+        "updated": "2018-11-28T03:55:46.992Z",
+        "artist": "b'Rihanna'",
+        "name": "b'FourFiveSeconds'",
+        "genre": "chill",
+        "code": "spotify:track:5XzmZjXhMjDHr7ZfJ6DELQ",
+        "valence": 0.321,
+        "energy": 0.268
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 283,
+    "fields": {
+        "created": "2018-11-28T03:55:47.110Z",
+        "updated": "2018-11-28T03:55:47.110Z",
+        "artist": "b'JONES'",
+        "name": "b'Melt (Acoustic Version)'",
+        "genre": "chill",
+        "code": "spotify:track:6W83GER4shtT9lpkYzEYeq",
+        "valence": 0.345,
+        "energy": 0.241
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 284,
+    "fields": {
+        "created": "2018-11-28T03:55:47.200Z",
+        "updated": "2018-11-28T03:55:47.200Z",
+        "artist": "b'Julia Michaels'",
+        "name": "b'Issues - Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:4TqiKcUUvK7y6x6JG5NpJX",
+        "valence": 0.632,
+        "energy": 0.342
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 285,
+    "fields": {
+        "created": "2018-11-28T03:55:47.289Z",
+        "updated": "2018-11-28T03:55:47.289Z",
+        "artist": "b'Peter Bradley Adams'",
+        "name": "b'My Arms Were Always Around You'",
+        "genre": "chill",
+        "code": "spotify:track:53iFMaNUXn6Oj8hUIKSO5a",
+        "valence": 0.422,
+        "energy": 0.436
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 286,
+    "fields": {
+        "created": "2018-11-28T03:55:47.370Z",
+        "updated": "2018-11-28T03:55:47.370Z",
+        "artist": "b'Jillian Jacqueline'",
+        "name": "b'Reasons - Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:6WCejh5wPX3OHgpdT6jvn4",
+        "valence": 0.581,
+        "energy": 0.388
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 287,
+    "fields": {
+        "created": "2018-11-28T03:55:47.489Z",
+        "updated": "2018-11-28T03:55:47.489Z",
+        "artist": "b'Kina Grannis'",
+        "name": "b'For Now'",
+        "genre": "chill",
+        "code": "spotify:track:0c99BUd87HQfzgUUQqRyds",
+        "valence": 0.329,
+        "energy": 0.249
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 288,
+    "fields": {
+        "created": "2018-11-28T03:55:47.577Z",
+        "updated": "2018-11-28T03:55:47.577Z",
+        "artist": "b'Tom Odell'",
+        "name": "b'Magnetised - Acoustic'",
+        "genre": "chill",
+        "code": "spotify:track:5baXzOMmD0sf26hayRqfqI",
+        "valence": 0.123,
+        "energy": 0.0746
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 289,
+    "fields": {
+        "created": "2018-11-28T03:55:47.657Z",
+        "updated": "2018-11-28T03:55:47.657Z",
+        "artist": "b'Birdy'",
+        "name": "b'Tee Shirt'",
+        "genre": "chill",
+        "code": "spotify:track:3C5in0EVdoGepp5bA6lhlE",
+        "valence": 0.557,
+        "energy": 0.341
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 290,
+    "fields": {
+        "created": "2018-11-28T03:55:47.740Z",
+        "updated": "2018-11-28T03:55:47.740Z",
+        "artist": "b'Vance Joy'",
+        "name": "b'Georgia'",
+        "genre": "chill",
+        "code": "spotify:track:429EttO8gs0bDo2SQfUNSm",
+        "valence": 0.401,
+        "energy": 0.66
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 291,
+    "fields": {
+        "created": "2018-11-28T03:55:47.847Z",
+        "updated": "2018-11-28T03:55:47.847Z",
+        "artist": "b'Ed Sheeran'",
+        "name": "b'Perfect Duet (Ed Sheeran & Beyonc\\xc3\\xa9)'",
+        "genre": "chill",
+        "code": "spotify:track:1bhUWB0zJMIKr9yVPrkEuI",
+        "valence": 0.356,
+        "energy": 0.299
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 292,
+    "fields": {
+        "created": "2018-11-28T03:55:47.938Z",
+        "updated": "2018-11-28T03:55:47.938Z",
+        "artist": "b'George Ogilvie'",
+        "name": "b'Foreign Hands'",
+        "genre": "chill",
+        "code": "spotify:track:7fDkkwlp02iHGzKlG2gZr8",
+        "valence": 0.361,
+        "energy": 0.543
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 293,
+    "fields": {
+        "created": "2018-11-28T03:55:48.030Z",
+        "updated": "2018-11-28T03:55:48.030Z",
+        "artist": "b'SINY'",
+        "name": "b'Hainan Paradise'",
+        "genre": "chill",
+        "code": "spotify:track:3au9gDDso4imJhWbJAS5Fp",
+        "valence": 0.431,
+        "energy": 0.446
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 294,
+    "fields": {
+        "created": "2018-11-28T03:55:48.116Z",
+        "updated": "2018-11-28T03:55:48.116Z",
+        "artist": "b'AGM'",
+        "name": "b'Conclusion'",
+        "genre": "chill",
+        "code": "spotify:track:1e92VSkCg0HIFwyxnDCfje",
+        "valence": 0.581,
+        "energy": 0.165
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 295,
+    "fields": {
+        "created": "2018-11-28T03:55:48.223Z",
+        "updated": "2018-11-28T03:55:48.224Z",
+        "artist": "b'Bertholet'",
+        "name": "b'Shut Down'",
+        "genre": "chill",
+        "code": "spotify:track:2HwUu7zFGbjxe6EDJgFyr6",
+        "valence": 0.0605,
+        "energy": 0.178
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 296,
+    "fields": {
+        "created": "2018-11-28T03:55:48.319Z",
+        "updated": "2018-11-28T03:55:48.319Z",
+        "artist": "b'Guustavv'",
+        "name": "b'Pashunfruit'",
+        "genre": "chill",
+        "code": "spotify:track:1KIDqJe5UTOYc6AckPlyNK",
+        "valence": 0.573,
+        "energy": 0.342
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 297,
+    "fields": {
+        "created": "2018-11-28T03:55:48.414Z",
+        "updated": "2018-11-28T03:55:48.414Z",
+        "artist": "b'Axian'",
+        "name": "b'Longing'",
+        "genre": "chill",
+        "code": "spotify:track:0lTckeFgXaqfQRuQlRyNNP",
+        "valence": 0.538,
+        "energy": 0.594
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 298,
+    "fields": {
+        "created": "2018-11-28T03:55:48.502Z",
+        "updated": "2018-11-28T03:55:48.502Z",
+        "artist": "b'MF Eistee'",
+        "name": "b'select'",
+        "genre": "chill",
+        "code": "spotify:track:4kHMEpUfa8YM88C7wsAjUU",
+        "valence": 0.716,
+        "energy": 0.0745
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 299,
+    "fields": {
+        "created": "2018-11-28T03:55:48.601Z",
+        "updated": "2018-11-28T03:55:48.601Z",
+        "artist": "b'Psalm Trees'",
+        "name": "b'4getu'",
+        "genre": "chill",
+        "code": "spotify:track:66EQzGelnmpiI1a1dhrjdE",
+        "valence": 0.595,
+        "energy": 0.363
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 300,
+    "fields": {
+        "created": "2018-11-28T03:55:48.680Z",
+        "updated": "2018-11-28T03:55:48.680Z",
+        "artist": "b'Minthaze'",
+        "name": "b'Burberry'",
+        "genre": "chill",
+        "code": "spotify:track:7M8TasYtN8n4q1rQLLZkZV",
+        "valence": 0.657,
+        "energy": 0.591
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 301,
+    "fields": {
+        "created": "2018-11-28T03:55:48.746Z",
+        "updated": "2018-11-28T03:55:48.746Z",
+        "artist": "b'Bluedoom'",
+        "name": "b'Sighs'",
+        "genre": "chill",
+        "code": "spotify:track:0sW00sB20vB9LsGb2FzjYI",
+        "valence": 0.267,
+        "energy": 0.499
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 302,
+    "fields": {
+        "created": "2018-11-28T03:55:48.851Z",
+        "updated": "2018-11-28T03:55:48.851Z",
+        "artist": "b'luvwn'",
+        "name": "b'sanya'",
+        "genre": "chill",
+        "code": "spotify:track:5199wPUOgLF1guJAh1uyZ2",
+        "valence": 0.89,
+        "energy": 0.358
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 303,
+    "fields": {
+        "created": "2018-11-28T03:55:48.935Z",
+        "updated": "2018-11-28T03:55:48.935Z",
+        "artist": "b'Dontcry'",
+        "name": "b'The Harpist'",
+        "genre": "chill",
+        "code": "spotify:track:1CSs2KYW56r1qkQKpisCqG",
+        "valence": 0.678,
+        "energy": 0.203
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 304,
+    "fields": {
+        "created": "2018-11-28T03:55:49.014Z",
+        "updated": "2018-11-28T03:55:49.014Z",
+        "artist": "b'Mura Kami'",
+        "name": "b'Kaze'",
+        "genre": "chill",
+        "code": "spotify:track:16FSb7d1bM4xeQQOr4CoBo",
+        "valence": 0.657,
+        "energy": 0.403
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 305,
+    "fields": {
+        "created": "2018-11-28T03:55:49.092Z",
+        "updated": "2018-11-28T03:55:49.092Z",
+        "artist": "b'aimless'",
+        "name": "b'Cookies'",
+        "genre": "chill",
+        "code": "spotify:track:0hHrmNBHncN8dHICJtxQ6D",
+        "valence": 0.6,
+        "energy": 0.456
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 306,
+    "fields": {
+        "created": "2018-11-28T03:55:49.200Z",
+        "updated": "2018-11-28T03:55:49.200Z",
+        "artist": "b'Frook'",
+        "name": "b'Snake Oil'",
+        "genre": "chill",
+        "code": "spotify:track:2ESsvGkB16B4JacbzUPjNk",
+        "valence": 0.588,
+        "energy": 0.553
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 307,
+    "fields": {
+        "created": "2018-11-28T03:55:49.286Z",
+        "updated": "2018-11-28T03:55:49.286Z",
+        "artist": "b'invention_'",
+        "name": "b'ebb//flo'",
+        "genre": "chill",
+        "code": "spotify:track:3t54ahneTDvIHb399rhZHA",
+        "valence": 0.157,
+        "energy": 0.275
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 308,
+    "fields": {
+        "created": "2018-11-28T03:55:49.375Z",
+        "updated": "2018-11-28T03:55:49.375Z",
+        "artist": "b'.clouds'",
+        "name": "b'lilac days'",
+        "genre": "chill",
+        "code": "spotify:track:5GspcrDjbuhHoTJkRd59K0",
+        "valence": 0.389,
+        "energy": 0.115
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 309,
+    "fields": {
+        "created": "2018-11-28T03:55:49.457Z",
+        "updated": "2018-11-28T03:55:49.457Z",
+        "artist": "b'Loop Schrauber'",
+        "name": "b'Feel'",
+        "genre": "chill",
+        "code": "spotify:track:0FSzkoU1vVV9MDUl38UAG9",
+        "valence": 0.643,
+        "energy": 0.369
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 310,
+    "fields": {
+        "created": "2018-11-28T03:55:49.565Z",
+        "updated": "2018-11-28T03:55:49.565Z",
+        "artist": "b'Monma'",
+        "name": "b'Brazil'",
+        "genre": "chill",
+        "code": "spotify:track:3KS3tCvMtzsxNVp8yyIbga",
+        "valence": 0.718,
+        "energy": 0.596
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 311,
+    "fields": {
+        "created": "2018-11-28T03:55:49.655Z",
+        "updated": "2018-11-28T03:55:49.655Z",
+        "artist": "b'ev\\xc3\\xa4n'",
+        "name": "b'blessin'",
+        "genre": "chill",
+        "code": "spotify:track:1BFk18jaOtzLU8wKycdXyJ",
+        "valence": 0.832,
+        "energy": 0.359
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 312,
+    "fields": {
+        "created": "2018-11-28T03:55:49.735Z",
+        "updated": "2018-11-28T03:55:49.735Z",
+        "artist": "b'Yomoti'",
+        "name": "b'Cats Walking'",
+        "genre": "chill",
+        "code": "spotify:track:0Nk0WGJ0q9WAciS7mcpM4w",
+        "valence": 0.445,
+        "energy": 0.533
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 313,
+    "fields": {
+        "created": "2018-11-28T03:55:49.819Z",
+        "updated": "2018-11-28T03:55:49.819Z",
+        "artist": "b'Mark Rybczynski'",
+        "name": "b'Downtime'",
+        "genre": "chill",
+        "code": "spotify:track:33G15TQjVxtnFovOkqKXfp",
+        "valence": 0.31,
+        "energy": 0.123
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 314,
+    "fields": {
+        "created": "2018-11-28T03:55:49.931Z",
+        "updated": "2018-11-28T03:55:49.931Z",
+        "artist": "b'J. Roosevelt'",
+        "name": "b'Sandalwood'",
+        "genre": "chill",
+        "code": "spotify:track:6KykddnA5NxNkaip0LEpgG",
+        "valence": 0.378,
+        "energy": 0.349
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 315,
+    "fields": {
+        "created": "2018-11-28T03:55:50.014Z",
+        "updated": "2018-11-28T03:55:50.014Z",
+        "artist": "b'Bokki'",
+        "name": "b'Wherewithal'",
+        "genre": "chill",
+        "code": "spotify:track:5X1x7olCET1Kix9YjOMTkN",
+        "valence": 0.137,
+        "energy": 0.265
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 316,
+    "fields": {
+        "created": "2018-11-28T03:55:50.090Z",
+        "updated": "2018-11-28T03:55:50.090Z",
+        "artist": "b'Axian'",
+        "name": "b'If I Ever Build a House'",
+        "genre": "chill",
+        "code": "spotify:track:1AzfhvDwYiu9SdtKvIJcXk",
+        "valence": 0.688,
+        "energy": 0.505
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 317,
+    "fields": {
+        "created": "2018-11-28T03:55:50.177Z",
+        "updated": "2018-11-28T03:55:50.177Z",
+        "artist": "b'Cookie Jar'",
+        "name": "b'The Hype'",
+        "genre": "chill",
+        "code": "spotify:track:1IksaRdqvnduRQqNRMdZTn",
+        "valence": 0.829,
+        "energy": 0.721
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 318,
+    "fields": {
+        "created": "2018-11-28T03:55:50.286Z",
+        "updated": "2018-11-28T03:55:50.286Z",
+        "artist": "b'Hiss Golden Messenger'",
+        "name": "b'Caledonia, My Love'",
+        "genre": "chill",
+        "code": "spotify:track:7cgka1GOkbcvNqQYrs2FwE",
+        "valence": 0.198,
+        "energy": 0.144
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 319,
+    "fields": {
+        "created": "2018-11-28T03:55:50.369Z",
+        "updated": "2018-11-28T03:55:50.369Z",
+        "artist": "b'Isbells'",
+        "name": "b'Dreamer'",
+        "genre": "chill",
+        "code": "spotify:track:0PZLSFZUf910nZ9qFtQqAf",
+        "valence": 0.421,
+        "energy": 0.383
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 320,
+    "fields": {
+        "created": "2018-11-28T03:55:50.465Z",
+        "updated": "2018-11-28T03:55:50.465Z",
+        "artist": "b'Peter Bradley Adams'",
+        "name": "b'My Arms Were Always Around You'",
+        "genre": "chill",
+        "code": "spotify:track:02a2RQEICEzbdPPYh0aLnJ",
+        "valence": 0.422,
+        "energy": 0.436
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 321,
+    "fields": {
+        "created": "2018-11-28T03:55:50.547Z",
+        "updated": "2018-11-28T03:55:50.547Z",
+        "artist": "b'Ray LaMontagne'",
+        "name": "b'Jolene'",
+        "genre": "chill",
+        "code": "spotify:track:2fSIF8CJhoc9CJhF9vJDXp",
+        "valence": 0.288,
+        "energy": 0.142
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 322,
+    "fields": {
+        "created": "2018-11-28T03:55:50.652Z",
+        "updated": "2018-11-28T03:55:50.652Z",
+        "artist": "b'Matt Hartke'",
+        "name": "b'Gold'",
+        "genre": "chill",
+        "code": "spotify:track:3iTi975Q6qnoRKrBL1FNsl",
+        "valence": 0.34,
+        "energy": 0.415
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 323,
+    "fields": {
+        "created": "2018-11-28T03:55:50.735Z",
+        "updated": "2018-11-28T03:55:50.735Z",
+        "artist": "b'Sera Cahoone'",
+        "name": "b'Up to Me'",
+        "genre": "chill",
+        "code": "spotify:track:7w0g7QoPeNUOySpVffqh9q",
+        "valence": 0.581,
+        "energy": 0.381
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 324,
+    "fields": {
+        "created": "2018-11-28T03:55:50.814Z",
+        "updated": "2018-11-28T03:55:50.814Z",
+        "artist": "b'Shannon Lay'",
+        "name": "b'Recording 15'",
+        "genre": "chill",
+        "code": "spotify:track:1vNfYCzcCJz0FY7MVVA9lM",
+        "valence": 0.439,
+        "energy": 0.126
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 325,
+    "fields": {
+        "created": "2018-11-28T03:55:50.897Z",
+        "updated": "2018-11-28T03:55:50.897Z",
+        "artist": "b'Lucy Dacus'",
+        "name": "b'...Familiar Place'",
+        "genre": "chill",
+        "code": "spotify:track:0lp0bQqzyLmNNHHFYRaaJf",
+        "valence": 0.0277,
+        "energy": 0.148
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 326,
+    "fields": {
+        "created": "2018-11-28T03:55:51.007Z",
+        "updated": "2018-11-28T03:55:51.007Z",
+        "artist": "b'Joan Shelley'",
+        "name": "b'Stay On My Shore'",
+        "genre": "chill",
+        "code": "spotify:track:1hGP5EL7gf1YfYXulWALGf",
+        "valence": 0.187,
+        "energy": 0.216
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 327,
+    "fields": {
+        "created": "2018-11-28T03:55:51.092Z",
+        "updated": "2018-11-28T03:55:51.092Z",
+        "artist": "b'Glen Hansard'",
+        "name": "b'Why Woman'",
+        "genre": "chill",
+        "code": "spotify:track:7Kjh6A5voYQ1rFFnYEbYq6",
+        "valence": 0.0862,
+        "energy": 0.452
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 328,
+    "fields": {
+        "created": "2018-11-28T03:55:51.168Z",
+        "updated": "2018-11-28T03:55:51.168Z",
+        "artist": "b'Lydia Luce'",
+        "name": "b'Sausalito'",
+        "genre": "chill",
+        "code": "spotify:track:3l2wMTBa64PBV7aCPwYkEf",
+        "valence": 0.24,
+        "energy": 0.183
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 329,
+    "fields": {
+        "created": "2018-11-28T03:55:51.246Z",
+        "updated": "2018-11-28T03:55:51.246Z",
+        "artist": "b'Water Liars'",
+        "name": "b'Let It Breathe'",
+        "genre": "chill",
+        "code": "spotify:track:52uKQxYJKHpYz0DEwKLltI",
+        "valence": 0.3,
+        "energy": 0.151
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 330,
+    "fields": {
+        "created": "2018-11-28T03:55:51.346Z",
+        "updated": "2018-11-28T03:55:51.346Z",
+        "artist": "b'I Am Oak'",
+        "name": "b'Woandering'",
+        "genre": "chill",
+        "code": "spotify:track:1bjqyTv5A06p8yGIG8KoeJ",
+        "valence": 0.21,
+        "energy": 0.269
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 331,
+    "fields": {
+        "created": "2018-11-28T03:55:51.427Z",
+        "updated": "2018-11-28T03:55:51.427Z",
+        "artist": "b'Craig Cardiff'",
+        "name": "b'Dirty Old Town'",
+        "genre": "chill",
+        "code": "spotify:track:567EmmCbOtpEuaVC2zznU6",
+        "valence": 0.328,
+        "energy": 0.418
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 332,
+    "fields": {
+        "created": "2018-11-28T03:55:51.507Z",
+        "updated": "2018-11-28T03:55:51.507Z",
+        "artist": "b'Joy Williams'",
+        "name": "b'The Trouble with Wanting'",
+        "genre": "chill",
+        "code": "spotify:track:0a1Jael2mnrkLTyPetixjh",
+        "valence": 0.19,
+        "energy": 0.198
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 333,
+    "fields": {
+        "created": "2018-11-28T03:55:51.612Z",
+        "updated": "2018-11-28T03:55:51.613Z",
+        "artist": "b'Terrible Sons'",
+        "name": "b\"Tears Don't Fall\"",
+        "genre": "chill",
+        "code": "spotify:track:02p7KhGzlicIY8rvRVVION",
+        "valence": 0.819,
+        "energy": 0.566
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 334,
+    "fields": {
+        "created": "2018-11-28T03:55:51.690Z",
+        "updated": "2018-11-28T03:55:51.690Z",
+        "artist": "b'Valerie June'",
+        "name": "b'With You - A Sweet Little Love Song Demo'",
+        "genre": "chill",
+        "code": "spotify:track:1RbhQxFFJM7QNKALY5JebS",
+        "valence": 0.588,
+        "energy": 0.254
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 335,
+    "fields": {
+        "created": "2018-11-28T03:55:51.778Z",
+        "updated": "2018-11-28T03:55:51.778Z",
+        "artist": "b'Brooke Annibale'",
+        "name": "b'Answers'",
+        "genre": "chill",
+        "code": "spotify:track:1uvbbPXwyRueQ6xbiOLHGh",
+        "valence": 0.265,
+        "energy": 0.161
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 336,
+    "fields": {
+        "created": "2018-11-28T03:55:51.881Z",
+        "updated": "2018-11-28T03:55:51.881Z",
+        "artist": "b'Rosie Carney'",
+        "name": "b'Thousand (feat. Lisa Hannigan)'",
+        "genre": "chill",
+        "code": "spotify:track:12VVXFEYxro5C61KyWee9C",
+        "valence": 0.125,
+        "energy": 0.198
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 337,
+    "fields": {
+        "created": "2018-11-28T03:55:51.958Z",
+        "updated": "2018-11-28T03:55:51.958Z",
+        "artist": "b'Lori McKenna'",
+        "name": "b\"The Time I've Wasted\"",
+        "genre": "chill",
+        "code": "spotify:track:1JtvwshkJMxfm4oRhJp93C",
+        "valence": 0.261,
+        "energy": 0.25
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 338,
+    "fields": {
+        "created": "2018-11-28T03:55:52.040Z",
+        "updated": "2018-11-28T03:55:52.040Z",
+        "artist": "b'Henry Jamison'",
+        "name": "b'Real Peach'",
+        "genre": "chill",
+        "code": "spotify:track:0zswVEAFordAn8lbrgWsb6",
+        "valence": 0.328,
+        "energy": 0.559
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 339,
+    "fields": {
+        "created": "2018-11-28T03:55:52.153Z",
+        "updated": "2018-11-28T03:55:52.153Z",
+        "artist": "b'Jason Isbell and the 400 Unit'",
+        "name": "b'If We Were Vampires'",
+        "genre": "chill",
+        "code": "spotify:track:250RLekaiL1q9qZer975Eg",
+        "valence": 0.685,
+        "energy": 0.208
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 340,
+    "fields": {
+        "created": "2018-11-28T03:55:52.324Z",
+        "updated": "2018-11-28T03:55:52.324Z",
+        "artist": "b'Ryan Montbleau'",
+        "name": "b'I Was Just Leaving'",
+        "genre": "chill",
+        "code": "spotify:track:2P7d62DM2Q1A9i6kkc4rgl",
+        "valence": 0.434,
+        "energy": 0.361
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 341,
+    "fields": {
+        "created": "2018-11-28T03:55:52.402Z",
+        "updated": "2018-11-28T03:55:52.402Z",
+        "artist": "b'Cory Chisel'",
+        "name": "b'Songbird'",
+        "genre": "chill",
+        "code": "spotify:track:41lqGsXFhFnno7r9MkaXtK",
+        "valence": 0.287,
+        "energy": 0.261
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 342,
+    "fields": {
+        "created": "2018-11-28T03:55:52.480Z",
+        "updated": "2018-11-28T03:55:52.481Z",
+        "artist": "b'Julie Byrne'",
+        "name": "b'Follow My Voice'",
+        "genre": "chill",
+        "code": "spotify:track:7pT3faDXSC5tNAlIKmtrYf",
+        "valence": 0.177,
+        "energy": 0.0811
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 343,
+    "fields": {
+        "created": "2018-11-28T03:55:52.592Z",
+        "updated": "2018-11-28T03:55:52.592Z",
+        "artist": "b'Lauv'",
+        "name": "b'Never Not'",
+        "genre": "chill",
+        "code": "spotify:track:4fFfyouye6vrX9o9z4PVMu",
+        "valence": 0.264,
+        "energy": 0.221
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 344,
+    "fields": {
+        "created": "2018-11-28T03:55:52.674Z",
+        "updated": "2018-11-28T03:55:52.674Z",
+        "artist": "b'Lady Gaga'",
+        "name": "b'Shallow - Radio Edit'",
+        "genre": "chill",
+        "code": "spotify:track:6QfS2wq5sSC1xAJCQsTSlj",
+        "valence": 0.277,
+        "energy": 0.33
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 345,
+    "fields": {
+        "created": "2018-11-28T03:55:52.767Z",
+        "updated": "2018-11-28T03:55:52.767Z",
+        "artist": "b'James TW'",
+        "name": "b'Soldier'",
+        "genre": "chill",
+        "code": "spotify:track:0P7hldeLJsslU345SbZi5R",
+        "valence": 0.326,
+        "energy": 0.648
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 346,
+    "fields": {
+        "created": "2018-11-28T03:55:52.874Z",
+        "updated": "2018-11-28T03:55:52.875Z",
+        "artist": "b'Joakim Molitor'",
+        "name": "b'4U'",
+        "genre": "chill",
+        "code": "spotify:track:5hLXYhAxLn64snsHUcRVjt",
+        "valence": 0.525,
+        "energy": 0.779
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 347,
+    "fields": {
+        "created": "2018-11-28T03:55:52.957Z",
+        "updated": "2018-11-28T03:55:52.957Z",
+        "artist": "b'Charlotte Lawrence'",
+        "name": "b'Stole Your Car'",
+        "genre": "chill",
+        "code": "spotify:track:1MTanOR2Kts7au3HtM0nez",
+        "valence": 0.202,
+        "energy": 0.712
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 348,
+    "fields": {
+        "created": "2018-11-28T03:55:53.035Z",
+        "updated": "2018-11-28T03:55:53.035Z",
+        "artist": "b'Martin Garrix'",
+        "name": "b'Ocean (feat. Khalid)'",
+        "genre": "chill",
+        "code": "spotify:track:3nc420PXjTdBV5TN0gCFkS",
+        "valence": 0.221,
+        "energy": 0.693
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 349,
+    "fields": {
+        "created": "2018-11-28T03:55:53.135Z",
+        "updated": "2018-11-28T03:55:53.135Z",
+        "artist": "b'Lauv'",
+        "name": "b'Superhero'",
+        "genre": "chill",
+        "code": "spotify:track:1Fo4OvzP9PThFKMeMIAEYu",
+        "valence": 0.417,
+        "energy": 0.34
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 350,
+    "fields": {
+        "created": "2018-11-28T03:55:53.218Z",
+        "updated": "2018-11-28T03:55:53.218Z",
+        "artist": "b'Emily Burns'",
+        "name": "b\"Friends Don't Kiss Friends\"",
+        "genre": "chill",
+        "code": "spotify:track:1Uk26UmIDGCQrEkXCUJyBV",
+        "valence": 0.598,
+        "energy": 0.262
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 351,
+    "fields": {
+        "created": "2018-11-28T03:55:53.290Z",
+        "updated": "2018-11-28T03:55:53.290Z",
+        "artist": "b'Alec Benjamin'",
+        "name": "b'Let Me Down Slowly'",
+        "genre": "chill",
+        "code": "spotify:track:2uaiyLKnYvazyfR0Ky3Kbk",
+        "valence": 0.506,
+        "energy": 0.548
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 352,
+    "fields": {
+        "created": "2018-11-28T03:55:53.397Z",
+        "updated": "2018-11-28T03:55:53.397Z",
+        "artist": "b'Lukas Graham'",
+        "name": "b'Love Someone'",
+        "genre": "chill",
+        "code": "spotify:track:6r3baE6njwU4aoJq6zPukG",
+        "valence": 0.299,
+        "energy": 0.412
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 353,
+    "fields": {
+        "created": "2018-11-28T03:55:53.557Z",
+        "updated": "2018-11-28T03:55:53.557Z",
+        "artist": "b'Peter Manos'",
+        "name": "b'In My Head'",
+        "genre": "chill",
+        "code": "spotify:track:1tT55K6VEyO6XFDxK4lDQe",
+        "valence": 0.0747,
+        "energy": 0.181
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 354,
+    "fields": {
+        "created": "2018-11-28T03:55:53.638Z",
+        "updated": "2018-11-28T03:55:53.638Z",
+        "artist": "b'Anne-Marie'",
+        "name": "b'Perfect To Me'",
+        "genre": "chill",
+        "code": "spotify:track:0DC7Zs2qvAbNK1owWQ4mlL",
+        "valence": 0.402,
+        "energy": 0.546
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 355,
+    "fields": {
+        "created": "2018-11-28T03:55:53.712Z",
+        "updated": "2018-11-28T03:55:53.713Z",
+        "artist": "b'TW3LV'",
+        "name": "b'Picture Of Us'",
+        "genre": "chill",
+        "code": "spotify:track:0MUGiVxBMDEEeUyZj76k8Z",
+        "valence": 0.305,
+        "energy": 0.755
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 356,
+    "fields": {
+        "created": "2018-11-28T03:55:53.821Z",
+        "updated": "2018-11-28T03:55:53.822Z",
+        "artist": "b'MARC'",
+        "name": "b\"Love You Til' It's Over\"",
+        "genre": "chill",
+        "code": "spotify:track:78lIe5o1TN3gK6hHJaVhBU",
+        "valence": 0.593,
+        "energy": 0.785
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 357,
+    "fields": {
+        "created": "2018-11-28T03:55:53.901Z",
+        "updated": "2018-11-28T03:55:53.902Z",
+        "artist": "b'Diplo'",
+        "name": "b'Stay Open'",
+        "genre": "chill",
+        "code": "spotify:track:2yvDDDQUmJnop6ycSqOAGf",
+        "valence": 0.412,
+        "energy": 0.589
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 358,
+    "fields": {
+        "created": "2018-11-28T03:55:53.982Z",
+        "updated": "2018-11-28T03:55:53.982Z",
+        "artist": "b'Alec Benjamin'",
+        "name": "b'Death Of A Hero'",
+        "genre": "chill",
+        "code": "spotify:track:3btBmFS3dZ1EEh0pEH9imU",
+        "valence": 0.577,
+        "energy": 0.618
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 359,
+    "fields": {
+        "created": "2018-11-28T03:55:54.057Z",
+        "updated": "2018-11-28T03:55:54.057Z",
+        "artist": "b'Hugo Helmig'",
+        "name": "b'Wild'",
+        "genre": "chill",
+        "code": "spotify:track:0kTUf60V9AQTqNVKZAmJKc",
+        "valence": 0.767,
+        "energy": 0.72
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 360,
+    "fields": {
+        "created": "2018-11-28T03:55:54.157Z",
+        "updated": "2018-11-28T03:55:54.157Z",
+        "artist": "b'R3HAB'",
+        "name": "b'Rumors (With Sofia Carson)'",
+        "genre": "chill",
+        "code": "spotify:track:4ogFKRgF6CWAmMWcstMU08",
+        "valence": 0.638,
+        "energy": 0.496
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 361,
+    "fields": {
+        "created": "2018-11-28T03:55:54.238Z",
+        "updated": "2018-11-28T03:55:54.238Z",
+        "artist": "b'Kiiara'",
+        "name": "b'Messy'",
+        "genre": "chill",
+        "code": "spotify:track:0BOEuUKoHdy8in20fG5smd",
+        "valence": 0.681,
+        "energy": 0.456
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 362,
+    "fields": {
+        "created": "2018-11-28T03:55:54.320Z",
+        "updated": "2018-11-28T03:55:54.320Z",
+        "artist": "b'Shawn Mendes'",
+        "name": "b'Where Were You In The Morning?'",
+        "genre": "chill",
+        "code": "spotify:track:5cuRYDNIcSu5noyXQpULKg",
+        "valence": 0.457,
+        "energy": 0.517
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 363,
+    "fields": {
+        "created": "2018-11-28T03:55:54.425Z",
+        "updated": "2018-11-28T03:55:54.425Z",
+        "artist": "b'Zara Larsson'",
+        "name": "b'Ruin My Life'",
+        "genre": "chill",
+        "code": "spotify:track:5Fyjxarrx6ZFrZ2DHte8Z5",
+        "valence": 0.609,
+        "energy": 0.696
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 364,
+    "fields": {
+        "created": "2018-11-28T03:55:54.502Z",
+        "updated": "2018-11-28T03:55:54.502Z",
+        "artist": "b'JP Saxe'",
+        "name": "b'The Few Things (with Charlotte Lawrence)'",
+        "genre": "chill",
+        "code": "spotify:track:7GajeLvMksa794ZEQXwRSy",
+        "valence": 0.375,
+        "energy": 0.426
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 365,
+    "fields": {
+        "created": "2018-11-28T03:55:54.583Z",
+        "updated": "2018-11-28T03:55:54.583Z",
+        "artist": "b'Rita Ora'",
+        "name": "b'Only Want You'",
+        "genre": "chill",
+        "code": "spotify:track:2CTN6UuO2dNEVZXR0DJVk2",
+        "valence": 0.376,
+        "energy": 0.528
+    }
+},
+{
+    "model": "tunes.song",
+    "pk": 366,
+    "fields": {
+        "created": "2018-11-28T03:55:54.681Z",
+        "updated": "2018-11-28T03:55:54.681Z",
+        "artist": "b'Matthew Schultz'",
+        "name": "b'Somewhere Far'",
+        "genre": "chill",
+        "code": "spotify:track:3nJSqBvdpwzYoVerTEPWay",
+        "valence": 0.227,
+        "energy": 0.71
+    }
+}
+]
