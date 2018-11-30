@@ -66,7 +66,17 @@ class Command(MoodyBaseCommand):
                 for playlist in playlists:
                     if songs_from_category < settings.SPOTIFY['max_songs_from_category']:
                         num_tracks = settings.SPOTIFY['max_songs_from_category'] - songs_from_category
+                        self.logger.info('{} - Calling Spotify API to get {} track(s) for playlist {}'.format(
+                            self._unique_id,
+                            num_tracks,
+                            playlist['uri']
+                        ))
                         raw_tracks = spotify.get_songs_from_playlist(playlist, num_tracks)
+
+                        self.logger.info('{} - Calling Spotify API to get feature data for {} tracks'.format(
+                            self._unique_id,
+                            len(raw_tracks)
+                        ))
                         complete_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
                         # Add genre information to each track. We can use the category search term as the genre
