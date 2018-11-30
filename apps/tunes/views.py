@@ -84,7 +84,7 @@ class VoteView(generics.CreateAPIView):
         try:
             emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         except (Emotion.DoesNotExist, Emotion.MultipleObjectsReturned):
-            logger.warning('Unable to retrieve song with code {}'.format(self.cleaned_data['emotion']))
+            logger.warning('Unable to retrieve emotion with code {}'.format(self.cleaned_data['emotion']))
 
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
