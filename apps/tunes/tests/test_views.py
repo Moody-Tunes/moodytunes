@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from rest_framework import status
 
+from accounts.models import UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
 
@@ -43,3 +44,44 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_song['id'], song.id)
+
+
+class TestVoteView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:vote')
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.client.logout()
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'vote': True
+        }
+        resp = self.client.post(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_happy_path(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'vote': True
+        }
+        resp = self.client.post(self.url, data=data)
+
+        vote_created = UserSongVote.objects.filter(
+            user=self.user,
+            emotion__name=Emotion.HAPPY,
+            song=self.song,
+            vote=True
+        ).exists()
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(vote_created)
