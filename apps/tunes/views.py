@@ -74,8 +74,6 @@ class VoteView(generics.CreateAPIView):
         super(VoteView, self).__init__()
 
     def create(self, request, *args, **kwargs):
-        #import pdb; pdb.set_trace()
-
         try:
             song = Song.objects.get(code=self.cleaned_data['song_code'])
         except (Song.DoesNotExist, Song.MultipleObjectsReturned):
