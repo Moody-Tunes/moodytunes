@@ -57,7 +57,11 @@ class Command(MoodyBaseCommand):
 
             try:
                 playlists = spotify.get_playlists_for_category(category, settings.SPOTIFY['max_playlist_from_category'])
-                self.logger.info('Got {} playlists for category: {}'.format(len(playlists), category))
+                self.logger.info('{} - Got {} playlists for category: {}'.format(
+                    self._unique_id,
+                    len(playlists),
+                    category
+                ))
 
                 for playlist in playlists:
                     if songs_from_category < settings.SPOTIFY['max_songs_from_category']:
@@ -70,7 +74,8 @@ class Command(MoodyBaseCommand):
                         for track in complete_tracks:
                             track.update({'genre': category})
 
-                        self.logger.info('Got {} tracks from {}'.format(
+                        self.logger.info('{} - Got {} tracks from {}'.format(
+                            self._unique_id,
                             len(complete_tracks),
                             playlist['name']
                         ))
