@@ -6,4 +6,8 @@ install:
   pip install -r requirements/common.txt
 
 script:
-  python manage.py test --verbosity=2
+  - echo 'Starting unit tests...'
+  - python manage.py test --verbosity=2
+  - echo 'Starting linter...'
+  - flake8
+  - echo 'Success!'
