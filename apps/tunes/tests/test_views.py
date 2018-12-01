@@ -114,4 +114,4 @@ class TestVoteView(TestCase):
         }
         resp = self.client.post(self.url, data=data)
 
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

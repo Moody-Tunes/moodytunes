@@ -2,6 +2,7 @@ import logging
 
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError
+from django.http import Http404
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -79,14 +80,12 @@ class VoteView(generics.CreateAPIView):
         except (Song.DoesNotExist, Song.MultipleObjectsReturned):
             logger.warning('Unable to retrieve song with code {}'.format(self.cleaned_data['song_code']))
 
-            raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
+            raise Http404('No song exists with code: {}'.format(self.cleaned_data['song_code']))
 
-        try:
-            emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
-        except (Emotion.DoesNotExist, Emotion.MultipleObjectsReturned):
-            logger.warning('Unable to retrieve emotion with code {}'.format(self.cleaned_data['emotion']))
-
-            raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
+        # `emotion` is assured to be a valid Emotion name because the form
+        # we use to clean the data to this view validates that `emotion`
+        # is mapped to a record in our database
+        emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
 
         vote_data = {
             'user_id': self.request.user.id,
