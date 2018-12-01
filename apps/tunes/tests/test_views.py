@@ -115,3 +115,39 @@ class TestVoteView(TestCase):
         resp = self.client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_upvoting_on_song_updates_user_emotion_boundaries(self):
+        user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        pre_upper_bound = user_emotion.upper_bound
+        pre_lower_bound = user_emotion.lower_bound
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'vote': True
+        }
+        self.client.post(self.url, data=data)
+
+        user_emotion.refresh_from_db()
+        expected_upper_bound = (pre_upper_bound + self.song.valence) / 2
+        expected_lower_bound = (pre_lower_bound + self.song.energy) / 2
+
+        self.assertEqual(user_emotion.upper_bound, expected_upper_bound)
+        self.assertEqual(user_emotion.lower_bound, expected_lower_bound)
+
+    def test_downvoting_on_song_does_not_update_user_emotion_boundaries(self):
+        user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        pre_upper_bound = user_emotion.upper_bound
+        pre_lower_bound = user_emotion.lower_bound
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'vote': False
+        }
+        self.client.post(self.url, data=data)
+
+        user_emotion.refresh_from_db()
+
+        self.assertEqual(user_emotion.upper_bound, pre_upper_bound)
+        self.assertEqual(user_emotion.lower_bound, pre_lower_bound)
