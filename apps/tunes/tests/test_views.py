@@ -135,7 +135,7 @@ class TestVoteView(TestCase):
         self.assertEqual(user_emotion.upper_bound, expected_upper_bound)
         self.assertEqual(user_emotion.lower_bound, expected_lower_bound)
 
-    def test_downvoting_on_song_does_not_update_user_emotion_boundaries(self):
+    def test_downvoting_song_does_not_update_user_emotion_boundaries(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         pre_upper_bound = user_emotion.upper_bound
         pre_lower_bound = user_emotion.lower_bound
