@@ -3,3 +3,4 @@ envparse==0.2.0
 django-extensions==2.1.0
 requests==2.20.0
 djangorestframework==3.9.0
+flake8==3.6.0

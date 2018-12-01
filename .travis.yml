@@ -6,4 +6,5 @@ install:
   pip install -r requirements/common.txt
 
 script:
-  python manage.py test --verbosity=2
+  - python manage.py test --verbosity=2
+  - flake8
