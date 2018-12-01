@@ -107,11 +107,6 @@ class TestVoteView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_bad_request_if_bad_song_code_sent(self):
-
-
-
-
-
         data = {
             'emotion': Emotion.HAPPY,
             'song_code': 'Bad song code',
