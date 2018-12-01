@@ -10,4 +10,3 @@ script:
   - python manage.py test --verbosity=2
   - echo 'Starting linter...'
   - flake8
-  - echo 'Success!'
