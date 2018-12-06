@@ -45,6 +45,29 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_song['id'], song.id)
 
+    def test_playlist_excludes_previously_voted_songs(self):
+        voted_song = MoodyUtil.create_song()
+        not_voted_song = MoodyUtil.create_song()
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=voted_song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True
+        )
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'jitter': 0
+        }
+
+        resp = self.client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data), 1)
+        self.assertEqual(resp_data[0]['id'], not_voted_song.id)
+
 
 class TestVoteView(TestCase):
     @classmethod

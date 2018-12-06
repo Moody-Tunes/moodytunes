@@ -41,16 +41,21 @@ class BrowseView(generics.ListAPIView):
         if jitter is None:
             jitter = self.default_jitter
 
+        # `emotion` is assured to be a valid Emotion name because the form
+        # we use to clean the data to this view validates that `emotion`
+        # is mapped to a record in our database
         user_emotion = user.get_user_emotion_record(emotion)
 
-        # TODO: Refactor to use prefetch helper when we create one
-        # TODO: Only filter out songs that the user has already vote on for the emotion
-        previously_seen_song_ids = user.usersongvote_set.all().values_list('song__id', flat=True)
+        # Only exclude songs a user has previously voted on for the given emotion
+        # ex. if the user voted on a song when asking for Melancholy songs, it
+        # should still be a candidate if the user then asks for Happy songs
+        user_votes = user.get_user_song_vote_records(emotion)
+        previously_voted_song_ids = [vote.song.id for vote in user_votes]
 
         playlist = generate_browse_playlist(
             user_emotion.lower_bound,
             user_emotion.upper_bound,
-            exclude_ids=previously_seen_song_ids,
+            exclude_ids=previously_voted_song_ids,
             limit=limit,
             jitter=float(jitter)
         )
