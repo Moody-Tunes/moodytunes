@@ -41,6 +41,9 @@ class BrowseView(generics.ListAPIView):
         if jitter is None:
             jitter = self.default_jitter
 
+        # `emotion` is assured to be a valid Emotion name because the form
+        # we use to clean the data to this view validates that `emotion`
+        # is mapped to a record in our database
         user_emotion = user.get_user_emotion_record(emotion)
 
         user_votes = user.get_user_song_vote_records(emotion)
