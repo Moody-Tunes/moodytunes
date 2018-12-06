@@ -4,11 +4,13 @@ from django.db import models
 from base.models import BaseModel
 
 
-class UserEmotionPrefetchManager(BaseUserManager):
-    """Manager to automatically add `prefetch_related` to the useremotion_set for a given user"""
+class UserPrefetchManager(BaseUserManager):
+    """Manager to automatically add `prefetch_related` for related tables when querying the MoodyTunes model"""
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
             'useremotion_set__emotion',
+            'usersongvote_set__emotion',
+            'usersongvote_set__song',
         )
 
 
@@ -17,15 +19,15 @@ class MoodyUser(BaseModel, AbstractUser):
     Represents a user in our system. Extends Django auth features and includes
     logic needed in course of site flow.
     """
-    cached_emotions = UserEmotionPrefetchManager()
+    prefetch_manager = UserPrefetchManager()
 
     def get_user_emotion_record(self, emotion_name):
         """
         Return the UserEmotion record for a given name. This is done in Python to take advantage of `prefetch_related`
         caching. Note that you would need to prefetch the `useremotion_set` related manager; this will happen for you
-        if you call the `MoodyUser.cached_emotions` manager.
+        if you make your query using the `MoodyUser.prefetch_manager` manager.
 
-        :@ param emotion_name: (str) `Emotion.name` constant to retrive
+        :param emotion_name: (str) `Emotion.name` constant to retrieve
         :> return:
             - `UserEmotion` record for the given `emotion_name`
             - `None` if `emotion_name` is not valid
@@ -35,6 +37,17 @@ class MoodyUser(BaseModel, AbstractUser):
                 return user_emotion
 
         return None
+
+
+    def get_user_song_vote_records(self, emotion_name):
+        """
+        Return the list of UserSongVote records for a given emotion. This is done in Python to take advantage of
+        `prefetch_related` caching. Note that you would need to prefetch the `useresongvote_set` related manager;
+        this will happen for you if you make your query using the `MoodyUser.prefetch_manager` manager.
+        :param emotion_name:
+        :return:
+        """
+        return [vote for vote in self.usersongvote_set.all() if vote.emotion.name == emotion_name]
 
     def update_information(self, data):
         """
