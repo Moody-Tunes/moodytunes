@@ -5,7 +5,7 @@ from base.models import BaseModel
 
 
 class UserPrefetchManager(BaseUserManager):
-    """Manager to automatically add `prefetch_related` for related tables when querying the MoodyTunes model"""
+    """Manager to automatically `prefetch_related` records when querying the MoodyUser model"""
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
             'useremotion_set__emotion',

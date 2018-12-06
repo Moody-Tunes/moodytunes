@@ -46,6 +46,9 @@ class BrowseView(generics.ListAPIView):
         # is mapped to a record in our database
         user_emotion = user.get_user_emotion_record(emotion)
 
+        # Only exclude songs a user has previously voted on for the given emotion
+        # ex. if the user voted on a song when asking for Melancholy songs, it
+        # should still be a candidate if the user then asks for Happy songs
         user_votes = user.get_user_song_vote_records(emotion)
         previously_voted_song_ids = [vote.song.id for vote in user_votes]
 
