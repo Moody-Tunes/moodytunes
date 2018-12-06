@@ -43,14 +43,13 @@ class BrowseView(generics.ListAPIView):
 
         user_emotion = user.get_user_emotion_record(emotion)
 
-        # TODO: Refactor to use prefetch helper when we create one
-        # TODO: Only filter out songs that the user has already vote on for the emotion
-        previously_seen_song_ids = user.usersongvote_set.all().values_list('song__id', flat=True)
+        user_votes = user.get_user_song_vote_records(emotion)
+        previously_voted_song_ids = [vote.song.id for vote in user_votes]
 
         playlist = generate_browse_playlist(
             user_emotion.lower_bound,
             user_emotion.upper_bound,
-            exclude_ids=previously_seen_song_ids,
+            exclude_ids=previously_voted_song_ids,
             limit=limit,
             jitter=float(jitter)
         )
