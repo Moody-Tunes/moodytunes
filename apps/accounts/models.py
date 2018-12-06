@@ -38,7 +38,6 @@ class MoodyUser(BaseModel, AbstractUser):
 
         return None
 
-
     def get_user_song_vote_records(self, emotion_name):
         """
         Return the list of UserSongVote records for a given emotion. This is done in Python to take advantage of
