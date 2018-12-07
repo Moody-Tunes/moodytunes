@@ -24,6 +24,9 @@ class Command(MoodyBaseCommand):
         """
         success, fail = 0, 0
         for track in tracks:
+            # Decode track data name/artist from unicode to string
+            track['name'] = track['name'].decode('utf-8')
+            track['artist'] = track['artist'].decode('utf-8')
 
             try:
                 song, created = Song.objects.get_or_create(code=track['code'], defaults=track)
