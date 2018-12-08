@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.models import UserSongVote
-from tunes.forms import BrowseSongsForm, VoteSongsForm
+from tunes.forms import BrowseSongsForm, VoteSongsForm, PlaylistSongsForm
 from tunes.models import Song, Emotion
 from tunes.serializers import SongSerializer
 from tunes.utils import generate_browse_playlist
@@ -128,3 +128,45 @@ class VoteView(generics.CreateAPIView):
             logger.warning('Invalid POST data supplied to VoteView.post: {}'.format(request.POST))
 
             raise SuspiciousOperation('Invalid POST data supplied to {}'.format(self.__class__.__name__))
+
+
+class PlaylistView(generics.ListAPIView):
+    serializer_class = SongSerializer
+    queryset = Song.objects.all()
+
+    def __init__(self):
+        self.cleaned_data = {}  # Cleaned GET data for query
+        super(PlaylistView, self).__init__()
+
+    def get_queryset(self):
+        queryset = super(PlaylistView, self).get_queryset()
+
+        if self.cleaned_data['genre']:
+            queryset = queryset.filter(genre=self.cleaned_data['genre'])
+
+        return queryset
+
+    def filter_queryset(self, queryset):
+        # Find the songs the user has previously voted as making them feel the desired emotion
+
+        # `emotion` is assured to be a valid Emotion name because the form
+        # we use to clean the data to this view validates that `emotion`
+        # is mapped to a record in our database
+        emotion = self.cleaned_data['emotion']
+
+        user_votes_for_emotion = self.request.user.get_user_song_vote_records(emotion)
+        desired_songs = [vote.song.id for vote in user_votes_for_emotion if vote.vote]
+
+        return queryset.filter(id__in=desired_songs)
+
+    def get(self, request, *args, **kwargs):
+        form = PlaylistSongsForm(request.GET)
+
+        if form.is_valid():
+            self.cleaned_data = form.cleaned_data
+            return super().get(request, *args, **kwargs)
+
+        else:
+            logger.warning('Invalid data supplied to PlaylistView.get: {}'.format(request.GET))
+
+            raise SuspiciousOperation('Invalid GET data supplied to {}'.format(self.__class__.__name__))
