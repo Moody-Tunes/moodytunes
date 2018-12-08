@@ -20,14 +20,12 @@ class TestBrowseSongsForm(TestCase):
 
 
 class TestPlaylistSongsForm(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.song = MoodyUtil.create_song()
 
     def test_valid_genre_is_valid(self):
+        song = MoodyUtil.create_song()
         data = {
             'emotion': Emotion.HAPPY,
-            'genre': self.song.genre
+            'genre': song.genre
         }
         form = PlaylistSongsForm(data)
 
