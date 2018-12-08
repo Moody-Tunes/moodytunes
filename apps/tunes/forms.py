@@ -1,6 +1,15 @@
 from django import forms
 
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
+
+
+def get_available_genres():
+    """
+    Return the different genres we have in our system.
+    Need to return a two-tuple per Django form standards
+    """
+    genres = Song.objects.all().values_list('genre', flat=True).distinct()
+    return [(genre, genre) for genre in genres]
 
 
 class BrowseSongsForm(forms.Form):
@@ -12,8 +21,15 @@ class BrowseSongsForm(forms.Form):
 
 
 class VoteSongsForm(forms.Form):
-    """Provides validation for /tunes/vote"""
+    """Provides validation for /tunes/vote/"""
 
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     song_code = forms.CharField()
     vote = forms.BooleanField()
+
+
+class PlaylistSongsForm(forms.Form):
+    """Provides validation for /tunes/playlist/"""
+
+    emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    genre = forms.ChoiceField(choices=get_available_genres, required=False)
