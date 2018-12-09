@@ -24,10 +24,7 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unknown_emotion_passed_returns_bad_request(self):
-        params = {
-            'emotion': 'unknown'
-        }
-
+        params = {'emotion': 'unknown'}
         resp = self.client.get(self.url, data=params)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -189,9 +186,7 @@ class TestPlaylistView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
 
-        data = {
-            'emotion': Emotion.HAPPY,
-        }
+        data = {'emotion': Emotion.HAPPY,}
         resp = self.client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
@@ -204,9 +199,7 @@ class TestPlaylistView(TestCase):
             vote=True
         )
 
-        data = {
-            'emotion': Emotion.HAPPY
-        }
+        data = {'emotion': Emotion.HAPPY}
         resp = self.client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -221,9 +214,7 @@ class TestPlaylistView(TestCase):
             vote=False
         )
 
-        data = {
-            'emotion': Emotion.HAPPY
-        }
+        data = {'emotion': Emotion.HAPPY}
         resp = self.client.get(self.url, data=data)
         resp_data = resp.json()
 
