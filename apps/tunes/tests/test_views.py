@@ -186,7 +186,7 @@ class TestPlaylistView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
 
-        data = {'emotion': Emotion.HAPPY,}
+        data = {'emotion': Emotion.HAPPY}
         resp = self.client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
