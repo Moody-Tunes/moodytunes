@@ -255,3 +255,9 @@ class TestPlaylistView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['id'], new_song.id)
+
+    def test_invalid_emotion_returns_bad_request(self):
+        data = {'emotion': 'some-bad-value'}
+        resp = self.client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
