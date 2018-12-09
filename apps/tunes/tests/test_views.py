@@ -24,10 +24,7 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unknown_emotion_passed_returns_bad_request(self):
-        params = {
-            'emotion': 'unknown'
-        }
-
+        params = {'emotion': 'unknown'}
         resp = self.client.get(self.url, data=params)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -174,3 +171,84 @@ class TestVoteView(TestCase):
 
         self.assertEqual(user_emotion.upper_bound, pre_upper_bound)
         self.assertEqual(user_emotion.lower_bound, pre_lower_bound)
+
+
+class TestPlaylistView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:playlist')
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.client.logout()
+
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.client.post(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_happy_path(self):
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True
+        )
+
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data[0]['id'], self.song.id)
+
+    def test_downvoted_songs_are_not_returned(self):
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=False
+        )
+
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data), 0)
+
+    def test_filter_playlist_by_genre(self):
+        new_song = MoodyUtil.create_song(genre='super-dope')
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True
+        )
+        UserSongVote.objects.create(
+            user=self.user,
+            song=new_song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'genre': new_song.genre
+        }
+        resp = self.client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data), 1)
+        self.assertEqual(resp_data[0]['id'], new_song.id)
+
+    def test_invalid_emotion_returns_bad_request(self):
+        data = {'emotion': 'some-bad-value'}
+        resp = self.client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
