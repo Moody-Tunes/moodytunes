@@ -18,7 +18,7 @@ class TestGenerateBrowsePlaylist(TestCase):
 
     @mock.patch('random.randint')
     def test_jitter_bumps_upper_bound(self, mock_rand):
-        songs_mock = mock.Mock()
+        songs_mock = mock.MagicMock()
         mock_rand.return_value = 2
 
         lower_bound = .5
@@ -39,7 +39,7 @@ class TestGenerateBrowsePlaylist(TestCase):
 
     @mock.patch('random.randint')
     def test_jitter_bumps_lower_bound(self, mock_rand):
-        songs_mock = mock.Mock()
+        songs_mock = mock.MagicMock()
         mock_rand.return_value = 1
 
         lower_bound = .5
@@ -64,4 +64,4 @@ class TestGenerateBrowsePlaylist(TestCase):
 
         playlist = generate_browse_playlist(.75, 1.0, limit=5)
 
-        self.assertEqual(playlist.count(), 5)
+        self.assertEqual(len(playlist), 5)

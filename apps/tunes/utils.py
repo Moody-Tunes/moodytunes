@@ -37,6 +37,10 @@ def generate_browse_playlist(lower_bound, upper_bound, limit=None, jitter=None, 
         energy__lte=upper_bound
     )
 
+    # Shuffle playlist to ensure freshness
+    playlist = list(playlist)
+    random.shuffle(playlist)
+
     if limit:
         playlist = playlist[:limit]
 
