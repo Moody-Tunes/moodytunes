@@ -16,51 +16,42 @@ class TestGenerateBrowsePlaylist(TestCase):
         self.assertIn(song, playlist)
         self.assertNotIn(outlier_song, playlist)
 
-    def test_exclude_behavior(self):
-        in_song = MoodyUtil.create_song(valence=.5, energy=.75)
-        out_song = MoodyUtil.create_song(valence=.6, energy=.65)
-
-        playlist = generate_browse_playlist(in_song.valence, in_song.energy, exclude_ids=[out_song.id])
-
-        self.assertIn(in_song, playlist)
-        self.assertNotIn(out_song, playlist)
-
-    @mock.patch('tunes.models.Song.objects.filter')
     @mock.patch('random.randint')
-    def test_jitter_bumps_upper_bound(self, mock_rand, mock_filter):
+    def test_jitter_bumps_upper_bound(self, mock_rand):
+        songs_mock = mock.Mock()
         mock_rand.return_value = 2
 
         lower_bound = .5
         upper_bound = .75
         jitter = .2
 
-        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter)
+        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter, songs=songs_mock)
 
         expected_lower_bound = lower_bound - jitter
         expected_upper_bound = upper_bound + jitter
 
-        mock_filter.assert_called_with(
+        songs_mock.filter.assert_called_with(
             valence__gte=expected_lower_bound,
             valence__lte=expected_upper_bound,
             energy__gte=expected_lower_bound,
             energy__lte=expected_upper_bound
         )
 
-    @mock.patch('tunes.models.Song.objects.filter')
     @mock.patch('random.randint')
-    def test_jitter_bumps_lower_bound(self, mock_rand, mock_filter):
+    def test_jitter_bumps_lower_bound(self, mock_rand):
+        songs_mock = mock.Mock()
         mock_rand.return_value = 1
 
         lower_bound = .5
         upper_bound = .75
         jitter = .2
 
-        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter)
+        generate_browse_playlist(lower_bound, upper_bound, jitter=jitter, songs=songs_mock)
 
         expected_lower_bound = lower_bound + jitter
         expected_upper_bound = upper_bound - jitter
 
-        mock_filter.assert_called_with(
+        songs_mock.filter.assert_called_with(
             valence__gte=expected_lower_bound,
             valence__lte=expected_upper_bound,
             energy__gte=expected_lower_bound,
