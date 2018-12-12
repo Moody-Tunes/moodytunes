@@ -56,6 +56,9 @@ class BrowseView(generics.ListAPIView):
     def get_queryset(self):
         queryset = super(BrowseView, self).get_queryset()
 
+        if self.cleaned_data['genre']:
+            queryset.filter(genre=self.cleaned_data['genre'])
+
         # Exclude songs a user has previously voted on for the given emotion
         # ex. if the user voted on a song when asking for Melancholy songs, it
         # should still be a candidate if the user then asks for Happy songs

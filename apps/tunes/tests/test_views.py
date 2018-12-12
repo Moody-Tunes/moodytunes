@@ -42,6 +42,21 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_song['id'], song.id)
 
+    def test_filter_on_genre(self):
+        MoodyUtil.create_song()
+        expected_song = MoodyUtil.create_song(genre='super-dope')
+        params = {
+            'emotion': Emotion.HAPPY,
+            'jitter': 0,
+            'genre': expected_song.genre
+        }
+
+        resp = self.client.get(self.url, data=params)
+        resp_song = resp.json()[0]
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_song['id'], expected_song.id)
+
     def test_playlist_respects_limit(self):
         for _ in range(10):
             MoodyUtil.create_song()
