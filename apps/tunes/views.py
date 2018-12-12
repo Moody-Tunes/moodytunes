@@ -28,7 +28,6 @@ class BrowseView(generics.ListAPIView):
     default_jitter = .25
     default_limit = 10
 
-
     def __init__(self):
         self.cleaned_data = {}  # Cleaned GET data for query
         super(BrowseView, self).__init__()
