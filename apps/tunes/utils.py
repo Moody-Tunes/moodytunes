@@ -12,8 +12,7 @@ def generate_browse_playlist(lower_bound, upper_bound, limit=None, jitter=None, 
     :param upper_bound: (float) Upper bound for attributes of `Song` records returned
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
-    :param songs: (QuerySet) Optional queryset of songs to filter. This is used in the `BrowseView` logic to filter a
-    queryset that has already excluded songs the user has previously voted on
+    :param songs: (QuerySet) Optional queryset of songs to filter
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
     """
