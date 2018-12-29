@@ -23,6 +23,8 @@ class BrowseView(generics.ListAPIView):
     of the songs that should be returned.
     """
     serializer_class = SongSerializer
+    queryset = Song.objects.all()
+
     default_jitter = .25
     default_limit = 10
 
@@ -30,10 +32,7 @@ class BrowseView(generics.ListAPIView):
         self.cleaned_data = {}  # Cleaned GET data for query
         super(BrowseView, self).__init__()
 
-    def get_queryset(self):
-        user = self.request.user
-
-        emotion = self.cleaned_data['emotion']
+    def filter_queryset(self, queryset):
         jitter = self.cleaned_data['jitter']
         limit = self.cleaned_data['limit'] or self.default_limit
 
@@ -44,23 +43,29 @@ class BrowseView(generics.ListAPIView):
         # `emotion` is assured to be a valid Emotion name because the form
         # we use to clean the data to this view validates that `emotion`
         # is mapped to a record in our database
-        user_emotion = user.get_user_emotion_record(emotion)
+        user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
 
-        # Only exclude songs a user has previously voted on for the given emotion
-        # ex. if the user voted on a song when asking for Melancholy songs, it
-        # should still be a candidate if the user then asks for Happy songs
-        user_votes = user.get_user_song_vote_records(emotion)
-        previously_voted_song_ids = [vote.song.id for vote in user_votes]
-
-        playlist = generate_browse_playlist(
+        return generate_browse_playlist(
             user_emotion.lower_bound,
             user_emotion.upper_bound,
-            exclude_ids=previously_voted_song_ids,
             limit=limit,
-            jitter=float(jitter)
+            jitter=float(jitter),
+            songs=queryset
         )
 
-        return playlist
+    def get_queryset(self):
+        queryset = super(BrowseView, self).get_queryset()
+
+        if self.cleaned_data['genre']:
+            queryset = queryset.filter(genre=self.cleaned_data['genre'])
+
+        # Exclude songs a user has previously voted on for the given emotion
+        # ex. if the user voted on a song when asking for Melancholy songs, it
+        # should still be a candidate if the user then asks for Happy songs
+        user_votes = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
+        previously_voted_song_ids = [vote.song.id for vote in user_votes]
+
+        return queryset.exclude(id__in=previously_voted_song_ids)
 
     def get(self, request, *args, **kwargs):
         form = BrowseSongsForm(request.GET)
