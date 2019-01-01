@@ -1,4 +1,4 @@
-### local development configuration
+# local development configuration
 # If you would lke to override any settings, create a local_personal.py file
 # that imports this module. Then you are free to override any settings values
 # you would like

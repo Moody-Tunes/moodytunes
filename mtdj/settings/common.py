@@ -122,6 +122,10 @@ LOGGING = {
             'format': '{levelname}|{asctime}|{pathname}@{lineno}|{name} {message}',
             'style': '{',
         },
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'fmt': '%(levelname)s %(asctime)s %s(pathname)s %(lineno)s %(name)s %(message)s',
+        },
         'simple': {
             'format': '{levelname}: {name} - {message}',
             'style': '{',
@@ -142,13 +146,13 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': env.str('DJANGO_LOG_APP_FILENAME', default=os.path.join(BASE_DIR, 'dev_app.log')),
-            'formatter': 'verbose',
+            'formatter': 'json',
         },
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': env.str('DJANGO_LOG_ERROR_FILENAME', default=os.path.join(BASE_DIR, 'dev_err.log')),
-            'formatter': 'verbose',
+            'formatter': 'json',
         }
     },
     'loggers': {

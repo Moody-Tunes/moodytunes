@@ -1,4 +1,4 @@
-### Test specfic settings
+# Test specific settings
 
 from .common import *
 
