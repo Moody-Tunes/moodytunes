@@ -41,7 +41,7 @@ class Command(MoodyBaseCommand):
                     fail += 1
             except ValidationError:
                 msg = 'ERROR: Could not create song with data: {}'.format(track)
-                self.write_to_log_and_output(msg, output_stream='stderr', log_level='warning')
+                self.write_to_log_and_output(msg, output_stream='stderr', log_level=logging.WARNING)
                 fail += 1
 
         return success, fail
@@ -106,7 +106,7 @@ class Command(MoodyBaseCommand):
                     'Error connecting to Spotify! Exception detail: {}. '
                     'Got {} track(s) successfully. Proceeding to save phase...'.format(exc, len(tracks)),
                     output_stream='stderr',
-                    log_level='warning'
+                    log_level=logging.WARNING
                 )
 
                 break
