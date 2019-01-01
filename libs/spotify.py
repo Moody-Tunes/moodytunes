@@ -33,13 +33,17 @@ class SpotifyClient(object):
 
         :return (dict) Response content
         """
-        logger.info('{id} - Making {method} request to Spotify URL: {url}. GET data: {GET}. POST data: {POST}'.format(
-            id=self.fingerprint,
-            method=method,
-            url=url,
-            GET=params,
-            POST=data
-        ))
+        logger.info(
+            '{id} - Making {method} request to Spotify URL: {url}'.format(
+                id=self.fingerprint,
+                method=method,
+                url=url,
+            ),
+            extra={
+                'params': params,
+                'data': data
+            }
+        )
 
         if not headers:
             # Retrieve the header we need to make an auth request
@@ -57,7 +61,10 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
-            logger.info('{} - Successful request made to {}. Response: {}'.format(self.fingerprint, url, response))
+            logger.debug(
+                '{} - Successful request made to {}.'.format(self.fingerprint, url, response),
+                extra={'response_data': response}
+            )
 
         except requests.exceptions.HTTPError:
             logger.warning('{} - Received HTTPError requesting {}'.format(self.fingerprint, url), exc_info=True)
