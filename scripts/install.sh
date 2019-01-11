@@ -1,6 +1,6 @@
 #! /bin/bash
 # moodytunes install script
-# Works on UNIX-style systems
+# Works on Linux Mint 18.3
 
 function check_for_error {
     # Check if last command succeeded. If it did not, print message passed
