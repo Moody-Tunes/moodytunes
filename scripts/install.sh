@@ -1,8 +1,19 @@
 #! /bin/bash
-
 # moodytunes install script
+# Works on UNIX-style systems
 
-# Check if python3 venv is insstalled
+PROJECT_PYTHON_VERSION="Python 3.5.2"
+
+# Ensure python3 version is 3.5
+python_version=$(python3 -V)
+
+if [ ! $python_version = $PROJECT_PYTHON_VERSION ]
+then
+    echo "Installing $PROJECT_PYTHON_VERSION"
+    sudo apt-get install python3.5 -y >/dev/null
+fi
+
+# Check if python3 venv is installed
 python3 -m venv venv > /dev/null
 
 if [ $? -eq 1 ]
