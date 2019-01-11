@@ -45,7 +45,7 @@ check_for_error "ERROR: Failed to install python3.5-venv"
 if [[ ! -d venv ]]
 then
 	echo "Creating virtual environment..."
-	python3.5 -m venv venv
+	python3.5 -m venv venv > /dev/null
 fi
 
 echo "Activating python virtual environment..."
@@ -53,8 +53,10 @@ echo "Activating python virtual environment..."
 
 check_for_error "ERROR: Failed to create virtual environment"
 
-pip3 install --upgrade pip
-pip3 install -r requirements/dev.txt
+echo "Installing dependencies..."
+
+pip3 install --upgrade pip > /dev/null
+pip3 install -r requirements/dev.txt > /dev/null
 
 check_for_error "ERROR: Failed to install dependencies"
 
