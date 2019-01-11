@@ -61,7 +61,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
 
         return data
 
-    def _handle_bad_request(self, request):
+    def _handle_bad_request(self, request, *args, **kwargs):
         self._log_bad_request()
         response = BadRequest('Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__))
         self.headers = self.default_response_headers
@@ -81,7 +81,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
                 self.cleaned_data = form.cleaned_data
                 return super().dispatch(request, *args, **kwargs)
             else:
-                self._handle_bad_request(request)
+                self._handle_bad_request(request, *args, **kwargs)
                 return self.response
         else:
             return super().dispatch(request, *args, **kwargs)
