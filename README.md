@@ -2,19 +2,36 @@
 The REAL Pandora of emotions
 
 ## Setup
+
+If you happen to be running Linux Mint 18.3, you can run scripts/install.sh to install the proper packages to run
+moodytunes on your machine
+
+`bash scripts/install.sh`
+
+This will install python3.5 and python3.5-venv on your system, as well as create a virtual environment, install the
+needed dependencies, and start your moodytunes application. If you are running a different OS, follow the steps below
+
 Install python3 virtual environment
 
-`sudo apt-get install python3-venv  # Linux based systems`
+`sudo apt-get install python3.5-venv  # Linux based systems`
 
-`brew install python3-venv  # Mac base systems`
+`brew install python3.5-venv  # Mac base systems`
 
-Setup python3 virtual environment and activate. You might need to update the `pip` package manager in a newly created
+Setup python3 virtual environment and activate. You should to update the `pip` package manager in a newly created
 virtual environment.
 
 ```
-python3 -m venv venv
+python3.5 -m venv venv
 source venv/bin/activate
 (venv) pip install --upgrade pip
+```
+
+Run the needed migrations and load the sample song data into your database. This will create a db.sqlite3 file in the
+project directory to act as your local database
+
+```
+python manage.py migrate
+python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
 ```
 
 Install dependencies.
@@ -26,14 +43,6 @@ Install dependencies.
 You can start the development server by using the Django `runserver` command. By default this runs on 127.0.0.1:8000
 
 `python manage.py runserver`
-
-You can load test songs into your database by loading the fixture file in the tunes app.
-You will need to run the migrations first to create the tables.
-
-```
-python manage.py migrate
-python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
-```
 
 You can run a Django shell with all the project's model already imported with shell_plus.
 
