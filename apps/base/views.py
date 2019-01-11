@@ -74,8 +74,9 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
         if data and not isinstance(data, QueryDict):
             data = self._parse_request_body(data)
 
-        if data and form_class:
-            form = form_class(data)
+        if form_class:
+            form_data = data or {}
+            form = form_class(form_data)
 
             if form.is_valid():
                 self.cleaned_data = form.cleaned_data

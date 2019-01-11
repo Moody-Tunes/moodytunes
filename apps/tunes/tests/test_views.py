@@ -19,9 +19,16 @@ class TestBrowseView(TestCase):
 
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
-        resp = self.client.get(self.url)
+
+        params = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=params)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_no_query_params_passed_returns_bad_request(self):
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unknown_emotion_passed_returns_bad_request(self):
         params = {'emotion': 'unknown'}
@@ -118,6 +125,16 @@ class TestVoteView(TestCase):
         resp = self.client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_no_post_data_passed_returns_bad_request(self):
+        resp = self.client.post(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_no_delete_data_passed_returns_bad_request(self):
+        resp = self.client.delete(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
         data = {
@@ -282,9 +299,15 @@ class TestPlaylistView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
 
-        resp = self.client.get(self.url)
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_no_query_params_passed_returns_bad_request(self):
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
         UserSongVote.objects.create(
