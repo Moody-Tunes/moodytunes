@@ -161,7 +161,7 @@ class VoteView(generics.CreateAPIView, generics.DestroyAPIView):
             raise SuspiciousOperation('Invalid POST data supplied to {}'.format(self.__class__.__name__))
 
     def delete(self, request, *args, **kwargs):
-        form = DeleteVoteForm(request.POST)
+        form = DeleteVoteForm(request.data)
 
         if form.is_valid():
             self.cleaned_data = form.cleaned_data

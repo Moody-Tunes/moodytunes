@@ -203,6 +203,71 @@ class TestVoteView(TestCase):
         self.assertEqual(user_emotion.upper_bound, pre_upper_bound)
         self.assertEqual(user_emotion.lower_bound, pre_lower_bound)
 
+    def test_delete_happy_path(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            vote=True
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code
+        }
+
+        resp = self.client.delete(self.url, data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(UserSongVote.objects.filter(user=self.user).exists())
+
+    def test_delete_bad_request_data(self):
+        data = {
+            'emotion': 'foobarbaz',
+            'song_code': self.song.code
+        }
+
+        resp = self.client.delete(self.url, data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_vote_not_found(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code
+        }
+
+        resp = self.client.delete(self.url, data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_vote_conflict(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            vote=True
+        )
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            vote=True
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code
+        }
+
+        resp = self.client.delete(self.url, data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+
 
 class TestPlaylistView(TestCase):
     @classmethod
