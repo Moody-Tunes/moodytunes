@@ -3,8 +3,11 @@
 # Works on UNIX-style systems
 
 PROJECT_PYTHON_VERSION="Python 3.5.2"
+VIRTUAL_ENV_FILE="venv/bin/activate"
 
-# Ensure python3 version is 3.5
+echo "Updating package list. Your password might be required..."
+sudo apt-get update
+
 python_version=$(python3 -V)
 
 if [[ ! $python_version = $PROJECT_PYTHON_VERSION ]]
@@ -29,7 +32,7 @@ then
 fi
 
 echo "Activating python virtual environment..."
-. venv/bin/activate
+. $VIRTUAL_ENV_FILE
 
 pip3 install --upgrade pip
 pip3 install -r requirements/dev.txt
