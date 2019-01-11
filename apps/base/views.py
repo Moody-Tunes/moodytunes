@@ -64,7 +64,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
         form_class = getattr(self, '{}_form'.format(request.method.lower()))
         data = getattr(request, self.REQUEST_DATA_MAPPING[request.method])
 
-        if not isinstance(data, QueryDict):
+        if data and not isinstance(data, QueryDict):
             data = self._parse_request_body(data)
 
         if data and form_class:
