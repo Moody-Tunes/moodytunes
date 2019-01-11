@@ -42,5 +42,4 @@ python manage.py migrate
 python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
 
 echo "Finished installing mtdj!"
-echo "In the future, execute 'source venv/bin/activate' to work in the created virtual environment"
-
+echo "Enter the command 'source venv/bin/activate' to work in the created virtual environment"
