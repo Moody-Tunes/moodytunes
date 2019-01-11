@@ -18,11 +18,12 @@ class BadRequest(Response):
 
 class ValidateRequestDataMixin(generics.GenericAPIView):
     """
-    Mixin to verify incoming request data. This object contains the various REST methods (GET, POST, DELETE) used
-    by django-rest-framework and adds validation for incoming request data.
+    Mixin to verify incoming request data. This class contains logic to validate incoming request data for various
+    REST methods.
 
     To use the functionality for this class, inherit from it and define the relevant form to use in verifying data for
-    the specific method.
+    the specific method. For example, if your view has GET functionality and you want to validate the incoming data,
+    you should override the `get_form` attribute on the class.
     """
     get_form = None
     post_form = None
