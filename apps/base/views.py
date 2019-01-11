@@ -1,5 +1,8 @@
+import json
 import logging
 
+from django.conf import settings
+from django.http import QueryDict
 from django.urls import reverse
 from django.views.generic.base import RedirectView
 from rest_framework import generics, status
@@ -25,8 +28,16 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
     post_form = None
     delete_form = None
 
+    # Dictionary mapping request method to instance attribute containing data for the request
+    REQUEST_DATA_MAPPING = {
+        'GET': 'GET',
+        'POST': 'POST',
+        'DELETE': 'body'
+    }
+
     def __init__(self):
         self.cleaned_data = {}  # Cleaned data for request
+        self.delete_data = None  # Django doesn't handle DELETE data as easily as GET or POST...
         super().__init__()
 
     def _log_error(self):
@@ -34,48 +45,43 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
             'Invalid {} data supplied to {}'.format(self.request.method, self.__class__.__name__),
             extra={
                 'params': self.request.GET,
-                'data': self.request.data,
+                'data': self.delete_data if self.delete_data else self.request.POST,
                 'user': self.request.user.id
             }
         )
 
-    def get(self, request, *args, **kwargs):
-        form_class = getattr(self, 'get_form')
-        form = form_class(request.GET)
+    def _parse_request_body(self, data):
+        raw_data = data.decode(settings.DEFAULT_CHARSET)
+        json_data = raw_data.replace("'", "\"")
+        data = json.loads(json_data)
 
-        if form.is_valid():
-            self.cleaned_data = form.cleaned_data
-            return super().get(request, *args, **kwargs)
+        if self.request.method == 'DELETE':
+            self.delete_data = data
 
+        return data
+
+    def dispatch(self, request, *args, **kwargs):
+        form_class = getattr(self, '{}_form'.format(request.method.lower()))
+        data = getattr(request, self.REQUEST_DATA_MAPPING[request.method])
+
+        if not isinstance(data, QueryDict):
+            data = self._parse_request_body(data)
+
+        if data and form_class:
+            form = form_class(data)
+
+            if form.is_valid():
+                self.cleaned_data = form.cleaned_data
+                return super().dispatch(request, *args, **kwargs)
+            else:
+                self._log_error()
+                response = BadRequest('Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__))
+                self.headers = self.default_response_headers
+                self.response = self.finalize_response(request, response, *args, **kwargs)
+
+                return self.response
         else:
-            self._log_error()
-            return BadRequest('Invalid GET data supplied to {}'.format(self.__class__.__name__))
-
-    def post(self, request, *args, **kwargs):
-        form_class = getattr(self, 'post_form')
-        form = form_class(request.POST)
-
-        if form.is_valid():
-            self.cleaned_data = form.cleaned_data
-
-            return super().post(request, *args, **kwargs)
-
-        else:
-            self._log_error()
-            return BadRequest('Invalid GET data supplied to {}'.format(self.__class__.__name__))
-
-    def delete(self, request, *args, **kwargs):
-        form_class = getattr(self, 'delete_form')
-        form = form_class(request.data)
-
-        if form.is_valid():
-            self.cleaned_data = form.cleaned_data
-
-            return super().delete(request, *args, **kwargs)
-
-        else:
-            self._log_error()
-            return BadRequest('Invalid GET data supplied to {}'.format(self.__class__.__name__))
+            return super().dispatch(request, *args, **kwargs)
 
 
 class HomePageView(RedirectView):
