@@ -6,7 +6,7 @@ function check_for_error {
     # Check if last command succeeded. If it did not, print message passed
     # as argument to function.
 
-    if [[ $? -eq 1 ]]
+    if [[ ! $? -eq 0 ]]
     then
         echo $1 >&2
         exit 1
@@ -19,14 +19,14 @@ PROJECT_PYTHON_VERSION="Python 3.5.2"
 VIRTUAL_ENV_FILE="venv/bin/activate"
 
 echo "Updating package list. Your password might be required..."
-sudo apt-get update
+sudo apt-get update > /dev/null
 
 python_version=$(python3 -V)
 
 if [[ ! $python_version = $PROJECT_PYTHON_VERSION ]]
 then
     echo "Installing $PROJECT_PYTHON_VERSION"
-    sudo apt-get install python3.5 -y >/dev/null
+    sudo apt-get install python3.5 -y > /dev/null
 fi
 
 check_for_error "ERROR: Failed to install python3.5"
