@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.models import UserSongVote
-from tunes.forms import BrowseSongsForm, VoteSongsForm, PlaylistSongsForm
+from tunes.forms import BrowseSongsForm, VoteSongsForm, PlaylistSongsForm, DeleteVoteForm
 from tunes.models import Song, Emotion
 from tunes.serializers import SongSerializer
 from tunes.utils import generate_browse_playlist
@@ -80,9 +80,9 @@ class BrowseView(generics.ListAPIView):
             raise SuspiciousOperation('Invalid GET data supplied to {}'.format(self.__class__.__name__))
 
 
-class VoteView(generics.CreateAPIView):
+class VoteView(generics.CreateAPIView, generics.DestroyAPIView):
     def __init__(self):
-        self.cleaned_data = {}  # Cleaned POST data for request
+        self.cleaned_data = {}  # Cleaned data for request
         super(VoteView, self).__init__()
 
     def create(self, request, *args, **kwargs):
@@ -121,6 +121,32 @@ class VoteView(generics.CreateAPIView):
 
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            vote = UserSongVote.objects.get(
+                user_id=self.request.user.id,
+                emotion__name=self.cleaned_data['emotion'],
+                song__code=self.cleaned_data['song_code']
+            )
+
+            # TODO: What to do about boundaries for the UserEmotion?
+            vote.delete()
+
+            logger.info('Deleted vote for user {} with song {} and emotion {}'.format(
+                self.request.user.username,
+                self.cleaned_data['emotion'],
+                self.cleaned_data['song_code']
+            ))
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except UserSongVote.DoesNotExist:
+            logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
+            raise Http404
+        except UserSongVote.MultipleObjectsReturned:
+            logger.warning('Conflict when trying to delete UserSongVote', extra={'request_dat': self.cleaned_data})
+            return Response(status=status.HTTP_409_CONFLICT)
+
     def post(self, request, *args, **kwargs):
         form = VoteSongsForm(request.POST)
 
@@ -133,6 +159,19 @@ class VoteView(generics.CreateAPIView):
             logger.warning('Invalid POST data supplied to VoteView.post: {}'.format(request.POST))
 
             raise SuspiciousOperation('Invalid POST data supplied to {}'.format(self.__class__.__name__))
+
+    def delete(self, request, *args, **kwargs):
+        form = DeleteVoteForm(request.POST)
+
+        if form.is_valid():
+            self.cleaned_data = form.cleaned_data
+
+            return super(VoteView, self).delete(request, *args, **kwargs)
+
+        else:
+            logger.warning('Invalid DELETE data supplied to VoteView.post: {}'.format(request.POST))
+
+            raise SuspiciousOperation('Invalid DELETE data supplied to {}'.format(self.__class__.__name__))
 
 
 class PlaylistView(generics.ListAPIView):
