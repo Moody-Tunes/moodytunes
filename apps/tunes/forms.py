@@ -28,6 +28,7 @@ class VoteSongsForm(forms.Form):
     song_code = forms.CharField()
     vote = forms.BooleanField()
 
+
 class DeleteVoteForm(forms.Form):
     """Provides validation for DELETE /tunes/vote/"""
 
