@@ -2,7 +2,7 @@ import json
 import logging
 
 from django.conf import settings
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseNotAllowed
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 
@@ -45,7 +45,9 @@ class ValidateRequestDataMixin(MoodyMixin):
             'params': self.request.GET,
             'post': self.request.POST,
             'user_id': self.request.user.id,
-            'headers': self.request.META
+            'headers': self.request.META,
+            'method': self.request.method,
+            'allowed_methods': self.allowed_methods
         }
 
         if self.data:
@@ -82,6 +84,10 @@ class ValidateRequestDataMixin(MoodyMixin):
         return self.finalize_response(request, response, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
+        if not hasattr(self, request.method.lower()):
+            self._log_bad_request()
+            return HttpResponseNotAllowed(self.allowed_methods)
+
         form_class = getattr(self, '{}_form'.format(request.method.lower()))
 
         if form_class:

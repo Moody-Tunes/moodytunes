@@ -3,6 +3,7 @@ import urllib
 
 from django.test import TestCase
 from django.http import QueryDict
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from base.mixins import ValidateRequestDataMixin
@@ -11,6 +12,7 @@ from base.mixins import ValidateRequestDataMixin
 class TestValidateRequestDataMixing(TestCase):
     def setUp(self):
         self.mixin = ValidateRequestDataMixin()
+        self.mixin.get = None  # Need to mock at least one method for the view
 
     def test_parse_request_body_happy_path(self):
         data = b"{'test': 'case'}"
@@ -98,3 +100,14 @@ class TestValidateRequestDataMixing(TestCase):
 
                 error_handler.assert_called_once_with(mock_request)
                 self.assertIsNone(self.mixin.response)
+
+    def test_dispatch_receives_method_not_allowed(self):
+        mock_request = mock.MagicMock()
+        mock_request.method = 'POST'  # Test mixin only has GET method
+
+        with mock.patch.object(self.mixin, '_log_bad_request') as error_logger:
+            resp = self.mixin.dispatch(mock_request)
+
+            error_logger.assert_called_once_with()
+            self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+            self.assertEqual(resp['Allow'], ', '.join(self.mixin.allowed_methods))
