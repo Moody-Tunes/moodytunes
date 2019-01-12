@@ -41,6 +41,7 @@ class ValidateRequestDataMixin(MoodyMixin):
         super().__init__()
 
     def _log_bad_request(self):
+        """Log information about a request if something fails to validate"""
         request_data = {
             'params': self.request.GET,
             'post': self.request.POST,
@@ -59,6 +60,14 @@ class ValidateRequestDataMixin(MoodyMixin):
         )
 
     def _parse_request_body(self, data):
+        """
+        Given a byte string of JSON data, return a Python dictionary parsed from the contents. This is used as a
+        workaround for  DELETE and PUT methods, as Django does not assign the contents of these request methods to
+        instance variables so we'll have to do it ourselves.
+        on the request.
+        :param data: (bytes) Byte-string of request data in JSON format
+        :return: (dict) Python dictionary representing the request data
+        """
         try:
             raw_data = data.decode(settings.DEFAULT_CHARSET)
         except AttributeError:
@@ -78,6 +87,12 @@ class ValidateRequestDataMixin(MoodyMixin):
         return data
 
     def _handle_bad_request(self, request, *args, **kwargs):
+        """
+        Handles creating an instance of `base.responses.BadResponse` for the request. Follows mostly the same format
+        as the Django implementation of returning a response.
+        :param request: (Request) WSGI request object
+        :return: (BadRequest) Instance of response indicating a bad request
+        """
         self._log_bad_request()
         response = BadRequest('Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__))
         self.headers = self.default_response_headers
