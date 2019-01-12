@@ -109,7 +109,6 @@ class UserEmotion(BaseModel):
         :param energy: (float) Representation of song intensity
         :param change: (bool) Flag to denote resetting the boundaries for a record. Used in the case a user "unvotes"
         a song to reset the boundaries for that emotion
-        :return:
         """
         if reset:
             self.upper_bound = 2 * self.upper_bound - valence
