@@ -38,7 +38,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
 
     def __init__(self):
         self.cleaned_data = {}  # Cleaned data for request
-        self.delete_data = None  # Django doesn't handle DELETE data as easily as GET or POST...
+        self.data = None  # For cases where data is not attached to request
         super().__init__()
 
     def _log_bad_request(self):
@@ -46,7 +46,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
             'Invalid {} data supplied to {}'.format(self.request.method, self.__class__.__name__),
             extra={
                 'params': self.request.GET,
-                'data': self.delete_data if self.delete_data else self.request.POST,
+                'data': self.data if self.data else self.request.POST,
                 'user': self.request.user.id
             }
         )
@@ -56,8 +56,7 @@ class ValidateRequestDataMixin(generics.GenericAPIView):
         json_data = raw_data.replace("'", "\"")
         data = json.loads(json_data)
 
-        if self.request.method == 'DELETE':
-            self.delete_data = data
+        self.data = data
 
         return data
 
