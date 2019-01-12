@@ -42,6 +42,20 @@ class TestUserEmot(TestCase):
         self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
         self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
 
+    def test_reset_emotion_boundaries(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
+
+        valence = .5
+        energy = .5
+
+        expected_new_upper_bound = 2 * emotion.upper_bound - valence
+        expected_new_lower_bound = 2 * emotion.lower_bound - energy
+
+        user_emot.update_emotion_boundaries(valence, energy, reset=True)
+        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
+        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+
 
 class TestMoodyUser(TestCase):
     @mock.patch('django.contrib.auth.base_user.AbstractBaseUser.set_password')
