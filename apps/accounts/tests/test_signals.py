@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import TestCase
 
 from accounts.models import UserSongVote
@@ -24,30 +26,23 @@ class TestUpdateUserBoundariesSignal(TestCase):
         cls.song = util.create_song()
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-    def test_upvoting_song_updates_boundaries(self):
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-
-        expected_new_upper_bound = (user_emot.upper_bound + self.song.valence) / 2
-        expected_new_lower_bound = (user_emot.lower_bound + self.song.energy) / 2
-
-        UserSongVote.objects.create(
+    @mock.patch('accounts.models.UserEmotion.update_emotion_boundaries')
+    def test_upvoting_song_updates_boundaries(self, mock_update):
+        vote = UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
             song=self.song,
             vote=True
         )
 
-        user_emot.refresh_from_db()
+        mock_update.assert_called_once_with(self.song.valence, self.song.energy)
 
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+        # If we save the vote again, we shouldn't trigger another update
+        vote.save()
+        self.assertEqual(mock_update.call_count, 1)
 
-    def test_downvoting_song_does_not_update_boundaries(self):
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-
-        expected_new_upper_bound = user_emot.upper_bound
-        expected_new_lower_bound = user_emot.lower_bound
-
+    @mock.patch('accounts.models.UserEmotion.update_emotion_boundaries')
+    def test_downvoting_song_does_not_update_boundaries(self, mock_update):
         UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
@@ -55,7 +50,4 @@ class TestUpdateUserBoundariesSignal(TestCase):
             vote=False
         )
 
-        user_emot.refresh_from_db()
-
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+        mock_update.assert_not_called()
