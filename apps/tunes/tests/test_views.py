@@ -223,7 +223,7 @@ class TestVoteView(TestCase):
     def test_delete_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-        UserSongVote.objects.create(
+        vote_record = UserSongVote.objects.create(
             user=self.user,
             emotion=emotion,
             song=self.song,
@@ -236,9 +236,10 @@ class TestVoteView(TestCase):
         }
 
         resp = self.client.delete(self.url, data=data, content_type='application/json')
+        vote_record.refresh_from_db()
 
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(UserSongVote.objects.filter(user=self.user).exists())
+        self.assertFalse(vote_record.vote)
 
     def test_delete_bad_request_data(self):
         data = {

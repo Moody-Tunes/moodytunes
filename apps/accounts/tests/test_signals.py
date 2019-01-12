@@ -64,23 +64,3 @@ class TestUpdateUserBoundariesSignal(TestCase):
 
         self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
         self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
-
-    def test_deleting_vote_resets_boundaries(self):
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-
-        expected_new_upper_bound = user_emot.upper_bound
-        expected_new_lower_bound = user_emot.lower_bound
-
-        vote = UserSongVote.objects.create(
-            user=self.user,
-            emotion=self.emotion,
-            song=self.song,
-            vote=True
-        )
-
-        vote.delete()
-
-        user_emot.refresh_from_db()
-
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)

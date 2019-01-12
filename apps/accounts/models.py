@@ -133,3 +133,16 @@ class UserSongVote(BaseModel):
 
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
+
+    def delete(self, *args, **kwargs):
+        # Update the user_emotion boundaries for the given emotion
+        user_emot = self.user.useremotion_set.get(emotion=self.emotion)
+        user_emot.update_emotion_boundaries(
+            self.song.valence,
+            self.song.energy,
+            reset=True
+        )
+
+        # We don't actually want to delete these records, so just set the vote value to false
+        self.vote = False
+        self.save()

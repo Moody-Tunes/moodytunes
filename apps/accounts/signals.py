@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 
 from accounts.models import UserEmotion, UserSongVote
 from tunes.models import Emotion
@@ -44,23 +44,4 @@ post_save.connect(
     update_user_boundaries,
     sender=UserSongVote,
     dispatch_uid='user_song_vote_post_save_update_useremotion_boundaries'
-)
-
-
-def reset_user_boundaries(sender, instance, using, *args, **kwargs):
-    user_emote = instance.user.useremotion_set.get(
-        emotion__name=instance.emotion.name
-    )
-
-    user_emote.update_emotion_boundaries(
-        instance.song.valence,
-        instance.song.energy,
-        reset=True
-    )
-
-
-post_delete.connect(
-    reset_user_boundaries,
-    sender=UserSongVote,
-    dispatch_uid='user_song_vote_post_delete_reset_useremotion_boundaries'
 )

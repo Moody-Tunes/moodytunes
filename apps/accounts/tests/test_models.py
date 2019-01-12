@@ -5,7 +5,7 @@ from django.db.utils import IntegrityError
 from django.db.models.signals import post_save
 from django.test import TestCase
 
-from accounts.models import MoodyUser, UserEmotion
+from accounts.models import MoodyUser, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
@@ -74,3 +74,32 @@ class TestMoodyUser(TestCase):
         self.assertEqual(user.username, data['username'])
         self.assertEqual(user.email, data['email'])
         mock_password_update.assert_called_with(data['password'])
+
+
+class TestUserSongVote(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        util = MoodyUtil()
+        cls.user = util.create_user()
+        cls.song = util.create_song()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+    def test_deleting_vote_resets_boundaries(self):
+        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+
+        expected_new_upper_bound = user_emot.upper_bound
+        expected_new_lower_bound = user_emot.lower_bound
+
+        vote = UserSongVote.objects.create(
+            user=self.user,
+            emotion=self.emotion,
+            song=self.song,
+            vote=True
+        )
+
+        vote.delete()
+
+        user_emot.refresh_from_db()
+
+        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
+        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
