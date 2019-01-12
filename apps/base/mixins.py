@@ -63,8 +63,7 @@ class ValidateRequestDataMixin(MoodyMixin):
         """
         Given a byte string of JSON data, return a Python dictionary parsed from the contents. This is used as a
         workaround for  DELETE and PUT methods, as Django does not assign the contents of these request methods to
-        instance variables so we'll have to do it ourselves.
-        on the request.
+        instance variables on the request object so we'll have to parseo it ourselves.
         :param data: (bytes) Byte-string of request data in JSON format
         :return: (dict) Python dictionary representing the request data
         """
@@ -88,8 +87,8 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     def _handle_bad_request(self, request, *args, **kwargs):
         """
-        Handles creating an instance of `base.responses.BadResponse` for the request. Follows mostly the same format
-        as the Django implementation of returning a response.
+        Handles creating an instance of `base.responses.BadResponse` to return the request.
+        Follows mostly the same format as the Django implementation of returning a response.
         :param request: (Request) WSGI request object
         :return: (BadRequest) Instance of response indicating a bad request
         """
