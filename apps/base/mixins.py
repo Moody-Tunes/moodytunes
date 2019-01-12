@@ -4,6 +4,7 @@ import logging
 from django.conf import settings
 from django.http import QueryDict
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
 from base.responses import BadRequest
 
@@ -40,19 +41,35 @@ class ValidateRequestDataMixin(MoodyMixin):
         super().__init__()
 
     def _log_bad_request(self):
+        request_data = {
+            'params': self.request.GET,
+            'post': self.request.POST,
+            'user_id': self.request.user.id,
+            'headers': self.request.META
+        }
+
+        if self.data:
+            request_data['data'] = self.data
+
         logger.warning(
             'Invalid {} data supplied to {}'.format(self.request.method, self.__class__.__name__),
-            extra={
-                'params': self.request.GET,
-                'data': self.data if self.data else self.request.POST,
-                'user': self.request.user.id
-            }
+            extra=request_data
         )
 
     def _parse_request_body(self, data):
-        raw_data = data.decode(settings.DEFAULT_CHARSET)
+        try:
+            raw_data = data.decode(settings.DEFAULT_CHARSET)
+        except AttributeError:
+            self._log_bad_request()
+            raise ValidationError('Unable to decode request body')
+
         json_data = raw_data.replace("'", "\"")
-        data = json.loads(json_data)
+
+        try:
+            data = json.loads(json_data)
+        except json.JSONDecodeError:
+            self._log_bad_request()
+            raise ValidationError('Unable to parse request body')
 
         self.data = data
 
@@ -62,16 +79,21 @@ class ValidateRequestDataMixin(MoodyMixin):
         self._log_bad_request()
         response = BadRequest('Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__))
         self.headers = self.default_response_headers
-        self.response = self.finalize_response(request, response, *args, **kwargs)
+        return self.finalize_response(request, response, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         form_class = getattr(self, '{}_form'.format(request.method.lower()))
-        data = getattr(request, self.REQUEST_DATA_MAPPING[request.method])
-
-        if data and not isinstance(data, QueryDict):
-            data = self._parse_request_body(data)
 
         if form_class:
+            data = getattr(request, self.REQUEST_DATA_MAPPING[request.method])
+
+            if data and not isinstance(data, QueryDict):
+                try:
+                    data = self._parse_request_body(data)
+                except ValidationError:
+                    self.response = self._handle_bad_request(request, *args, **kwargs)
+                    return self.response
+
             form_data = data or {}
             form = form_class(form_data)
 
@@ -79,7 +101,12 @@ class ValidateRequestDataMixin(MoodyMixin):
                 self.cleaned_data = form.cleaned_data
                 return super().dispatch(request, *args, **kwargs)
             else:
-                self._handle_bad_request(request, *args, **kwargs)
+                self.response = self._handle_bad_request(request, *args, **kwargs)
                 return self.response
         else:
-            return super().dispatch(request, *args, **kwargs)
+            raise AttributeError(
+                '{} received a {} request but did not defined a form class for this method'.format(
+                    self.__class__,
+                    request.method
+                )
+            )
