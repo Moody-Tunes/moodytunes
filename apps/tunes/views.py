@@ -105,7 +105,6 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
                 song__code=self.cleaned_data['song_code']
             )
 
-            # TODO: What to do about boundaries for the UserEmotion?
             vote.delete()
 
             logger.info('Deleted vote for user {} with song {} and emotion {}'.format(
@@ -120,7 +119,7 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
             logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
             raise Http404
         except UserSongVote.MultipleObjectsReturned:
-            logger.warning('Conflict when trying to delete UserSongVote', extra={'request_dat': self.cleaned_data})
+            logger.warning('Conflict when trying to delete UserSongVote', extra={'request_data': self.cleaned_data})
             return Response(status=status.HTTP_409_CONFLICT)
 
 
