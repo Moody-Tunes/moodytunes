@@ -102,14 +102,20 @@ class UserEmotion(BaseModel):
 
         super().save(*args, **kwargs)
 
-    def update_emotion_boundaries(self, valence, energy):
+    def update_emotion_boundaries(self, valence, energy, reset=False):
         """
-        Given a valence and energy, recompute boundaries for the given emotion
-        box. `valence` governs the upper_bound values while energy determines
-        the lower_bound values.
+        Given the valence and energy of a song, recompute boundaries for the given emotion box
+        :param valence: (float) Representation of song mood
+        :param energy: (float) Representation of song intensity
+        :param change: (bool) Flag to denote resetting the boundaries for a record. Used in the case a user "unvotes"
+        a song to reset the boundaries for that emotion
         """
-        self.upper_bound = (self.upper_bound + valence) / 2
-        self.lower_bound = (self.lower_bound + energy) / 2
+        if reset:
+            self.upper_bound = 2 * self.upper_bound - valence
+            self.lower_bound = 2 * self.lower_bound - energy
+        else:
+            self.upper_bound = (self.upper_bound + valence) / 2
+            self.lower_bound = (self.lower_bound + energy) / 2
         self.save()
 
 
@@ -126,3 +132,16 @@ class UserSongVote(BaseModel):
 
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
+
+    def delete(self, *args, **kwargs):
+        # Update the user_emotion boundaries for the given emotion
+        user_emot = self.user.useremotion_set.get(emotion=self.emotion)
+        user_emot.update_emotion_boundaries(
+            self.song.valence,
+            self.song.energy,
+            reset=True
+        )
+
+        # We don't actually want to delete these records, so just set the vote value to false
+        self.vote = False
+        self.save()

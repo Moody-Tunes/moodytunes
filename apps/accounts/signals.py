@@ -23,17 +23,19 @@ post_save.connect(
 
 
 def update_user_boundaries(sender, instance, created, *args, **kwargs):
-    # If vote is positive (song makes user feel emotion) update the
-    # boundaries for the given user_emotion with the song attributes
-    if instance.vote and created:
-        user_emot, _ = instance.user.useremotion_set.get_or_create(
-            emotion__name=instance.emotion.name,
-            defaults={
-                'user': instance.user,
-                'emotion': instance.emotion
-            }
-        )
+    # Get the boundary record for the given user and emotion
+    # We should always call this to ensure that if we add new emotions, we'll auto
+    # create the corresponding record when a user starts to browse for songs in
+    # that emotion
+    user_emot, _ = instance.user.useremotion_set.get_or_create(
+        emotion__name=instance.emotion.name,
+        defaults={
+            'user': instance.user,
+            'emotion': instance.emotion
+        }
+    )
 
+    if instance.vote and created:
         user_emot.update_emotion_boundaries(
             instance.song.valence,
             instance.song.energy

@@ -64,7 +64,7 @@ class Emotion(BaseModel):
         return self.full_name
 
     def __repr__(self):
-        return self.name
+        return '<{}: {}>'.format(self.__class__.__name__, self.name)
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -95,7 +95,7 @@ class Song(BaseModel):
         return '{}: {}'.format(self.artist, self.name)
 
     def __repr__(self):
-        return self.code
+        return '<{}: {}>'.format(self.__class__.__name__, self.code)
 
     def save(self, *args, **kwargs):
         self.full_clean()

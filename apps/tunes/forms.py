@@ -22,11 +22,18 @@ class BrowseSongsForm(forms.Form):
 
 
 class VoteSongsForm(forms.Form):
-    """Provides validation for /tunes/vote/"""
+    """Provides validation for POST /tunes/vote/"""
 
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     song_code = forms.CharField()
     vote = forms.BooleanField()
+
+
+class DeleteVoteForm(forms.Form):
+    """Provides validation for DELETE /tunes/vote/"""
+
+    emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    song_code = forms.CharField()
 
 
 class PlaylistSongsForm(forms.Form):
