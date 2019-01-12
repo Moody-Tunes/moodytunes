@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.models import UserSongVote
-from base.views import ValidateRequestDataMixin
+from base.mixins import ValidateRequestDataMixin
 from tunes.forms import BrowseSongsForm, VoteSongsForm, PlaylistSongsForm, DeleteVoteForm
 from tunes.models import Song, Emotion
 from tunes.serializers import SongSerializer
