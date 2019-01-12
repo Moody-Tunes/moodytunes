@@ -13,7 +13,7 @@ class TestValidateRequestDataMixing(TestCase):
         self.mixin = ValidateRequestDataMixin()
 
     def test_parse_request_body_happy_path(self):
-        data =  b"{'test': 'case'}"
+        data = b"{'test': 'case'}"
         expected_return = {'test': 'case'}
 
         ret = self.mixin._parse_request_body(data)
