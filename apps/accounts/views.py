@@ -94,14 +94,14 @@ class AnalyticsView(ValidateRequestDataMixin):
             desired_songs = [song for song in desired_songs if song.genre == genre]
 
         # Calculate average valence and energy for songs user has voted on for the emotion
-        sentiments = []
+        energies = []
         valences = []
         for song in desired_songs:
-            sentiments.append(song.sentiment)
+            energies.append(song.energy)
             valences.append(song.valence)
 
         return {
-            'average_sentiment': average(sentiments),
+            'average_energy': average(energies),
             'average_valence': average(valences),
             'total_songs': len(desired_songs)
         }
