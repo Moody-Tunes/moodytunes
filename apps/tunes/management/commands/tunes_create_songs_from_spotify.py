@@ -52,7 +52,7 @@ class Command(MoodyBaseCommand):
 
         :return: (list[dict]) Track data for saving as Song records
         """
-        spotify = SpotifyClient(command_id=self._unique_id)
+        spotify = SpotifyClient(identifier=self._unique_id)
         tracks = []
 
         for category in settings.SPOTIFY['categories']:

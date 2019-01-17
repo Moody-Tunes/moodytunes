@@ -15,6 +15,24 @@ class TestSpotifyClient(TestCase):
         cls.spotify_client = SpotifyClient()
         cls.auth_code = 'some-auth-code'
 
+    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_make_auth_access_token_request_happy_path(self, mock_request):
+        mock_request.return_value = {'access_token': self.auth_code}
+
+        auth = self.spotify_client._make_auth_access_token_request()
+
+        self.assertEqual(auth, self.auth_code)
+
+    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_make_auth_access_token_request_auth_code_not_found(self, mock_request):
+        mock_request.return_value = {}
+
+        auth = self.spotify_client._make_auth_access_token_request()
+
+        self.assertIsNone(auth)
+
     @mock.patch('django.core.cache.cache.set')
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
@@ -98,6 +116,48 @@ class TestSpotifyClient(TestCase):
         self.assertDictEqual(response, {})
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_playlists_for_category_happy_path(self, mock_request):
+        mock_request.return_value = {
+            'playlists': {
+                'items': [{
+                    'name': 'Super Dope',
+                    'id': 'unique-id',
+                    'owner': {
+                        'id': 'unique-user-id'
+                    },
+                }],
+            },
+        }
+
+        expected_resp = [{
+            'name': 'Super Dope'.encode('ascii', 'ignore'),
+            'uri': 'unique-id',
+            'user': 'unique-user-id'
+        }]
+
+        resp = self.spotify_client.get_playlists_for_category('category', 1)
+
+        self.assertEqual(resp, expected_resp)
+        mock_request.assert_called_with(
+            'GET',
+            '{api_url}/browse/categories/{category_id}/playlists'.format(
+                api_url=settings.SPOTIFY['api_url'],
+                category_id='category'
+            ),
+            params={
+                'country': settings.COUNTRY_CODE,
+                'limit': 1
+            }
+        )
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_playlist_for_category_raises_exception_if_no_playlists_retrieved(self, mock_request):
+        mock_request.return_value = {}
+
+        with self.assertRaises(SpotifyException):
+            self.spotify_client.get_playlists_for_category('category', 1)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_songs_from_playlist_happy_path(self, mock_request):
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
@@ -177,3 +237,96 @@ class TestSpotifyClient(TestCase):
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_song_from_playlist_raises_exception_if_no_songs_retrieved(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub', 'name': 'beats.pu'}
+
+        mock_request.return_value = {}
+
+        with self.assertRaises(SpotifyException):
+            self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_song_from_playlist_respects_limit(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [
+                    {
+                        'track': {
+                            'uri': 'song-uri',
+                            'explicit': False,
+                            'name': 'Glazed',
+                            'artists': [{
+                                'name': 'J Dilla'
+                            }],
+                        },
+                    },
+                    {
+                        'track': {
+                            'uri': 'other-song-uri',
+                            'explicit': False,
+                            'name': 'King',
+                            'artists': [{
+                                'name': 'J Dilla'
+                            }],
+                        },
+                    },
+                ]
+            }
+        }
+
+        resp = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertEqual(len(resp), 1)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_for_tracks_happy_path(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{
+                'valence': .5,
+                'energy': .5
+            }]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertEqual(new_track['energy'], .5)
+        self.assertEqual(new_track['valence'], .5)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_handles_missing_track_data(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{}]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertIsNone(new_track.get('energy'))
+        self.assertIsNone(new_track.get('valence'))
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{
+                'valence': .5,
+            }]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertIsNone(new_track.get('energy'))
+        self.assertIsNone(new_track.get('valence'))
