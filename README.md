@@ -54,7 +54,7 @@ You can run a Django shell with all the project's model already imported with sh
 
 ### Unit Tests
 
-You can run unit tests using tox. This will invoke the Django test runner with the settings we use for running unit tests.
+You can run unit tests using [tox](https://tox.readthedocs.io/en/latest/). This will invoke the Django test runner with the settings we use for running unit tests.
 
 `tox`
 
