@@ -280,3 +280,53 @@ class TestSpotifyClient(TestCase):
 
         resp = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertEqual(len(resp), 1)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_for_tracks_happy_path(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{
+                'valence': .5,
+                'energy': .5
+            }]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertEqual(new_track['energy'], .5)
+        self.assertEqual(new_track['valence'], .5)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_handles_missing_track_data(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{}]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertIsNone(new_track.get('energy'))
+        self.assertIsNone(new_track.get('valence'))
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request):
+        track = {'code': 'spotify:song:code'}
+        tracks = [track]
+
+        mock_request.return_value = {
+            'audio_features': [{
+                'valence': .5,
+            }]
+        }
+
+        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
+        new_track = resp[0]
+
+        self.assertIsNone(new_track.get('energy'))
+        self.assertIsNone(new_track.get('valence'))
