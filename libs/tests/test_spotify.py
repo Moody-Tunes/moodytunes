@@ -237,3 +237,46 @@ class TestSpotifyClient(TestCase):
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_song_from_playlist_raises_exception_if_no_songs_retrieved(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub', 'name': 'beats.pu'}
+
+        mock_request.return_value = {}
+
+        with self.assertRaises(SpotifyException):
+            self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_song_from_playlist_respects_limit(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [
+                    {
+                        'track': {
+                            'uri': 'song-uri',
+                            'explicit': False,
+                            'name': 'Glazed',
+                            'artists': [{
+                                'name': 'J Dilla'
+                            }],
+                        },
+                    },
+                    {
+                        'track': {
+                            'uri': 'other-song-uri',
+                            'explicit': False,
+                            'name': 'King',
+                            'artists': [{
+                                'name': 'J Dilla'
+                            }],
+                        },
+                    },
+                ]
+            }
+        }
+
+        resp = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertEqual(len(resp), 1)
