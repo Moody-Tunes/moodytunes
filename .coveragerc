@@ -1,0 +1,13 @@
+[run]
+branch = True
+source =
+    apps/
+    libs/
+omit =
+    venv/
+    */migrations/*
+    */tests/*
+
+[report]
+exclude_lines =
+    pragma: no cover
