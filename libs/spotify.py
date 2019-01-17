@@ -136,7 +136,7 @@ class SpotifyClient(object):
         :param num_playlists: (int) Number of playlists to return
         :return: (list[dict]) Playlist mappings for the given category
             - name (str): Name of the playlist
-            - uri (str): Spotiy ID for the playlist
+            - uri (str): Spotify ID for the playlist
             - user (str): Spotify ID for the playlist owner
 
         :raises: `SpotifyException` if unable to retrieve playlists for category
