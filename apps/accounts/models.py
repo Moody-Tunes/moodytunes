@@ -1,10 +1,10 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 from base.models import BaseModel
 
 
-class UserPrefetchManager(BaseUserManager):
+class UserPrefetchManager(UserManager):
     """Manager to automatically `prefetch_related` records when querying the MoodyUser model"""
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
