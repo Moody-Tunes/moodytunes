@@ -1,0 +1,15 @@
+[run]
+branch = True
+source =
+    apps/
+    libs/
+omit =
+    venv/
+    */migrations/*
+    */tests/*
+    *__init__*.py
+
+[report]
+fail_under = 80
+exclude_lines =
+    pragma: no cover
