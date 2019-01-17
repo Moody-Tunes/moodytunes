@@ -40,6 +40,9 @@ Install dependencies.
 
 
 ## Handy Tips/Tricks
+
+### Django Commands
+
 You can start the development server by using the Django `runserver` command. By default this runs on 127.0.0.1:8000
 
 `python manage.py runserver`
@@ -48,9 +51,41 @@ You can run a Django shell with all the project's model already imported with sh
 
 `python manage.py shell_plus`
 
+
+### Unit Tests
+
 You can run unit tests using tox. This will invoke the Django test runner with the settings we use for running unit tests.
 
 `tox`
+
+If you added packages to the requirements file and need them in your tests, you might need to recreate the tox
+virtual environment. You can do this by passing the `--recreate` flag to tox.
+
+`tox -r [--recreate]`
+
+We use the [coverage](https://coverage.readthedocs.io/en/v4.5.x/) pacakge to report how much of our codebase has unit
+test coverage. After running the tests using tox, you can see a report of the current coverage by running
+
+`coverage report`
+
+after running tox. If you would like to see a detailed output of the coverage (like what exact lines were hit) you can
+generate an HTML report by running
+
+`coverage html`
+
+This will generate a directory in the project root with files corresponding to each code file in the project. Open the
+index.html file in any browser of your chouce to view the source files for the project, their coverage percentage, and
+what lines have (or have not) been tested.
+
+NOTE: Your build will fail and any pull request rejected if the total coverage is less than 80% after the Travis build
+is finished. If you *need* to circumvent this, you can cover any code that doesn't need to be tested with pragmas:
+
+```python
+if settings.DEBUG:  # pragma: no cover
+    print('Not necessary to test...')
+```
+
+### Logging
 
 Log files are written to the files defined by the `DJANGO_LOG_APP_FILENAME` and `DJANGO_LOG_ERROR_FILENAME` environment variables.
 By default they go to `dev_app.log` and `dev_err.log` in the project root directory.
