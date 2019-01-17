@@ -6,9 +6,14 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
+from rest_framework.response import Response
 
-from accounts.forms import CreateUserForm, UpdateUserInfoForm
+from accounts.forms import CreateUserForm, UpdateUserInfoForm, AnalyticsForm
 from accounts.models import MoodyUser
+from accounts.serializers import AnalyticsSerializer
+from base.mixins import ValidateRequestDataMixin
+from tunes.models import Emotion
+from libs.utils import average
 
 
 @method_decorator(login_required, name='dispatch')
@@ -67,3 +72,55 @@ class CreateUserView(View):
             return HttpResponseRedirect(reverse('accounts:login'))
         else:
             return render(request, self.template_name, {'form': form})
+
+
+class AnalyticsView(ValidateRequestDataMixin):
+    get_form = AnalyticsForm
+    serializer_class = AnalyticsSerializer
+
+    def _get_boundaries(self):
+        """Return boundaries for the given user based on the emotion"""
+        user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+        return (user_emotion.lower_bound, user_emotion.upper_bound)
+
+    def _get_average_attributes(self):
+        """Return average song attributes for the user based on the songs they have voted on"""
+        genre = self.cleaned_data['genre']
+        votes_for_emotion = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
+        desired_songs = [vote.song for vote in votes_for_emotion if vote.vote]
+
+        # Filter songs by genre if provided
+        if genre:
+            desired_songs = [song for song in desired_songs if song.genre == genre]
+
+        # Calculate average valence and energy for songs user has voted on for the emotion
+        sentiments = []
+        valences = []
+        for song in desired_songs:
+            sentiments.append(song.sentiment)
+            valences.append(song.valence)
+
+        return {
+            'average_sentiment': average(sentiments),
+            'average_valence': average(valences),
+            'total_songs': len(desired_songs)
+        }
+
+    def get(self, request, *args, **kwargs):
+        emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
+        genre = self.cleaned_data['genre']
+
+        lower_bound, upper_bound = self._get_boundaries()
+
+        data = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': genre,
+            'lower_bound': lower_bound,
+            'upper_bound': upper_bound,
+        }
+
+        data.update(self._get_average_attributes())
+
+        serializer = self.serializer_class(data)
+        return Response(serializer.data)
