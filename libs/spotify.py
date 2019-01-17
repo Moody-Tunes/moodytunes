@@ -17,8 +17,8 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
-    def __init__(self, command_id='SpotifyClient'):
-        self.fingerprint = command_id
+    def __init__(self, identifier='SpotifyClient'):
+        self.fingerprint = identifier
         self.seen_songs = []
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
