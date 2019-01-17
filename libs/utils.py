@@ -8,9 +8,9 @@ def average(collection):
     if not collection:
         return None
 
-    all_nums = [type(ele) == int or type(ele) == float for ele in collection]
+    all_nums = all([type(ele) == int or type(ele) == float for ele in collection])
 
-    if not all(all_nums):
+    if not all_nums:
         raise ValueError('Received a non numeric type, the only types accepted are `float` and `int`')
 
     return round(sum(collection) / len(collection), 2)
