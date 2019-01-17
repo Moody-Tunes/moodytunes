@@ -9,3 +9,4 @@ class AnalyticsSerializer(serializers.Serializer):
     upper_bound = serializers.FloatField(min_value=0, max_value=1)
     average_sentiment = serializers.FloatField(min_value=0, max_value=1)
     average_valence = serializers.FloatField(min_value=0, max_value=1)
+    total_songs = serializers.IntegerField()
