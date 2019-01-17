@@ -15,6 +15,24 @@ class TestSpotifyClient(TestCase):
         cls.spotify_client = SpotifyClient()
         cls.auth_code = 'some-auth-code'
 
+    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_make_auth_access_token_request_happy_path(self, mock_request):
+        mock_request.return_value = {'access_token': self.auth_code}
+
+        auth = self.spotify_client._make_auth_access_token_request()
+
+        self.assertEqual(auth, self.auth_code)
+
+    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_make_auth_access_token_request_auth_code_not_found(self, mock_request):
+        mock_request.return_value = {}
+
+        auth = self.spotify_client._make_auth_access_token_request()
+
+        self.assertIsNone(auth)
+
     @mock.patch('django.core.cache.cache.set')
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
