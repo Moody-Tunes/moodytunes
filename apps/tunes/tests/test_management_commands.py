@@ -8,10 +8,14 @@ from tunes.management.commands.tunes_create_songs_from_spotify import Command as
 from tunes.models import Song
 
 
+@mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
 class TestSpotifyCommand(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.command = SpotifyCommand()
+        cls.command.stderr = mock.MagicMock()
+        cls.command.stdout = mock.MagicMock()
+
         cls.track_data = {
             'code': 'song-code',
             'name': b'Sapphire',
