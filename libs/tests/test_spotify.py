@@ -144,7 +144,7 @@ class TestSpotifyClient(TestCase):
                 api_url=settings.SPOTIFY['api_url'],
                 category_id='category'
             ),
-            params= {
+            params={
                 'country': settings.COUNTRY_CODE,
                 'limit': 1
             }
