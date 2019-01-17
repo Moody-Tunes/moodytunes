@@ -45,7 +45,7 @@ class SpotifyClient(object):
             }
         )
 
-        if not headers:
+        if not headers:  # pragma: no cover
             # Retrieve the header we need to make an auth request
             auth_token = self._get_auth_access_token()
             headers = {'Authorization': 'Bearer {}'.format(auth_token)}
