@@ -22,8 +22,10 @@ LOGGING['handlers'].update({
         'level': 'DEBUG',
         'class': 'logging.StreamHandler',
         'formatter': 'simple',
-    }
+    },
 })
+
+LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 
 LOGGING['loggers'].update({
     'django': {

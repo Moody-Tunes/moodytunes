@@ -17,8 +17,8 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
-    def __init__(self, command_id='SpotifyClient'):
-        self.fingerprint = command_id
+    def __init__(self, identifier='SpotifyClient'):
+        self.fingerprint = identifier
         self.seen_songs = []
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
@@ -45,7 +45,7 @@ class SpotifyClient(object):
             }
         )
 
-        if not headers:
+        if not headers:  # pragma: no cover
             # Retrieve the header we need to make an auth request
             auth_token = self._get_auth_access_token()
             headers = {'Authorization': 'Bearer {}'.format(auth_token)}
@@ -136,7 +136,7 @@ class SpotifyClient(object):
         :param num_playlists: (int) Number of playlists to return
         :return: (list[dict]) Playlist mappings for the given category
             - name (str): Name of the playlist
-            - uri (str): Spotiy ID for the playlist
+            - uri (str): Spotify ID for the playlist
             - user (str): Spotify ID for the playlist owner
 
         :raises: `SpotifyException` if unable to retrieve playlists for category
