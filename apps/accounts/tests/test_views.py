@@ -1,10 +1,11 @@
-from requests import codes
-
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
 
-from accounts.models import MoodyUser
+from accounts.models import MoodyUser, UserSongVote
+from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
 
 
 class TestProfileView(TestCase):
@@ -16,7 +17,7 @@ class TestProfileView(TestCase):
         resp = self.client.get(self.url)
         expected_rediect = '{}?next={}'.format(reverse('accounts:login'), self.url)
 
-        self.assertEqual(resp.status_code, codes.found)
+        self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, expected_rediect)
 
 
@@ -30,7 +31,7 @@ class TestUpdateView(TestCase):
         resp = self.client.get(self.url)
         expected_rediect = '{}?next={}'.format(reverse('accounts:login'), self.url)
 
-        self.assertEqual(resp.status_code, codes.found)
+        self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, expected_rediect)
 
     def test_happy_path(self):
@@ -49,7 +50,7 @@ class TestUpdateView(TestCase):
         self.assertEqual(self.user.username, update_data['username'])
         self.assertEqual(self.user.email, update_data['email'])
 
-        self.assertEqual(resp.status_code, codes.okay)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(resp, 'login.html')
 
 
@@ -67,6 +68,126 @@ class TestCreateUserView(TestCase):
 
         resp = self.client.post(self.url, data=user_data)
 
-        self.assertEqual(resp.status_code, codes.found)
+        self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, reverse('accounts:login'))
         self.assertTrue(MoodyUser.objects.filter(username=user_data['username']).exists())
+
+
+class TestAnalyticsView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('accounts:analytics')
+        cls.user = MoodyUtil.create_user()
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.client.logout()
+
+        params = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=params)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_unsupported_method_is_rejected(self):
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.client.post(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_unknown_emotion_returns_bad_request(self):
+        data = {'emotion': 'some-fake-emotion'}
+        resp = self.client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_happy_path(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        upvoted_song_1 = MoodyUtil.create_song(valence=.75, energy=.65)
+        upvoted_song_2 = MoodyUtil.create_song(valence=.65, energy=.7)
+        downvoted_song = MoodyUtil.create_song(valence=.5, energy=.45)
+
+        UserSongVote.objects.create(user=self.user, emotion=emotion, song=upvoted_song_1, vote=True)
+        UserSongVote.objects.create(user=self.user, emotion=emotion, song=upvoted_song_2, vote=True)
+        UserSongVote.objects.create(user=self.user, emotion=emotion, song=downvoted_song, vote=False)
+
+        working_songs = [upvoted_song_1, upvoted_song_2]
+        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        expected_response = {
+            'average_energy': average([song.energy for song in working_songs]),
+            'average_valence': average([song.valence for song in working_songs]),
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': '',
+            'lower_bound': user_emotion.lower_bound,
+            'upper_bound': user_emotion.upper_bound,
+            'total_songs': len(working_songs)
+        }
+
+        params = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_genre_filter_only_returns_songs_for_genre(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song(genre='hiphop')
+        other_song = MoodyUtil.create_song(genre='something-else')
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True
+        )
+
+        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        expected_response = {
+            'average_energy': expected_song.energy,
+            'average_valence': expected_song.valence,
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': expected_song.genre,
+            'lower_bound': user_emotion.lower_bound,
+            'upper_bound': user_emotion.upper_bound,
+            'total_songs': 1,
+        }
+
+        params = {'emotion': Emotion.HAPPY, 'genre': expected_song.genre}
+        resp = self.client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_user_with_no_votes_returns_defaults(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        expected_response = {
+            'average_energy': None,
+            'average_valence': None,
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': '',
+            'lower_bound': user_emotion.lower_bound,
+            'upper_bound': user_emotion.upper_bound,
+            'total_songs': 0
+        }
+
+        params = {'emotion': Emotion.HAPPY}
+        resp = self.client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
