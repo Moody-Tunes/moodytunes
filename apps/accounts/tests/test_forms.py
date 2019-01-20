@@ -1,9 +1,10 @@
 from django.test import TestCase
 
-from accounts.forms import UpdateUserForm
+from accounts.forms import BaseUserForm
+from libs.tests.helpers import MoodyUtil
 
 
-class TestUpdateUserInfoForm(TestCase):
+class TestUserForm(TestCase):
 
     def test_clean_password_values_match(self):
         data = {
@@ -11,7 +12,7 @@ class TestUpdateUserInfoForm(TestCase):
             'confirm_password': '12345'
         }
 
-        form = UpdateUserForm(data)
+        form = BaseUserForm(data)
         self.assertTrue(form.is_valid())
 
     def test_clean_password_values_do_not_match(self):
@@ -20,5 +21,16 @@ class TestUpdateUserInfoForm(TestCase):
             'confirm_password': '67890'
         }
 
-        form = UpdateUserForm(data)
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_username_for_existing_user(self):
+        user = MoodyUtil.create_user()
+        data = {
+            'username': user.username,
+            'password': '12345',
+            'confirm_password': '12345'
+        }
+
+        form = BaseUserForm(data)
         self.assertFalse(form.is_valid())

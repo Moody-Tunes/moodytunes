@@ -39,13 +39,6 @@ class BaseUserForm(forms.Form):
 
         return new_password
 
-
-class UpdateUserForm(BaseUserForm):
-    email = forms.EmailField(required=False)
-
-
-class CreateUserForm(BaseUserForm):
-
     def clean_username(self):
         username = self.cleaned_data.get('username')
 
@@ -56,3 +49,11 @@ class CreateUserForm(BaseUserForm):
             )
 
         return username
+
+
+class CreateUserForm(BaseUserForm):
+    pass
+
+
+class UpdateUserForm(BaseUserForm):
+    email = forms.EmailField(required=False)
