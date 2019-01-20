@@ -9,4 +9,7 @@ urlpatterns = [
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('update/', views.UpdateInfoView.as_view(), name='update'),
     path('create/', views.CreateUserView.as_view(), name='create'),
+
+    # Django Rest Framework endpoints
+    path('analytics/', views.AnalyticsView.as_view(), name='analytics'),
 ]
