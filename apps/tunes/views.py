@@ -172,7 +172,7 @@ class OptionView(generics.GenericAPIView):
     serializer_class = OptionsSerializer
 
     def get(self, request, *args, **kwargs):
-        # Build map of emotions  including code name and display name
+        # Build map of emotions including code name and display name
         emotion_choices = []
         for emotion in Emotion.objects.all():
             emotion_choices.append({
