@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from accounts.forms import UpdateUserInfoForm
+from accounts.forms import UpdateUserForm
 
 
 class TestUpdateUserInfoForm(TestCase):
@@ -11,7 +11,7 @@ class TestUpdateUserInfoForm(TestCase):
             'confirm_password': '12345'
         }
 
-        form = UpdateUserInfoForm(data)
+        form = UpdateUserForm(data)
         self.assertTrue(form.is_valid())
 
     def test_clean_password_values_do_not_match(self):
@@ -20,5 +20,5 @@ class TestUpdateUserInfoForm(TestCase):
             'confirm_password': '67890'
         }
 
-        form = UpdateUserInfoForm(data)
+        form = UpdateUserForm(data)
         self.assertFalse(form.is_valid())

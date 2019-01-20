@@ -40,7 +40,7 @@ class BaseUserForm(forms.Form):
         return new_password
 
 
-class UpdateUserInfoForm(BaseUserForm):
+class UpdateUserForm(BaseUserForm):
     email = forms.EmailField(required=False)
 
 

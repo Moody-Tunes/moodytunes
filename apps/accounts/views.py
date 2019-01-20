@@ -8,7 +8,7 @@ from django.views import View
 from django.views.generic.base import TemplateView
 from rest_framework.response import Response
 
-from accounts.forms import CreateUserForm, UpdateUserInfoForm
+from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
 from base.mixins import ValidateRequestDataMixin
@@ -23,7 +23,7 @@ class ProfileView(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 class UpdateInfoView(View):
-    form_class = UpdateUserInfoForm
+    form_class = UpdateUserForm
     template_name = 'update.html'
 
     def get(self, request):
