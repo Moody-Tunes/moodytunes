@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 from base.models import BaseModel
+from base.validators import validate_decimal_value
 
 
 class UserPrefetchManager(UserManager):
@@ -83,8 +84,8 @@ class UserEmotion(BaseModel):
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
-    lower_bound = models.FloatField()
-    upper_bound = models.FloatField()
+    lower_bound = models.FloatField(validators=[validate_decimal_value])
+    upper_bound = models.FloatField(validators=[validate_decimal_value])
 
     class Meta:
         unique_together = ('user', 'emotion')
