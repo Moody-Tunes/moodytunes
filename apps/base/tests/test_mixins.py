@@ -35,7 +35,8 @@ class TestValidateRequestDataMixing(TestCase):
         super_dispatch.assert_called_once_with(mock_request)
         self.assertDictEqual(self.mixin.cleaned_data, transformed_data)
 
-    def test_dispatch_receives_invalid_data(self):
+    @mock.patch('base.mixins.ValidateRequestDataMixin.initialize_request')
+    def test_dispatch_receives_invalid_data(self, mock_initialize_request):
         transformed_data = {'hello': 'world'}
 
         mock_serializer = mock.MagicMock()
@@ -44,6 +45,7 @@ class TestValidateRequestDataMixing(TestCase):
         self.mixin.get_request_serializer = mock_serializer
 
         mock_request = self.factory.get('/path/', data=transformed_data)
+        mock_initialize_request.return_value = mock_request
 
         with mock.patch.object(self.mixin, '_handle_bad_request') as error_handler:
             error_handler.return_value = None

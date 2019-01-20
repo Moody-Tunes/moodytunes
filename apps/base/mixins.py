@@ -73,7 +73,7 @@ class ValidateRequestDataMixin(MoodyMixin):
             self._log_bad_request()
             return HttpResponseNotAllowed(self.allowed_methods)
 
-        serializer_class = getattr(self, '{}_request_serializer'.format(_request.method.lower()))
+        serializer_class = getattr(self, '{}_request_serializer'.format(_request.method.lower()), None)
 
         if serializer_class:
             data = getattr(_request, self.REQUEST_DATA_MAPPING[_request.method], {})
@@ -84,12 +84,14 @@ class ValidateRequestDataMixin(MoodyMixin):
                 self.cleaned_data = serializer.data
                 return super().dispatch(request, *args, **kwargs)
             else:
-                self.response = self._handle_bad_request(request, *args, **kwargs)
+                self.response = self._handle_bad_request(_request, *args, **kwargs)
                 return self.response
         else:
             raise AttributeError(
-                '{} received a {} request but did not defined a form class for this method'.format(
+                '{} received a {} request but did not defined a form class for this method. '
+                'Please set the {} attribute on this view to process this request'.format(
                     self.__class__,
-                    _request.method
+                    _request.method,
+                    '{}_request_serializer'.format(_request.method.lower())
                 )
             )
