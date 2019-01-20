@@ -15,8 +15,8 @@ class Command(MoodyBaseCommand):
 
     email_subject = 'Updated Password For Moodytunes'
     email_body = 'You have requested your password for moodytunes be updated. ' \
-                      'Your new password is {password}. ' \
-                      'Login at {site} to get access to your account'
+                 'Your new password is {password}. ' \
+                 'Login at {site} to get access to your account'
 
     def add_arguments(self, parser):
         parser.add_argument(
