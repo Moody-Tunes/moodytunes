@@ -9,6 +9,11 @@ class SongSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OptionsSerializer(serializers.Serializer):
+    emotions = serializers.ListField()
+    genres = serializers.ListField()
+
+
 class BrowseSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/browse/"""
 

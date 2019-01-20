@@ -305,7 +305,7 @@ class TestPlaylistView(TestCase):
         self.api_client.logout()
 
         data = {'emotion': Emotion.HAPPY}
-        resp = self.client.get(self.url, data=data)
+        resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -375,3 +375,35 @@ class TestPlaylistView(TestCase):
         resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestOptionsView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:options')
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+        cls.api_client = APIClient()
+
+    def setUp(self):
+        self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.api_client.logout()
+
+        resp = self.api_client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_happy_path(self):
+        expected_emotions = [{'name': emotion.full_name, 'code': emotion.name} for emotion in Emotion.objects.all()]
+        expected_genres = [self.song.genre]
+        expected_response = {
+            'emotions': expected_emotions,
+            'genres': expected_genres
+        }
+
+        resp = self.api_client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp.json(), expected_response)

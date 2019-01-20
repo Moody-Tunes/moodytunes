@@ -14,7 +14,8 @@ from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
     PlaylistSongsRequestSerializer,
-    VoteSongsRequestSerializer
+    VoteSongsRequestSerializer,
+    OptionsSerializer
 )
 from tunes.utils import generate_browse_playlist
 
@@ -161,3 +162,32 @@ class PlaylistView(ValidateRequestDataMixin, generics.ListAPIView):
         desired_songs = [vote.song.id for vote in user_votes_for_emotion if vote.vote]
 
         return queryset.filter(id__in=desired_songs)
+
+
+class OptionView(generics.GenericAPIView):
+    """
+    Returns a JSON response of available site options. This returns the emotions we have in our system, as well as the
+    different genres of songs in our database.
+    """
+    serializer_class = OptionsSerializer
+
+    def get(self, request, *args, **kwargs):
+        # Build map of emotions including code name and display name
+        emotion_choices = []
+        for emotion in Emotion.objects.all():
+            emotion_choices.append({
+                'name': emotion.full_name,
+                'code': emotion.name
+            })
+
+        # Retrieve list of song genres
+        genre_choices = Song.objects.all().values_list('genre', flat=True).distinct()
+
+        data = {
+            'emotions': emotion_choices,
+            'genres': genre_choices
+        }
+
+        serializer = self.serializer_class(data=data)
+
+        return Response(data=serializer.initial_data)
