@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from accounts.models import MoodyUser
+from accounts.models import MoodyUser, UserEmotion
+from base.validators import validate_decimal_value
 
 
 def validate_matching_passwords(password, confirm_password):
@@ -57,3 +58,9 @@ class CreateUserForm(BaseUserForm):
 
 class UpdateUserForm(BaseUserForm):
     email = forms.EmailField(required=False)
+
+
+class UpdateUserEmotionBoundariesForm(forms.ModelForm):
+    class Meta:
+        model = UserEmotion
+        fields = ('lower_bound', 'upper_bound')
