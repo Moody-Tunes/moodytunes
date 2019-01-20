@@ -305,7 +305,7 @@ class TestPlaylistView(TestCase):
         self.api_client.logout()
 
         data = {'emotion': Emotion.HAPPY}
-        resp = self.client.get(self.url, data=data)
+        resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
