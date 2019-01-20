@@ -8,9 +8,9 @@ from django.views import View
 from django.views.generic.base import TemplateView
 from rest_framework.response import Response
 
-from accounts.forms import CreateUserForm, UpdateUserInfoForm, AnalyticsForm
+from accounts.forms import CreateUserForm, UpdateUserInfoForm
 from accounts.models import MoodyUser
-from accounts.serializers import AnalyticsSerializer
+from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
 from base.mixins import ValidateRequestDataMixin
 from tunes.models import Emotion
 from libs.utils import average
@@ -75,8 +75,9 @@ class CreateUserView(View):
 
 
 class AnalyticsView(ValidateRequestDataMixin):
-    get_form = AnalyticsForm
     serializer_class = AnalyticsSerializer
+
+    get_request_serializer = AnalyticsRequestSerializer
 
     def _get_boundaries(self):
         """Return boundaries for the given user based on the emotion"""
@@ -85,7 +86,7 @@ class AnalyticsView(ValidateRequestDataMixin):
 
     def _get_average_attributes(self):
         """Return average song attributes for the user based on the songs they have voted on"""
-        genre = self.cleaned_data['genre']
+        genre = self.cleaned_data.get('genre')
         votes_for_emotion = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
         desired_songs = [vote.song for vote in votes_for_emotion if vote.vote]
 
@@ -108,7 +109,7 @@ class AnalyticsView(ValidateRequestDataMixin):
 
     def get(self, request, *args, **kwargs):
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
-        genre = self.cleaned_data['genre']
+        genre = self.cleaned_data.get('genre')
 
         lower_bound, upper_bound = self._get_boundaries()
 

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from tunes.models import Emotion
+
 
 class AnalyticsSerializer(serializers.Serializer):
     emotion = serializers.CharField(min_length=3, max_length=3)
@@ -10,3 +12,8 @@ class AnalyticsSerializer(serializers.Serializer):
     average_energy = serializers.FloatField(min_value=0, max_value=1)
     average_valence = serializers.FloatField(min_value=0, max_value=1)
     total_songs = serializers.IntegerField()
+
+
+class AnalyticsRequestSerializer(serializers.Serializer):
+    genre = serializers.CharField(max_length=15, required=False)
+    emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)

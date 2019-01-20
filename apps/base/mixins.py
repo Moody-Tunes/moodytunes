@@ -1,10 +1,7 @@
-import json
 import logging
 
-from django.conf import settings
-from django.http import QueryDict, HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed
 from rest_framework import generics
-from rest_framework.exceptions import ValidationError
 
 from base.responses import BadRequest
 
@@ -22,7 +19,7 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     To use the functionality for this class, inherit from it and define the relevant form to use in verifying data for
     the specific method. For example, if your view has GET functionality and you want to validate the incoming data,
-    you should override the `get_form` attribute on the class.
+    you should override the `get_request_serializer` attribute on the class.
     """
     get_form = None
     post_form = None
@@ -30,60 +27,31 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     # Dictionary mapping request method to instance attribute containing data for the request
     REQUEST_DATA_MAPPING = {
-        'GET': 'GET',
-        'POST': 'POST',
-        'DELETE': 'body'
+        'GET': 'query_params',
+        'POST': 'data',
+        'DELETE': 'data'
     }
 
     def __init__(self):
         self.cleaned_data = {}  # Cleaned data for request
-        self.data = None  # For cases where data is not attached to request
+        self.data = None   # Used in cases where we're reading the request body (POST, DELETE)
         super().__init__()
 
     def _log_bad_request(self):
         """Log information about a request if something fails to validate"""
         request_data = {
             'params': self.request.GET,
-            'post': self.request.POST,
+            'data': self.data if self.data else self.request.body,
             'user_id': self.request.user.id,
             'headers': self.request.META,
             'method': self.request.method,
             'allowed_methods': self.allowed_methods
         }
 
-        if self.data:
-            request_data['data'] = self.data
-
         logger.warning(
             'Invalid {} data supplied to {}'.format(self.request.method, self.__class__.__name__),
             extra=request_data
         )
-
-    def _parse_request_body(self, data):
-        """
-        Given a byte string of JSON data, return a Python dictionary parsed from the contents. This is used as a
-        workaround for  DELETE and PUT methods, as Django does not assign the contents of these request methods to
-        instance variables on the request object so we'll have to parseo it ourselves.
-        :param data: (bytes) Byte-string of request data in JSON format
-        :return: (dict) Python dictionary representing the request data
-        """
-        try:
-            raw_data = data.decode(settings.DEFAULT_CHARSET)
-        except AttributeError:
-            self._log_bad_request()
-            raise ValidationError('Unable to decode request body')
-
-        json_data = raw_data.replace("'", "\"")
-
-        try:
-            data = json.loads(json_data)
-        except json.JSONDecodeError:
-            self._log_bad_request()
-            raise ValidationError('Unable to parse request body')
-
-        self.data = data
-
-        return data
 
     def _handle_bad_request(self, request, *args, **kwargs):
         """
@@ -98,35 +66,32 @@ class ValidateRequestDataMixin(MoodyMixin):
         return self.finalize_response(request, response, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        if not hasattr(self, request.method.lower()):
+        # Need to covert Django WSGI request to DRF request in order to access request.data
+        _request = self.initialize_request(request, *args, **kwargs)
+
+        if not hasattr(self, _request.method.lower()):
             self._log_bad_request()
             return HttpResponseNotAllowed(self.allowed_methods)
 
-        form_class = getattr(self, '{}_form'.format(request.method.lower()))
+        serializer_class = getattr(self, '{}_request_serializer'.format(_request.method.lower()), None)
 
-        if form_class:
-            data = getattr(request, self.REQUEST_DATA_MAPPING[request.method])
+        if serializer_class:
+            data = getattr(_request, self.REQUEST_DATA_MAPPING[_request.method], {})
+            self.data = data
+            serializer = serializer_class(data=data)
 
-            if data and not isinstance(data, QueryDict):
-                try:
-                    data = self._parse_request_body(data)
-                except ValidationError:
-                    self.response = self._handle_bad_request(request, *args, **kwargs)
-                    return self.response
-
-            form_data = data or {}
-            form = form_class(form_data)
-
-            if form.is_valid():
-                self.cleaned_data = form.cleaned_data
+            if serializer.is_valid():
+                self.cleaned_data = serializer.data
                 return super().dispatch(request, *args, **kwargs)
             else:
-                self.response = self._handle_bad_request(request, *args, **kwargs)
+                self.response = self._handle_bad_request(_request, *args, **kwargs)
                 return self.response
         else:
             raise AttributeError(
-                '{} received a {} request but did not defined a form class for this method'.format(
+                '{} received a {} request but did not defined a form class for this method. '
+                'Please set the {} attribute on this view to process this request'.format(
                     self.__class__,
-                    request.method
+                    _request.method,
+                    '{}_request_serializer'.format(_request.method.lower())
                 )
             )

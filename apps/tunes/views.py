@@ -8,9 +8,14 @@ from rest_framework.response import Response
 
 from accounts.models import UserSongVote
 from base.mixins import ValidateRequestDataMixin
-from tunes.forms import BrowseSongsForm, VoteSongsForm, PlaylistSongsForm, DeleteVoteForm
 from tunes.models import Song, Emotion
-from tunes.serializers import SongSerializer
+from tunes.serializers import (
+    SongSerializer,
+    BrowseSongsRequestSerializer,
+    DeleteVoteRequestSerializer,
+    PlaylistSongsRequestSerializer,
+    VoteSongsRequestSerializer
+)
 from tunes.utils import generate_browse_playlist
 
 logger = logging.getLogger(__name__)
@@ -18,21 +23,21 @@ logger = logging.getLogger(__name__)
 
 class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
     """
-    Return a JSON response of Song records that match a given inout query params.
+    Return a JSON response of Song records that match a given input query params.
     The main thing that should be passed is an `emotion_name`, which denotes the emotion
-    of the songs that should be returned.
+    of the songs that the user wants to feel.
     """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
 
-    default_jitter = .25
+    default_jitter = .05
     default_limit = 10
 
-    get_form = BrowseSongsForm
+    get_request_serializer = BrowseSongsRequestSerializer
 
     def filter_queryset(self, queryset):
-        jitter = self.cleaned_data['jitter']
-        limit = self.cleaned_data['limit'] or self.default_limit
+        jitter = self.cleaned_data.get('jitter')
+        limit = self.cleaned_data.get('limit') or self.default_limit
 
         # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
@@ -51,7 +56,7 @@ class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
     def get_queryset(self):
         queryset = super(BrowseView, self).get_queryset()
 
-        if self.cleaned_data['genre']:
+        if self.cleaned_data.get('genre'):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
 
         user_votes = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
@@ -61,8 +66,14 @@ class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
 
 
 class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.DestroyAPIView):
-    post_form = VoteSongsForm
-    delete_form = DeleteVoteForm
+    """
+    POST: Register a new `UserSongVote` for the given request user, song, and emotion; denotes whether or not the song
+    made the user feel that emotion.
+    DELETE: Unregister a `UserSongVote` for the given request user, song, and emotion; marks the song as not making the
+    user feel that emotion.
+    """
+    post_request_serializer = VoteSongsRequestSerializer
+    delete_request_serializer = DeleteVoteRequestSerializer
 
     def create(self, request, *args, **kwargs):
         try:
@@ -124,15 +135,19 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
 
 
 class PlaylistView(ValidateRequestDataMixin, generics.ListAPIView):
+    """
+    Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
+    on the songs as making them feel the given emotion.
+    """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
 
-    get_form = PlaylistSongsForm
+    get_request_serializer = PlaylistSongsRequestSerializer
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
 
-        if self.cleaned_data['genre']:
+        if self.cleaned_data.get('genre'):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
 
         return queryset
