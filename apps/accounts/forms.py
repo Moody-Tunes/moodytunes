@@ -19,9 +19,8 @@ def validate_matching_passwords(password, confirm_password):
     return None
 
 
-class UpdateUserInfoForm(forms.Form):
+class BaseUserForm(forms.Form):
     username = forms.CharField(max_length=150, required=False)
-    email = forms.EmailField(required=False)
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
 
@@ -41,26 +40,11 @@ class UpdateUserInfoForm(forms.Form):
         return new_password
 
 
-class CreateUserForm(forms.Form):
-    username = forms.CharField(max_length=150)
-    confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput)
-    password = forms.CharField(max_length=64, widget=forms.PasswordInput)
+class UpdateUserInfoForm(BaseUserForm):
+    email = forms.EmailField(required=False)
 
-    def clean_password(self):
-        new_password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password')
 
-        # Call settings.AUTH_PASSWORD_VALIDATORS on supplied password
-        validate_password(new_password)
-
-        validate_matching_passwords(new_password, confirm_password)
-
-        error = validate_matching_passwords(new_password, confirm_password)
-
-        if error:
-            self.add_error(*error)
-
-        return new_password
+class CreateUserForm(BaseUserForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
