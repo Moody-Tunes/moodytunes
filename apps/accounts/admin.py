@@ -7,9 +7,7 @@ from accounts.models import MoodyUser, UserEmotion, UserSongVote
 class MoodyUserAdmin(admin.ModelAdmin):
     list_display = ('username',)
     exclude = ('password',)
-    readonly_fields = (
-        'last_login', 'date_joined', 'first_name', 'last_name', 'username',
-    )
+    readonly_fields = ('last_login', 'date_joined', 'first_name', 'last_name', 'username',)
 
 
 class UserEmotionAdmin(admin.ModelAdmin):
