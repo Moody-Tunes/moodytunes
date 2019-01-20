@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
@@ -78,27 +79,28 @@ class TestAnalyticsView(TestCase):
     def setUpTestData(cls):
         cls.url = reverse('accounts:analytics')
         cls.user = MoodyUtil.create_user()
+        cls.api_client = APIClient()
 
     def setUp(self):
-        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
     def test_unauthenticated_request_is_forbidden(self):
-        self.client.logout()
+        self.api_client.logout()
 
         params = {'emotion': Emotion.HAPPY}
-        resp = self.client.get(self.url, data=params)
+        resp = self.api_client.get(self.url, data=params)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unsupported_method_is_rejected(self):
         data = {'emotion': Emotion.HAPPY}
-        resp = self.client.post(self.url, data=data)
+        resp = self.api_client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unknown_emotion_returns_bad_request(self):
         data = {'emotion': 'some-fake-emotion'}
-        resp = self.client.get(self.url, data=data)
+        resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -119,14 +121,14 @@ class TestAnalyticsView(TestCase):
             'average_valence': average([song.valence for song in working_songs]),
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': '',
+            'genre': None,
             'lower_bound': user_emotion.lower_bound,
             'upper_bound': user_emotion.upper_bound,
             'total_songs': len(working_songs)
         }
 
         params = {'emotion': Emotion.HAPPY}
-        resp = self.client.get(self.url, data=params)
+        resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -164,7 +166,7 @@ class TestAnalyticsView(TestCase):
         }
 
         params = {'emotion': Emotion.HAPPY, 'genre': expected_song.genre}
-        resp = self.client.get(self.url, data=params)
+        resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -179,14 +181,14 @@ class TestAnalyticsView(TestCase):
             'average_valence': None,
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': '',
+            'genre': None,
             'lower_bound': user_emotion.lower_bound,
             'upper_bound': user_emotion.upper_bound,
             'total_songs': 0
         }
 
         params = {'emotion': Emotion.HAPPY}
-        resp = self.client.get(self.url, data=params)
+        resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
