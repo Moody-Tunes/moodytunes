@@ -177,7 +177,7 @@ class OptionView(generics.GenericAPIView):
         for emotion in Emotion.objects.all():
             emotion_choices.append({
                 'name': emotion.full_name,
-                'code': emotion.pk
+                'code': emotion.name
             })
 
         # Retrieve list of song genres
