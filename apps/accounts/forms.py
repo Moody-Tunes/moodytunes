@@ -3,8 +3,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser
-from tunes.forms import get_available_genres
 from tunes.models import Emotion
+from tunes.utils import get_available_genres
 
 
 def validate_matching_passwords(password, confirm_password):

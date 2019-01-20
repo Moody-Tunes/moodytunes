@@ -1,15 +1,7 @@
 from django import forms
 
-from tunes.models import Emotion, Song
-
-
-def get_available_genres():
-    """
-    Return the different genres we have in our system.
-    Need to return a two-tuple per Django form standards
-    """
-    genres = Song.objects.all().values_list('genre', flat=True).distinct()
-    return [(genre, genre) for genre in genres]
+from tunes.models import Emotion
+from tunes.utils import get_available_genres
 
 
 class BrowseSongsForm(forms.Form):
