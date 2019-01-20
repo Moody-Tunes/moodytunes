@@ -70,7 +70,7 @@ class TestUpdateView(TestCase):
         other_user = MoodyUtil.create_user(username='something-else')
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-        request_data = {'username': other_user.username,}
+        request_data = {'username': other_user.username}
 
         resp = self.client.post(self.url, data=request_data)
 
