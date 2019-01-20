@@ -1,8 +1,6 @@
-from django.utils.functional import lazy
 from rest_framework import serializers
 
 from tunes.models import Emotion
-from tunes.utils import get_available_genres
 
 
 class AnalyticsSerializer(serializers.Serializer):
@@ -17,5 +15,5 @@ class AnalyticsSerializer(serializers.Serializer):
 
 
 class AnalyticsRequestSerializer(serializers.Serializer):
-    genre = serializers.ChoiceField(choices=lazy(get_available_genres, tuple)(), required=False)
+    genre = serializers.CharField(max_length=15, required=False)
     emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)

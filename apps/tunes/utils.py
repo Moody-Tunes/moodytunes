@@ -44,12 +44,3 @@ def generate_browse_playlist(lower_bound, upper_bound, limit=None, jitter=None, 
         playlist = playlist[:limit]
 
     return playlist
-
-
-def get_available_genres():
-    """
-    Return the different genres we have in our system.
-    Need to return a two-tuple per Django form standards
-    """
-    genres = Song.objects.all().values_list('genre', flat=True).distinct()
-    return [(genre, genre) for genre in genres]
