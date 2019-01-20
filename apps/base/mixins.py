@@ -34,13 +34,14 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     def __init__(self):
         self.cleaned_data = {}  # Cleaned data for request
+        self.data = None   # Used in cases where we're reading the request body (POST, DELETE)
         super().__init__()
 
     def _log_bad_request(self):
         """Log information about a request if something fails to validate"""
         request_data = {
             'params': self.request.GET,
-            'data': self.request.POST,
+            'data': self.data if self.data else self.request.body,
             'user_id': self.request.user.id,
             'headers': self.request.META,
             'method': self.request.method,
@@ -76,6 +77,7 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         if serializer_class:
             data = getattr(_request, self.REQUEST_DATA_MAPPING[_request.method], {})
+            self.data = data
             serializer = serializer_class(data=data)
 
             if serializer.is_valid():
