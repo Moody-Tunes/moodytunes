@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 
 class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
     """
-    Return a JSON response of Song records that match a given inout query params.
+    Return a JSON response of Song records that match a given input query params.
     The main thing that should be passed is an `emotion_name`, which denotes the emotion
-    of the songs that should be returned.
+    of the songs that the user wants to feel.
     """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
@@ -66,6 +66,12 @@ class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
 
 
 class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.DestroyAPIView):
+    """
+    POST: Register a new `UserSongVote` for the given request user, song, and emotion; denotes whether or not the song
+    made the user feel that emotion.
+    DELETE: Unregister a `UserSongVote` for the given request user, song, and emotion; marks the song as not making the
+    user feel that emotion.
+    """
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
@@ -129,6 +135,10 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
 
 
 class PlaylistView(ValidateRequestDataMixin, generics.ListAPIView):
+    """
+    Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
+    on the songs as making them feel the given emotion.
+    """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
 
