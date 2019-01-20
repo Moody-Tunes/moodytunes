@@ -3,8 +3,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser
-from tunes.models import Emotion
-from tunes.utils import get_available_genres
 
 
 def validate_matching_passwords(password, confirm_password):
@@ -74,8 +72,3 @@ class CreateUserForm(forms.Form):
             )
 
         return username
-
-
-class AnalyticsForm(forms.Form):
-    genre = forms.ChoiceField(choices=get_available_genres, required=False)
-    emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
