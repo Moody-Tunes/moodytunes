@@ -13,6 +13,8 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
 
 APPEND_SLASH = True
 
+SITE_URL = env.str('MTDJ_SITE_URL', default='moodytunes.localhost')
+
 # App definitions
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -108,6 +110,9 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+# Email settings
+SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
