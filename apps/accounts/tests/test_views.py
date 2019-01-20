@@ -26,7 +26,6 @@ class TestUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('accounts:update')
-        cls.user = MoodyUtil.create_user()
 
     def test_login_required(self):
         resp = self.client.get(self.url)
@@ -36,23 +35,49 @@ class TestUpdateView(TestCase):
         self.assertRedirects(resp, expected_rediect)
 
     def test_happy_path(self):
-        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         update_data = {
             'username': 'my_new_user',
             'email': 'foo@example.com',
-            'password': '12345',
-            'confirm_password': '12345'
         }
 
         resp = self.client.post(self.url, data=update_data, follow=True)
 
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.username, update_data['username'])
-        self.assertEqual(self.user.email, update_data['email'])
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        user.refresh_from_db()
+        self.assertEqual(user.username, update_data['username'])
+        self.assertEqual(user.email, update_data['email'])
+
+    def test_updating_password_redirect_to_login(self):
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        update_data = {
+            'password': 'superSecret123',
+            'confirm_password': 'superSecret123'
+        }
+
+        resp = self.client.post(self.url, data=update_data, follow=True)
+
+        expected_redirect = '{}?next={}'.format(reverse('accounts:login'), reverse('accounts:profile'))
+        self.assertRedirects(resp, expected_redirect)
+
+    def test_updating_user_with_existing_username_is_rejected(self):
+        user = MoodyUtil.create_user()
+        other_user = MoodyUtil.create_user(username='something-else')
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        request_data = {'username': other_user.username,}
+
+        resp = self.client.post(self.url, data=request_data)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(resp, 'login.html')
+        self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
+        self.assertEqual(MoodyUser.objects.filter(username=other_user.username).count(), 1)
+        self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
 
 
 class TestCreateUserView(TestCase):
@@ -72,6 +97,20 @@ class TestCreateUserView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, reverse('accounts:login'))
         self.assertTrue(MoodyUser.objects.filter(username=user_data['username']).exists())
+
+    def test_creating_user_with_existing_username_is_rejected(self):
+        user = MoodyUtil.create_user()
+        request_data = {
+            'username': user.username,
+            'password': 'superSecret123',
+            'confirm_password': 'superSecret123'
+        }
+
+        resp = self.client.post(self.url, data=request_data)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
+        self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
 
 
 class TestAnalyticsView(TestCase):
