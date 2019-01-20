@@ -3,7 +3,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser, UserEmotion
-from base.validators import validate_decimal_value
 
 
 def validate_matching_passwords(password, confirm_password):
