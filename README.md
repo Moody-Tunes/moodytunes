@@ -26,6 +26,10 @@ source venv/bin/activate
 (venv) pip install --upgrade pip
 ```
 
+Install dependencies.
+
+`(venv) pip install -r requirements/dev.text`
+
 Run the needed migrations and load the sample song data into your database. This will create a db.sqlite3 file in the
 project directory to act as your local database
 
@@ -33,11 +37,6 @@ project directory to act as your local database
 python manage.py migrate
 python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
 ```
-
-Install dependencies.
-
-`(venv) pip install -r requirements/dev.text`
-
 
 ## Handy Tips/Tricks
 
