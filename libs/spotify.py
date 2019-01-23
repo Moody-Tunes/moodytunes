@@ -33,6 +33,8 @@ class SpotifyClient(object):
 
         :return (dict) Response content
         """
+        response = None
+
         logger.info(
             '{id} - Making {method} request to Spotify URL: {url}'.format(
                 id=self.fingerprint,
@@ -67,12 +69,23 @@ class SpotifyClient(object):
             )
 
         except requests.exceptions.HTTPError:
-            logger.warning('{} - Received HTTPError requesting {}'.format(self.fingerprint, url), exc_info=True)
-            response = {}
+            logger.exception(
+                '{} - Received HTTPError requesting {}'.format(self.fingerprint, url),
+                extra={
+                    'request_method': method,
+                    'data': data,
+                    'params': params,
+                    'response_code': response.status_code,
+                    'response_reason': response.reason
+                }
+            )
+
+            raise SpotifyException('Received HTTP Error requesting {}'.format(url))
 
         except Exception:
-            logger.error('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url), exc_info=True)
-            response = {}
+            logger.exception('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
+
+            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
 
         return response
 
@@ -153,11 +166,6 @@ class SpotifyClient(object):
 
         response = self._make_spotify_request('GET', url, params=params)
 
-        if not response:
-            logger.warning('{} - Failed to fetch playlists for category {}'.format(self.fingerprint, category))
-
-            raise SpotifyException('Unable to fetch playlists for {}'.format(category))
-
         retrieved_playlists = []
         for playlist in response['playlists']['items']:
             payload = {
@@ -194,11 +202,6 @@ class SpotifyClient(object):
         params = {'fields': 'tracks(items(track(id,uri,name,artists,explicit)))'}
 
         response = self._make_spotify_request('GET', url, params=params)
-
-        if not response:
-            logger.warning('{} - Failed to get songs from playlist {}'.format(self.fingerprint, playlist['uri']))
-
-            raise SpotifyException('Unable to fetch songs from playlist {}'.format(playlist['name']))
 
         processed_tracks = 0
         retrieved_tracks = []
