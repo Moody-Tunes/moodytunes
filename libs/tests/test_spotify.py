@@ -8,7 +8,6 @@ from requests.exceptions import HTTPError
 from libs.spotify import SpotifyClient, SpotifyException
 
 
-@override_settings(CACHE={'default': settings.CACHES['dummy']})
 class TestSpotifyClient(TestCase):
     @classmethod
     def setUpTestData(cls):

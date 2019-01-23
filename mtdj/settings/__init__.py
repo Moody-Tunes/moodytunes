@@ -18,7 +18,11 @@ LIBS_DIR = '{}/{}'.format(BASE_DIR, 'libs')
 sys.path.append(APPS_DIR)
 sys.path.append(LIBS_DIR)
 
-if ENV == 'dev':
+# Tests should not depend on local personal file
+if 'test' in os.environ['DJANGO_SETTINGS_MODULE']:
+    from .test import *
+
+elif ENV == 'dev':
     try:
         from .local_personal import *
     except ImportError:
