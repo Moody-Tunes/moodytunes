@@ -3,40 +3,9 @@ The REAL Pandora of emotions
 
 ## Setup
 
-If you happen to be running Linux Mint 18.3, you can run scripts/install.sh to install the proper packages to run
-moodytunes on your machine
-
-`bash scripts/install.sh`
-
-This will install python3.5 and python3.5-venv on your system, as well as create a virtual environment, install the
-needed dependencies, and start your moodytunes application. If you are running a different OS, follow the steps below
-
-Install python3 virtual environment
-
-`sudo apt-get install python3.5-venv  # Linux based systems`
-
-`brew install python3.5-venv  # Mac base systems`
-
-Setup python3 virtual environment and activate. You should to update the `pip` package manager in a newly created
-virtual environment.
-
-```
-python3.5 -m venv venv
-source venv/bin/activate
-(venv) pip install --upgrade pip
-```
-
-Install dependencies.
-
-`(venv) pip install -r requirements/dev.text`
-
-Run the needed migrations and load the sample song data into your database. This will create a db.sqlite3 file in the
-project directory to act as your local database
-
-```
-python manage.py migrate
-python manage.py loaddata apps/tunes/fixtures/Initial_Songs.json
-```
+We use Vagrant and ansible to manage building and provisioning virtual machines. This ensures that we can easily build
+new hosts for our producion environment, as well as develop in a similar environment to the one we'll deploy mtdj. See
+our [cradle](https://github.com/Moody-Tunes/cradle#cradle) repository for how to get an instance of mtdj setup and running.
 
 ## Handy Tips/Tricks
 
@@ -62,7 +31,7 @@ virtual environment. You can do this by passing the `--recreate` flag to tox.
 
 `tox -r [--recreate]`
 
-We use the [coverage](https://coverage.readthedocs.io/en/v4.5.x/) pacakge to report how much of our codebase has unit
+We use the [coverage](https://coverage.readthedocs.io/en/v4.5.x/) package to report how much of our codebase has unit
 test coverage. After running the tests using tox, you can see a report of the current coverage by running
 
 `coverage report`
