@@ -46,7 +46,7 @@ class TestRecoverUserAccount(TestCase):
 
         expected_body = RecoverCommand.email_body.format(
             password=password,
-            site='{}{}'.format(settings.SITE_URL, reverse('accounts:login'))
+            site='{}{}'.format(settings.SITE_HOSTNAME, reverse('accounts:login'))
         )
 
         mock_mail.assert_called_once_with(
