@@ -55,8 +55,8 @@ if settings.DEBUG:  # pragma: no cover
 
 ### Logging
 
-Log files are written to the files defined by the `DJANGO_LOG_APP_FILENAME` and `DJANGO_LOG_ERROR_FILENAME` environment variables.
-By default they go to `dev_app.log` and `dev_err.log` in the project root directory.
+Log files are written to the directory defined by the `DJANGO_APP_LOG_DIR` environment variable.
+By default they go to `application.log` and `error.log` in the directory perscribed by `DJANGO_APP_LOG_DIR`.
 
 To use logging in your module import `logging`, get a logger, and log away!
 ```python
