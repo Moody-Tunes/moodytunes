@@ -7,7 +7,7 @@ from envparse import env
 env_file = os.environ.get('MTDJ_ENV_FILE', '.dev')
 env.read_envfile(env_file)
 
-ENV = env.str('ENV', default='dev')
+ENV = env.str('ENV', default='__not-set__')
 
 # Add apps/ and libs/ directory to Python path
 parent_dir = os.path.dirname  # For better readability

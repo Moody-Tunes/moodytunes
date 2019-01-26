@@ -1,6 +1,0 @@
-# Dev environment configuration variables
-# DO NOT REPLICATE THESE IN OTHER ENVIRONMENTS
-
-ENV='dev'
-DJANGO_SECRET_KEY="+k_ci(+_v$_*n#((9tpubst(w33+$sez3n(1og8!u#sk8js7@h"
-DJANGO_DEBUG=True
