@@ -72,12 +72,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mtdj.wsgi.application'
 
-DATABASES = env.json('DJANGO_DATABASES', default={
+DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': env.str('MTDJ_DATABASE_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': env.str('MTDJ_DATABASE_NAME', default='mtdj_test_database'),
+        'USER': env.str('MTDJ_DATABASE_USER', default=''),
+        'PASSWORD': env.str('MTDJ_DATABASE_PASSWORD', default='__database-password-not-set__'),
+        'HOST': env.str('MTDJ_DATABASE_HOST', default='127.0.0.1'),
+        'PORT': env.str('MTDJ_DATABASE_PORT', default='5432')
     }
-})
+}
 
 CACHES = env.json('DJANGO_CACHES', default={
     'default': {
