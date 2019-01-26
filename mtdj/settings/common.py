@@ -13,7 +13,7 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
 
 APPEND_SLASH = True
 
-SITE_URL = env.str('MTDJ_SITE_URL', default='moodytunes.localhost')
+SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 
 # App definitions
 DJANGO_APPS = [
