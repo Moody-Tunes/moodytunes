@@ -1,10 +1,14 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from envparse import env
 
 # Load env file
-env_file = os.environ.get('MTDJ_ENV_FILE', '.dev')
+env_file = os.environ.get('MTDJ_ENV_FILE')
+if not env_file or not os.path.exists(env_file):
+    raise ImproperlyConfigured('Unable to find env file. Are you running mtdj in your ansible managed VM?')
+
 env.read_envfile(env_file)
 
 ENV = env.str('ENV', default='__not-set__')
