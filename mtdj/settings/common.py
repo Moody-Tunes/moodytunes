@@ -134,6 +134,8 @@ REST_FRAMEWORK = {
     },
 }
 
+LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -165,13 +167,13 @@ LOGGING = {
         'app_file': {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': env.str('DJANGO_LOG_APP_FILENAME', default=os.path.join(BASE_DIR, 'dev_app.log')),
+            'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
         },
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': env.str('DJANGO_LOG_ERROR_FILENAME', default=os.path.join(BASE_DIR, 'dev_err.log')),
+            'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
         }
     },
