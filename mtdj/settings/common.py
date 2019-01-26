@@ -9,7 +9,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
 
 APPEND_SLASH = True
 
