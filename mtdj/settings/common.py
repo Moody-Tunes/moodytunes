@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'mtdj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': env.str('MTDJ_DATABASE_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': env.str('MTDJ_DATABASE_NAME', default='mtdj_test_database'),
+        'NAME': env.str('MTDJ_DATABASE_NAME', default='mtdj_local_database'),
         'USER': env.str('MTDJ_DATABASE_USER', default=''),
         'PASSWORD': env.str('MTDJ_DATABASE_PASSWORD', default='__database-password-not-set__'),
         'HOST': env.str('MTDJ_DATABASE_HOST', default='127.0.0.1'),
@@ -85,10 +85,11 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django_redis.cache.RedisCache'),
-        'LOCATION': env.str('MTDJ_CACHE_LOCATION', 'redis://127.0.0.1:6379/1'),
+        'VERSION': env.int('MTDJ_CACHE_VERSION', default=1),
+        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django.core.cache.backends.filebased.FileBasedCache'),
+        'LOCATION': env.str('MTDJ_CACHE_LOCATION', default='{}/mtdj_cache'.format(tempfile.gettempdir())),
         'OPTIONS': {
-            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default='django_redis.client.DefaultClient'),
+            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
         },
         'KEY_PREFIX': 'mtdj'
     }}
