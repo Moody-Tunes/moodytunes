@@ -19,6 +19,16 @@ class TestValidateRequestDataMixing(TestCase):
         with self.assertRaises(AttributeError):
             self.mixin.dispatch(mock_request)
 
+    def test_clean_headers_with_authorization_header(self):
+        headers = {'HTTP_AUTHORIZATION': 'Foo-Bar'}
+        new_headers = self.mixin._clean_headers(headers)
+        self.assertEqual(new_headers['HTTP_AUTHORIZATION'], '********')
+
+    def test_clean_headers_with_sessionid(self):
+        headers = {'HTTP_COOKIE': 'sessionid=foobarbaz'}
+        new_headers = self.mixin._clean_headers(headers)
+        self.assertEqual(new_headers['HTTP_COOKIE'], {'sessionid': '********'})
+
     @mock.patch('rest_framework.generics.GenericAPIView.dispatch')
     def test_dispatch_happy_path(self, super_dispatch):
         transformed_data = {'hello': 'world'}
