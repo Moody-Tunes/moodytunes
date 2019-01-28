@@ -50,7 +50,7 @@ MIDDLEWARE = [
 
 # Security middleware definitions
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER =  True
+SECURE_BROWSER_XSS_FILTER = True
 
 ROOT_URLCONF = 'mtdj.urls'
 
@@ -83,13 +83,15 @@ DATABASES = {
     }
 }
 
-CACHES = env.json('DJANGO_CACHES', default={
+CACHES = {
     'default': {
-        'VERSION': 1,
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir()),
-    }
-})
+        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django_redis.cache.RedisCache'),
+        'LOCATION': env.str('MTDJ_CACHE_LOCATION', 'redis://127.0.0.1:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default='django_redis.client.DefaultClient'),
+        },
+        'KEY_PREFIX': 'mtdj'
+    }}
 
 CACHES.update({
     'dummy': {
@@ -155,7 +157,7 @@ LOGGING = {
     },
     'filters': {
         'require_debug_false': {
-        '()': 'django.utils.log.RequireDebugFalse',
+            '()': 'django.utils.log.RequireDebugFalse',
         }
     },
     'handlers': {
