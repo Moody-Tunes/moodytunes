@@ -44,11 +44,11 @@ class ValidateRequestDataMixin(MoodyMixin):
         :param headers: (dict) Request headers to be stripped.
         :return: (dict) Headers with sensitive information from it
         """
-        sensitive_headers = ['HTTP_AUTHORIZATION',]
+        sensitive_headers = ['HTTP_AUTHORIZATION']
         stripped_value = '********'
 
         def __strip_cookie(cookie_string):
-            sensitive_cookies = ['sessionid',]
+            sensitive_cookies = ['sessionid']
 
             cookies = cookie_string.split(';')
             cookie_dict = dict([cookie.split('=') for cookie in cookies])
@@ -67,7 +67,6 @@ class ValidateRequestDataMixin(MoodyMixin):
                 headers[name] = stripped_value
 
         return headers
-
 
     def _log_bad_request(self):
         """Log information about a request if something fails to validate"""
