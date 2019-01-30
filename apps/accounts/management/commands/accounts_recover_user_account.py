@@ -40,7 +40,7 @@ class Command(MoodyBaseCommand):
             try:
                 body = self.email_body.format(
                     password=new_password,
-                    site='{}{}'.format(settings.SITE_URL, reverse('accounts:login'))
+                    site='{}{}'.format(settings.SITE_HOSTNAME, reverse('accounts:login'))
                 )
                 send_mail(self.email_subject, body, settings.SYSTEM_EMAIL_ADDRESS, [user.email])
                 self.write_to_log_and_output('Successfully sent updated password to {}'.format(user.email))

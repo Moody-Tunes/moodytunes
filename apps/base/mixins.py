@@ -1,3 +1,4 @@
+import copy
 import logging
 
 from django.http import HttpResponseNotAllowed
@@ -37,13 +38,43 @@ class ValidateRequestDataMixin(MoodyMixin):
         self.data = None   # Used in cases where we're reading the request body (POST, DELETE)
         super().__init__()
 
+    def _clean_headers(self, headers):
+        """
+        Remove sensitive header information from headers before logging
+        :param headers: (dict) Request headers to be stripped.
+        :return: (dict) Headers with sensitive information from it
+        """
+        sensitive_headers = ['HTTP_AUTHORIZATION']
+        stripped_value = '********'
+
+        def __strip_cookie(cookie_string):
+            sensitive_cookies = ['sessionid']
+
+            cookies = cookie_string.split(';')
+            cookie_dict = dict([cookie.split('=') for cookie in cookies])
+
+            for name, value in cookie_dict.items():
+                if name in sensitive_cookies:
+                    cookie_dict[name] = stripped_value
+
+            return cookie_dict
+
+        for name, value in headers.items():
+            if name == 'HTTP_COOKIE':
+                headers[name] = __strip_cookie(copy.deepcopy(value).strip())
+
+            if name in sensitive_headers:
+                headers[name] = stripped_value
+
+        return headers
+
     def _log_bad_request(self):
         """Log information about a request if something fails to validate"""
         request_data = {
             'params': self.request.GET,
             'data': self.data if self.data else self.request.body,
             'user_id': self.request.user.id,
-            'headers': self.request.META,
+            'headers': self._clean_headers(copy.deepcopy(self.request.META)),
             'method': self.request.method,
             'allowed_methods': self.allowed_methods
         }

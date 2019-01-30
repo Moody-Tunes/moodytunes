@@ -1,13 +1,18 @@
 import os
 import sys
+import warnings
 
+from django.core.exceptions import ImproperlyConfigured
 from envparse import env
 
 # Load env file
-env_file = os.environ.get('MTDJ_ENV_FILE', '.dev')
+env_file = os.environ.get('MTDJ_ENV_FILE')
+if not env_file:
+    warnings.warn('env file not set, falling back to defaults...')
+
 env.read_envfile(env_file)
 
-ENV = env.str('ENV', default='dev')
+ENV = env.str('ENV', default='__not-set__')
 
 # Add apps/ and libs/ directory to Python path
 parent_dir = os.path.dirname  # For better readability

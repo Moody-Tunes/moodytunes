@@ -11,3 +11,12 @@ CACHES['default'] = CACHES['dummy']
 # We want to make it easy to create test users, so we'll remove the password
 # validators when running tests
 AUTH_PASSWORD_VALIDATORS = []
+
+
+# Use sqlite3 database for testing
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'test_db.sqlite3'),
+    }
+}

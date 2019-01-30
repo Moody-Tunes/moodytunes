@@ -9,11 +9,11 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
 
 APPEND_SLASH = True
 
-SITE_URL = env.str('MTDJ_SITE_URL', default='moodytunes.localhost')
+SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 
 # App definitions
 DJANGO_APPS = [
@@ -50,7 +50,7 @@ MIDDLEWARE = [
 
 # Security middleware definitions
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER =  True
+SECURE_BROWSER_XSS_FILTER = True
 
 ROOT_URLCONF = 'mtdj.urls'
 
@@ -72,20 +72,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mtdj.wsgi.application'
 
-DATABASES = env.json('DJANGO_DATABASES', default={
+DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': env.str('MTDJ_DATABASE_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': env.str('MTDJ_DATABASE_NAME', default='mtdj_local_database'),
+        'USER': env.str('MTDJ_DATABASE_USER', default=''),
+        'PASSWORD': env.str('MTDJ_DATABASE_PASSWORD', default='__database-password-not-set__'),
+        'HOST': env.str('MTDJ_DATABASE_HOST', default='127.0.0.1'),
+        'PORT': env.str('MTDJ_DATABASE_PORT', default='5432')
     }
-})
+}
 
-CACHES = env.json('DJANGO_CACHES', default={
+CACHES = {
     'default': {
-        'VERSION': 1,
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir()),
-    }
-})
+        'VERSION': env.int('MTDJ_CACHE_VERSION', default=1),
+        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django.core.cache.backends.filebased.FileBasedCache'),
+        'LOCATION': env.str('MTDJ_CACHE_LOCATION', default='{}/mtdj_cache'.format(tempfile.gettempdir())),
+        'OPTIONS': {
+            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
+        },
+        'KEY_PREFIX': 'mtdj'
+    }}
 
 CACHES.update({
     'dummy': {
@@ -110,6 +117,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '_static/'
 
 # Email settings
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')
@@ -128,6 +136,8 @@ REST_FRAMEWORK = {
         'user': '5/sec',
     },
 }
+
+LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
 
 LOGGING = {
     'version': 1,
@@ -148,7 +158,7 @@ LOGGING = {
     },
     'filters': {
         'require_debug_false': {
-        '()': 'django.utils.log.RequireDebugFalse',
+            '()': 'django.utils.log.RequireDebugFalse',
         }
     },
     'handlers': {
@@ -160,13 +170,13 @@ LOGGING = {
         'app_file': {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': env.str('DJANGO_LOG_APP_FILENAME', default=os.path.join(BASE_DIR, 'dev_app.log')),
+            'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
         },
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': env.str('DJANGO_LOG_ERROR_FILENAME', default=os.path.join(BASE_DIR, 'dev_err.log')),
+            'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
         }
     },
