@@ -1,15 +1,12 @@
 import copy
 import logging
 
-from django.http import HttpResponseNotAllowed
-from rest_framework import generics
-
 from base.responses import BadRequest
 
 logger = logging.getLogger(__name__)
 
 
-class MoodyMixin(generics.GenericAPIView):
+class MoodyMixin(object):
     """Base class for mixins in mtdj"""
 
 
@@ -22,9 +19,6 @@ class ValidateRequestDataMixin(MoodyMixin):
     the specific method. For example, if your view has GET functionality and you want to validate the incoming data,
     you should override the `get_request_serializer` attribute on the class.
     """
-    get_form = None
-    post_form = None
-    delete_form = None
 
     # Dictionary mapping request method to instance attribute containing data for the request
     REQUEST_DATA_MAPPING = {
@@ -68,61 +62,71 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         return headers
 
-    def _log_bad_request(self):
+    def _log_bad_request(self, request):
         """Log information about a request if something fails to validate"""
         request_data = {
-            'params': self.request.GET,
-            'data': self.data if self.data else self.request.body,
-            'user_id': self.request.user.id,
-            'headers': self._clean_headers(copy.deepcopy(self.request.META)),
-            'method': self.request.method,
-            'allowed_methods': self.allowed_methods
+            'params': request.GET,
+            'data': request.data if request.data else request.body,
+            'user_id': request.user.id,
+            'headers': self._clean_headers(copy.deepcopy(request.META)),
+            'method': request.method,
         }
 
         logger.warning(
-            'Invalid {} data supplied to {}'.format(self.request.method, self.__class__.__name__),
+            'Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__),
             extra=request_data
         )
 
-    def _handle_bad_request(self, request, *args, **kwargs):
-        """
-        Handles creating an instance of `base.responses.BadResponse` to return the request.
-        Follows mostly the same format as the Django implementation of returning a response.
-        :param request: (Request) WSGI request object
-        :return: (BadRequest) Instance of response indicating a bad request
-        """
-        self._log_bad_request()
-        response = BadRequest('Invalid {} data supplied to {}'.format(request.method, self.__class__.__name__))
-        self.headers = self.default_response_headers
-        return self.finalize_response(request, response, *args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        # Need to covert Django WSGI request to DRF request in order to access request.data
-        _request = self.initialize_request(request, *args, **kwargs)
-
-        if not hasattr(self, _request.method.lower()):
-            self._log_bad_request()
-            return HttpResponseNotAllowed(self.allowed_methods)
-
-        serializer_class = getattr(self, '{}_request_serializer'.format(_request.method.lower()), None)
+    def _validate_request(self, request):
+        serializer_class = getattr(self, '{}_request_serializer'.format(request.method.lower()), None)
 
         if serializer_class:
-            data = getattr(_request, self.REQUEST_DATA_MAPPING[_request.method], {})
+            data = getattr(request, self.REQUEST_DATA_MAPPING[request.method], {})
             self.data = data
             serializer = serializer_class(data=data)
 
             if serializer.is_valid():
                 self.cleaned_data = serializer.data
-                return super().dispatch(request, *args, **kwargs)
+                return True
             else:
-                self.response = self._handle_bad_request(_request, *args, **kwargs)
-                return self.response
+                self._log_bad_request(request)
+                return False
         else:
             raise AttributeError(
                 '{} received a {} request but did not defined a form class for this method. '
                 'Please set the {} attribute on this view to process this request'.format(
                     self.__class__,
-                    _request.method,
-                    '{}_request_serializer'.format(_request.method.lower())
+                    request.method,
+                    '{}_request_serializer'.format(request.method.lower())
                 )
             )
+
+
+class GetRequestValidatorMixin(ValidateRequestDataMixin):
+    get_request_serializer = None
+
+    def get(self, request, *args, **kwargs):
+        if self._validate_request(request):
+            return super(GetRequestValidatorMixin, self).get(request, *args, **kwargs)
+        else:
+            return BadRequest()
+
+
+class PostRequestValidatorMixin(ValidateRequestDataMixin):
+    post_request_serializer = None
+
+    def post(self, request, *args, **kwargs):
+        if self._validate_request(request):
+            return super(PostRequestValidatorMixin, self).post(request, *args, **kwargs)
+        else:
+            return BadRequest()
+
+
+class DeleteRequestValidatorMixin(ValidateRequestDataMixin):
+    delete_request_serializer = None
+
+    def delete(self, request, *args, **kwargs):
+        if self._validate_request(request):
+            return super(DeleteRequestValidatorMixin, self).delete(request, *args, **kwargs)
+        else:
+            return BadRequest()
