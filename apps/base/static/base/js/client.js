@@ -21,26 +21,35 @@
 
             return params;
         },
-        options: function () {
-            var url = this.buildRequestURL('/tunes/options/', {});
-
-            fetch(url, {
+        request: function (url, method, data, callback) {
+            var options = {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-            }).then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Bad response from ' + url);
                 }
-            }).then((json) => {
-                console.log(json);
-            });
+            };
+
+            if (method !== 'GET') {
+                options[body] = JSON.stringify(data);
+            }
+
+            fetch(url, options)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Bad response from ' + url);
+                    }
+                }).then((json) => {
+                    callback(json);
+                });
         },
-        browsePlaylist: function (emotion, jitter, limit, genre) {
+        options: function (callback) {
+            var url = this.buildRequestURL('/tunes/options/', {});
+            this.request(url, 'GET', {}, callback);
+        },
+        browsePlaylist: function (emotion, jitter, limit, genre, callback) {
             var params = {
                 emotion: emotion,
                 jitter: jitter,
@@ -51,22 +60,7 @@
             params = this.stripNullParams(params);
 
             var url = this.buildRequestURL('/tunes/browse/', params);
-
-            fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }).then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Bad response from ' + url);
-                }
-            }).then((json) => {
-                console.log(json);
-            });
+            this.request(url, 'GET', {}, callback);
         }
     };
 })();
