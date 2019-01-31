@@ -2,8 +2,8 @@
 
 (function IIFE() {
     document.MoodyTunesClient = {
-        buildRequestURL: function(url, params) {
-            var requestUrl = new URL(window.location.origin + url);
+        buildRequestURL: function(endpoint, params) {
+            var requestUrl = new URL(window.location.origin + endpoint);
             for (var key in params) {
                 if (params.hasOwnProperty(key)) {
                     requestUrl.searchParams.append(key, params[key]);
@@ -21,7 +21,8 @@
 
             return params;
         },
-        request: function (url, method, data, callback) {
+        request: function (endpoint, method, params, data, callback) {
+            var url = this.buildRequestURL(endpoint, this.stripNullParams(params));
             var options = {
                 method: 'GET',
                 credentials: 'include',
@@ -46,8 +47,7 @@
                 });
         },
         options: function (callback) {
-            var url = this.buildRequestURL('/tunes/options/', {});
-            this.request(url, 'GET', {}, callback);
+            this.request('/tunes/options/', 'GET', {}, {}, callback);
         },
         browsePlaylist: function (emotion, jitter, limit, genre, callback) {
             var params = {
@@ -57,10 +57,7 @@
                 genre: genre
             };
 
-            params = this.stripNullParams(params);
-
-            var url = this.buildRequestURL('/tunes/browse/', params);
-            this.request(url, 'GET', {}, callback);
+            this.request('/tunes/browse/', 'GET', params, {}, callback);
         }
     };
 })();
