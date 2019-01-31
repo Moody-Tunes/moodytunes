@@ -64,6 +64,13 @@
                     callback(json);
                 });
         },
+        userAnalytics: function (emotion, genre, callback) {
+            var params = {
+                emotion: emotion,
+                genre: genre
+            };
+            this.request('/accounts/analytics/', 'GET', params, {}, callback);
+        },
         options: function (callback) {
             this.request('/tunes/options/', 'GET', {}, {}, callback);
         },
