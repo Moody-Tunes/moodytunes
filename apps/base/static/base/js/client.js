@@ -56,12 +56,7 @@
             fetch(url, options)
                 .then((response) => {
                     if (response.ok) {
-                        try {
-                            return response.json();
-                        } catch (SyntaxError) {
-                            console.log('No JSON response from ' + url);
-                            callback();
-                        }
+                        return response.json();
                     } else {
                         throw new Error('Bad response from ' + url);
                     }
