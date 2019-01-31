@@ -12,6 +12,15 @@
 
             return requestUrl;
         },
+        stripNullParams: function(params) {
+            for (var key in params) {
+                if (params.hasOwnProperty(key) && params[key] === undefined) {
+                    delete params[key];
+                }
+            }
+
+            return params;
+        },
         options: function () {
             var url = this.buildRequestURL('/tunes/options/', {});
 
@@ -38,11 +47,9 @@
                 limit: limit,
                 genre: genre
             };
-            for (var key in params) {
-                if (params[key] === undefined) {
-                    delete params[key];
-                }
-            }
+
+            params = this.stripNullParams(params);
+
             var url = this.buildRequestURL('/tunes/browse/', params);
 
             fetch(url, {
