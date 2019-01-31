@@ -1,7 +1,7 @@
 import logging
 
 from django.db import IntegrityError
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -106,7 +106,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 vote_data['vote']
             ))
 
-            return Response(status=status.HTTP_201_CREATED)
+            return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
         except IntegrityError:
             logger.warning('Bad data supplied to VoteView.create: {}'.format(vote_data))
@@ -129,7 +129,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 self.cleaned_data['song_code']
             ))
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse({'status': 'OK'}, status=status.HTTP_204_NO_CONTENT)
 
         except UserSongVote.DoesNotExist:
             logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
