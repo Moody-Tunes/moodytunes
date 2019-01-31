@@ -21,10 +21,27 @@
 
             return params;
         },
+        getCookie: function (name) {
+            // Lifted from Django documentation https://docs.djangoproject.com/en/2.1/ref/csrf/
+
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i=0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+
+            return cookieValue;
+        },
         request: function (endpoint, method, params, data, callback) {
             var url = this.buildRequestURL(endpoint, this.stripNullParams(params));
             var options = {
-                method: 'GET',
+                method: method,
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
@@ -32,13 +49,19 @@
             };
 
             if (method !== 'GET') {
-                options[body] = JSON.stringify(data);
+                options.body = JSON.stringify(data);
+                options.headers['X-CSRFToken'] = this.getCookie('csrftoken');
             }
 
             fetch(url, options)
                 .then((response) => {
                     if (response.ok) {
-                        return response.json();
+                        try {
+                            return response.json();
+                        } catch (SyntaxError) {
+                            console.log('No JSON response from ' + url);
+                            callback();
+                        }
                     } else {
                         throw new Error('Bad response from ' + url);
                     }
@@ -58,6 +81,14 @@
             };
 
             this.request('/tunes/browse/', 'GET', params, {}, callback);
+        },
+        addVote: function(songCode, emotion, vote, callback) {
+            var data = {
+                song_code: songCode,
+                emotion: emotion,
+                vote: vote
+            };
+            this.request('/tunes/vote/', 'POST', {}, data, callback);
         }
     };
 })();
