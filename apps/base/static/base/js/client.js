@@ -30,6 +30,36 @@
             }).then((json) => {
                 console.log(json);
             });
+        },
+        browsePlaylist: function (emotion, jitter, limit, genre) {
+            var params = {
+                emotion: emotion,
+                jitter: jitter,
+                limit: limit,
+                genre: genre
+            };
+            for (var key in params) {
+                if (params[key] === undefined) {
+                    delete params[key];
+                }
+            }
+            var url = this.buildRequestURL('/tunes/browse/', params);
+
+            fetch(url, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Bad response from ' + url);
+                }
+            }).then((json) => {
+                console.log(json);
+            });
         }
     };
 })();
