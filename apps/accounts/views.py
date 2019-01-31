@@ -7,7 +7,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
 from rest_framework import generics
-from rest_framework.response import Response
 
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser
