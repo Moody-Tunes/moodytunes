@@ -21,7 +21,7 @@
 
             return params;
         },
-        getCookie: function (name) {
+        getCookie: function(name) {
             // Lifted from Django documentation https://docs.djangoproject.com/en/2.1/ref/csrf/
 
             var cookieValue = null;
@@ -38,7 +38,7 @@
 
             return cookieValue;
         },
-        request: function (endpoint, method, params, data, callback) {
+        request: function(endpoint, method, params, data, callback) {
             var url = this.buildRequestURL(endpoint, this.stripNullParams(params));
             var options = {
                 method: method,
@@ -64,17 +64,17 @@
                     callback(json);
                 });
         },
-        getOptions: function (callback) {
+        getOptions: function(callback) {
             this.request('/tunes/options/', 'GET', {}, {}, callback);
         },
-        getUserAnalytics: function (emotion, genre, callback) {
+        getUserAnalytics: function(emotion, genre, callback) {
             var params = {
                 emotion: emotion,
                 genre: genre
             };
             this.request('/accounts/analytics/', 'GET', params, {}, callback);
         },
-        getBrowsePlaylist: function (emotion, jitter, limit, genre, callback) {
+        getBrowsePlaylist: function(emotion, jitter, limit, genre, callback) {
             var params = {
                 emotion: emotion,
                 jitter: jitter,
@@ -83,6 +83,14 @@
             };
 
             this.request('/tunes/browse/', 'GET', params, {}, callback);
+        },
+        getEmotionPlaylist: function(emotion, genre, callback) {
+            var params = {
+                emotion: emotion,
+                genre: genre
+            };
+
+            this.request('/tunes/playlist/', 'GET', params, {}, callback);
         },
         postVote: function(songCode, emotion, vote, callback) {
             var data = {
