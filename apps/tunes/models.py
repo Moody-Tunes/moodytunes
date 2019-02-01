@@ -7,8 +7,8 @@ from base.validators import validate_decimal_value
 class Emotion(BaseModel):
     """
     Represents an "emotion" in the context of our offered moods we allow users
-    to select from. `lower_bound` and `upper_bound` are the lowest and highest
-    points to select songs from for a given emotion. These values must be
+    to select from. `energy` and `valence` are the associated Song attribute
+    points to use in suggesting songs for for a given emotion. These values must be
     between 0 <= value <= 1. Emotions MAY overlap with other emotion
     boundaries.
 
@@ -51,8 +51,8 @@ class Emotion(BaseModel):
         (EXCITED, 'Excited'),
     ]
 
-    lower_bound = models.FloatField(validators=[validate_decimal_value])
-    upper_bound = models.FloatField(validators=[validate_decimal_value])
+    energy = models.FloatField(validators=[validate_decimal_value])
+    valence = models.FloatField(validators=[validate_decimal_value])
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,

@@ -79,11 +79,6 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
     get_request_serializer = AnalyticsRequestSerializer
 
-    def _get_boundaries(self):
-        """Return boundaries for the given user based on the emotion"""
-        user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
-        return (user_emotion.lower_bound, user_emotion.upper_bound)
-
     def _get_average_attributes(self):
         """Return average song attributes for the user based on the songs they have voted on"""
         genre = self.cleaned_data.get('genre')
@@ -111,14 +106,23 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         genre = self.cleaned_data.get('genre')
 
-        lower_bound, upper_bound = self._get_boundaries()
+        user_emotion = self.request.user.get_user_emotion_record(emotion.name)
+        votes_for_emotion = self.request.user.get_user_song_vote_records(emotion.name)
+
+        energy = user_emotion.energy
+        valence = user_emotion.valence
+
+        desired_songs = [vote.song for vote in votes_for_emotion if vote.vote]
+        if genre:
+            desired_songs = [song for song in desired_songs if song.genre == genre]
 
         data = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': genre,
-            'lower_bound': lower_bound,
-            'upper_bound': upper_bound,
+            'energy': energy,
+            'valence': valence,
+            'total_songs': len(desired_songs)
         }
 
         data.update(self._get_average_attributes())

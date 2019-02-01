@@ -62,4 +62,4 @@ class UpdateUserForm(BaseUserForm):
 class UpdateUserEmotionBoundariesForm(forms.ModelForm):
     class Meta:
         model = UserEmotion
-        fields = ('lower_bound', 'upper_bound')
+        fields = ('energy', 'valence')

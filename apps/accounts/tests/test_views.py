@@ -156,13 +156,11 @@ class TestAnalyticsView(TestCase):
         working_songs = [upvoted_song_1, upvoted_song_2]
         user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
-            'average_energy': average([song.energy for song in working_songs]),
-            'average_valence': average([song.valence for song in working_songs]),
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'lower_bound': user_emotion.lower_bound,
-            'upper_bound': user_emotion.upper_bound,
+            'energy': user_emotion.energy,
+            'valence': user_emotion.valence,
             'total_songs': len(working_songs)
         }
 
@@ -194,13 +192,11 @@ class TestAnalyticsView(TestCase):
 
         user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
-            'average_energy': expected_song.energy,
-            'average_valence': expected_song.valence,
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': expected_song.genre,
-            'lower_bound': user_emotion.lower_bound,
-            'upper_bound': user_emotion.upper_bound,
+            'energy': user_emotion.energy,
+            'valence': user_emotion.valence,
             'total_songs': 1,
         }
 
@@ -216,13 +212,11 @@ class TestAnalyticsView(TestCase):
 
         user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
-            'average_energy': None,
-            'average_valence': None,
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'lower_bound': user_emotion.lower_bound,
-            'upper_bound': user_emotion.upper_bound,
+            'energy': user_emotion.energy,
+            'valence': user_emotion.valence,
             'total_songs': 0
         }
 

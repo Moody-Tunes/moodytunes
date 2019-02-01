@@ -39,7 +39,7 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
-        song = MoodyUtil.create_song(energy=.75, valence=.75)
+        song = MoodyUtil.create_song()
         params = {
             'emotion': Emotion.HAPPY,
             'jitter': 0
@@ -189,8 +189,8 @@ class TestVoteView(TestCase):
 
     def test_upvoting_on_song_updates_user_emotion_boundaries(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-        pre_upper_bound = user_emotion.upper_bound
-        pre_lower_bound = user_emotion.lower_bound
+        pre_energy = user_emotion.energy
+        pre_valence = user_emotion.valence
 
         data = {
             'emotion': Emotion.HAPPY,
@@ -200,16 +200,16 @@ class TestVoteView(TestCase):
         self.api_client.post(self.url, data=data, format='json')
 
         user_emotion.refresh_from_db()
-        expected_upper_bound = (pre_upper_bound + self.song.valence) / 2
-        expected_lower_bound = (pre_lower_bound + self.song.energy) / 2
+        expected_energy = (pre_energy + self.song.energy) / 2
+        expected_valence = (pre_valence + self.song.valence) / 2
 
-        self.assertEqual(user_emotion.upper_bound, expected_upper_bound)
-        self.assertEqual(user_emotion.lower_bound, expected_lower_bound)
+        self.assertEqual(user_emotion.energy, expected_energy)
+        self.assertEqual(user_emotion.valence, expected_valence)
 
     def test_downvoting_song_does_not_update_user_emotion_boundaries(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-        pre_upper_bound = user_emotion.upper_bound
-        pre_lower_bound = user_emotion.lower_bound
+        pre_energy = user_emotion.energy
+        pre_valence = user_emotion.valence
 
         data = {
             'emotion': Emotion.HAPPY,
@@ -220,8 +220,8 @@ class TestVoteView(TestCase):
 
         user_emotion.refresh_from_db()
 
-        self.assertEqual(user_emotion.upper_bound, pre_upper_bound)
-        self.assertEqual(user_emotion.lower_bound, pre_lower_bound)
+        self.assertEqual(user_emotion.energy, pre_energy)
+        self.assertEqual(user_emotion.valence, pre_valence)
 
     def test_delete_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)

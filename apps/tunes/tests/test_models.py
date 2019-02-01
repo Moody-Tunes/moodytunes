@@ -16,38 +16,38 @@ class TestEmotion(TestCase):
         with self.assertRaises(ValidationError):
             Emotion.objects.create(
                 name='Im Not Real!',
-                upper_bound=.5,
-                lower_bound=.5,
+                energy=.5,
+                valence=.5,
             )
 
     def test_invalid_boundary_negative(self):
         with self.assertRaises(ValidationError):
             Emotion.objects.create(
                 name=Emotion.HAPPY,
-                upper_bound=-.5,
-                lower_bound=.5,
+                energy=-.5,
+                valence=.5,
             )
 
     def test_invalid_boundary_beyond_range(self):
         with self.assertRaises(ValidationError):
             Emotion.objects.create(
                 name=Emotion.HAPPY,
-                upper_bound=2,
-                lower_bound=.5,
+                energy=2,
+                valence=.5,
             )
 
     def test_uniqueness_on_name(self):
         Emotion.objects.create(
             name=Emotion.HAPPY,
-            upper_bound=.5,
-            lower_bound=.5
+            energy=.5,
+            valence=.5
         )
 
         with self.assertRaises(ValidationError):
             Emotion.objects.create(
                 name=Emotion.HAPPY,
-                upper_bound=.5,
-                lower_bound=.5
+                energy=.5,
+                valence=.5
             )
 
 
