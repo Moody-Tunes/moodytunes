@@ -99,6 +99,13 @@
                 vote: vote
             };
             this.request('/tunes/vote/', 'POST', {}, data, callback);
+        },
+        deleteVote: function(songCode, emotion, callback) {
+            var data = {
+                song_code: songCode,
+                emotion: emotion
+            };
+            this.request('/tunes/vote/', 'DELETE', {}, data, callback);
         }
     };
 })();
