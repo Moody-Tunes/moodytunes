@@ -32,8 +32,8 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
         playlist = songs.filter(
             energy__gte=energy_lower_limit,
             energy__lte=energy_upper_limit,
-            valence__gte = valence_lower_limit,
-            valence__lte = valence_upper_limit
+            valence__gte=valence_lower_limit,
+            valence__lte=valence_upper_limit
         )
 
     else:
