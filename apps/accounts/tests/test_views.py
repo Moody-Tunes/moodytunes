@@ -15,10 +15,10 @@ class TestProfileView(TestCase):
 
     def test_login_required(self):
         resp = self.client.get(self.url)
-        expected_rediect = '{}?next={}'.format(reverse('accounts:login'), self.url)
+        expected_redirect = '{}?next={}'.format(reverse('accounts:login'), self.url)
 
         self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
-        self.assertRedirects(resp, expected_rediect)
+        self.assertRedirects(resp, expected_redirect)
 
 
 class TestUpdateView(TestCase):
