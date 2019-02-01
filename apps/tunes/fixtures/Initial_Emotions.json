@@ -3,8 +3,8 @@
   "model": "tunes.emotion",
   "pk": 1,
   "fields": {
-    "energy": "0.25",
-    "valence": "0.25",
+    "energy": "0.26",
+    "valence": "0.22",
     "name": "MEL"
   }
 },
@@ -12,8 +12,8 @@
   "model": "tunes.emotion",
   "pk": 2,
   "fields": {
-    "energy": "0.25",
-    "valence": "0.50",
+    "energy": "0.46",
+    "valence": "0.44",
     "name": "CLM"
   }
 },
@@ -21,8 +21,8 @@
   "model": "tunes.emotion",
   "pk": 3,
   "fields": {
-    "energy": "0.50",
-    "valence": "0.75",
+    "energy": "0.69",
+    "valence": "0.66",
     "name": "HPY"
   }
 },
@@ -30,8 +30,8 @@
   "model": "tunes.emotion",
   "pk": 4,
   "fields": {
-    "energy": "0.75",
-    "valence": "1",
+    "energy": "0.84",
+    "valence": "0.81",
     "name": "EXC"
   }
 }
