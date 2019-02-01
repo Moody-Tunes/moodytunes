@@ -64,17 +64,17 @@
                     callback(json);
                 });
         },
-        userAnalytics: function (emotion, genre, callback) {
+        getOptions: function (callback) {
+            this.request('/tunes/options/', 'GET', {}, {}, callback);
+        },
+        getUserAnalytics: function (emotion, genre, callback) {
             var params = {
                 emotion: emotion,
                 genre: genre
             };
             this.request('/accounts/analytics/', 'GET', params, {}, callback);
         },
-        options: function (callback) {
-            this.request('/tunes/options/', 'GET', {}, {}, callback);
-        },
-        browsePlaylist: function (emotion, jitter, limit, genre, callback) {
+        getBrowsePlaylist: function (emotion, jitter, limit, genre, callback) {
             var params = {
                 emotion: emotion,
                 jitter: jitter,
@@ -84,7 +84,7 @@
 
             this.request('/tunes/browse/', 'GET', params, {}, callback);
         },
-        addVote: function(songCode, emotion, vote, callback) {
+        postVote: function(songCode, emotion, vote, callback) {
             var data = {
                 song_code: songCode,
                 emotion: emotion,
