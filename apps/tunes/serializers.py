@@ -6,7 +6,7 @@ from tunes.models import Emotion, Song
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = '__all__'
+        fields = ('artist', 'name', 'genre', 'code')
 
 
 class OptionsSerializer(serializers.Serializer):
