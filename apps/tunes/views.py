@@ -40,6 +40,17 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = BrowseSongsRequestSerializer
 
+    def _set_situation_data(self):
+        # Assign context data to request session if present
+        context_session_key =  '{}_context'.format(self.cleaned_data['emotion'])
+        description_session_key =  '{}_description'.format(self.cleaned_data['emotion'])
+
+        if self.cleaned_data.get('context'):
+            self.request.session[context_session_key] = self.cleaned_data['context']
+
+        if self.cleaned_data.get('description'):
+            self.request.session[description_session_key] = self.cleaned_data['description']
+
     def filter_queryset(self, queryset):
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
@@ -59,15 +70,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
     def get_queryset(self):
-        context_session_key =  '{}_context'.format(self.cleaned_data['emotion'])
-        description_session_key =  '{}_description'.format(self.cleaned_data['emotion'])
-
-        if self.cleaned_data.get('context'):
-            self.request.session[context_session_key] = self.cleaned_data['context']
-
-        if self.cleaned_data.get('description'):
-            self.request.session[description_session_key] = self.cleaned_data['description']
-
+        self._set_situation_data()
         queryset = super(BrowseView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
