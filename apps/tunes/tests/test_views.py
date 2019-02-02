@@ -399,7 +399,7 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_data[0]['code'], self.song.code)
+        self.assertEqual(resp_data[0]['song']['code'], self.song.code)
 
     def test_downvoted_songs_are_not_returned(self):
         UserSongVote.objects.create(
@@ -440,7 +440,7 @@ class TestPlaylistView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
-        self.assertEqual(resp_data[0]['code'], new_song.code)
+        self.assertEqual(resp_data[0]['song']['code'], new_song.code)
 
     def test_invalid_emotion_returns_bad_request(self):
         data = {'emotion': 'some-bad-value'}

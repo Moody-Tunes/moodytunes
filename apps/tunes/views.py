@@ -14,12 +14,13 @@ from base.mixins import (
 )
 from tunes.models import Song, Emotion
 from tunes.serializers import (
+    OptionsSerializer,
     SongSerializer,
+    VoteSerializer,
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
     PlaylistSongsRequestSerializer,
     VoteSongsRequestSerializer,
-    OptionsSerializer
 )
 from tunes.utils import generate_browse_playlist
 
@@ -158,28 +159,28 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
     on the songs as making them feel the given emotion.
     """
-    serializer_class = SongSerializer
-    queryset = Song.objects.all()
+    serializer_class = VoteSerializer
+    queryset = UserSongVote.objects.all()
 
     get_request_serializer = PlaylistSongsRequestSerializer
+
+    def filter_queryset(self, queryset):
+        # Find the songs the user has previously voted as making them feel the desired emotion
+        emotion = self.cleaned_data['emotion']
+
+        return queryset.filter(
+            user=self.request.user,
+            emotion__name=emotion,
+            vote=True
+        )
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
-            queryset = queryset.filter(genre=self.cleaned_data['genre'])
+            queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
 
         return queryset
-
-    def filter_queryset(self, queryset):
-        # Find the songs the user has previously voted as making them feel the desired emotion
-
-        emotion = self.cleaned_data['emotion']
-
-        user_votes_for_emotion = self.request.user.get_user_song_vote_records(emotion)
-        desired_songs = [vote.song.id for vote in user_votes_for_emotion if vote.vote]
-
-        return queryset.filter(id__in=desired_songs)
 
 
 class OptionView(generics.GenericAPIView):
