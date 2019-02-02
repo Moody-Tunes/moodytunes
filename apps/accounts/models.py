@@ -84,8 +84,8 @@ class UserEmotion(BaseModel):
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
-    lower_bound = models.FloatField(validators=[validate_decimal_value])
-    upper_bound = models.FloatField(validators=[validate_decimal_value])
+    energy = models.FloatField(validators=[validate_decimal_value])
+    valence = models.FloatField(validators=[validate_decimal_value])
 
     class Meta:
         unique_together = ('user', 'emotion')
@@ -94,12 +94,12 @@ class UserEmotion(BaseModel):
         return '{} - {}'.format(self.user, self.emotion)
 
     def save(self, *args, **kwargs):
-        # Set lower_bound and upper_bound to emotion defaults
-        if not self.lower_bound:
-            self.lower_bound = self.emotion.lower_bound
+        # Set energy and valence to emotion defaults
+        if not self.energy:
+            self.energy = self.emotion.energy
 
-        if not self.upper_bound:
-            self.upper_bound = self.emotion.upper_bound
+        if not self.valence:
+            self.valence = self.emotion.valence
 
         super().save(*args, **kwargs)
 
@@ -112,11 +112,11 @@ class UserEmotion(BaseModel):
         a song to reset the boundaries for that emotion
         """
         if reset:
-            self.upper_bound = 2 * self.upper_bound - valence
-            self.lower_bound = 2 * self.lower_bound - energy
+            self.valence = 2 * self.valence - valence
+            self.energy = 2 * self.energy - energy
         else:
-            self.upper_bound = (self.upper_bound + valence) / 2
-            self.lower_bound = (self.lower_bound + energy) / 2
+            self.valence = (self.valence + valence) / 2
+            self.energy = (self.energy + energy) / 2
         self.save()
 
 

@@ -4,7 +4,7 @@ from tunes.models import Emotion, Song
 
 
 class EmotionAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'lower_bound', 'upper_bound')
+    list_display = ('full_name', 'energy', 'valence')
     readonly_fields = ('name',)
 
 

@@ -51,10 +51,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
 
         return generate_browse_playlist(
-            user_emotion.lower_bound,
-            user_emotion.upper_bound,
+            user_emotion.energy,
+            user_emotion.valence,
             limit=limit,
-            jitter=float(jitter),
+            jitter=jitter,
             songs=queryset
         )
 

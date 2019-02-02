@@ -12,7 +12,7 @@ class MoodyUserAdmin(admin.ModelAdmin):
 
 class UserEmotionAdmin(admin.ModelAdmin):
     form = UpdateUserEmotionBoundariesForm
-    list_display = ('user', 'emotion', 'lower_bound', 'upper_bound')
+    list_display = ('user', 'emotion', 'energy', 'valence')
     readonly_fields = ('user', 'emotion')
     list_filter = ('emotion',)
 

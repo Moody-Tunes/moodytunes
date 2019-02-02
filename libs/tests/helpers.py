@@ -2,7 +2,7 @@ import random
 import string
 
 from accounts.models import MoodyUser
-from tunes.models import Song
+from tunes.models import Song, Emotion
 
 
 class SignalDisconnect(object):
@@ -49,18 +49,22 @@ class MoodyUtil(object):
     DEFAULT_USER_PASSWORD = 'test'
 
     @staticmethod
-    def create_song(name='Test Song', artist='Test Artist', genre='Test Genre', energy=.5, valence=.5):
+    def create_song(**kwargs):
         def generate_song_code():
             """Return a mocked Spotify song code"""
             sample = [random.choice(string.ascii_letters) for _ in range(22)]
             code = ''.join(sample)
             return 'spotify:track:{}'.format(code)
 
+        emotion = kwargs.get('emotion') or Emotion.objects.get(name=Emotion.HAPPY)
+        energy = kwargs.get('energy') or emotion.energy
+        valence = kwargs.get('valence') or emotion.valence
+
         params = {
             'code': generate_song_code(),
-            'name': name,
-            'genre': genre,
-            'artist': artist,
+            'name': kwargs.get('name', 'Test Song'),
+            'genre': kwargs.get('genre', 'Test Genre'),
+            'artist': kwargs.get('artist', 'Test Artist'),
             'energy': energy,
             'valence': valence,
         }

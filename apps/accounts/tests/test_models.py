@@ -35,12 +35,12 @@ class TestUserEmot(TestCase):
         valence = .5
         energy = .5
 
-        expected_new_upper_bound = (emotion.upper_bound + valence) / 2
-        expected_new_lower_bound = (emotion.lower_bound + energy) / 2
+        expected_new_energy = (emotion.energy + energy) / 2
+        expected_new_valence = (emotion.valence + valence) / 2
 
         user_emot.update_emotion_boundaries(valence, energy)
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+        self.assertEqual(user_emot.energy, expected_new_energy)
+        self.assertEqual(user_emot.valence, expected_new_valence)
 
     def test_reset_emotion_boundaries(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
@@ -49,12 +49,12 @@ class TestUserEmot(TestCase):
         valence = .5
         energy = .5
 
-        expected_new_upper_bound = 2 * emotion.upper_bound - valence
-        expected_new_lower_bound = 2 * emotion.lower_bound - energy
+        expected_new_energy = 2 * emotion.energy - energy
+        expected_new_valence = 2 * emotion.valence - valence
 
         user_emot.update_emotion_boundaries(valence, energy, reset=True)
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+        self.assertEqual(user_emot.energy, expected_new_energy)
+        self.assertEqual(user_emot.valence, expected_new_valence)
 
 
 class TestMoodyUser(TestCase):
@@ -87,8 +87,8 @@ class TestUserSongVote(TestCase):
     def test_deleting_vote_resets_boundaries(self):
         user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
 
-        expected_new_upper_bound = user_emot.upper_bound
-        expected_new_lower_bound = user_emot.lower_bound
+        expected_new_energy = user_emot.energy
+        expected_new_valence = user_emot.valence
 
         vote = UserSongVote.objects.create(
             user=self.user,
@@ -101,5 +101,5 @@ class TestUserSongVote(TestCase):
 
         user_emot.refresh_from_db()
 
-        self.assertEqual(user_emot.upper_bound, expected_new_upper_bound)
-        self.assertEqual(user_emot.lower_bound, expected_new_lower_bound)
+        self.assertEqual(user_emot.energy, expected_new_energy)
+        self.assertEqual(user_emot.valence, expected_new_valence)

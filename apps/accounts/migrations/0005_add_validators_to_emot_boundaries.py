@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='useremotion',
-            name='lower_bound',
+            name='energy',
             field=models.FloatField(validators=[base.validators.validate_decimal_value]),
         ),
         migrations.AlterField(
             model_name='useremotion',
-            name='upper_bound',
+            name='valence',
             field=models.FloatField(validators=[base.validators.validate_decimal_value]),
         ),
     ]

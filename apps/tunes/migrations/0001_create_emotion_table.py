@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(choices=[('MEL', 'Melancholy'), ('CLM', 'Calm'), ('HPY', 'Happy'), ('EXC', 'Excited')], db_index=True, max_length=3, unique=True)),
-                ('lower_bound', models.FloatField(validators=[tunes.models.validate_decimal_value])),
-                ('upper_bound', models.FloatField(validators=[tunes.models.validate_decimal_value])),
+                ('energy', models.FloatField(validators=[tunes.models.validate_decimal_value])),
+                ('valence', models.FloatField(validators=[tunes.models.validate_decimal_value])),
             ],
             options={
                 'abstract': False,

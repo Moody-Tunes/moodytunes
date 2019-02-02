@@ -18,8 +18,8 @@ def load_emotion_data_from_fixture(apps, schema_editor):
         params = {
             'pk': emotion['pk'],
             'name': emotion['fields']['name'],
-            'lower_bound': emotion['fields']['lower_bound'],
-            'upper_bound': emotion['fields']['upper_bound'],
+            'energy': emotion['fields']['energy'],
+            'valence': emotion['fields']['valence'],
         }
 
         Emotion.objects.create(**params)
