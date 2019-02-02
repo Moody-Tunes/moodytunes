@@ -6,12 +6,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
-from rest_framework.response import Response
+from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
-from base.mixins import ValidateRequestDataMixin
+from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
 from libs.utils import average
 
@@ -74,7 +74,7 @@ class CreateUserView(View):
             return render(request, self.template_name, {'form': form})
 
 
-class AnalyticsView(ValidateRequestDataMixin):
+class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     serializer_class = AnalyticsSerializer
 
     get_request_serializer = AnalyticsRequestSerializer
@@ -107,7 +107,7 @@ class AnalyticsView(ValidateRequestDataMixin):
             'total_songs': len(desired_songs)
         }
 
-    def get(self, request, *args, **kwargs):
+    def get_object(self):
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         genre = self.cleaned_data.get('genre')
 
@@ -122,6 +122,4 @@ class AnalyticsView(ValidateRequestDataMixin):
         }
 
         data.update(self._get_average_attributes())
-
-        serializer = self.serializer_class(data)
-        return Response(serializer.data)
+        return data

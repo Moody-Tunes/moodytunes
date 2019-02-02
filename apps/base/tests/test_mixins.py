@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.test import TestCase
-from rest_framework import status
 from rest_framework.test import APIRequestFactory
+from rest_framework.request import Request
 
 from base.mixins import ValidateRequestDataMixin
 
@@ -10,14 +10,12 @@ from base.mixins import ValidateRequestDataMixin
 class TestValidateRequestDataMixing(TestCase):
     def setUp(self):
         self.mixin = ValidateRequestDataMixin()
-        self.mixin.get = None  # Need to mock at least one method for the view
         self.factory = APIRequestFactory()
 
-    def test_dispatch_with_no_form_provided_raises_validation_error(self):
-        mock_request = self.factory.get('/path/')
-
-        with self.assertRaises(AttributeError):
-            self.mixin.dispatch(mock_request)
+    def test_clean_headers_does_not_strip_safe_values(self):
+        headers = {'HTTP_HOST': 'example.com'}
+        new_header = self.mixin._clean_headers(headers)
+        self.assertEqual(new_header['HTTP_HOST'], headers['HTTP_HOST'])
 
     def test_clean_headers_with_authorization_header(self):
         headers = {'HTTP_AUTHORIZATION': 'Foo-Bar'}
@@ -29,48 +27,44 @@ class TestValidateRequestDataMixing(TestCase):
         new_headers = self.mixin._clean_headers(headers)
         self.assertEqual(new_headers['HTTP_COOKIE'], {'sessionid': '********'})
 
-    @mock.patch('rest_framework.generics.GenericAPIView.dispatch')
-    def test_dispatch_happy_path(self, super_dispatch):
-        transformed_data = {'hello': 'world'}
+    def test_serializer_not_specified_raises_attribute_error(self):
+        request = self.factory.get('/test/')
 
-        mock_serializer = mock.MagicMock()
+        with self.assertRaises(AttributeError):
+            self.mixin._validate_request(request)
+
+    def test_valid_data_sets_mixin_cleaned_data(self):
+        request_data = {'foo': 'bar'}
+
+        mock_serializer = mock.Mock()
         mock_serializer.is_valid.return_value = True
-        mock_serializer.data = transformed_data
+        mock_serializer.data = request_data
         mock_serializer.return_value = mock_serializer
-        self.mixin.get_request_serializer = mock_serializer
 
-        mock_request = self.factory.get('/path/', data=transformed_data)
+        mixin = ValidateRequestDataMixin()
+        mixin.get_request_serializer = mock_serializer
 
-        self.mixin.dispatch(mock_request)
-        super_dispatch.assert_called_once_with(mock_request)
-        self.assertDictEqual(self.mixin.cleaned_data, transformed_data)
+        mock_request = self.factory.get('/test/', data=request_data)
+        request = Request(mock_request)
+        resp = mixin._validate_request(request)
 
-    @mock.patch('base.mixins.ValidateRequestDataMixin.initialize_request')
-    def test_dispatch_receives_invalid_data(self, mock_initialize_request):
-        transformed_data = {'hello': 'world'}
+        self.assertTrue(resp)
+        self.assertDictEqual(mixin.cleaned_data, request_data)
 
-        mock_serializer = mock.MagicMock()
+    @mock.patch('base.mixins.ValidateRequestDataMixin._log_bad_request')
+    def test_invalid_data_logs_bad_request(self, mock_bad_request_logger):
+        request_data = {'foo': 'bar'}
+
+        mock_serializer = mock.Mock()
         mock_serializer.is_valid.return_value = False
         mock_serializer.return_value = mock_serializer
-        self.mixin.get_request_serializer = mock_serializer
 
-        mock_request = self.factory.get('/path/', data=transformed_data)
-        mock_initialize_request.return_value = mock_request
+        mixin = ValidateRequestDataMixin()
+        mixin.get_request_serializer = mock_serializer
 
-        with mock.patch.object(self.mixin, '_handle_bad_request') as error_handler:
-            error_handler.return_value = None
-            self.mixin.dispatch(mock_request)
+        mock_request = self.factory.get('/test/', data=request_data)
+        request = Request(mock_request)
+        resp = mixin._validate_request(request)
 
-            error_handler.assert_called_once_with(mock_request)
-            self.assertIsNone(self.mixin.response)
-
-    def test_dispatch_receives_method_not_allowed(self):
-        # Test mixin only has GET method
-        mock_request = self.factory.post('/path/', data={'mock_data': 'foo-bar'})
-
-        with mock.patch.object(self.mixin, '_log_bad_request') as error_logger:
-            resp = self.mixin.dispatch(mock_request)
-
-            error_logger.assert_called_once_with()
-            self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-            self.assertEqual(resp['Allow'], ', '.join(self.mixin.allowed_methods))
+        self.assertFalse(resp)
+        mock_bad_request_logger.assert_called_once_with(request)

@@ -49,7 +49,7 @@ class TestBrowseView(TestCase):
         resp_song = resp.json()[0]
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_song['id'], song.id)
+        self.assertEqual(resp_song['code'], song.code)
 
     def test_filter_on_genre(self):
         MoodyUtil.create_song()
@@ -64,7 +64,7 @@ class TestBrowseView(TestCase):
         resp_song = resp.json()[0]
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_song['id'], expected_song.id)
+        self.assertEqual(resp_song['code'], expected_song.code)
 
     def test_playlist_respects_limit(self):
         for _ in range(10):
@@ -103,7 +103,7 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
-        self.assertEqual(resp_data[0]['id'], not_voted_song.id)
+        self.assertEqual(resp_data[0]['code'], not_voted_song.code)
 
 
 class TestVoteView(TestCase):
@@ -327,7 +327,7 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_data[0]['id'], self.song.id)
+        self.assertEqual(resp_data[0]['code'], self.song.code)
 
     def test_downvoted_songs_are_not_returned(self):
         UserSongVote.objects.create(
@@ -368,7 +368,7 @@ class TestPlaylistView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
-        self.assertEqual(resp_data[0]['id'], new_song.id)
+        self.assertEqual(resp_data[0]['code'], new_song.code)
 
     def test_invalid_emotion_returns_bad_request(self):
         data = {'emotion': 'some-bad-value'}

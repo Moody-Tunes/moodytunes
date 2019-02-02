@@ -1,13 +1,17 @@
 import logging
 
 from django.db import IntegrityError
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.models import UserSongVote
-from base.mixins import ValidateRequestDataMixin
+from base.mixins import (
+    GetRequestValidatorMixin,
+    PostRequestValidatorMixin,
+    DeleteRequestValidatorMixin
+)
 from tunes.models import Song, Emotion
 from tunes.serializers import (
     SongSerializer,
@@ -22,7 +26,7 @@ from tunes.utils import generate_browse_playlist
 logger = logging.getLogger(__name__)
 
 
-class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
+class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     Return a JSON response of Song records that match a given input query params.
     The main thing that should be passed is an `emotion_name`, which denotes the emotion
@@ -66,7 +70,7 @@ class BrowseView(ValidateRequestDataMixin, generics.ListAPIView):
         return queryset.exclude(id__in=previously_voted_song_ids)
 
 
-class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.DestroyAPIView):
+class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):
     """
     POST: Register a new `UserSongVote` for the given request user, song, and emotion; denotes whether or not the song
     made the user feel that emotion.
@@ -102,7 +106,7 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
                 vote_data['vote']
             ))
 
-            return Response(status=status.HTTP_201_CREATED)
+            return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
         except IntegrityError:
             logger.warning('Bad data supplied to VoteView.create: {}'.format(vote_data))
@@ -125,7 +129,7 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
                 self.cleaned_data['song_code']
             ))
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse({'status': 'OK'}, status=status.HTTP_204_NO_CONTENT)
 
         except UserSongVote.DoesNotExist:
             logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
@@ -135,7 +139,7 @@ class VoteView(ValidateRequestDataMixin, generics.CreateAPIView, generics.Destro
             return Response(status=status.HTTP_409_CONFLICT)
 
 
-class PlaylistView(ValidateRequestDataMixin, generics.ListAPIView):
+class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
     on the songs as making them feel the given emotion.
