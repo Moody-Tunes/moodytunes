@@ -61,10 +61,10 @@
 
             return cookieValue;
         },
-        request: function(endpoint, method, params, data, callback) {
+        request: function(method, endpoint, params, data, callback) {
             // Wrapper for making request to MoodyTunes API
-            // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @method (str): Request method to use in request (GET, POST, DELETE)
+            // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to include in request
             // @data (object): Request data to send (used for POST and DELETE methods)
             // @callback (function): Callback function to pass retrieved data onto
@@ -97,7 +97,7 @@
         getOptions: function(callback) {
             // Retrieve options for site interaction (emotions and genres in our system)
             // Used to build options for users to choose from when generating playlists to listen to
-            this.request('/tunes/options/', 'GET', {}, {}, callback);
+            this.request('GET', '/tunes/options/', {}, {}, callback);
         },
         getUserAnalytics: function(emotion, genre, callback) {
             // Retrieve analytics for users based on what songs they've listened to
@@ -105,7 +105,7 @@
                 emotion: emotion,
                 genre: genre
             };
-            this.request('/accounts/analytics/', 'GET', params, {}, callback);
+            this.request('GET', '/accounts/analytics/', params, {}, callback);
         },
         getBrowsePlaylist: function(emotion, jitter, limit, genre, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
@@ -117,7 +117,7 @@
                 genre: genre
             };
 
-            this.request('/tunes/browse/', 'GET', params, {}, callback);
+            this.request('GET', '/tunes/browse/', params, {}, callback);
         },
         getEmotionPlaylist: function(emotion, genre, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
@@ -126,7 +126,7 @@
                 genre: genre
             };
 
-            this.request('/tunes/playlist/', 'GET', params, {}, callback);
+            this.request('GET', '/tunes/playlist/', params, {}, callback);
         },
         postVote: function(songCode, emotion, vote, callback) {
             // Register a vote for a song in our system based on whether or not the song makes the user feel
@@ -136,7 +136,7 @@
                 emotion: emotion,
                 vote: vote
             };
-            this.request('/tunes/vote/', 'POST', {}, data, callback);
+            this.request('POST', '/tunes/vote/', {}, data, callback);
         },
         deleteVote: function(songCode, emotion, callback) {
             // "Unvote" a song the user has previously reported as making them feel the desired emotion
@@ -144,7 +144,7 @@
                 song_code: songCode,
                 emotion: emotion
             };
-            this.request('/tunes/vote/', 'DELETE', {}, data, callback);
+            this.request('DELETE', '/tunes/vote/', {}, data, callback);
         }
     };
 })();
