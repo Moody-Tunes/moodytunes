@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
 
 
 class TestProfileView(TestCase):

@@ -13,6 +13,7 @@ from accounts.models import MoodyUser
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
+from libs.utils import average
 
 
 @method_decorator(login_required, name='dispatch')
