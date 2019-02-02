@@ -59,6 +59,15 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
     def get_queryset(self):
+        context_session_key =  '{}_context'.format(self.cleaned_data['emotion'])
+        description_session_key =  '{}_description'.format(self.cleaned_data['emotion'])
+
+        if self.cleaned_data.get('context'):
+            self.request.session[context_session_key] = self.cleaned_data['context']
+
+        if self.cleaned_data.get('description'):
+            self.request.session[description_session_key] = self.cleaned_data['description']
+
         queryset = super(BrowseView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
@@ -94,7 +103,9 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             'user_id': self.request.user.id,
             'emotion_id': emotion.id,
             'song_id': song.id,
-            'vote': self.cleaned_data['vote']
+            'vote': self.cleaned_data['vote'],
+            'context': request.session.get('{}_context'.format(self.cleaned_data['emotion']), ''),
+            'description': request.session.get('{}_description'.format(self.cleaned_data['emotion']), '')
         }
 
         try:
