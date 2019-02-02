@@ -174,7 +174,7 @@ class TestAnalyticsView(TestCase):
     def test_genre_filter_only_returns_songs_for_genre(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song(genre='hiphop')
-        other_song = MoodyUtil.create_song(genre='something-else')
+        other_song = MoodyUtil.create_song(genre='something-else', energy=.3, valence=.25)
 
         UserSongVote.objects.create(
             user=self.user,
@@ -190,13 +190,14 @@ class TestAnalyticsView(TestCase):
             vote=True
         )
 
-        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        # We should only see the energy and valence for the song in the genre, not the users
+        # average enegy and valence for this genre
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': expected_song.genre,
-            'energy': user_emotion.energy,
-            'valence': user_emotion.valence,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
             'total_songs': 1,
         }
 
