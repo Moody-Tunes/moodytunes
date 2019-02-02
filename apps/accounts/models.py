@@ -126,9 +126,21 @@ class UserSongVote(BaseModel):
     song made the user feel the linked emotion. This table will be used to
     track what songs a user associates with a particular emotion.
     """
+    CONTEXT_CHOICES = [
+        ('PARTY', 'Listening to music at a party'),
+        ('RELAX', 'Listening to music to relax'),
+        ('WORK', 'Listening to music while working on a task'),
+    ]
+
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
     song = models.ForeignKey('tunes.Song', on_delete=models.CASCADE)
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
+    description = models.TextField(blank=True)
+    context = models.CharField(
+        max_length=10,
+        choices=CONTEXT_CHOICES,
+        blank=True
+    )
     vote = models.BooleanField()
 
     def __str__(self):
