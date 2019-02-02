@@ -15,15 +15,22 @@
         the data in the context of the page (like appending Spotify play buttons to a section or writing the data to an
         element on the page).
         */
+        checkTruthyObject: function(obj) {
+            // Return whether or not `obj` is a Javascript Object and is empty
+            return Boolean(obj && obj.constructor === Object && Object.entries(obj).length !== 0);
+        },
         buildRequestURL: function(endpoint, params) {
             // Build a URL for making a request to the backend API
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to append to request url
             // :return (str): Full url for API request
             var requestUrl = new URL(window.location.origin + endpoint);
-            for (var key in params) {
-                if (params.hasOwnProperty(key)) {
-                    requestUrl.searchParams.append(key, params[key]);
+
+            if (this.checkTruthyObject(params)) {
+                for (var key in params) {
+                    if (params.hasOwnProperty(key)) {
+                        requestUrl.searchParams.append(key, params[key]);
+                    }
                 }
             }
 
@@ -33,9 +40,11 @@
             // Strips null values from params to ensure that URL doesn't include undefined parameters
             // @params (object): Query params to include in request
             // :return (object): Same params passed in, minus any keys that have undefined values
-            for (var key in params) {
-                if (params.hasOwnProperty(key) && params[key] === undefined) {
-                    delete params[key];
+            if (this.checkTruthyObject(params)) {
+                for (var key in params) {
+                    if (params.hasOwnProperty(key) && params[key] === undefined) {
+                        delete params[key];
+                    }
                 }
             }
 
