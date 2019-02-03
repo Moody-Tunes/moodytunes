@@ -19,3 +19,11 @@ class BrowseForm(forms.Form):
     genre = forms.ChoiceField(choices=get_song_genre_choices, required=False)
     context = forms.ChoiceField(choices=context_options, required=False)
     description = forms.CharField(required=False)
+
+
+class PlaylistForm(forms.Form):
+    context_options = UserSongVote.CONTEXT_CHOICES + default_option
+
+    emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    genre = forms.ChoiceField(choices=get_song_genre_choices, required=False)
+    context = forms.ChoiceField(choices=context_options, required=False)
