@@ -14,12 +14,13 @@ from base.mixins import (
 )
 from tunes.models import Song, Emotion
 from tunes.serializers import (
+    OptionsSerializer,
     SongSerializer,
+    VoteSerializer,
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
     PlaylistSongsRequestSerializer,
     VoteSongsRequestSerializer,
-    OptionsSerializer
 )
 from tunes.utils import generate_browse_playlist
 
@@ -40,6 +41,17 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = BrowseSongsRequestSerializer
 
+    def _set_situation_data(self):
+        # Assign context data to request session if present
+        context_session_key = '{}_context'.format(self.cleaned_data['emotion'])
+        description_session_key = '{}_description'.format(self.cleaned_data['emotion'])
+
+        if self.cleaned_data.get('context'):
+            self.request.session[context_session_key] = self.cleaned_data['context']
+
+        if self.cleaned_data.get('description'):
+            self.request.session[description_session_key] = self.cleaned_data['description']
+
     def filter_queryset(self, queryset):
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
@@ -59,6 +71,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
     def get_queryset(self):
+        self._set_situation_data()
         queryset = super(BrowseView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
@@ -94,7 +107,9 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             'user_id': self.request.user.id,
             'emotion_id': emotion.id,
             'song_id': song.id,
-            'vote': self.cleaned_data['vote']
+            'vote': self.cleaned_data['vote'],
+            'context': request.session.get('{}_context'.format(self.cleaned_data['emotion']), ''),
+            'description': request.session.get('{}_description'.format(self.cleaned_data['emotion']), '')
         }
 
         try:
@@ -144,28 +159,28 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
     on the songs as making them feel the given emotion.
     """
-    serializer_class = SongSerializer
-    queryset = Song.objects.all()
+    serializer_class = VoteSerializer
+    queryset = UserSongVote.objects.all()
 
     get_request_serializer = PlaylistSongsRequestSerializer
+
+    def filter_queryset(self, queryset):
+        # Find the songs the user has previously voted as making them feel the desired emotion
+        emotion = self.cleaned_data['emotion']
+
+        return queryset.filter(
+            user=self.request.user,
+            emotion__name=emotion,
+            vote=True
+        )
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
-            queryset = queryset.filter(genre=self.cleaned_data['genre'])
+            queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
 
         return queryset
-
-    def filter_queryset(self, queryset):
-        # Find the songs the user has previously voted as making them feel the desired emotion
-
-        emotion = self.cleaned_data['emotion']
-
-        user_votes_for_emotion = self.request.user.get_user_song_vote_records(emotion)
-        desired_songs = [vote.song.id for vote in user_votes_for_emotion if vote.vote]
-
-        return queryset.filter(id__in=desired_songs)
 
 
 class OptionView(generics.GenericAPIView):
