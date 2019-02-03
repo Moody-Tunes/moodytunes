@@ -33,6 +33,7 @@ THIRD_PARTY_APPS = [
 OUR_APPS = [
     'accounts',
     'base',
+    'moodytunes',
     'tunes',
 ]
 
