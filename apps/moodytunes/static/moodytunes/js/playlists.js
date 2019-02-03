@@ -18,7 +18,7 @@
         return button
     }
 
-    function displayPlayList(data) {
+    function displayEmotionPlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
 
         // Clean out playlist if there are any old songs still present
@@ -67,7 +67,7 @@
         var context = document.getElementById('id_context').value || undefined;
 
         document.MoodyTunesClient.getEmotionPlaylist(
-            emotion, genre, context, displayPlayList
+            emotion, genre, context, displayEmotionPlaylist
         );
     }
 

@@ -22,7 +22,7 @@
         return button
     }
 
-    function displayBrowsePlayList(data) {
+    function displayBrowsePlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
 
         // Clean out playlist if there are any old songs still present
@@ -75,7 +75,7 @@
         var description = document.getElementById('id_description').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, description, displayBrowsePlayList
+            emotion, jitter, limit, genre, context, description, displayBrowsePlaylist
         );
     }
 
