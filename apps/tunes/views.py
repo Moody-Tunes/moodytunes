@@ -180,6 +180,9 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         if self.cleaned_data.get('genre'):
             queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
 
+        if self.cleaned_data.get('context'):
+            queryset = queryset.filter(context=self.cleaned_data['context'])
+
         return queryset
 
 

@@ -386,6 +386,12 @@ class TestPlaylistView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_invalid_emotion_returns_bad_request(self):
+        data = {'emotion': 'some-bad-value'}
+        resp = self.api_client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_happy_path(self):
         UserSongVote.objects.create(
             user=self.user,
@@ -442,11 +448,35 @@ class TestPlaylistView(TestCase):
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['song']['code'], new_song.code)
 
-    def test_invalid_emotion_returns_bad_request(self):
-        data = {'emotion': 'some-bad-value'}
-        resp = self.api_client.get(self.url, data=data)
+    def test_filter_by_context(self):
+        expected_song = MoodyUtil.create_song(name='song-with-context')
+        context = 'WORK'
 
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        UserSongVote.objects.create(
+            user=self.user,
+            song=expected_song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True,
+            context=context
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True,
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'context': context
+        }
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data), 1)
+        self.assertEqual(resp_data[0]['song']['code'], expected_song.code)
 
 
 class TestOptionsView(TestCase):
