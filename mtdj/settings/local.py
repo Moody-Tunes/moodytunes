@@ -26,13 +26,5 @@ LOGGING['handlers'].update({
 })
 
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
-
-LOGGING['loggers'].update({
-    'django': {
-        'handlers': ['console'],
-        'propagate': True,
-    },
-})
-
 LOGGING['root']['handlers'].append('console')
 LOGGING['root']['level'] = 'DEBUG'

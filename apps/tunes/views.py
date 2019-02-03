@@ -144,7 +144,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 self.cleaned_data['song_code']
             ))
 
-            return JsonResponse({'status': 'OK'}, status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse({'status': 'OK'})
 
         except UserSongVote.DoesNotExist:
             logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
