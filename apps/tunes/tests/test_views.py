@@ -500,9 +500,12 @@ class TestOptionsView(TestCase):
     def test_happy_path(self):
         expected_emotions = [{'name': emotion.full_name, 'code': emotion.name} for emotion in Emotion.objects.all()]
         expected_genres = [self.song.genre]
+        expected_contexts = [{'code': choice[0], 'name': choice[1]} for choice in UserSongVote.CONTEXT_CHOICES]
+
         expected_response = {
             'emotions': expected_emotions,
-            'genres': expected_genres
+            'genres': expected_genres,
+            'contexts': expected_contexts
         }
 
         resp = self.api_client.get(self.url)

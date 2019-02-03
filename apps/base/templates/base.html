@@ -10,15 +10,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{% block title %}MoodyTunes{% endblock %}</title>
 		<link rel="icon" href="{% static 'base/images/favicon.ico' %}" type="image/png">
+        <link rel="stylesheet" type="text/css" href="{% static 'base/css/base.css' %}">.
         <script src="{% static 'base/js/client.js' %}"></script>
-		{# TODO: When base.css is defined, include here #}
 		{% block superhead %}
 		{% endblock %}
 	</head>
 	<body>
 		<div id="header">
-			{# TODO: This should be constant across all pages. Figure out what should go here #}
-			{# Things like links to user homepage, account page, about page, logout buttons, etc. #}
+            <div class="navbar">
+                <a class="navbar-child" href="{% url 'homepage' %}">Home</a>
+                {% if user.is_authenticated %}
+                    <a class="navbar-child" href="{% url 'accounts:profile' %}">Profile</a>
+                    <a class="navbar-child" href="{% url 'moodytunes:browse' %}">Browse</a>
+                    <a class="navbar-child" href="{% url 'accounts:logout' %}">Logout</a>
+                {% endif %}
+            </div>
 			{% if messages %}
 			<ul class="messages">
 				{% for message in messages %}
