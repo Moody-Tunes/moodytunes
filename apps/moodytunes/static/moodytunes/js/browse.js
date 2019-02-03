@@ -11,6 +11,17 @@
         })
     }
 
+    function createVoteButton(voteValue, song) {
+        var name = voteValue ? 'Upvote' : 'Downvote';
+        var button = document.createElement('button');
+        button.appendChild(document.createTextNode(name));
+        button.dataset.song = song;
+        button.dataset.vote = voteValue;
+        button.addEventListener('click', voteOnSong);
+
+        return button
+    }
+
     function displayBrowsePlayList(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
 
@@ -34,19 +45,8 @@
             songContainer.appendChild(playButton);
 
             // Generate voting buttons
-            var upvoteButton = document.createElement('button');
-            upvoteButton.appendChild(document.createTextNode('Upvote'));
-            upvoteButton.dataset.song = song.code;
-            upvoteButton.dataset.vote = true;
-            upvoteButton.addEventListener('click', voteOnSong);
-            songContainer.appendChild(upvoteButton);
-
-            var downvoteButton = document.createElement('button');
-            downvoteButton.appendChild(document.createTextNode('Downvote'));
-            downvoteButton.dataset.song = song.code;
-            downvoteButton.dataset.vote = false;
-            downvoteButton.addEventListener('click', voteOnSong);
-            songContainer.appendChild(downvoteButton);
+            songContainer.appendChild(createVoteButton(true, song.code));
+            songContainer.appendChild(createVoteButton(false, song.code));
 
             listRecord.appendChild(songContainer);
             playButtonList.appendChild(listRecord);
