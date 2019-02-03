@@ -123,7 +123,9 @@
                 emotion: emotion,
                 jitter: jitter,
                 limit: limit,
-                genre: genre
+                genre: genre,
+                context: context,
+                description: description
             };
 
             this.request('GET', '/tunes/browse/', params, {}, callback);
