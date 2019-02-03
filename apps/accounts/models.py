@@ -130,6 +130,7 @@ class UserSongVote(BaseModel):
         ('PARTY', 'Listening to music at a party'),
         ('RELAX', 'Listening to music to relax'),
         ('WORK', 'Listening to music while working on a task'),
+        ('OTHER', 'Doing something else')
     ]
 
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)

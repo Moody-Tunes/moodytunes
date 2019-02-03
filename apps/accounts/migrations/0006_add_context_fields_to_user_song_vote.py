@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usersongvote',
             name='context',
-            field=models.CharField(blank=True, choices=[('PARTY', 'Listening to music at a party'), ('RELAX', 'Listening to music to relax'), ('WORK', 'Listening to music while working on a task')], max_length=10),
+            field=models.CharField(blank=True, choices=[('PARTY', 'Listening to music at a party'), ('RELAX', 'Listening to music to relax'), ('WORK', 'Listening to music while working on a task'), ('OTHER', 'Doing something else')], max_length=10),
         ),
         migrations.AddField(
             model_name='usersongvote',
