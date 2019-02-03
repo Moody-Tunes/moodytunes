@@ -1,5 +1,5 @@
 (function IIFE() {
-    function voteOnSong() {
+    function deleteVote() {
         var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
 
@@ -13,13 +13,18 @@
         var button = document.createElement('button');
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
-        button.addEventListener('click', voteOnSong);
+        button.addEventListener('click', deleteVote);
 
         return button
     }
 
     function displayPlayList(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
+
+        // Clean out playlist if there are any old songs still present
+        while(playlistContainer.hasChildNodes()) {
+            playlistContainer.removeChild(playlistContainer.firstChild);
+        }
 
         // Check if we didn't got any songs back
         if (data.length === 0) {
@@ -30,11 +35,6 @@
             playlistContainer.appendChild(message);
 
             return;
-        }
-
-        // Clean out playlist if there are any old songs still present
-        while(playlistContainer.hasChildNodes()) {
-            playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
         // Create list for play buttons

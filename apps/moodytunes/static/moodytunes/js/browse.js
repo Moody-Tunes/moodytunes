@@ -25,6 +25,11 @@
     function displayBrowsePlayList(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
 
+        // Clean out playlist if there are any old songs still present
+        while(playlistContainer.hasChildNodes()) {
+            playlistContainer.removeChild(playlistContainer.firstChild);
+        }
+
         // Check if we didn't got any songs back
         if (data.length === 0) {
             var message = document.createElement('p');
@@ -32,11 +37,6 @@
             playlistContainer.appendChild(message);
 
             return;
-        }
-
-        // Clean out playlist if there are any old songs still present
-        while(playlistContainer.hasChildNodes()) {
-            playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
         // Create list for play buttons
