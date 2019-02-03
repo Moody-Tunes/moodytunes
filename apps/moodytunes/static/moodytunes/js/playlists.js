@@ -1,0 +1,78 @@
+(function IIFE() {
+    function voteOnSong() {
+        var emotion = document.getElementById('id_emotion').value;
+        var song = this.dataset.song;
+
+        document.MoodyTunesClient.deleteVote(song, emotion, function(data) {
+            var songContainer = document.getElementById('song-' + song);
+            songContainer.hidden = true;
+        })
+    }
+
+    function createDeleteButton(song) {
+        var button = document.createElement('button');
+        button.appendChild(document.createTextNode('Delete'));
+        button.dataset.song = song;
+        button.addEventListener('click', voteOnSong);
+
+        return button
+    }
+
+    function displayPlayList(data) {
+        var playlistContainer = document.getElementById('playlist-display-container');
+
+        // Check if we didn't got any songs back
+        if (data.length === 0) {
+            var message = document.createElement('p');
+            var emotion = document.getElementById('id_emotion').value;
+
+            message.innerText = 'You haven\'t voted any songs as making you feel ' + emotion + ' yet!';
+            playlistContainer.appendChild(message);
+
+            return;
+        }
+
+        // Clean out playlist if there are any old songs still present
+        while(playlistContainer.hasChildNodes()) {
+            playlistContainer.removeChild(playlistContainer.firstChild);
+        }
+
+        // Create list for play buttons
+        var playButtonList = document.createElement('ul');
+
+        for (var i=0; i<data.length; i++) {
+            var vote = data[i];
+            var song = vote.song;
+
+            var listRecord = document.createElement('li');
+            var songContainer = document.createElement('div');
+            listRecord.id = 'song-' + song.code;
+
+            // Generate Spotify play button for track and add to playlist
+            var playButton = document.createElement('iframe');
+            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+            songContainer.appendChild(playButton);
+
+            // Generate delete button
+            songContainer.appendChild(createDeleteButton(song.code));
+
+            listRecord.appendChild(songContainer);
+            playButtonList.appendChild(listRecord);
+        }
+
+        playlistContainer.appendChild(playButtonList);
+    }
+
+    function getEmotionPlaylist() {
+        var emotion = document.getElementById('id_emotion').value;
+        var genre = document.getElementById('id_genre').value || undefined;
+        var context = document.getElementById('id_context').value || undefined;
+
+        document.MoodyTunesClient.getEmotionPlaylist(
+            emotion, genre, context, displayPlayList
+        );
+    }
+
+    var generatePlaylistButton = document.getElementById('generate-playlist');
+    generatePlaylistButton.onclick = getEmotionPlaylist;
+})();

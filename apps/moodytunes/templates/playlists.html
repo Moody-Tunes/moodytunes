@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block superhead %}
+    <script src="{% static 'moodytunes/js/playlists.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<h1>Playlists For Emotion</h1>
+<div id="playlist-generator-container">
+    <ul>
+        {{ form.as_ul }}
+    </ul>
+    <input id="generate-playlist" type="submit" />
+</div>
+<div id="playlist-display-container"></div>
+{% endblock %}
