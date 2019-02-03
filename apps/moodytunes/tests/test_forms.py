@@ -54,4 +54,3 @@ class TestBrowseForm(TestCase):
 
         form = BrowseForm(data)
         self.assertFalse(form.is_valid())
-
