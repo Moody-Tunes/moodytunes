@@ -105,6 +105,7 @@ CACHES.update({
 
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
