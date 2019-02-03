@@ -4,9 +4,14 @@
 <h1>Profile</h1>
 {% if user.is_authenticated %}
 	<p>Hello {{ user.username }}!</p>
+    <h3>Account Options</h3>
 	<ul>
 		<li><a href="{% url 'accounts:update' %}">Update Information</a></li>
 		<li><a href="{% url 'accounts:logout' %}">Logout</a></li>
 	</ul>
+    <h3>MoodyTunes</h3>
+    <ul>
+        <li><a href="{% url 'moodytunes:browse' %}">Browse New Songs</a></li>
+    </ul>
 {% endif %}
 {% endblock %}
