@@ -244,8 +244,8 @@ class TestVoteView(TestCase):
     def test_vote_with_session_context_for_voting_emotion_saves_data_to_vote(self):
         context = 'WORK'
         description = 'Working on MoodyTunes'
-        context_session_key =  '{}_context'.format(Emotion.HAPPY)
-        description_session_key =  '{}_description'.format(Emotion.HAPPY)
+        context_session_key = '{}_context'.format(Emotion.HAPPY)
+        description_session_key = '{}_description'.format(Emotion.HAPPY)
 
         session = self.api_client.session
         session[context_session_key] = context
@@ -271,8 +271,8 @@ class TestVoteView(TestCase):
     def test_vote_with_session_context_for_other_emotion_does_not_save_data_to_vote(self):
         context = 'WORK'
         description = 'Working on MoodyTunes'
-        context_session_key =  '{}_context'.format(Emotion.CALM)
-        description_session_key =  '{}_description'.format(Emotion.CALM)
+        context_session_key = '{}_context'.format(Emotion.CALM)
+        description_session_key = '{}_description'.format(Emotion.CALM)
 
         session = self.api_client.session
         session[context_session_key] = context

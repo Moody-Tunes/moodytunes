@@ -43,8 +43,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     def _set_situation_data(self):
         # Assign context data to request session if present
-        context_session_key =  '{}_context'.format(self.cleaned_data['emotion'])
-        description_session_key =  '{}_description'.format(self.cleaned_data['emotion'])
+        context_session_key = '{}_context'.format(self.cleaned_data['emotion'])
+        description_session_key = '{}_description'.format(self.cleaned_data['emotion'])
 
         if self.cleaned_data.get('context'):
             self.request.session[context_session_key] = self.cleaned_data['context']
