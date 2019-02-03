@@ -138,6 +138,9 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'user': '5/sec',
     },
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
 
 LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
