@@ -66,3 +66,4 @@ class PlaylistSongsRequestSerializer(serializers.Serializer):
 
     emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     genre = serializers.CharField(max_length=15, required=False)
+    context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
