@@ -1,6 +1,20 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block superhead %}
+    <script src="{% static 'moodytunes/js/browse.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <h1>Browse Songs</h1>
-<p>Hello World!</p>
+<div id="playlist-generator-container">
+<form action="{% url 'tunes:browse' %}" method="get">
+    <ul>
+        {{ form.as_ul }}
+    </ul>
+    <input id="generate-playlist" type="submit" />
+</form>
+</div>
+<div id="playlist-display-container"></div>
 {% endblock %}
