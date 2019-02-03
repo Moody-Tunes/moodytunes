@@ -9,7 +9,7 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
     `UserEmotion` record for a given `Emotion`
 
     :param energy: (float) Energy estimate of `Song` records returned
-    :param valence: (float) Valence estime of `Song` records returned
+    :param valence: (float) Valence estimate of `Song` records returned
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
     :param songs: (QuerySet) Optional queryset of songs to filter
