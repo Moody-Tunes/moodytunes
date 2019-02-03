@@ -33,6 +33,7 @@ class VoteSerializer(serializers.ModelSerializer):
 class OptionsSerializer(serializers.Serializer):
     emotions = serializers.ListField()
     genres = serializers.ListField()
+    context = serializers.ListField()
 
 
 class BrowseSongsRequestSerializer(serializers.Serializer):

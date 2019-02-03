@@ -202,12 +202,22 @@ class OptionView(generics.GenericAPIView):
                 'code': emotion.name
             })
 
+        # Build map of vote context choices
+        context_choices = []
+        for choice in UserSongVote.CONTEXT_CHOICES:
+            name, full_name = choice
+            context_choices.append({
+                'name': full_name,
+                'code': name
+            })
+
         # Retrieve list of song genres
         genre_choices = Song.objects.all().values_list('genre', flat=True).distinct()
 
         data = {
             'emotions': emotion_choices,
-            'genres': genre_choices
+            'genres': genre_choices,
+            'contexts': context_choices
         }
 
         serializer = self.serializer_class(data=data)
