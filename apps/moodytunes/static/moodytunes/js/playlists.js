@@ -29,9 +29,7 @@
         // Check if we didn't got any songs back
         if (data.length === 0) {
             var message = document.createElement('p');
-            var emotion = document.getElementById('id_emotion').value;
-
-            message.innerText = 'You haven\'t voted any songs as making you feel ' + emotion + ' yet!';
+            message.innerText = 'No songs you have previously voted on fit the criteria specified';
             playlistContainer.appendChild(message);
 
             return;
