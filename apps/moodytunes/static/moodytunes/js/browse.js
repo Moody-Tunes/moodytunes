@@ -1,7 +1,28 @@
 (function IIFE() {
     function displayBrowsePlayList(data) {
-        alert('Made request OK!');
-        console.log('Data for playlist: ' + data);
+        var playlistContainer = document.getElementById('playlist-display-container');
+
+        // Clean out playlist if there are any old songs still present
+        while(playlistContainer.hasChildNodes()) {
+            playlistContainer.removeChild(playlistContainer.firstChild);
+        }
+
+        // Create list for play buttons
+        var playButtonList = document.createElement('ul');
+
+        for (var i=0; i<data.length; i++) {
+            var song = data[i];
+            var listRecord = document.createElement('li');
+
+            // Generate Spotify play button for track and add to playlist
+            var playButton = document.createElement('iframe');
+            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+
+            listRecord.appendChild(playButton);
+            playButtonList.appendChild(listRecord);
+        }
+
+        playlistContainer.appendChild(playButtonList);
     }
 
     function getBrowsePlaylist() {
