@@ -17,5 +17,5 @@ class BrowseForm(forms.Form):
 
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     genre = forms.ChoiceField(choices=get_song_genre_choices, required=False)
-    context = forms.ChoiceField(choices= context_options, required=False)
+    context = forms.ChoiceField(choices=context_options, required=False)
     description = forms.CharField(required=False)
