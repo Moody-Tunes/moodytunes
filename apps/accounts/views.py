@@ -36,7 +36,7 @@ class UpdateInfoView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST, user=request.user)
 
         if form.is_valid():
             request.user.update_information(form.cleaned_data)
