@@ -86,7 +86,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.filter(
             user=self.request.user,
-            emotion__name=self.cleaned_data['emotion'],
+            emotion=emotion,
             vote=True
         )
 
