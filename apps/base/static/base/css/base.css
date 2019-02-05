@@ -25,3 +25,7 @@ li {
     background-color: #ddd;
     color: black;
 }
+
+.navbar-user {
+    float: right;
+}
