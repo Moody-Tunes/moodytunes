@@ -82,6 +82,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     def get_object(self):
         energy = None
         valence = None
+        genre = self.cleaned_data.get('genre')
 
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.filter(
@@ -95,9 +96,8 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             energy = user_emotion.energy
             valence = user_emotion.valence
 
-        if self.cleaned_data.get('genre'):
+        if genre:
             # If we get a genre, calculate attributes for songs in that genre
-            genre = self.cleaned_data['genre']
             votes_for_emotion = [vote.song for vote in votes_for_emotion if vote.song.genre == genre]
             energy = average([song.energy for song in votes_for_emotion])
             valence = average([song.valence for song in votes_for_emotion])
@@ -105,7 +105,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         data = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': self.cleaned_data.get('genre'),
+            'genre': genre,
             'energy': energy,
             'valence': valence,
             'total_songs': len(votes_for_emotion)
