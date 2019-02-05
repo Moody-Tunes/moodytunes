@@ -6,6 +6,17 @@ li {
     margin-bottom: 5px;
 }
 
+/* error message definitions */
+.errorlist {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.errorlist li {
+    color: #ff0010;
+    font-size: 16px;
+}
+
 /* navbar definitions */
 .navbar {
     background-color: #333;
