@@ -13,3 +13,11 @@
 .play-button {
     height: 90px;
 }
+
+.vote-button {
+    margin-left: 5px;
+}
+
+.vote-button-true {
+    position: absolute;
+}

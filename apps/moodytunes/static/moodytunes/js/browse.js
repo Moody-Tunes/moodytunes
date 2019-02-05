@@ -12,8 +12,9 @@
     }
 
     function createVoteButton(voteValue, song) {
-        var name = voteValue ? 'Upvote' : 'Downvote';
         var button = document.createElement('button');
+        button.className = 'vote-button vote-button-' + voteValue;
+        var name = voteValue ? 'Upvote' : 'Downvote';
         button.appendChild(document.createTextNode(name));
         button.dataset.song = song;
         button.dataset.vote = voteValue;
