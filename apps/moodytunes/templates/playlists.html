@@ -5,30 +5,31 @@
 {% block superhead %}
     <script src="{% static 'moodytunes/js/playlists.js' %}" defer></script>
     <link rel="stylesheet" type="text/css" href="{% static 'moodytunes/css/playlist.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'moodytunes/css/analytics.css' %}">
 {% endblock %}
 
 {% block content %}
 <h1>Playlists For Emotion</h1>
 <div id="playlist-generator-container">
+    <div id="analytics-container">
+        <table>
+            <tr>
+                <th>Emotion</th>
+                <th>Energy</th>
+                <th>Valence</th>
+                <th>Total Songs</th>
+            </tr>
+            <tr>
+                <td id="analytics-emotion"></td>
+                <td id="analytics-energy"></td>
+                <td id="analytics-valence"></td>
+                <td id="analytics-total-songs"></td>
+            </tr>
+        </table>
+    </div>
     {{ form.as_p }}
     <input id="generate-playlist" type="submit" />
     <p id="alert-no-results" class="warning" hidden>No songs you have previously voted on fit the criteria specified</p>
-</div>
-<div id="analytics-container">
-    <table>
-        <tr>
-            <th>Emotion</th>
-            <th>Energy</th>
-            <th>Valence</th>
-            <th>Total Songs</th>
-        </tr>
-        <tr>
-            <td id="analytics-emotion"></td>
-            <td id="analytics-energy"></td>
-            <td id="analytics-valence"></td>
-            <td id="analytics-total-songs"></td>
-        </tr>
-    </table>
 </div>
 <div id="playlist-display-container"></div>
 {% endblock %}
