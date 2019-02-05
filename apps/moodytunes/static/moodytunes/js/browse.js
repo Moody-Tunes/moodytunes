@@ -44,6 +44,7 @@
 
             // Generate Spotify play button for track and add to playlist
             var playButton = document.createElement('iframe');
+            playButton.className = 'play-button';
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
             songContainer.appendChild(playButton);
 
