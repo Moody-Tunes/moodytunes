@@ -20,15 +20,15 @@
 
     function displayAnalytics(data) {
         document.getElementById('analytics-emotion').innerText = data.emotion_name;
-        document.getElementById('analytics-energy').innerText = data.energy.toPrecision(2);
-        document.getElementById('analytics-valence').innerText = data.valence.toPrecision(2);
+        document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
+        document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
         document.getElementById('analytics-total-songs').innerText = data.total_songs;
     }
 
     function displayEmotionPlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length > 1;  // Show alert if we don't get any data back
+        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
         // Clean out playlist if there are any old songs still present
         while(playlistContainer.hasChildNodes()) {
