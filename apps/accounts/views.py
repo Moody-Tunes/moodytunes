@@ -90,7 +90,6 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             vote=True
         )
 
-        # Don't return values for an emotion the user has not voted on
         if votes_for_emotion:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
             energy = user_emotion.energy
