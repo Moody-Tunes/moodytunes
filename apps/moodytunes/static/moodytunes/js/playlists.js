@@ -11,6 +11,7 @@
 
     function createDeleteButton(song) {
         var button = document.createElement('button');
+        button.className = 'vote-button';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
         button.addEventListener('click', deleteVote);
@@ -35,30 +36,24 @@
             playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
-        // Create list for play buttons
-        var playButtonList = document.createElement('ul');
-
         for (var i=0; i<data.length; i++) {
             var vote = data[i];
             var song = vote.song;
 
-            var listRecord = document.createElement('li');
             var songContainer = document.createElement('div');
-            listRecord.id = 'song-' + song.code;
+            songContainer.id = 'song-' + song.code;
+            songContainer.className = 'song-container';
 
-            // Generate Spotify play button for track and add to playlist
+            // Generate Spotify play button for track
             var playButton = document.createElement('iframe');
+            playButton.className = 'play-button';
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
             songContainer.appendChild(playButton);
 
-            // Generate delete button
+            // Generate voting buttons
             songContainer.appendChild(createDeleteButton(song.code));
-
-            listRecord.appendChild(songContainer);
-            playButtonList.appendChild(listRecord);
+            playlistContainer.appendChild(songContainer);
         }
-
-        playlistContainer.appendChild(playButtonList);
     }
 
     function getEmotionPlaylist() {
