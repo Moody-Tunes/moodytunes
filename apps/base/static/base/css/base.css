@@ -17,6 +17,11 @@ li {
     font-size: 16px;
 }
 
+.error-message {
+    color: #ff0010;
+    font-size: 16px;
+}
+
 /* navbar definitions */
 .navbar {
     background-color: #333;
