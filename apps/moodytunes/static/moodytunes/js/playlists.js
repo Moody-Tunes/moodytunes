@@ -1,32 +1,34 @@
 (function IIFE() {
-    function voteOnSong() {
+    function deleteVote() {
         var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
-        var vote = this.dataset.vote;
 
-        document.MoodyTunesClient.postVote(song, emotion, vote, function(data) {
-            // Hide container holding song to prevent double votes
+        document.MoodyTunesClient.deleteVote(song, emotion, function(data) {
             var songContainer = document.getElementById('song-' + song);
             songContainer.hidden = true;
         })
     }
 
-    function createVoteButton(voteValue, song) {
-        var name = voteValue ? 'Upvote' : 'Downvote';
+    function createDeleteButton(song) {
         var button = document.createElement('button');
-        button.appendChild(document.createTextNode(name));
+        button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
-        button.dataset.vote = voteValue;
-        button.addEventListener('click', voteOnSong);
+        button.addEventListener('click', deleteVote);
 
         return button
     }
 
-    function displayBrowsePlaylist(data) {
+    function displayAnalytics(data) {
+        document.getElementById('analytics-emotion').innerText = data.emotion_name;
+        document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
+        document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
+        document.getElementById('analytics-total-songs').innerText = data.total_songs;
+    }
+
+    function displayEmotionPlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length > 1;  // Show alert if we don't get any data back
-
+        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
         // Clean out playlist if there are any old songs still present
         while(playlistContainer.hasChildNodes()) {
@@ -37,7 +39,9 @@
         var playButtonList = document.createElement('ul');
 
         for (var i=0; i<data.length; i++) {
-            var song = data[i];
+            var vote = data[i];
+            var song = vote.song;
+
             var listRecord = document.createElement('li');
             var songContainer = document.createElement('div');
             listRecord.id = 'song-' + song.code;
@@ -47,9 +51,8 @@
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
             songContainer.appendChild(playButton);
 
-            // Generate voting buttons
-            songContainer.appendChild(createVoteButton(true, song.code));
-            songContainer.appendChild(createVoteButton(false, song.code));
+            // Generate delete button
+            songContainer.appendChild(createDeleteButton(song.code));
 
             listRecord.appendChild(songContainer);
             playButtonList.appendChild(listRecord);
@@ -58,21 +61,15 @@
         playlistContainer.appendChild(playButtonList);
     }
 
-    function getBrowsePlaylist() {
-        // TODO: Set these values from user input
-        var jitter = undefined;
-        var limit = undefined;
-
+    function getEmotionPlaylist() {
         var emotion = document.getElementById('id_emotion').value;
         var genre = document.getElementById('id_genre').value || undefined;
         var context = document.getElementById('id_context').value || undefined;
-        var description = document.getElementById('id_description').value || undefined;
 
-        document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, description, displayBrowsePlaylist
-        );
+        document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
+        document.MoodyTunesClient.getUserAnalytics(emotion, genre, displayAnalytics)
     }
 
     var generatePlaylistButton = document.getElementById('generate-playlist');
-    generatePlaylistButton.onclick = getBrowsePlaylist;
+    generatePlaylistButton.onclick = getEmotionPlaylist;
 })();

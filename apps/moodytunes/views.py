@@ -1,16 +1,17 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
 
-from moodytunes.forms import BrowseForm
+from base.views import FormView
+from moodytunes.forms import BrowseForm, PlaylistForm
 
 
 @method_decorator(login_required, name='dispatch')
-class BrowsePlaylistsView(TemplateView):
+class BrowsePlaylistsView(FormView):
     template_name = 'browse.html'
+    form_class = BrowseForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = BrowseForm()
 
-        return context
+@method_decorator(login_required, name='dispatch')
+class EmotionPlaylistsView(FormView):
+    template_name = 'playlists.html'
+    form_class = PlaylistForm

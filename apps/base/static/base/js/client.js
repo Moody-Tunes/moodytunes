@@ -130,11 +130,12 @@
 
             this.request('GET', '/tunes/browse/', params, {}, callback);
         },
-        getEmotionPlaylist: function(emotion, genre, callback) {
+        getEmotionPlaylist: function(emotion, genre, context, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
             var params = {
                 emotion: emotion,
-                genre: genre
+                genre: genre,
+                context: context
             };
 
             this.request('GET', '/tunes/playlist/', params, {}, callback);

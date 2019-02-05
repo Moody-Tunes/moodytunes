@@ -313,7 +313,7 @@ class TestVoteView(TestCase):
         resp = self.api_client.delete(self.url, data=data, format='json')
         vote_record.refresh_from_db()
 
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(vote_record.vote)
 
     def test_delete_bad_request_data(self):
