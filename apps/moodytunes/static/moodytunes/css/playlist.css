@@ -3,6 +3,11 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+.song-container {
+    margin: 15px;
 }
 
 .play-button {

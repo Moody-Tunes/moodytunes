@@ -37,8 +37,9 @@
             var song = data[i];
             var songContainer = document.createElement('div');
             songContainer.id = 'song-' + song.code;
+            songContainer.className = 'song-container';
 
-            // Generate Spotify play button for track and add to playlist
+            // Generate Spotify play button for track
             var playButton = document.createElement('iframe');
             playButton.className = 'play-button';
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
