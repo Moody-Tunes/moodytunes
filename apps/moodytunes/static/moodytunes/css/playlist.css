@@ -1,7 +1,10 @@
-.play-button {
-    height: 90px;
-}
-
 #playlist-display-container {
     margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.play-button {
+    height: 90px;
 }

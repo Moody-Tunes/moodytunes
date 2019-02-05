@@ -33,14 +33,10 @@
             playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
-        // Create list for play buttons
-        var playButtonList = document.createElement('ul');
-
         for (var i=0; i<data.length; i++) {
             var song = data[i];
-            var listRecord = document.createElement('li');
             var songContainer = document.createElement('div');
-            listRecord.id = 'song-' + song.code;
+            songContainer.id = 'song-' + song.code;
 
             // Generate Spotify play button for track and add to playlist
             var playButton = document.createElement('iframe');
@@ -51,12 +47,8 @@
             // Generate voting buttons
             songContainer.appendChild(createVoteButton(true, song.code));
             songContainer.appendChild(createVoteButton(false, song.code));
-
-            listRecord.appendChild(songContainer);
-            playButtonList.appendChild(listRecord);
+            playlistContainer.appendChild(songContainer);
         }
-
-        playlistContainer.appendChild(playButtonList);
     }
 
     function getBrowsePlaylist() {
