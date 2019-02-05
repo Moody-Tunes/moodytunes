@@ -39,6 +39,9 @@ class BaseUserForm(forms.Form):
 
         return new_password
 
+
+class CreateUserForm(BaseUserForm):
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
 
@@ -49,10 +52,6 @@ class BaseUserForm(forms.Form):
             )
 
         return username
-
-
-class CreateUserForm(BaseUserForm):
-    pass
 
 
 class UpdateUserForm(BaseUserForm):
