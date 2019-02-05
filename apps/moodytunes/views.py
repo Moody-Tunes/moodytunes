@@ -10,6 +10,7 @@ class BrowsePlaylistsView(FormView):
     template_name = 'browse.html'
     form_class = BrowseForm
 
+
 @method_decorator(login_required, name='dispatch')
 class EmotionPlaylistsView(FormView):
     template_name = 'playlists.html'

@@ -189,8 +189,8 @@ class TestAnalyticsView(TestCase):
             vote=True
         )
 
-        # We should only see the energy and valence for the song in the genre, not the users
-        # average energy and valence for this genre
+        # We should only see the average energy and valence
+        # for the songs in the genre
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
@@ -207,16 +207,15 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
-    def test_user_with_no_votes_returns_defaults(self):
+    def test_user_with_no_votes_returns_no_analytics(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-        user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'energy': user_emotion.energy,
-            'valence': user_emotion.valence,
+            'energy': None,
+            'valence': None,
             'total_songs': 0
         }
 

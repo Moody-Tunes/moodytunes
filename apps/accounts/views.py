@@ -9,7 +9,7 @@ from django.views.generic.base import TemplateView
 from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser
+from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
@@ -80,29 +80,36 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     get_request_serializer = AnalyticsRequestSerializer
 
     def get_object(self):
+        energy = None
+        valence = None
+
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
-        genre = self.cleaned_data.get('genre')
+        votes_for_emotion = UserSongVote.objects.filter(
+            user=self.request.user,
+            emotion__name=self.cleaned_data['emotion'],
+            vote=True
+        )
 
-        user_emotion = self.request.user.get_user_emotion_record(emotion.name)
-        votes_for_emotion = self.request.user.get_user_song_vote_records(emotion.name)
+        # Don't return values for an emotion the user has not voted on
+        if votes_for_emotion:
+            user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+            energy = user_emotion.energy
+            valence = user_emotion.valence
 
-        energy = user_emotion.energy
-        valence = user_emotion.valence
-
-        desired_songs = [vote.song for vote in votes_for_emotion if vote.vote]
-        if genre:
+        if self.cleaned_data.get('genre'):
             # If we get a genre, calculate attributes for songs in that genre
-            desired_songs = [song for song in desired_songs if song.genre == genre]
-            energy = average([song.energy for song in desired_songs])
-            valence = average([song.valence for song in desired_songs])
+            genre = self.cleaned_data['genre']
+            votes_for_emotion = [vote.song for vote in votes_for_emotion if vote.song.genre == genre]
+            energy = average([song.energy for song in votes_for_emotion])
+            valence = average([song.valence for song in votes_for_emotion])
 
         data = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': genre,
+            'genre': self.cleaned_data.get('genre'),
             'energy': energy,
             'valence': valence,
-            'total_songs': len(desired_songs)
+            'total_songs': len(votes_for_emotion)
         }
 
         return data
