@@ -6,6 +6,42 @@ li {
     margin-bottom: 5px;
 }
 
+/* server message definitions */
+.messages {
+    background: #226be2;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.messages li {
+    margin-bottom: 0;
+}
+
+.messages .info {
+    color: #ffffff;
+    font-size: 16px;
+}
+/* end server message */
+
+
+/* error message definitions */
+.errorlist {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.errorlist li {
+    color: #ff0010;
+    font-size: 16px;
+}
+
+.error-message {
+    color: #ff0010;
+    font-size: 16px;
+}
+/* end error message */
+
+
 /* navbar definitions */
 .navbar {
     background-color: #333;
@@ -25,3 +61,8 @@ li {
     background-color: #ddd;
     color: black;
 }
+
+.navbar-user {
+    float: right;
+}
+/* end navbar */

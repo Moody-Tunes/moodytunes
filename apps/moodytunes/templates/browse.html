@@ -9,9 +9,7 @@
 {% block content %}
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
-    <ul>
-        {{ form.as_ul }}
-    </ul>
+    {{ form.as_p }}
     <input id="generate-playlist" type="submit" />
     <p id="alert-no-results" class="warning" hidden>We were unable to find any songs for you to browse</p>
 </div>

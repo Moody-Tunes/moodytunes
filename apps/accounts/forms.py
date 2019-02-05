@@ -39,6 +39,9 @@ class BaseUserForm(forms.Form):
 
         return new_password
 
+
+class CreateUserForm(BaseUserForm):
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
 
@@ -51,12 +54,26 @@ class BaseUserForm(forms.Form):
         return username
 
 
-class CreateUserForm(BaseUserForm):
-    pass
-
-
 class UpdateUserForm(BaseUserForm):
     email = forms.EmailField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+
+        super().__init__(*args, **kwargs)
+
+    def clean_username(self):
+        # If user is updating their username, need to check if it's already taken
+        username = self.cleaned_data.get('username')
+
+        if username and username != self.user.username:
+            if MoodyUser.objects.filter(username=username).exists():
+                self.add_error(
+                    'username',
+                    ValidationError('This username is already taken. Please choose a different one')
+                )
+
+        return username
 
 
 class UpdateUserEmotionBoundariesForm(forms.ModelForm):

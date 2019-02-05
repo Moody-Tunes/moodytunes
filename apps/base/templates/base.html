@@ -4,15 +4,24 @@
 <html lang="en-US">
 	<head>
 		<meta charset="utf-8">
-		<meta http-equiv="Content-Language" value="en-US">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<meta http-equiv="Content-Language" content="en-US">
 		<meta name="description" content="Site that generates playlists to influence your mood">
 		<meta name="author" content="DiBari">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+
 		<title>{% block title %}MoodyTunes{% endblock %}</title>
 		<link rel="icon" href="{% static 'base/images/favicon.ico' %}" type="image/png">
-        <link rel="stylesheet" type="text/css" href="{% static 'base/css/base.css' %}">.
+        <link rel="stylesheet" type="text/css" href="{% static 'base/css/base.css' %}">
         <script src="{% static 'base/js/client.js' %}"></script>
+
 		{% block superhead %}
+            {% comment %}
+                Include any other head tags (scripts, stylesheets, etc.) in here
+            {% endcomment %}
 		{% endblock %}
 	</head>
 	<body>
@@ -20,10 +29,9 @@
             <div class="navbar">
                 <a class="navbar-child" href="{% url 'homepage' %}">Home</a>
                 {% if user.is_authenticated %}
-                    <a class="navbar-child" href="{% url 'accounts:profile' %}">Profile</a>
-                    <a class="navbar-child" href="{% url 'moodytunes:browse' %}">Browse</a>
-                    <a class="navbar-child" href="{% url 'moodytunes:playlists' %}">Playlists</a>
-                    <a class="navbar-child" href="{% url 'accounts:logout' %}">Logout</a>
+                    <a class="navbar-child navbar-user" href="{% url 'accounts:logout' %}">Logout</a>
+                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>3
+                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:browse' %}">Browse</a>
                 {% endif %}
             </div>
 			{% if messages %}
@@ -34,13 +42,12 @@
 			</ul>
 			{% endif %}
 		</div>
-		<div id="content">
-			{% block content %}
-			{% endblock %}
-		</div>
-		<div id="footer">
-			{% block footer %}
-			{% endblock %}
-		</div>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+
+            {% block footer %}
+            {% endblock %}
+        </div>
 	</body>
 </html>

@@ -11,15 +11,17 @@
 <form id="password-form" method="post">
 	{% csrf_token %}
 	{% if form.errors %}
-		{% for error in form.errors.values %}
-			{{ error }}
-		{% endfor %}
+        <div id="errorlist-container">
+            {% for error in form.errors.values %}
+                {{ error }}
+            {% endfor %}
+        </div>
 	{% endif %}
+    <p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
 	<p>Password: {{ form.password }}</p>
 	<p>Confirm password: {{ form.confirm_password }}</p>
 	<button id="submit-button" type="submit">Update</button>
 </form>
-<p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 {% endblock %}
