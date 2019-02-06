@@ -4,6 +4,7 @@ import tempfile
 
 from . import BASE_DIR
 from .common_api import *
+from .common_celery import *
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
@@ -145,14 +146,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
-
-CELERY_ALWAYS_EAGER = True
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'django-db'
-CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
 
