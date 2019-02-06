@@ -4,4 +4,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
-CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Define periodic tasks here as key:value pairs
+# Key should be a string identifying the task to be run
+# Value should be a dictionary containing configurations for the periodic task
+#   - task: dotted.path.to.task
+#   - schedule: Scheduler to use for calling task (crontab, seconds value, etc.)
+CELERY_BEAT_SCHEDULE = {}
