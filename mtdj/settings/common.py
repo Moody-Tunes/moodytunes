@@ -27,6 +27,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'django_extensions',
+    'django_celery_beat',
     'django_celery_results',
     'rest_framework',
 ]
@@ -151,6 +152,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
+CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
 
