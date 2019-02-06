@@ -4,6 +4,7 @@ import tempfile
 
 from . import BASE_DIR
 from .common_api import *
+from .common_celery import *
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
@@ -27,6 +28,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'django_extensions',
+    'django_celery_beat',
+    'django_celery_results',
     'rest_framework',
 ]
 

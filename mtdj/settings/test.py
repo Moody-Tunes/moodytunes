@@ -12,6 +12,7 @@ CACHES['default'] = CACHES['dummy']
 # validators when running tests
 AUTH_PASSWORD_VALIDATORS = []
 
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Use sqlite3 database for testing
 DATABASES = {
