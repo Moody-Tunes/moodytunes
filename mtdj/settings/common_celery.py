@@ -1,5 +1,7 @@
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
+from envparse import env
+
+CELERY_TASK_ALWAYS_EAGER = env.bool('MTDJ_CELERY_TASK_ALWAYS_EAGER', default=False)
+CELERY_BROKER_URL = env.str('MTDJ_CELERY_BROKER_URL', default='__broker_not_set__')
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
