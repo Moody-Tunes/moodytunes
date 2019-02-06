@@ -15,7 +15,7 @@ from .common import *
 # validators locally
 AUTH_PASSWORD_VALIDATORS = []
 
-CELERY_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Add ability to log messages to console
 LOGGING['handlers'].update({
