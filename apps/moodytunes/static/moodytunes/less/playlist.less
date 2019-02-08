@@ -1,3 +1,5 @@
+@import "../../../../base/static/base/less/colors";
+
 #playlist-display-container {
     margin-top: 15px;
     display: flex;
@@ -6,8 +8,20 @@
     justify-content: center;
 }
 
+#alert-no-results {
+    margin-top: 15px;
+}
+
 .song-container {
     margin: 15px;
+}
+
+.song-container-vote-true {
+    background-color: @brightGreen;
+}
+
+.song-container-vote-false {
+    background-color: @brightRed;
 }
 
 .play-button {
