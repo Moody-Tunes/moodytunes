@@ -42,7 +42,7 @@ generate an HTML report by running
 `coverage html`
 
 This will generate a directory in the project root with files corresponding to each code file in the project. Open the
-index.html file in any browser of your chouce to view the source files for the project, their coverage percentage, and
+index.html file in any browser of your choice to view the source files for the project, their coverage percentage, and
 what lines have (or have not) been tested.
 
 NOTE: Your build will fail and any pull request rejected if the total coverage is less than 80% after the Travis build
