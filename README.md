@@ -70,3 +70,14 @@ logger.warning('Mr Stark I dont feel so good')
 logger.critical('Really? Tears?')
 logger.error('You should have gone for the head')
 ```
+
+### Static Files
+
+Static files are served through nginx in our setup. When you make changes to static files during development, you will
+need to run the management command to have Django collect your static files into the _static directory that nginx will
+read when a request is made for a static file. Simply run the following command:
+
+`./manage.py collectstatic`
+
+after making changes to static files to have them collected and be available to serve. You will need to do this for
+every change made during development.
