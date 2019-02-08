@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 
+{% load compress %}
 {% load static %}
 
 {% block superhead %}
-<script src="{% static 'accounts/js/password_confirmation.js' %}" defer></script>
+    {% compress js %}
+        <script src="{% static 'accounts/js/password_confirmation.js' %}" defer></script>
+    {% endcompress %}
 {% endblock %}
 
 {% block content %}

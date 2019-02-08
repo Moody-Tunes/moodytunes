@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 
+{% load compress %}
 {% load static %}
 
 {% block superhead %}
-    <script src="{% static 'moodytunes/js/browse.js' %}" defer></script>
-    <link rel="stylesheet" type="text/css" href="{% static 'moodytunes/css/playlist.css' %}">
+    {% compress css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'moodytunes/css/playlist.css' %}">
+    {% endcompress %}
+
+    {% compress js %}
+        <script src="{% static 'moodytunes/js/browse.js' %}" defer></script>
+    {% endcompress %}
 {% endblock %}
 
 {% block content %}

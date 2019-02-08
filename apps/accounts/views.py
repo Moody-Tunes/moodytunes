@@ -32,7 +32,7 @@ class UpdateInfoView(View):
             'email': self.request.user.email
         }
 
-        form = self.form_class(initial=initial_data)
+        form = self.form_class(initial=initial_data, user=request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):

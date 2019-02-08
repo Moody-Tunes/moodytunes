@@ -1,3 +1,4 @@
+{% load compress %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -15,8 +16,14 @@
 
 		<title>{% block title %}MoodyTunes{% endblock %}</title>
 		<link rel="icon" href="{% static 'base/images/favicon.ico' %}" type="image/png">
-        <link rel="stylesheet" type="text/css" href="{% static 'base/css/base.css' %}">
-        <script src="{% static 'base/js/client.js' %}"></script>
+
+        {% compress css %}
+            <link rel="stylesheet" type="text/css" href="{% static 'base/css/base.css' %}">
+        {% endcompress %}
+
+        {% compress js %}
+            <script src="{% static 'base/js/client.js' %}"></script>
+        {% endcompress %}
 
 		{% block superhead %}
             {% comment %}
