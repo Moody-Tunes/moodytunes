@@ -7,6 +7,7 @@
         document.MoodyTunesClient.postVote(song, emotion, vote, function(data) {
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
+            songContainer.className += ' song-container-vote-' + vote;
             var voteButtons = songContainer.querySelectorAll('button');
 
             for (var i=0; i<voteButtons.length; i++) {
