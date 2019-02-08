@@ -11,6 +11,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
+INTERNAL_IPS = ('127.0.0.1',)
 
 APPEND_SLASH = True
 
@@ -134,6 +135,10 @@ STATICFILES_FINDERS = (
 
 # Always compress static files with django_compressor
 COMPRESS_ENABLED = True
+
+COMPRESS_PRECOMPILERS = (
+   ('text/less', 'lessc {infile} {outfile}'),
+)
 
 # Email settings
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')

@@ -107,4 +107,6 @@ venv.bak/
 local_personal.py
 .idea
 
+# Static file directories
 _static
+node_modules
