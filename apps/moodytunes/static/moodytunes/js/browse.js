@@ -5,9 +5,13 @@
         var vote = this.dataset.vote;
 
         document.MoodyTunesClient.postVote(song, emotion, vote, function(data) {
-            // Hide container holding song to prevent double votes
+            // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
-            songContainer.hidden = true;
+            var voteButtons = songContainer.querySelectorAll('button');
+
+            for (var i=0; i<voteButtons.length; i++) {
+                voteButtons[i].disabled = true;
+            }
         })
     }
 

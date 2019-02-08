@@ -4,8 +4,13 @@
         var song = this.dataset.song;
 
         document.MoodyTunesClient.deleteVote(song, emotion, function(data) {
+            // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
-            songContainer.hidden = true;
+            var voteButtons = songContainer.querySelectorAll('button');
+
+            for (var i=0; i<voteButtons.length; i++) {
+                voteButtons[i].disabled = true;
+            }
         })
     }
 
