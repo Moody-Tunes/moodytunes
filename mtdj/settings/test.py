@@ -16,6 +16,7 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 # Don't rely on django_compressor for unit tests
 COMPRESS_ENABLED = False
+COMPRESS_PRECOMPILERS = ()
 
 # Use sqlite3 database for testing
 DATABASES = {
