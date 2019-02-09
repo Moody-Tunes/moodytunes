@@ -24,6 +24,14 @@
         return button
     }
 
+    function createPlayButton(song) {
+        var playButton = document.createElement('iframe');
+        playButton.className = 'play-button';
+        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+
+        return playButton
+    }
+
     function displayAnalytics(data) {
         document.getElementById('analytics-emotion').innerText = data.emotion_name;
         document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
@@ -49,14 +57,9 @@
             songContainer.id = 'song-' + song.code;
             songContainer.className = 'song-container';
 
-            // Generate Spotify play button for track
-            var playButton = document.createElement('iframe');
-            playButton.className = 'play-button';
-            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
-            songContainer.appendChild(playButton);
-
-            // Generate voting buttons
+            songContainer.appendChild(createPlayButton(song));
             songContainer.appendChild(createDeleteButton(song.code));
+
             playlistContainer.appendChild(songContainer);
         }
     }
