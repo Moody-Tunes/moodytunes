@@ -6,6 +6,7 @@
         document.MoodyTunesClient.deleteVote(song, emotion, function(data) {
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
+            songContainer.className += ' song-container-vote-delete';
             var voteButtons = songContainer.querySelectorAll('button');
 
             for (var i=0; i<voteButtons.length; i++) {
@@ -15,13 +16,25 @@
     }
 
     function createDeleteButton(song) {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'vote-button-container';
+
         var button = document.createElement('button');
-        button.className = 'vote-button';
+        button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
         button.addEventListener('click', deleteVote);
+        buttonContainer.appendChild(button);
 
-        return button
+        return buttonContainer
+    }
+
+    function createPlayButton(song) {
+        var playButton = document.createElement('iframe');
+        playButton.className = 'play-button';
+        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+
+        return playButton
     }
 
     function displayAnalytics(data) {
@@ -49,14 +62,9 @@
             songContainer.id = 'song-' + song.code;
             songContainer.className = 'song-container';
 
-            // Generate Spotify play button for track
-            var playButton = document.createElement('iframe');
-            playButton.className = 'play-button';
-            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
-            songContainer.appendChild(playButton);
-
-            // Generate voting buttons
+            songContainer.appendChild(createPlayButton(song));
             songContainer.appendChild(createDeleteButton(song.code));
+
             playlistContainer.appendChild(songContainer);
         }
     }
