@@ -277,6 +277,24 @@ class TestVoteView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(vote_record.vote)
 
+    def test_delete_does_not_delete_downvote(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            vote=False
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.delete(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_bad_request_data(self):
         data = {
             'emotion': 'foobarbaz',
