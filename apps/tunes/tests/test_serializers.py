@@ -97,11 +97,14 @@ class TestDeleteVoteRequestSerializer(TestCase):
 
 
 class TestVoteSongsRequestSerializer(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.song = MoodyUtil.create_song()
+
     def test_valid_emotion_name_is_valid(self):
-        song = MoodyUtil.create_song()
         data = {
             'emotion': Emotion.HAPPY,
-            'song_code': song.code,
+            'song_code': self.song.code,
             'vote': True
         }
         serializer = VoteSongsRequestSerializer(data=data)
@@ -109,12 +112,22 @@ class TestVoteSongsRequestSerializer(TestCase):
         self.assertTrue(serializer.is_valid())
 
     def test_invalid_emotion_name_is_not_valid(self):
-        song = MoodyUtil.create_song()
         data = {
             'emotion': 'it be like that sometimes',
-            'song_code': song.code,
+            'song_code': self.song.code,
             'vote': True
         }
         serializer = VoteSongsRequestSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
+
+    def test_valid_context_is_valid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'vote': True
+        }
+        serializer = VoteSongsRequestSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())

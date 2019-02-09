@@ -96,8 +96,8 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             'emotion_id': emotion.id,
             'song_id': song.id,
             'vote': self.cleaned_data['vote'],
-            'context': request.session.get('{}_context'.format(self.cleaned_data['emotion']), ''),
-            'description': request.session.get('{}_description'.format(self.cleaned_data['emotion']), '')
+            'context': self.cleaned_data.get('context', ''),
+            'description': self.cleaned_data.get('description', '')
         }
 
         try:
