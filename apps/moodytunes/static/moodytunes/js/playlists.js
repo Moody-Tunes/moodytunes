@@ -15,13 +15,17 @@
     }
 
     function createDeleteButton(song) {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'vote-button-container';
+
         var button = document.createElement('button');
-        button.className = 'vote-button';
+        button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
         button.addEventListener('click', deleteVote);
+        buttonContainer.appendChild(button);
 
-        return button
+        return buttonContainer
     }
 
     function createPlayButton(song) {
