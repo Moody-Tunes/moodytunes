@@ -21,11 +21,21 @@
         button.className = 'vote-button vote-button-' + voteValue;
         var name = voteValue ? 'Upvote' : 'Downvote';
         button.appendChild(document.createTextNode(name));
-        button.dataset.song = song;
+        button.dataset.song = song.code;
         button.dataset.vote = voteValue;
         button.addEventListener('click', voteOnSong);
 
         return button
+    }
+
+    function createVoteButtons(song) {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'vote-button-container';
+
+        buttonContainer.appendChild(createVoteButton(true, song));
+        buttonContainer.appendChild(createVoteButton(false, song));
+
+        return buttonContainer;
     }
 
     function createPlayButton(song) {
@@ -54,8 +64,7 @@
             songContainer.className = 'song-container';
 
             songContainer.appendChild(createPlayButton(song));
-            songContainer.appendChild(createVoteButton(true, song.code));
-            songContainer.appendChild(createVoteButton(false, song.code));
+            songContainer.appendChild(createVoteButtons(song));
 
             playlistContainer.appendChild(songContainer);
         }
