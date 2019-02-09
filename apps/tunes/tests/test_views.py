@@ -105,24 +105,6 @@ class TestBrowseView(TestCase):
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['code'], not_voted_song.code)
 
-    def test_request_with_context_sets_session_data(self):
-        context = 'WORK'
-        description = 'Working on MoodyTunes'
-        context_session_key = '{}_context'.format(Emotion.HAPPY)
-        description_session_key = '{}_description'.format(Emotion.HAPPY)
-
-        params = {
-            'emotion': Emotion.HAPPY,
-            'jitter': 0,
-            'context': context,
-            'description': description
-        }
-
-        self.api_client.get(self.url, data=params)
-
-        self.assertEqual(self.api_client.session[context_session_key], context)
-        self.assertEqual(self.api_client.session[description_session_key], description)
-
 
 class TestVoteView(TestCase):
     @classmethod
