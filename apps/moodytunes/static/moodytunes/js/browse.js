@@ -1,4 +1,37 @@
 (function IIFE() {
+    function setUpContextModal() {
+        var modal = document.getElementById('context-modal');
+        var closeModal = document.getElementById('close-modal');
+        var clearContext = document.getElementById('clear-context');
+        var showModal = document.getElementById('set-context-button');
+        var submitModal = document.getElementById('submit-context');
+
+        showModal.onclick = function () {
+            modal.style.display = 'block';
+        };
+
+        submitModal.onclick = function () {
+            sessionStorage.context = document.getElementById('id_context').value;
+            sessionStorage.description = document.getElementById('id_description').value;
+            modal.style.display = 'none';
+        };
+
+        clearContext.onclick = function () {
+            sessionStorage.clear();
+            modal.style.display = 'none';
+        };
+
+        closeModal.onclick = function () {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = function (evt) {
+            if (evt.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
+
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
@@ -51,7 +84,7 @@
     function displayBrowsePlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length > 1;  // Show alert if we don't get any data back
+        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
 
         // Clean out playlist if there are any old songs still present
@@ -85,37 +118,7 @@
         );
     }
 
-    var modal = document.getElementById('context-modal');
-    var closeModal = document.getElementById('close-modal');
-    var clearContext = document.getElementById('clear-context');
-    var showModal = document.getElementById('set-context-button');
-    var submitModal = document.getElementById('submit-context');
-
-    showModal.onclick = function () {
-        modal.style.display = 'block';
-    };
-
-    submitModal.onclick = function () {
-        sessionStorage.context = document.getElementById('id_context').value;
-        sessionStorage.description = document.getElementById('id_description').value;
-        modal.style.display = 'none';
-    };
-
-    clearContext.onclick = function () {
-        sessionStorage.clear();
-        modal.style.display = 'none';
-    };
-
-    closeModal.onclick = function () {
-        modal.style.display = 'none';
-    };
-
-    window.onclick = function (evt) {
-        if (evt.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-
+    setUpContextModal();
     var generatePlaylistButton = document.getElementById('generate-playlist');
     generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
 })();
