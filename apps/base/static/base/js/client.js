@@ -116,7 +116,7 @@
             };
             this.request('GET', '/accounts/analytics/', params, {}, callback);
         },
-        getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, callback) {
+        getBrowsePlaylist: function(emotion, jitter, limit, genre, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
             // their desired emotion
             var params = {
@@ -124,8 +124,6 @@
                 jitter: jitter,
                 limit: limit,
                 genre: genre,
-                context: context,
-                description: description
             };
 
             this.request('GET', '/tunes/browse/', params, {}, callback);
@@ -140,12 +138,14 @@
 
             this.request('GET', '/tunes/playlist/', params, {}, callback);
         },
-        postVote: function(songCode, emotion, vote, callback) {
+        postVote: function(songCode, emotion, context, description, vote, callback) {
             // Register a vote for a song in our system based on whether or not the song makes the user feel
             // the desired emotion
             var data = {
                 song_code: songCode,
                 emotion: emotion,
+                context: context,
+                description: description,
                 vote: vote
             };
             this.request('POST', '/tunes/vote/', {}, data, callback);

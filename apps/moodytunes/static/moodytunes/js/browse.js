@@ -1,10 +1,12 @@
 (function IIFE() {
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
+        var context = sessionStorage.context;
+        var description = sessionStorage.description;
         var song = this.dataset.song;
         var vote = this.dataset.vote;
 
-        document.MoodyTunesClient.postVote(song, emotion, vote, function(data) {
+        document.MoodyTunesClient.postVote(song, emotion, context, description, vote, function(data) {
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
             songContainer.className += ' song-container-vote-' + vote;
