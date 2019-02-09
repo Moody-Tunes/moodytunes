@@ -77,13 +77,35 @@
 
         var emotion = document.getElementById('id_emotion').value;
         var genre = document.getElementById('id_genre').value || undefined;
-        var context = document.getElementById('id_context').value || undefined;
-        var description = document.getElementById('id_description').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, description, displayBrowsePlaylist
+            emotion, jitter, limit, genre, displayBrowsePlaylist
         );
     }
+
+    var modal = document.getElementById('context-modal');
+    var showModal = document.getElementById('set-context-button');
+    var submitModal = document.getElementById('submit-context');
+    var closeModal = document.getElementById('close-modal');
+
+    showModal.onclick = function () {
+        modal.style.display = 'block';
+    };
+
+    submitModal.onclick = function () {
+        // TODO: Set context and description in local storage
+        modal.style.display = 'none';
+    };
+
+    closeModal.onclick = function () {
+        modal.style.display = 'none';
+    };
+
+    window.onclick = function (evt) {
+        if (evt.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
 
     var generatePlaylistButton = document.getElementById('generate-playlist');
     generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
