@@ -86,9 +86,10 @@
     }
 
     var modal = document.getElementById('context-modal');
+    var closeModal = document.getElementById('close-modal');
+    var clearContext = document.getElementById('clear-context');
     var showModal = document.getElementById('set-context-button');
     var submitModal = document.getElementById('submit-context');
-    var closeModal = document.getElementById('close-modal');
 
     showModal.onclick = function () {
         modal.style.display = 'block';
@@ -97,6 +98,11 @@
     submitModal.onclick = function () {
         sessionStorage.context = document.getElementById('id_context').value;
         sessionStorage.description = document.getElementById('id_description').value;
+        modal.style.display = 'none';
+    };
+
+    clearContext.onclick = function () {
+        sessionStorage.clear();
         modal.style.display = 'none';
     };
 
