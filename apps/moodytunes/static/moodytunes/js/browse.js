@@ -93,7 +93,8 @@
     };
 
     submitModal.onclick = function () {
-        // TODO: Set context and description in local storage
+        sessionStorage.context = document.getElementById('id_context').value;
+        sessionStorage.description = document.getElementById('id_description').value;
         modal.style.display = 'none';
     };
 
