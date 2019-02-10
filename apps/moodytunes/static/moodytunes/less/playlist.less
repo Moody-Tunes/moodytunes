@@ -12,37 +12,39 @@
     margin-top: 15px;
 }
 
-.song-container {
-    margin: 15px;
-}
-
-.song-container-vote-true {
-    background-color: @brightGreen;
-}
-
-.song-container-vote-false {
-    background-color: @brightRed;
-}
-
-.song-container-vote-delete {
-    background-color: @strongBlack;
-}
-
 .play-button {
     height: 90px;
 }
 
+.song-container {
+    margin: 15px;
+
+    &-vote-true {
+        background-color: @brightGreen;
+    }
+
+    &-vote-false {
+        background-color: @brightRed;
+    }
+
+    &-vote-delete {
+        background-color: @strongBlack;
+    }
+}
+
 .vote-button {
     margin-bottom: 10px;
-}
 
-.vote-button-true {
-}
+    &-true {
+    }
 
-.vote-button-false {
-    float: right;
-}
 
-.vote-button-delete {
-    margin-left: 45%;
+    &-false {
+        float: right;
+    }
+
+    &-delete {
+        margin-left: 35%;
+    }
+
 }
