@@ -37,7 +37,7 @@
                 <a class="navbar-child" href="{% url 'homepage' %}">Home</a>
                 {% if user.is_authenticated %}
                     <a class="navbar-child navbar-user" href="{% url 'accounts:logout' %}">Logout</a>
-                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>3
+                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:browse' %}">Browse</a>
                 {% endif %}
             </div>
