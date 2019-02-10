@@ -16,7 +16,7 @@
 
 {% block content %}
 <h1>Playlists For Emotion</h1>
-<div id="playlist-generator-container">
+<div id= id="playlist-generator-container">
     <div id="analytics-container">
         <table id="analytics-table">
             <tr>
@@ -34,7 +34,7 @@
         </table>
     </div>
     {{ form.as_p }}
-    <input id="generate-playlist" type="submit" />
+    <button id="generate-playlist">Submit</button>
     <p id="alert-no-results" class="warning" hidden>No songs you have previously voted on fit the criteria specified</p>
 </div>
 <div id="playlist-display-container"></div>
