@@ -16,9 +16,22 @@
 {% block content %}
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
-    {{ form.as_p }}
+    <p>Emotion: {{ form.emotion }}</p>
+    <p>Genre: {{ form.genre }}</p>
+    <button id="set-context-button">Set Context</button>
     <input id="generate-playlist" type="submit" />
     <p id="alert-no-results" class="warning" hidden>We were unable to find any songs for you to browse. Please try a different set of criteria</p>
+</div>
+<div id="context-modal" class="modal" hidden>
+    <div class="modal-content">
+        <span id="close-modal" class="close">&times;</span>
+        <h2>Set Browsing Context</h2>
+        <p>Add additional information about how you are currently listening to music</p>
+        <p>Context: {{ form.context }}</p>
+        <p>Description: {{ form.description }}</p>
+        <input id="submit-context" type="submit"/>
+        <button id="clear-context">Clear Context</button>
+    </div>
 </div>
 <div id="playlist-display-container"></div>
 {% endblock %}

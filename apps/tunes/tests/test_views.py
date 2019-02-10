@@ -105,24 +105,6 @@ class TestBrowseView(TestCase):
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['code'], not_voted_song.code)
 
-    def test_request_with_context_sets_session_data(self):
-        context = 'WORK'
-        description = 'Working on MoodyTunes'
-        context_session_key = '{}_context'.format(Emotion.HAPPY)
-        description_session_key = '{}_description'.format(Emotion.HAPPY)
-
-        params = {
-            'emotion': Emotion.HAPPY,
-            'jitter': 0,
-            'context': context,
-            'description': description
-        }
-
-        self.api_client.get(self.url, data=params)
-
-        self.assertEqual(self.api_client.session[context_session_key], context)
-        self.assertEqual(self.api_client.session[description_session_key], description)
-
 
 class TestVoteView(TestCase):
     @classmethod
@@ -241,20 +223,15 @@ class TestVoteView(TestCase):
         self.assertEqual(user_emotion.energy, pre_energy)
         self.assertEqual(user_emotion.valence, pre_valence)
 
-    def test_vote_with_session_context_for_voting_emotion_saves_data_to_vote(self):
+    def test_vote_with_context_saves_data_to_vote(self):
         context = 'WORK'
-        description = 'Working on MoodyTunes'
-        context_session_key = '{}_context'.format(Emotion.HAPPY)
-        description_session_key = '{}_description'.format(Emotion.HAPPY)
-
-        session = self.api_client.session
-        session[context_session_key] = context
-        session[description_session_key] = description
-        session.save()
+        description = 'Working on moodytunes'
 
         data = {
             'emotion': Emotion.HAPPY,
             'song_code': self.song.code,
+            'context': context,
+            'description': description,
             'vote': False
         }
 
@@ -268,32 +245,16 @@ class TestVoteView(TestCase):
         self.assertEqual(vote.context, context)
         self.assertEqual(vote.description, description)
 
-    def test_vote_with_session_context_for_other_emotion_does_not_save_data_to_vote(self):
-        context = 'WORK'
-        description = 'Working on MoodyTunes'
-        context_session_key = '{}_context'.format(Emotion.CALM)
-        description_session_key = '{}_description'.format(Emotion.CALM)
-
-        session = self.api_client.session
-        session[context_session_key] = context
-        session[description_session_key] = description
-        session.save()
-
+    def test_vote_with_invalid_context_returns_bad_request(self):
         data = {
             'emotion': Emotion.HAPPY,
             'song_code': self.song.code,
+            'context': 'some-bad-context',
             'vote': False
         }
 
-        self.api_client.post(self.url, data=data, format='json')
-        vote = UserSongVote.objects.get(
-            user=self.user,
-            emotion__name=Emotion.HAPPY,
-            song=self.song
-        )
-
-        self.assertEqual(vote.context, '')
-        self.assertEqual(vote.description, '')
+        resp = self.api_client.post(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
@@ -315,6 +276,24 @@ class TestVoteView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(vote_record.vote)
+
+    def test_delete_does_not_delete_downvote(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            vote=False
+        )
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.delete(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_bad_request_data(self):
         data = {
