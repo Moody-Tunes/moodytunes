@@ -45,7 +45,12 @@
             var voteButtons = songContainer.querySelectorAll('button');
 
             for (var i=0; i<voteButtons.length; i++) {
-                voteButtons[i].disabled = true;
+                var button = voteButtons[i];
+                button.disabled = true;
+
+                if (button.dataset.vote === vote) {
+                    button.className += ' vote-button-' + vote + '-chosen';
+                }
             }
         })
     }
