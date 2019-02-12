@@ -42,11 +42,15 @@
         document.MoodyTunesClient.postVote(song, emotion, context, description, vote, function(data) {
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
-            songContainer.className += ' song-container-vote-' + vote;
             var voteButtons = songContainer.querySelectorAll('button');
 
             for (var i=0; i<voteButtons.length; i++) {
-                voteButtons[i].disabled = true;
+                var button = voteButtons[i];
+                button.disabled = true;
+
+                if (button.dataset.vote === vote) {
+                    button.className += ' vote-button-' + vote + '-chosen';
+                }
             }
         })
     }
@@ -54,7 +58,7 @@
     function createVoteButton(voteValue, song) {
         var button = document.createElement('button');
         button.className = 'vote-button vote-button-' + voteValue;
-        var name = voteValue ? 'Upvote' : 'Downvote';
+        var name = voteValue ? 'Yes' : 'No';
         button.appendChild(document.createTextNode(name));
         button.dataset.song = song.code;
         button.dataset.vote = voteValue;

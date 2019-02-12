@@ -12,39 +12,43 @@
     margin-top: 15px;
 }
 
-.song-container {
-    margin: 15px;
-}
-
-.song-container-vote-true {
-    background-color: @brightGreen;
-}
-
-.song-container-vote-false {
-    background-color: @brightRed;
-}
-
-.song-container-vote-delete {
-    background-color: @strongBlack;
-}
-
 .play-button {
     height: 90px;
 }
 
+.song-container {
+    margin: 15px 15px 25px;
+}
+
 .vote-button {
-    margin-bottom: 10px;
-}
+    color: @offWhite;
+    text-shadow: none;
 
-.vote-button-true {
-    margin-left: 25%
-}
+    &-true {
+        background: @brightGreen;
+        margin-left: 15%;
 
-.vote-button-false {
-    float: right;
-    margin-right: 25%;
-}
+        &-chosen {
+            border: 1px solid @brightGreen !important;
+        }
+    }
 
-.vote-button-delete {
-    margin-left: 45%;
+    &-false {
+        background: @brightRed;
+        float: right;
+        margin-right: 15%;
+
+        &-chosen {
+            border: 1px solid @brightRed !important;
+        }
+    }
+
+    &-delete {
+        background: @strongBlack;
+        margin-left: 35%;
+
+        &-chosen {
+            border: 1px solid @strongBlack !important;
+        }
+    }
 }
