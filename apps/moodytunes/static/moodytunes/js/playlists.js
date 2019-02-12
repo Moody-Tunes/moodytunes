@@ -7,11 +7,9 @@
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
             songContainer.className += ' song-container-vote-delete';
-            var voteButtons = songContainer.querySelectorAll('button');
-
-            for (var i=0; i<voteButtons.length; i++) {
-                voteButtons[i].disabled = true;
-            }
+            var button = songContainer.querySelectorAll('button')[0];  // We've only got the one delete button
+            button.disabled = true;
+            button.className += ' vote-button-delete-chosen';
         })
     }
 
