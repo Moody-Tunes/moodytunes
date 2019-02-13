@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load moody_tags %}
+
 {% block content  %}
 <h1>MoodyTunes</h1>
 <div id="about-site">
@@ -22,5 +24,13 @@
     for use in our site operation. Roughly speaking, valence denotes the mood of the song while energy marks the intensity
     of the song. As you vote on songs for a particular emotion, we use that information to better understand your personal
     ranges for each emotion. This allows us to suggest songs to use that fit your paticular prefence for an emotion.</p>
+</div>
+<div id="about-privacy">
+    <h3>Privacy Policy</h3>
+    <p>Through the course of using the site, we'll track certain pieces of information. For starters, we'll collect a
+    username and (optionally) email address from you. We'll also track your votes for songs you browse (whether or not
+    you vote them as making you feel an emotion) so we can suggest songs that better match your preference for an emotion.
+    If you have any questions about how your data is collected or want to have us purge your information from our records,
+    you can <a href="mailto: {% settings 'WEBMASTER_EMAIL' %}">email us your request</a>.</p>
 </div>
 {% endblock %}

@@ -17,6 +17,8 @@ APPEND_SLASH = True
 
 SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 
+WEBMASTER_EMAIL = env.str('MTDJ_WEBMASTER_EMAIL', default='foo@example.com')
+
 # App definitions
 DJANGO_APPS = [
     'django.contrib.admin',
