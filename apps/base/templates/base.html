@@ -11,13 +11,13 @@
 		<meta http-equiv="Content-Language" content="en-US">
 		<meta name="description" content="Site that generates playlists to influence your mood">
 		<meta name="author" content="DiBari">
-
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
 
 		<title>{% block title %}MoodyTunes{% endblock %}</title>
 		<link rel="icon" href="{% static 'base/images/favicon.ico' %}" type="image/png">
 
         {% compress css %}
+            <link rel="stylesheet" type="text/css" href="{% static 'base/css/bootstrap.min.css' %}">
             <link rel="stylesheet" type="text/less" href="{% static 'base/less/base.less' %}">
         {% endcompress %}
 
@@ -35,6 +35,7 @@
 		<div id="header">
             <div class="navbar">
                 <a class="navbar-child" href="{% url 'homepage' %}">Home</a>
+                <a class="navbar-child" href="{% url 'moodytunes:about' %}">About</a>
                 {% if user.is_authenticated %}
                     <a class="navbar-child navbar-user" href="{% url 'accounts:logout' %}">Logout</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>
