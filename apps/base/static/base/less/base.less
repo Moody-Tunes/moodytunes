@@ -1,7 +1,14 @@
 @import "colors";
+@import url('https://fonts.googleapis.com/css?family=Dosis');
 
 p {
-    line-height: 1.7em;
+    font-size: 1.5em;
+    line-height: 1.5em;
+	font-family: 'Dosis', sans-serif;
+}
+
+a {
+    font-size: 1.25em;
 }
 
 ul {
@@ -11,6 +18,20 @@ ul {
 li {
     margin-bottom: 5px;
 }
+
+label {
+    font-weight: normal;
+}
+
+.hClass (@index) when (@index > 0) {
+    h@{index} {
+    	font-family: 'Dosis', sans-serif;
+        font-weight: bold;
+    }
+    .hClass(@index - 1);
+}
+.hClass(6);
+
 
 button {
 	box-shadow: inset 0 1px 0 0 @pureWhite;
