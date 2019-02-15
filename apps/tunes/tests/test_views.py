@@ -384,7 +384,7 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_data[0]['song']['code'], self.song.code)
+        self.assertEqual(resp_data['results'][0]['song']['code'], self.song.code)
 
     def test_downvoted_songs_are_not_returned(self):
         UserSongVote.objects.create(
@@ -399,7 +399,7 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp_data), 0)
+        self.assertEqual(len(resp_data['results']), 0)
 
     def test_filter_playlist_by_genre(self):
         new_song = MoodyUtil.create_song(genre='super-dope')
@@ -424,8 +424,8 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp_data), 1)
-        self.assertEqual(resp_data[0]['song']['code'], new_song.code)
+        self.assertEqual(len(resp_data['results']), 1)
+        self.assertEqual(resp_data['results'][0]['song']['code'], new_song.code)
 
     def test_filter_by_context(self):
         expected_song = MoodyUtil.create_song(name='song-with-context')
@@ -454,8 +454,8 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp_data), 1)
-        self.assertEqual(resp_data[0]['song']['code'], expected_song.code)
+        self.assertEqual(len(resp_data['results']), 1)
+        self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
 
 
 class TestOptionsView(TestCase):

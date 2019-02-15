@@ -13,6 +13,7 @@ from base.mixins import (
     DeleteRequestValidatorMixin
 )
 from tunes.models import Song, Emotion
+from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
     OptionsSerializer,
     SongSerializer,
@@ -37,7 +38,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     queryset = Song.objects.all()
 
     default_jitter = .15
-    default_limit = 10
+    default_limit = 9
 
     get_request_serializer = BrowseSongsRequestSerializer
 
@@ -150,6 +151,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     serializer_class = VoteSerializer
     queryset = UserSongVote.objects.all()
+    pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
@@ -161,7 +163,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             user=self.request.user,
             emotion__name=emotion,
             vote=True
-        )
+        ).order_by('created')
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
