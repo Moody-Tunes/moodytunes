@@ -45,15 +45,18 @@
     function displayEmotionPlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
+        var songs = data.results;
+        var nextLink = data.next;
+        var previousLink = data.previous;
+        noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
         // Clean out playlist if there are any old songs still present
         while(playlistContainer.hasChildNodes()) {
             playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
-        for (var i=0; i<data.length; i++) {
-            var vote = data[i];
+        for (var i=0; i<songs.length; i++) {
+            var vote = songs[i];
             var song = vote.song;
 
             var songContainer = document.createElement('div');
