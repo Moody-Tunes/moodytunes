@@ -95,8 +95,12 @@
 
         // Add buttons to retrieve paginated responses
         if (nextLink || previousLink) {
-            var buttonContainer = document.createElement('div');
-            buttonContainer.className = 'playlist-paginator-button-container';
+            var buttonContainer = document.getElementById('playlist-pagination-button-container');
+
+            // Remove previous buttons if they exists
+            while(buttonContainer.hasChildNodes()) {
+                buttonContainer.removeChild(buttonContainer.firstChild);
+            }
 
             var previousButton = document.createElement('button');
             previousButton.appendChild(document.createTextNode('Previous'));
@@ -114,7 +118,6 @@
 
             buttonContainer.appendChild(previousButton);
             buttonContainer.appendChild(nextButton);
-            playlistContainer.appendChild(buttonContainer);
         }
     }
 
