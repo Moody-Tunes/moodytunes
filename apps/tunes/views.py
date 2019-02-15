@@ -163,7 +163,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             user=self.request.user,
             emotion__name=emotion,
             vote=True
-        )
+        ).order_by('created')
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
