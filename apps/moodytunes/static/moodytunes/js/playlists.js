@@ -68,7 +68,9 @@
 
     function displayEmotionPlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
+        var buttonContainer = document.getElementById('playlist-pagination-button-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
+
         var songs = data.results;
         var nextLink = data.next;
         var previousLink = data.previous;
@@ -77,6 +79,11 @@
         // Clean out playlist if there are any old songs still present
         while(playlistContainer.hasChildNodes()) {
             playlistContainer.removeChild(playlistContainer.firstChild);
+        }
+
+        // Remove previous buttons if they exists
+        while(buttonContainer.hasChildNodes()) {
+            buttonContainer.removeChild(buttonContainer.firstChild);
         }
 
         for (var i=0; i<songs.length; i++) {
@@ -95,13 +102,6 @@
 
         // Add buttons to retrieve paginated responses
         if (nextLink || previousLink) {
-            var buttonContainer = document.getElementById('playlist-pagination-button-container');
-
-            // Remove previous buttons if they exists
-            while(buttonContainer.hasChildNodes()) {
-                buttonContainer.removeChild(buttonContainer.firstChild);
-            }
-
             var previousButton = document.createElement('button');
             previousButton.appendChild(document.createTextNode('Previous'));
             previousButton.className = 'previous-button';
