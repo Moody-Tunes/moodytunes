@@ -13,6 +13,7 @@ from base.mixins import (
     DeleteRequestValidatorMixin
 )
 from tunes.models import Song, Emotion
+from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
     OptionsSerializer,
     SongSerializer,
@@ -150,6 +151,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     serializer_class = VoteSerializer
     queryset = UserSongVote.objects.all()
+    pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
