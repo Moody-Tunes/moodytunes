@@ -38,7 +38,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     queryset = Song.objects.all()
 
     default_jitter = .15
-    default_limit = 10
+    default_limit = 9
 
     get_request_serializer = BrowseSongsRequestSerializer
 
