@@ -7,8 +7,8 @@ from django.core.management import call_command
 logger = logging.getLogger(__name__)
 
 
-@task(bind=True)
-def create_songs_from_spotify_task(self):
+@task()
+def create_songs_from_spotify_task():
     """Periodic task to create songs from Spotify"""
     logger.info('Calling command to create songs from Spotify')
 
