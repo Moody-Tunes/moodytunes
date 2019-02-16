@@ -1,6 +1,7 @@
 from django import forms
 
 from accounts.models import UserSongVote
+from base.forms import RangeInput
 from tunes.models import Emotion, Song
 
 
@@ -19,6 +20,12 @@ class BrowseForm(forms.Form):
     genre = forms.ChoiceField(choices=get_song_genre_choices, required=False)
     context = forms.ChoiceField(choices=context_options, required=False)
     description = forms.CharField(required=False)
+    jitter = forms.FloatField(
+        required=False,
+        min_value=0,
+        max_value=0.5,
+        widget=RangeInput(attrs={'step': .05, 'class': 'slider', 'value': .15})
+    )
 
 
 class PlaylistForm(forms.Form):

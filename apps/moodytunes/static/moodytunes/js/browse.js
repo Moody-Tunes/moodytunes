@@ -32,6 +32,17 @@
         };
     }
 
+    function setUpJitterInput() {
+        var jitterInput = document.getElementById('id_jitter');
+        var jitterOutput = document.getElementById('jitter-value');
+        jitterOutput.innerText = jitterInput.value;
+
+        jitterInput.oninput = function () {
+            var jitterValue = Number.parseFloat(this.value);
+            jitterOutput.innerText = jitterValue.toFixed(2);
+        }
+    }
+
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
@@ -123,6 +134,7 @@
     }
 
     setUpContextModal();
+    setUpJitterInput();
     var generatePlaylistButton = document.getElementById('generate-playlist');
     generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
 })();
