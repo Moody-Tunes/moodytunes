@@ -1,5 +1,7 @@
 @import "../../../../base/static/base/less/colors";
 
+@votedBorderSize: 2px;
+
 #playlist-display-container {
     margin-top: 15px;
     display: flex;
@@ -44,7 +46,7 @@
         margin-left: 15%;
 
         &-chosen {
-            border: 1px solid @brightGreen !important;
+            border: @votedBorderSize solid @brightGreen !important;
         }
     }
 
@@ -54,7 +56,7 @@
         margin-right: 15%;
 
         &-chosen {
-            border: 1px solid @brightRed !important;
+            border: @votedBorderSize solid @brightRed !important;
         }
     }
 
@@ -63,7 +65,7 @@
         margin-left: 35%;
 
         &-chosen {
-            border: 1px solid @strongBlack !important;
+            border: @votedBorderSize solid @strongBlack !important;
         }
     }
 }
