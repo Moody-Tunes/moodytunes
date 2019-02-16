@@ -32,6 +32,17 @@
         };
     }
 
+    function setUpJitterInput() {
+        var jitterInput = document.getElementById('id_jitter');
+        var jitterOutput = document.getElementById('jitter-value');
+        jitterOutput.innerText = jitterInput.value;
+
+        jitterInput.oninput = function () {
+            var jitterValue = Number.parseFloat(this.value);
+            jitterOutput.innerText = jitterValue.toFixed(2);
+        }
+    }
+
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
@@ -110,11 +121,9 @@
     }
 
     function getBrowsePlaylist() {
-        // TODO: Set these values from user input
-        var jitter = undefined;
-        var limit = undefined;
-
+        var limit = undefined; // TODO: Allow user to specify nuber of songs to return
         var emotion = document.getElementById('id_emotion').value;
+        var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
@@ -123,6 +132,7 @@
     }
 
     setUpContextModal();
+    setUpJitterInput();
     var generatePlaylistButton = document.getElementById('generate-playlist');
     generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
 })();
