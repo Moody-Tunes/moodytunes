@@ -121,11 +121,9 @@
     }
 
     function getBrowsePlaylist() {
-        // TODO: Set these values from user input
-        var jitter = undefined;
-        var limit = undefined;
-
+        var limit = undefined; // TODO: Allow user to specify nuber of songs to return
         var emotion = document.getElementById('id_emotion').value;
+        var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
