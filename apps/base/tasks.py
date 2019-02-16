@@ -1,9 +1,8 @@
-import logging
-
 from celery.task import task
+from celery.utils.log import get_task_logger
 from django.core.management import call_command
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @task()

@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from unittest import mock
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
