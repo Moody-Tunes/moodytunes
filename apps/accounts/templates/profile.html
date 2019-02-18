@@ -1,15 +1,24 @@
 {% extends 'base.html' %}
 
+{% load static %}
+{% load compress %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/profile.less' %}">
+    {% endcompress %}
+{% endblock %}
+
 {% block content %}
 <h1>Profile</h1>
 <p>Hello {{ user.username }}! You last logged in {{ user.last_login|date:"M d, Y" }} at {{ user.last_login|date:"f A" }}</p>
 <h3>Account Options</h3>
 <ul>
-    <li><a href="{% url 'accounts:update' %}">Update Information</a></li>
+    <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>
 </ul>
 <h3>MoodyTunes</h3>
 <ul>
-    <li><a href="{% url 'moodytunes:browse' %}">Browse New Songs</a></li>
-    <li><a href="{% url 'moodytunes:playlists' %}">View Emotion Playlists</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:browse' %}">Browse New Songs</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:playlists' %}">View Emotion Playlists</a></li>
 </ul>
 {% endblock %}
