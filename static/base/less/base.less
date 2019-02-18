@@ -19,6 +19,7 @@ label {
     font-weight: normal;
 }
 
+// Set header font-family for all sizes
 .hClass (@index) when (@index > 0) {
     h@{index} {
     	font-family: 'Dosis', sans-serif;
@@ -27,7 +28,6 @@ label {
     .hClass(@index - 1);
 }
 .hClass(6);
-
 
 button {
 	box-shadow: inset 0 1px 0 0 @pureWhite;
