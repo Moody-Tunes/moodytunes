@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 
+{% load static %}
+{% load compress %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/login.less' %}">
+    {% endcompress %}
+{% endblock %}
+
 {% block content %}
 <h1>Login</h1>
 <form method="post">
@@ -7,5 +16,5 @@
 	{{ form.as_p }}
 	<button type="submit">Login</button>
 </form>
-<p>Don't have an account? <a href="{% url 'accounts:create' %}">Create one here</a></p>
+<p class="create-account">Don't have an account? <a href="{% url 'accounts:create' %}">Create one here</a></p>
 {% endblock %}
