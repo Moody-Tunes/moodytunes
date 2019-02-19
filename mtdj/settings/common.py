@@ -62,6 +62,9 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_SECURE = True  # Add `secure` flag when setting session cookie
+
+CSRF_COOKIE_SECURE = True  # Add `secure` flag when setting CSRF cookie
 
 ROOT_URLCONF = 'mtdj.urls'
 
