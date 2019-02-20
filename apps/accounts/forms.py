@@ -20,7 +20,7 @@ def validate_matching_passwords(password, confirm_password):
 
 
 class BaseUserForm(forms.Form):
-    username = forms.CharField(max_length=150, required=False)
+    username = forms.CharField(max_length=150, required=True)
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
 

@@ -15,9 +15,10 @@ class TestValidateMatchingPassword(TestCase):
         self.assertIsInstance(resp, ValidationError)
 
 
-class TestUserForm(TestCase):
+class TestBaseUserForm(TestCase):
     def test_clean_password_values_match(self):
         data = {
+            'username': 'foo',
             'password': '12345',
             'confirm_password': '12345'
         }
@@ -27,6 +28,7 @@ class TestUserForm(TestCase):
 
     def test_clean_password_values_do_not_match(self):
         data = {
+            'user': 'foo',
             'password': '12345',
             'confirm_password': '67890'
         }
@@ -34,8 +36,6 @@ class TestUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 
-
-class TestCreateUserForm(TestCase):
     def test_clean_username_for_taken_username(self):
         user = MoodyUtil.create_user()
         data = {
@@ -46,28 +46,3 @@ class TestCreateUserForm(TestCase):
 
         form = CreateUserForm(data)
         self.assertFalse(form.is_valid())
-
-
-class TestUpdateUserForm(TestCase):
-    def test_update_username_for_taken_username(self):
-        existing_user = MoodyUtil.create_user(username='old-head')
-        new_user = MoodyUtil.create_user(username='new-guy')
-        data = {
-            'username': existing_user.username,
-            'password': '12345',
-            'confirm_password': '12345'
-        }
-
-        form = UpdateUserForm(data, user=new_user)
-        self.assertFalse(form.is_valid())
-
-    def test_update_username_with_new_username(self):
-        user = MoodyUtil.create_user()
-        data = {
-            'username': 'some-new-user',
-            'password': '12345',
-            'confirm_password': '12345'
-        }
-
-        form = UpdateUserForm(data, user=user)
-        self.assertTrue(form.is_valid())

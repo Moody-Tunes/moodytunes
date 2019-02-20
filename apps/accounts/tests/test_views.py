@@ -55,6 +55,7 @@ class TestUpdateView(TestCase):
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         update_data = {
+            'username': user.username,
             'password': 'superSecret123',
             'confirm_password': 'superSecret123'
         }
