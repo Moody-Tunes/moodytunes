@@ -23,7 +23,6 @@ class TestBaseUserForm(TestCase):
             'confirm_password': '12345'
         }
 
-
         form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 

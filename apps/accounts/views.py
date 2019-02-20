@@ -39,6 +39,7 @@ class UpdateInfoView(View):
         form = self.form_class(request.POST, user=request.user)
 
         if form.is_valid():
+            import pdb; pdb.set_trace()
             request.user.update_information(form.cleaned_data)
             messages.info(request, 'Your account information has been updated.')
 
