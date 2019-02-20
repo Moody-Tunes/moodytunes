@@ -52,7 +52,13 @@ class BaseUserForm(forms.Form):
 
 
 class CreateUserForm(BaseUserForm):
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Make the password fields required when creating the account
+        self.fields['password'].required = True
+        self.fields['confirm_password'].required = True
 
 
 class UpdateUserForm(BaseUserForm):

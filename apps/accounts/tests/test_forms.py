@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from accounts.forms import BaseUserForm, CreateUserForm, UpdateUserForm, validate_matching_passwords
+from accounts.forms import BaseUserForm, CreateUserForm, validate_matching_passwords
 from libs.tests.helpers import MoodyUtil
 
 
@@ -28,7 +28,7 @@ class TestBaseUserForm(TestCase):
 
     def test_clean_password_values_do_not_match_is_invalid(self):
         data = {
-            'user': 'foo',
+            'username': 'foo',
             'password': '12345',
             'confirm_password': '67890'
         }
@@ -38,7 +38,7 @@ class TestBaseUserForm(TestCase):
 
     def test_clean_password_missing_confirm_password_is_invalid(self):
         data = {
-            'user': 'foo',
+            'username': 'foo',
             'password': '12345',
         }
 
@@ -51,6 +51,16 @@ class TestBaseUserForm(TestCase):
             'username': user.username,
             'password': '12345',
             'confirm_password': '12345'
+        }
+
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
+
+class TestCreateUserForm(TestCase):
+    def test_clean_password_missing_password_is_invalid(self):
+        data = {
+            'username': 'foo',
         }
 
         form = CreateUserForm(data)
