@@ -64,11 +64,17 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     def _log_bad_request(self, request):
         """Log information about a request if something fails to validate"""
+
+        # Filter HTTP headers from request metadata
+        request_headers = dict(
+            [(header, value) for header, value in request.META.items() if header.startswith('HTTP')]
+        )
+
         request_data = {
             'params': request.GET,
             'data': request.data if request.data else request.body,
             'user_id': request.user.id,
-            'headers': self._clean_headers(copy.deepcopy(request.META)),
+            'headers': self._clean_headers(copy.deepcopy(request_headers)),
             'method': request.method,
         }
 
