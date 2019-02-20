@@ -16,7 +16,7 @@ class TestValidateMatchingPassword(TestCase):
 
 
 class TestBaseUserForm(TestCase):
-    def test_clean_password_values_match(self):
+    def test_clean_password_values_match_is_valid(self):
         data = {
             'username': 'foo',
             'password': '12345',
@@ -26,11 +26,20 @@ class TestBaseUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertTrue(form.is_valid())
 
-    def test_clean_password_values_do_not_match(self):
+    def test_clean_password_values_do_not_match_is_invalid(self):
         data = {
             'user': 'foo',
             'password': '12345',
             'confirm_password': '67890'
+        }
+
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_password_missing_confirm_password_is_invalid(self):
+        data = {
+            'user': 'foo',
+            'password': '12345',
         }
 
         form = BaseUserForm(data)
