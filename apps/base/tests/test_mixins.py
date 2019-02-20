@@ -5,12 +5,14 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 
 from base.mixins import ValidateRequestDataMixin
+from libs.tests.helpers import MoodyUtil
 
 
 class TestValidateRequestDataMixing(TestCase):
     def setUp(self):
         self.mixin = ValidateRequestDataMixin()
         self.factory = APIRequestFactory()
+        self.user = MoodyUtil.create_user()
 
     def test_clean_headers_does_not_strip_safe_values(self):
         headers = {'HTTP_HOST': 'example.com'}
@@ -50,6 +52,34 @@ class TestValidateRequestDataMixing(TestCase):
 
         self.assertTrue(resp)
         self.assertDictEqual(mixin.cleaned_data, request_data)
+
+    @mock.patch('base.mixins.logger')
+    def test_log_bad_request(self, mock_logger):
+        request = self.factory.get(
+            '/test/',
+            data={'foo': 'bar'},
+            HTTP_COOKIE='sesssionid=foobarbaz',
+            HTTP_HOST='example.com'
+        )
+        request.user = self.user
+        request.data = ''
+
+        expected_request_data = {
+            'params': request.GET,
+            'data': request.data.encode(),
+            'user_id': request.user.id,
+            'headers': {
+                'HTTP_HOST': 'example.com',
+                'HTTP_COOKIE': '********'
+            },
+            'method': request.method,
+        }
+
+        self.mixin._log_bad_request(request)
+        mock_logger.warning.assert_called_once_with(
+            'Invalid {} data supplied to {}'.format(request.method, self.mixin.__class__.__name__),
+            extra=expected_request_data
+        )
 
     @mock.patch('base.mixins.ValidateRequestDataMixin._log_bad_request')
     def test_invalid_data_logs_bad_request(self, mock_bad_request_logger):
