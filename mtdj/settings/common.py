@@ -63,6 +63,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_SECURE = True  # Add `secure` flag when setting session cookie
+SESSION_COOKIE_HTTPONLY = True  # Add `HttpOnly` flag when setting session cookie
 
 CSRF_COOKIE_SECURE = True  # Add `secure` flag when setting CSRF cookie
 
