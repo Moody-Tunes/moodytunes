@@ -39,9 +39,6 @@ class BaseUserForm(forms.Form):
 
         return new_password
 
-
-class CreateUserForm(BaseUserForm):
-
     def clean_username(self):
         username = self.cleaned_data.get('username')
 
@@ -52,6 +49,10 @@ class CreateUserForm(BaseUserForm):
             )
 
         return username
+
+
+class CreateUserForm(BaseUserForm):
+    pass
 
 
 class UpdateUserForm(BaseUserForm):
@@ -67,11 +68,7 @@ class UpdateUserForm(BaseUserForm):
         username = self.cleaned_data.get('username')
 
         if username and username != self.user.username:
-            if MoodyUser.objects.filter(username=username).exists():
-                self.add_error(
-                    'username',
-                    ValidationError('This username is already taken. Please choose a different one')
-                )
+            return super().clean_username()
 
         return username
 
