@@ -25,7 +25,7 @@ class TestValidateRequestDataMixing(TestCase):
     def test_clean_headers_with_sessionid(self):
         headers = {'HTTP_COOKIE': 'sessionid=foobarbaz'}
         new_headers = self.mixin._clean_headers(headers)
-        self.assertEqual(new_headers['HTTP_COOKIE'], {'sessionid': '********'})
+        self.assertEqual(new_headers['HTTP_COOKIE'], '********')
 
     def test_serializer_not_specified_raises_attribute_error(self):
         request = self.factory.get('/test/')
