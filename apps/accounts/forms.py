@@ -21,8 +21,8 @@ def validate_matching_passwords(password, confirm_password):
 
 class BaseUserForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
-    confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
-    password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=False)
+    confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
+    password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
 
     def clean_password(self):
         new_password = self.cleaned_data.get('password')
@@ -52,28 +52,26 @@ class BaseUserForm(forms.Form):
 
 
 class CreateUserForm(BaseUserForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Make the password fields required when creating the account
-        self.fields['password'].required = True
-        self.fields['confirm_password'].required = True
+    pass
 
 
 class UpdateUserForm(BaseUserForm):
     email = forms.EmailField(required=False)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        self.user = kwargs.pop('user', None)
 
         super().__init__(*args, **kwargs)
+
+        # Make updating password optional
+        self.fields['password'].required = False
+        self.fields['confirm_password'].required = False
 
     def clean_username(self):
         # If user is updating their username, need to check if it's already taken
         username = self.cleaned_data.get('username')
 
-        if username and username != self.user.username:
+        if username != self.user.username:
             return super().clean_username()
 
         return username
