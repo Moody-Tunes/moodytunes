@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from accounts.forms import BaseUserForm, CreateUserForm, UpdateUserForm, validate_matching_passwords
+from accounts.forms import BaseUserForm, UpdateUserForm, validate_matching_passwords
 from libs.tests.helpers import MoodyUtil
 
 
@@ -15,9 +15,20 @@ class TestValidateMatchingPassword(TestCase):
         self.assertIsInstance(resp, ValidationError)
 
 
-class TestUserForm(TestCase):
-    def test_clean_password_values_match(self):
+class TestBaseUserForm(TestCase):
+    def test_clean_username_missing_value_is_invalid(self):
         data = {
+            'username': '',
+            'password': '12345',
+            'confirm_password': '12345'
+        }
+
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_password_values_match_is_valid(self):
+        data = {
+            'username': 'foo',
             'password': '12345',
             'confirm_password': '12345'
         }
@@ -25,8 +36,9 @@ class TestUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertTrue(form.is_valid())
 
-    def test_clean_password_values_do_not_match(self):
+    def test_clean_password_values_do_not_match_is_invalid(self):
         data = {
+            'username': 'foo',
             'password': '12345',
             'confirm_password': '67890'
         }
@@ -34,8 +46,15 @@ class TestUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 
+    def test_clean_password_missing_confirm_password_is_invalid(self):
+        data = {
+            'username': 'foo',
+            'password': '12345',
+        }
 
-class TestCreateUserForm(TestCase):
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
     def test_clean_username_for_taken_username(self):
         user = MoodyUtil.create_user()
         data = {
@@ -44,30 +63,20 @@ class TestCreateUserForm(TestCase):
             'confirm_password': '12345'
         }
 
-        form = CreateUserForm(data)
+        form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 
 
 class TestUpdateUserForm(TestCase):
-    def test_update_username_for_taken_username(self):
-        existing_user = MoodyUtil.create_user(username='old-head')
-        new_user = MoodyUtil.create_user(username='new-guy')
-        data = {
-            'username': existing_user.username,
-            'password': '12345',
-            'confirm_password': '12345'
-        }
-
-        form = UpdateUserForm(data, user=new_user)
-        self.assertFalse(form.is_valid())
-
-    def test_update_username_with_new_username(self):
+    def test_clean_password_missing_password_is_valid(self):
         user = MoodyUtil.create_user()
-        data = {
-            'username': 'some-new-user',
-            'password': '12345',
-            'confirm_password': '12345'
-        }
+        data = {'username': user.username}
 
         form = UpdateUserForm(data, user=user)
         self.assertTrue(form.is_valid())
+
+    def test_clean_username_missing_value_is_invalid(self):
+        data = {'username': ''}
+
+        form = UpdateUserForm(data)
+        self.assertFalse(form.is_valid())
