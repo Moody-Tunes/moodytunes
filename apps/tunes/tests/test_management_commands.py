@@ -3,9 +3,10 @@ from unittest import mock
 from django.core.management import call_command
 from django.test import TestCase
 
-from libs.spotify import SpotifyException
 from tunes.management.commands.tunes_create_songs_from_spotify import Command as SpotifyCommand
 from tunes.models import Song
+from libs.spotify import SpotifyException
+from libs.tests.helpers import generate_random_unicode_string
 
 
 @mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
@@ -40,6 +41,23 @@ class TestSpotifyCommand(TestCase):
         self.assertEqual(fail, 0)
 
         song = Song.objects.filter(code=self.track_data['code'])
+        self.assertTrue(song.exists())
+
+    def test_save_songs_to_database_with_unicode_characters(self):
+        track_data = {
+            'code': 'uni-code',
+            'name': generate_random_unicode_string(10).encode('utf-8'),
+            'artist': generate_random_unicode_string(10).encode('utf-8'),
+            'energy': .75,
+            'valence': .5,
+            'genre': 'Chill-Hop'
+        }
+
+        success, fail = self.command.save_songs_to_database([track_data])
+        self.assertEqual(success, 1)
+        self.assertEqual(fail, 0)
+
+        song = Song.objects.filter(code=track_data['code'])
         self.assertTrue(song.exists())
 
     def test_save_songs_to_database_song_already_exists(self):

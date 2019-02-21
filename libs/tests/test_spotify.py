@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from requests.exceptions import HTTPError
 
 from libs.spotify import SpotifyClient, SpotifyException
+from tests.helpers import generate_random_unicode_string
 
 
 class TestSpotifyClient(TestCase):
@@ -13,6 +14,10 @@ class TestSpotifyClient(TestCase):
     def setUpTestData(cls):
         cls.spotify_client = SpotifyClient()
         cls.auth_code = 'some-auth-code'
+
+    def setUp(self):
+        # Clear seen songs cache from SpotifyClient instance
+        self.spotify_client.seen_songs = []
 
     @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
@@ -176,6 +181,36 @@ class TestSpotifyClient(TestCase):
         self.assertDictEqual(expected_return, actual_return[0])
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_songs_from_playlist_with_unicode_data(self, mock_request):
+        mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
+        song_name = generate_random_unicode_string(10)
+        song_artist = generate_random_unicode_string(10)
+
+        mock_request.return_value = {
+            'tracks': {
+                'items': [{
+                    'track': {
+                        'uri': 'song-uri',
+                        'explicit': False,
+                        'name': song_name,
+                        'artists': [{
+                            'name': song_artist
+                        }],
+                    }
+                }]
+            }
+        }
+
+        expected_return = {
+            'name': song_name.encode('utf-8'),
+            'artist': song_artist.encode('utf-8'),
+            'code': 'song-uri'
+        }
+
+        actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
+        self.assertDictEqual(expected_return, actual_return[0])
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_songs_from_playlist_excludes_song_already_seen(self, mock_request):
         self.spotify_client.seen_songs = ['already-seen-code']
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
@@ -193,7 +228,6 @@ class TestSpotifyClient(TestCase):
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
-        self.spotify_client.seen_songs = []
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_songs_from_playlist_excludes_song_is_explicit(self, mock_request):
