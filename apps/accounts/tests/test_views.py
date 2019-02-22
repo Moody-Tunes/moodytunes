@@ -226,3 +226,44 @@ class TestAnalyticsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
+
+    def test_endpoint_return_analytics_for_context_if_provided(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song()
+        other_song = MoodyUtil.create_song(energy=.75, valence=.65)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        # We should only see the song for this context in the response
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': None,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'total_songs': 1,
+        }
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK'
+        }
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
