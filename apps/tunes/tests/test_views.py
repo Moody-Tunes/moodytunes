@@ -372,6 +372,7 @@ class TestPlaylistView(TestCase):
         cls.url = reverse('tunes:playlist')
         cls.user = MoodyUtil.create_user()
         cls.song = MoodyUtil.create_song()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
     def setUp(self):
         self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -379,7 +380,7 @@ class TestPlaylistView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.api_client.logout()
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
@@ -399,11 +400,11 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -414,11 +415,11 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=False
         )
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -430,18 +431,18 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
         UserSongVote.objects.create(
             user=self.user,
             song=new_song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
 
         data = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'genre': new_song.genre
         }
         resp = self.api_client.get(self.url, data=data)
@@ -458,7 +459,7 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=expected_song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
             context=context
         )
@@ -466,12 +467,12 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
         )
 
         data = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'context': context
         }
         resp = self.api_client.get(self.url, data=data)
@@ -486,7 +487,7 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
             context='WORK'
         )
@@ -494,12 +495,12 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
             context='PARTY'
         )
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
