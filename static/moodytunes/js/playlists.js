@@ -37,6 +37,18 @@
         return playButton
     }
 
+    function createPaginationButton(link, type) {
+        var name = type.charAt(0).toUpperCase() + type.slice(1);
+        var button = document.createElement('button');
+        button.appendChild(document.createTextNode(name));
+        button.className = type + '-button';
+        button.dataset.url = link;
+        button.addEventListener('click', getPaginatedEmotionPlaylist);
+        button.disabled = !link;  // Disable button if there is no URL to request
+
+        return button
+    }
+
     function displayAnalytics(data) {
         document.getElementById('analytics-emotion').innerText = data.emotion_name;
         document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
@@ -108,22 +120,8 @@
 
         // Add buttons to retrieve paginated responses
         if (nextLink || previousLink) {
-            var previousButton = document.createElement('button');
-            previousButton.appendChild(document.createTextNode('Previous'));
-            previousButton.className = 'previous-button';
-            previousButton.dataset.url = previousLink;
-            previousButton.addEventListener('click', getPaginatedEmotionPlaylist);
-            previousButton.disabled = !previousLink;  // Disable button if there is no next URL
-
-            var nextButton = document.createElement('button');
-            nextButton.appendChild(document.createTextNode('Next'));
-            nextButton.className = 'next-button';
-            nextButton.dataset.url = nextLink;
-            nextButton.addEventListener('click', getPaginatedEmotionPlaylist);
-            nextButton.disabled = !nextLink;  // Disable button if there is no next URL
-
-            buttonContainer.appendChild(previousButton);
-            buttonContainer.appendChild(nextButton);
+            buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
+            buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
         }
     }
 
