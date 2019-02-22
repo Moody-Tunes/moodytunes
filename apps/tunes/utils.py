@@ -19,7 +19,7 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
 
-    if not songs:
+    if songs is None:
         songs = Song.objects.all()
 
     if jitter:
