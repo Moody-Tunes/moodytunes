@@ -67,6 +67,11 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
 
         user_votes = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
+
+        # If a context is provided, only exclude songs a user has voted on for that context
+        if self.cleaned_data.get('context'):
+            user_votes = [vote for vote in user_votes if vote.context == self.cleaned_data['context']]
+
         previously_voted_song_ids = [vote.song.id for vote in user_votes]
 
         return queryset.exclude(id__in=previously_voted_song_ids)
