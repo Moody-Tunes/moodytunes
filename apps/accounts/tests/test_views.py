@@ -266,7 +266,6 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
-
     def test_endpoint_return_analytics_for_context_if_provided(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song()
