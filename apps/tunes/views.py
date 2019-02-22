@@ -163,12 +163,22 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     def filter_queryset(self, queryset):
         # Find the songs the user has previously voted as making them feel the desired emotion
         emotion = self.cleaned_data['emotion']
+        votes = []
 
-        return queryset.filter(
+        user_votes = queryset.filter(
             user=self.request.user,
             emotion__name=emotion,
             vote=True
         ).order_by('created')
+
+        # Filter out duplicate songs from payload
+        already_added_songs = []
+        for vote in user_votes:
+            if vote.song.id not in already_added_songs:
+                votes.append(vote)
+                already_added_songs.append(vote.song.id)
+
+        return votes
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()

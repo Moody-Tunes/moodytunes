@@ -481,6 +481,31 @@ class TestPlaylistView(TestCase):
         self.assertEqual(len(resp_data['results']), 1)
         self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
 
+    def test_multiple_votes_for_a_song_does_not_return_duplicate_songs(self):
+        # Create two upvotes in different contexts
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=True,
+            context='PARTY'
+        )
+
+        data = {'emotion': Emotion.HAPPY}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data['results']), 1)  # We should only see the song once in the response
+
 
 class TestOptionsView(TestCase):
     @classmethod
