@@ -178,7 +178,6 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
         return votes
 
-
     def filter_queryset(self, queryset):
         # Find the songs the user has previously voted as making them feel the desired emotion
         emotion = self.cleaned_data['emotion']
