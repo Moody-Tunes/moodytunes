@@ -269,6 +269,19 @@ class TestVoteView(TestCase):
         self.assertEqual(vote.context, context)
         self.assertEqual(vote.description, description)
 
+    def test_vote_with_context_and_blank_description_is_ok(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'description': '',
+            'vote': False
+        }
+
+        resp = self.api_client.post(self.url, data=data, format='json')
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
     def test_vote_with_invalid_context_returns_bad_request(self):
         data = {
             'emotion': Emotion.HAPPY,
@@ -372,6 +385,7 @@ class TestPlaylistView(TestCase):
         cls.url = reverse('tunes:playlist')
         cls.user = MoodyUtil.create_user()
         cls.song = MoodyUtil.create_song()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
     def setUp(self):
         self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -379,7 +393,7 @@ class TestPlaylistView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.api_client.logout()
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
@@ -399,11 +413,11 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -414,11 +428,11 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=False
         )
 
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -430,18 +444,18 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
         UserSongVote.objects.create(
             user=self.user,
             song=new_song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True
         )
 
         data = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'genre': new_song.genre
         }
         resp = self.api_client.get(self.url, data=data)
@@ -458,7 +472,7 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=expected_song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
             context=context
         )
@@ -466,12 +480,12 @@ class TestPlaylistView(TestCase):
         UserSongVote.objects.create(
             user=self.user,
             song=self.song,
-            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            emotion=self.emotion,
             vote=True,
         )
 
         data = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'context': context
         }
         resp = self.api_client.get(self.url, data=data)
@@ -480,6 +494,31 @@ class TestPlaylistView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)
         self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
+
+    def test_multiple_votes_for_a_song_does_not_return_duplicate_songs(self):
+        # Create two upvotes in different contexts
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=self.emotion,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=self.emotion,
+            vote=True,
+            context='PARTY'
+        )
+
+        data = {'emotion': self.emotion.name}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data['results']), 1)  # We should only see the song once in the response
 
 
 class TestOptionsView(TestCase):

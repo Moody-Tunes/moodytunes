@@ -160,15 +160,35 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
+    def _filter_duplicate_songs_from_playlist(self, user_votes):
+        """
+        Filter queryset of UserSongVotes on unique songs (prevent the same song from appearing twice in the playlist
+        even if there are multiple votes for the song)
+
+        :param user_votes: (QuerySet) Collection of songs user has previously voted as making them feel an Emotion
+        :return: Collection without duplicate votes for the same song
+        """
+        votes = []
+        already_added_songs = []
+
+        for vote in user_votes:
+            if vote.song.id not in already_added_songs:
+                votes.append(vote)
+                already_added_songs.append(vote.song.id)
+
+        return votes
+
     def filter_queryset(self, queryset):
         # Find the songs the user has previously voted as making them feel the desired emotion
         emotion = self.cleaned_data['emotion']
 
-        return queryset.filter(
+        user_votes = queryset.filter(
             user=self.request.user,
             emotion__name=emotion,
             vote=True
         ).order_by('created')
+
+        return self._filter_duplicate_songs_from_playlist(user_votes)
 
     def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()

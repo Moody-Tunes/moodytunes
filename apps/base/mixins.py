@@ -47,7 +47,7 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         return headers
 
-    def _log_bad_request(self, request):
+    def _log_bad_request(self, request, serializer):
         """Log information about a request if something fails to validate"""
 
         # Filter HTTP headers from request metadata
@@ -61,6 +61,7 @@ class ValidateRequestDataMixin(MoodyMixin):
             'user_id': request.user.id,
             'headers': cleaned_headers,
             'method': request.method,
+            'errors': serializer.errors,
         }
 
         logger.warning(
@@ -80,7 +81,7 @@ class ValidateRequestDataMixin(MoodyMixin):
                 self.cleaned_data = serializer.data
                 return True
             else:
-                self._log_bad_request(request)
+                self._log_bad_request(request, serializer)
                 return False
         else:
             raise AttributeError(
