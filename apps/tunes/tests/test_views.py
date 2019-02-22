@@ -105,6 +105,30 @@ class TestBrowseView(TestCase):
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['code'], not_voted_song.code)
 
+    def test_playlist_returns_songs_voted_on_in_a_different_context(self):
+        song = MoodyUtil.create_song()
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=song,
+            emotion=Emotion.objects.get(name=Emotion.HAPPY),
+            vote=False,
+            context='WORK'
+        )
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'jitter': 0,
+            'context': 'PARTY'
+        }
+
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data), 1)
+        self.assertEqual(resp_data[0]['code'], song.code)
+
 
 class TestVoteView(TestCase):
     @classmethod
