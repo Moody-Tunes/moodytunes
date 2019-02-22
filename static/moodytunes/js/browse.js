@@ -6,6 +6,9 @@
         var showModal = document.getElementById('set-context-button');
         var submitModal = document.getElementById('submit-context');
 
+        // Clear session storage to clear any previously set values
+        sessionStorage.clear();
+
         showModal.onclick = function () {
             modal.style.display = 'block';
         };
