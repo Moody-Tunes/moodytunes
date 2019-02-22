@@ -125,12 +125,14 @@
 
     function getBrowsePlaylist() {
         var limit = undefined; // We don't want people to set the limit themselves, keep it at the default
+
+        var context = sessionStorage.context;
         var emotion = document.getElementById('id_emotion').value;
         var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, displayBrowsePlaylist
+            emotion, jitter, limit, genre, context, displayBrowsePlaylist
         );
     }
 
