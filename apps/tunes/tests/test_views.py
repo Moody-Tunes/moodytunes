@@ -269,6 +269,19 @@ class TestVoteView(TestCase):
         self.assertEqual(vote.context, context)
         self.assertEqual(vote.description, description)
 
+    def test_vote_with_context_and_blank_description_is_ok(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'description': '',
+            'vote': False
+        }
+
+        resp = self.api_client.post(self.url, data=data, format='json')
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
     def test_vote_with_invalid_context_returns_bad_request(self):
         data = {
             'emotion': Emotion.HAPPY,
