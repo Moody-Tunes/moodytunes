@@ -11,6 +11,7 @@ from rest_framework import generics
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
+from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
 from libs.utils import average
@@ -82,6 +83,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     def get_object(self):
         energy = None
         valence = None
+        context = self.cleaned_data.get('context')
         genre = self.cleaned_data.get('genre')
 
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
@@ -91,16 +93,17 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             vote=True
         )
 
-        if votes_for_emotion:
-            user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
-            energy = user_emotion.energy
-            valence = user_emotion.valence
+        if votes_for_emotion.exists():
+            if context:
+                votes_for_emotion = votes_for_emotion.filter(context=context)
 
-        if genre:
-            # If we get a genre, calculate attributes for songs in that genre
-            votes_for_emotion = [vote.song for vote in votes_for_emotion if vote.song.genre == genre]
-            energy = average([song.energy for song in votes_for_emotion])
-            valence = average([song.valence for song in votes_for_emotion])
+            if genre:
+                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
+
+            votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
+
+            energy = average(votes_for_emotion.values_list('song__energy', flat=True))
+            valence = average(votes_for_emotion.values_list('song__valence', flat=True))
 
         data = {
             'emotion': emotion.name,
@@ -108,7 +111,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             'genre': genre,
             'energy': energy,
             'valence': valence,
-            'total_songs': len(votes_for_emotion)
+            'total_songs': votes_for_emotion.count()
         }
 
         return data

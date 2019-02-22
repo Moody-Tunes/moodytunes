@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
 
 
 class TestProfileView(TestCase):
@@ -154,13 +155,13 @@ class TestAnalyticsView(TestCase):
         UserSongVote.objects.create(user=self.user, emotion=emotion, song=downvoted_song, vote=False)
 
         working_songs = [upvoted_song_1, upvoted_song_2]
-        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        user_votes = self.user.get_user_song_vote_records(emotion.name)
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'energy': user_emotion.energy,
-            'valence': user_emotion.valence,
+            'energy': average([vote.song.energy for vote in user_votes if vote.vote]),
+            'valence': average([vote.song.valence for vote in user_votes if vote.vote]),
             'total_songs': len(working_songs)
         }
 
@@ -221,6 +222,144 @@ class TestAnalyticsView(TestCase):
         }
 
         params = {'emotion': Emotion.HAPPY}
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_multiple_votes_for_same_song_only_returns_one_count(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song()
+
+        # Make one vote without a context and one with a context
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        # We should only see the song once in the response
+        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': None,
+            'energy': user_emotion.energy,
+            'valence': user_emotion.valence,
+            'total_songs': 1,
+        }
+
+        params = {'emotion': Emotion.HAPPY}
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_endpoint_return_analytics_for_context_if_provided(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song()
+        other_song = MoodyUtil.create_song(energy=.75, valence=.65)
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        # We should only see the song for this context in the response
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': None,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'total_songs': 1,
+        }
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK'
+        }
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_endpoint_handles_context_and_genre_filters(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song(genre='first-genre')
+        other_song = MoodyUtil.create_song(genre='second-genre', energy=.75, valence=.65)
+
+        # Create matrix of expected song and context
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        # We should only see the expected song for this context and genre in the response
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': expected_song.genre,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'total_songs': 1,
+        }
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'genre': expected_song.genre,
+            'context': 'WORK'
+        }
         resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 

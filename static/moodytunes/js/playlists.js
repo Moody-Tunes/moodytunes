@@ -131,7 +131,7 @@
         var context = document.getElementById('id_context').value || undefined;
 
         document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(emotion, genre, displayAnalytics)
+        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics)
     }
 
     var generatePlaylistButton = document.getElementById('generate-playlist');
