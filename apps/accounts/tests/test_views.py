@@ -227,6 +227,45 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
+    def test_multiple_votes_for_same_song_only_returns_one_count(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song()
+
+        # Make one vote without a context and one with a context
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        # We should only see the song once in the response
+        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': None,
+            'energy': user_emotion.energy,
+            'valence': user_emotion.valence,
+            'total_songs': 1,
+        }
+
+        params = {'emotion': Emotion.HAPPY,}
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+
     def test_endpoint_return_analytics_for_context_if_provided(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song()
@@ -268,7 +307,7 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
-    def test_enpoint_handles_context_and_genre_filters(self):
+    def test_endpoint_handles_context_and_genre_filters(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song(genre='first-genre')
         other_song = MoodyUtil.create_song(genre='second-genre', energy=.75, valence=.65)

@@ -11,6 +11,7 @@ from rest_framework import generics
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
+from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
 from libs.utils import average
@@ -97,6 +98,8 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             energy = user_emotion.energy
             valence = user_emotion.valence
 
+            votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
+
             if context:
                 # If we get a context, calculate attributes for votes for that context
                 votes_for_emotion = votes_for_emotion.filter(context=context)
@@ -115,7 +118,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             'genre': genre,
             'energy': energy,
             'valence': valence,
-            'total_songs': len(votes_for_emotion)
+            'total_songs': votes_for_emotion.count()
         }
 
         return data
