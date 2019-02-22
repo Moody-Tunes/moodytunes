@@ -55,6 +55,9 @@ class TestValidateRequestDataMixing(TestCase):
 
     @mock.patch('base.mixins.logger')
     def test_log_bad_request(self, mock_logger):
+        mock_serializer = mock.Mock()
+        mock_serializer.errors = 'Some bad data here'
+
         request = self.factory.get(
             '/test/',
             data={'foo': 'bar'},
@@ -73,9 +76,10 @@ class TestValidateRequestDataMixing(TestCase):
                 'HTTP_COOKIE': '********'
             },
             'method': request.method,
+            'errors': mock_serializer.errors
         }
 
-        self.mixin._log_bad_request(request)
+        self.mixin._log_bad_request(request, mock_serializer)
         mock_logger.warning.assert_called_once_with(
             'Invalid {} data supplied to {}'.format(request.method, self.mixin.__class__.__name__),
             extra=expected_request_data
@@ -97,4 +101,4 @@ class TestValidateRequestDataMixing(TestCase):
         resp = mixin._validate_request(request)
 
         self.assertFalse(resp)
-        mock_bad_request_logger.assert_called_once_with(request)
+        mock_bad_request_logger.assert_called_once_with(request, mock_serializer)
