@@ -94,23 +94,16 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         )
 
         if votes_for_emotion.exists():
-            user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
-            energy = user_emotion.energy
-            valence = user_emotion.valence
+            if context:
+                votes_for_emotion = votes_for_emotion.filter(context=context)
+
+            if genre:
+                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
-            if context:
-                # If we get a context, calculate attributes for votes for that context
-                votes_for_emotion = votes_for_emotion.filter(context=context)
-                energy = average(votes_for_emotion.values_list('song__energy', flat=True))
-                valence = average(votes_for_emotion.values_list('song__valence', flat=True))
-
-            if genre:
-                # If we get a genre, calculate attributes for songs in that genre
-                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
-                energy = average(votes_for_emotion.values_list('song__energy', flat=True))
-                valence = average(votes_for_emotion.values_list('song__valence', flat=True))
+            energy = average(votes_for_emotion.values_list('song__energy', flat=True))
+            valence = average(votes_for_emotion.values_list('song__valence', flat=True))
 
         data = {
             'emotion': emotion.name,

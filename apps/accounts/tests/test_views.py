@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
 
 
 class TestProfileView(TestCase):
@@ -154,13 +155,13 @@ class TestAnalyticsView(TestCase):
         UserSongVote.objects.create(user=self.user, emotion=emotion, song=downvoted_song, vote=False)
 
         working_songs = [upvoted_song_1, upvoted_song_2]
-        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        user_votes = self.user.get_user_song_vote_records(emotion.name)
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'energy': user_emotion.energy,
-            'valence': user_emotion.valence,
+            'energy': average([vote.song.energy for vote in user_votes if vote.vote]),
+            'valence': average([vote.song.valence for vote in user_votes if vote.vote]),
             'total_songs': len(working_songs)
         }
 
