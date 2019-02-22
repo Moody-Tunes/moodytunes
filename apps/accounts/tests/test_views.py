@@ -259,7 +259,7 @@ class TestAnalyticsView(TestCase):
             'total_songs': 1,
         }
 
-        params = {'emotion': Emotion.HAPPY,}
+        params = {'emotion': Emotion.HAPPY}
         resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
