@@ -10,7 +10,6 @@ from libs.tests.helpers import MoodyUtil
 from libs.utils import average
 
 
-
 class TestLoginView(TestCase):
     @classmethod
     def setUpTestData(cls):
