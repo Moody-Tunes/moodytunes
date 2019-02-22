@@ -105,9 +105,9 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             if genre:
                 # If we get a genre, calculate attributes for songs in that genre
-                votes_for_emotion = [vote.song for vote in votes_for_emotion if vote.song.genre == genre]
-                energy = average([song.energy for song in votes_for_emotion])
-                valence = average([song.valence for song in votes_for_emotion])
+                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
+                energy = average(votes_for_emotion.values_list('song__energy', flat=True))
+                valence = average(votes_for_emotion.values_list('song__valence', flat=True))
 
         data = {
             'emotion': emotion.name,

@@ -267,3 +267,62 @@ class TestAnalyticsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
+
+    def test_enpoint_handles_context_and_genre_filters(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song(genre='first-genre')
+        other_song = MoodyUtil.create_song(genre='second-genre', energy=.75, valence=.65)
+
+        # Create matrix of expected song and context
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='WORK'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=expected_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=other_song,
+            vote=True,
+            context='PARTY'
+        )
+
+        # We should only see the expected song for this context and genre in the response
+        expected_response = {
+            'emotion': emotion.name,
+            'emotion_name': emotion.full_name,
+            'genre': expected_song.genre,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'total_songs': 1,
+        }
+
+        params = {
+            'emotion': Emotion.HAPPY,
+            'genre': expected_song.genre,
+            'context': 'WORK'
+        }
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
