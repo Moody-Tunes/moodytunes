@@ -108,11 +108,12 @@
             // Used to build options for users to choose from when generating playlists to listen to
             this.request('GET', '/tunes/options/', {}, {}, callback);
         },
-        getUserAnalytics: function(emotion, genre, callback) {
+        getUserAnalytics: function(emotion, genre, context, callback) {
             // Retrieve analytics for users based on what songs they've listened to
             var params = {
                 emotion: emotion,
-                genre: genre
+                genre: genre,
+                context: context,
             };
             this.request('GET', '/accounts/analytics/', params, {}, callback);
         },
