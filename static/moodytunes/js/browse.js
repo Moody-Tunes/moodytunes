@@ -124,7 +124,7 @@
     }
 
     function getBrowsePlaylist() {
-        var limit = undefined; // TODO: Allow user to specify nuber of songs to return
+        var limit = undefined; // We don't want people to set the limit themselves, keep it at the default
         var emotion = document.getElementById('id_emotion').value;
         var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
