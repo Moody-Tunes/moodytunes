@@ -95,6 +95,12 @@
             songContainer.className = 'song-container';
 
             songContainer.appendChild(createPlayButton(song));
+
+            var descriptionContainer = document.createElement('p');
+            descriptionContainer.className = 'song-description-container';
+            descriptionContainer.innerText = vote.description;
+            songContainer.appendChild(descriptionContainer);
+
             songContainer.appendChild(createDeleteButton(song.code));
 
             playlistContainer.appendChild(songContainer);
