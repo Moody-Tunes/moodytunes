@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -7,6 +8,49 @@ from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
+
+
+class TestLoginView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('accounts:login')
+        cls.user = MoodyUtil.create_user()
+
+    def test_login_redirects_to_valid_path(self):
+        next = reverse('moodytunes:browse')
+        url = self.url + '?next={}'.format(next)
+
+        data = {
+            'username': self.user.username,
+            'password': MoodyUtil.DEFAULT_USER_PASSWORD
+        }
+
+        resp = self.client.post(url, data=data)
+
+        self.assertRedirects(resp, next)
+
+    def test_login_redirect_to_default(self):
+        data = {
+            'username': self.user.username,
+            'password': MoodyUtil.DEFAULT_USER_PASSWORD
+        }
+
+        resp = self.client.post(self.url, data=data)
+
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL)
+
+    def test_login_returns_bad_request_for_invalid_path(self):
+        next = '6330599317423175408.owasp.org'
+        url = self.url + '?next={}'.format(next)
+
+        data = {
+            'username': self.user.username,
+            'password': MoodyUtil.DEFAULT_USER_PASSWORD
+        }
+
+        resp = self.client.post(url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestProfileView(TestCase):

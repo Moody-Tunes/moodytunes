@@ -1,8 +1,13 @@
+import logging
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, resolve, Resolver404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
@@ -15,6 +20,28 @@ from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
 from libs.utils import average
+
+logger = logging.getLogger(__name__)
+
+
+class MoodyLoginView(LoginView):
+    def get_redirect_url(self):
+        redirect_url = super().get_redirect_url()
+
+        if not redirect_url:
+            # If no redirect URL provided, redirect to default login redirect
+            return settings.LOGIN_REDIRECT_URL
+
+        try:
+            # Try to resolve the URL, if it is a valid path in our system it will return
+            # without errors and we can proceed with the redirect
+            resolve(redirect_url)
+            return redirect_url
+        except Resolver404:
+            # The supplied path is not one we have in our system, report the invalid
+            # redirect and raise an exception indicating suspicious operation
+            logger.error('Suspicious redirect detected for {}'.format(redirect_url))
+            raise SuspiciousOperation
 
 
 @method_decorator(login_required, name='dispatch')
