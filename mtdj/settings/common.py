@@ -10,12 +10,11 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
+SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 INTERNAL_IPS = ('127.0.0.1',)
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[SITE_HOSTNAME])
 
 APPEND_SLASH = True
-
-SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 
 WEBMASTER_EMAIL = env.str('MTDJ_WEBMASTER_EMAIL', default='foo@example.com')
 
@@ -153,6 +152,8 @@ COMPRESS_PRECOMPILERS = (
 )
 
 # Email settings
+EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.filebased.EmailBackend')
+EMAIL_FILE_PATH = env.str('DJANGO_EMAIL_FILE_PATH', default='{}/django_emails/'.format(tempfile.gettempdir()))
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')
 
 REST_FRAMEWORK = {
