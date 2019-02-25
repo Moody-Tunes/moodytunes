@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
 from django.views.generic.base import RedirectView, TemplateView
 
 
@@ -8,13 +7,13 @@ class HomePageView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             return settings.LOGIN_REDIRECT_URL
-        return reverse('accounts:login')
+        return settings.LOGIN_URL
 
 
 class PasswordResetDone(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         messages.info(self.request, 'Please login with your new password')
-        return reverse('accounts:login')
+        return settings.LOGIN_URL
 
 
 class FormView(TemplateView):

@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve, Resolver404, reverse_lazy
+from django.urls import reverse, resolve, Resolver404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
@@ -47,7 +47,7 @@ class MoodyLoginView(LoginView):
 
 
 class MoodyPasswordResetView(PasswordResetView):
-    success_url = reverse_lazy('accounts:login')
+    success_url = settings.LOGIN_URL
 
     def form_valid(self, form):
         messages.info(self.request, 'We have sent a password reset email to the address provided')
