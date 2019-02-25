@@ -3,11 +3,11 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve, Resolver404
+from django.urls import reverse, resolve, Resolver404, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 
 class MoodyLoginView(LoginView):
+    template_name = 'login.html'
+
     def get_redirect_url(self):
         redirect_url = super().get_redirect_url()
 
@@ -42,6 +44,14 @@ class MoodyLoginView(LoginView):
             # redirect and raise an exception indicating suspicious operation
             logger.error('Suspicious redirect detected for {}'.format(redirect_url))
             raise SuspiciousOperation
+
+
+class MoodyPasswordResetView(PasswordResetView):
+    success_url = reverse_lazy('accounts:login')
+
+    def form_valid(self, form):
+        messages.info(self.request, 'We have sent a password reset email to the address provided')
+        return super().form_valid(form)
 
 
 @method_decorator(login_required, name='dispatch')
