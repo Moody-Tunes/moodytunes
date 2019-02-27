@@ -102,9 +102,13 @@ class MoodyUtil(object):
         return song
 
     @staticmethod
-    def create_user(username='test', password=DEFAULT_USER_PASSWORD):
+    def create_user(username='test', password=DEFAULT_USER_PASSWORD, email=None):
         user, _ = MoodyUser.objects.get_or_create(username=username)
         user.set_password(password)
+
+        if email:
+            user.email = email
+
         user.save()
 
         return user

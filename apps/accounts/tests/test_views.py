@@ -1,4 +1,8 @@
+from unittest import mock
+
 from django.conf import settings
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -409,3 +413,55 @@ class TestAnalyticsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
+
+
+class TestMoodyPasswordResetView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('accounts:reset-password')
+        cls.user = MoodyUtil.create_user(email='foo@example.com')
+
+    @mock.patch('django.contrib.auth.tokens.PasswordResetTokenGenerator.make_token')
+    @mock.patch('django.contrib.auth.forms.PasswordResetForm.send_mail')
+    def test_happy_path(self, mock_send_mail, mock_token_generator):
+        mock_token_generator.return_value = 'foo-bar'
+        expected_redirect = reverse('accounts:login')
+        data = {'email': self.user.email}
+
+        resp = self.client.post(self.url, data=data)
+
+        self.assertRedirects(resp, expected_redirect)
+
+        # Get session messages for response
+        messages = [m.message for m in get_messages(resp.wsgi_request)]
+        self.assertIn('We have sent a password reset email to the address provided', messages)
+
+        email_context = {
+            'email': 'foo@example.com',
+            'domain': 'testserver',
+            'site_name': 'testserver',
+            'uid': 'MQ',
+            'user': self.user,
+            'token': mock_token_generator(),
+            'protocol': 'http'
+        }
+
+        mock_send_mail.assert_called_once_with(
+            'registration/password_reset_subject.txt',
+            'password_reset_email.html',
+            email_context,
+            None,  # From email, defaults to DEFAULT_FROM_EMAIL
+            self.user.email,
+            html_email_template_name=None
+        )
+
+    @mock.patch('django.contrib.auth.forms.PasswordResetForm.send_mail')
+    def test_bad_email_is_rejected(self, mock_send_mail):
+        data = {'email': 'bad-data'}
+
+        resp = self.client.post(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn('Enter a valid email address.', resp.context['form'].errors['email'])
+
+        mock_send_mail.assert_not_called()
