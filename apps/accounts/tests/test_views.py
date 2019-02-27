@@ -3,7 +3,6 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -13,7 +12,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Emotion
-from libs.tests.helpers import MoodyUtil
+from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from libs.utils import average
 
 
@@ -435,8 +434,7 @@ class TestMoodyPasswordResetView(TestCase):
 
         self.assertRedirects(resp, expected_redirect)
 
-        # Get session messages for response
-        messages = [m.message for m in get_messages(resp.wsgi_request)]
+        messages = get_messages_from_response(resp)
         self.assertIn('We have sent a password reset email to the address provided', messages)
 
         email_context = {
@@ -529,6 +527,5 @@ class TestMoodyPasswordResetDone(TestCase):
 
         self.assertRedirects(resp, expected_redirect)
 
-        # Get session messages for response
-        messages = [m.message for m in get_messages(resp.wsgi_request)]
+        messages = get_messages_from_response(resp)
         self.assertIn('Please login with your new password', messages)
