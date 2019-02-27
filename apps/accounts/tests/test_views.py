@@ -1,7 +1,6 @@
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
