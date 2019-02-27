@@ -1,9 +1,13 @@
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -464,6 +468,54 @@ class TestMoodyPasswordResetView(TestCase):
         self.assertIn('Enter a valid email address.', resp.context['form'].errors['email'])
 
         mock_send_mail.assert_not_called()
+
+
+class TestMoodyPasswordResetConfirmView(TestCase):
+    def test_happy_path(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
+        token = PasswordResetTokenGenerator().make_token(user)
+
+        url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
+
+        initial_resp = self.client.get(url)
+        reset_url = initial_resp['Location']
+
+        expected_redirect = reverse('accounts:password-reset-complete')
+        data = {
+            'new_password1': 'password',
+            'new_password2': 'password'
+        }
+
+        resp = self.client.post(reset_url, data=data)
+
+        self.assertRedirects(resp, expected_redirect, fetch_redirect_response=False)
+
+        # Test password updated OK
+        user.refresh_from_db()
+        updated_user = authenticate(username=user.username, password=data['new_password1'])
+
+        self.assertEqual(user.pk, updated_user.pk)
+
+    def test_non_matching_passwords_are_rejected(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
+        token = PasswordResetTokenGenerator().make_token(user)
+
+        url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
+
+        initial_resp = self.client.get(url)
+        reset_url = initial_resp['Location']
+
+        data = {
+            'new_password1': 'foo',
+            'new_password2': 'bar'
+        }
+
+        resp = self.client.post(reset_url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn("The two password fields didn't match.", resp.context['form'].errors['new_password2'])
 
 
 class TestMoodyPasswordResetDone(TestCase):
