@@ -154,10 +154,9 @@ COMPRESS_PRECOMPILERS = (
 
 # Email settings
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')
-
-EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.filebased.EmailBackend')
-EMAIL_FILE_PATH = env.str('DJANGO_EMAIL_FILE_PATH', default='{}/django_emails/'.format(tempfile.gettempdir()))
 DEFAULT_FROM_EMAIL = SYSTEM_EMAIL_ADDRESS
+
+EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='__email-backend-not-set__')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

@@ -10,12 +10,19 @@
 #
 from .common import *
 
+import tempfile
+
 
 # We want to make it easy to create test users, so we'll remove the password
 # validators locally
 AUTH_PASSWORD_VALIDATORS = []
 
 CELERY_TASK_ALWAYS_EAGER = True
+
+# Use a file-based backend for testing emails
+# Any emails that would be normally sent can be viewed as text files at /tmp/django_emails/
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '{}/django_emails/'.format(tempfile.gettempdir())
 
 # Add ability to log messages to console
 LOGGING['handlers'].update({

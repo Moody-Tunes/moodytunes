@@ -14,6 +14,9 @@ AUTH_PASSWORD_VALIDATORS = []
 
 CELERY_TASK_ALWAYS_EAGER = True
 
+# Don't send emails when running unit tests
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
 # Don't rely on django_compressor for unit tests
 COMPRESS_ENABLED = False
 COMPRESS_PRECOMPILERS = ()
