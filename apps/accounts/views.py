@@ -3,14 +3,14 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordResetView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve, Resolver404
+from django.urls import reverse, resolve, Resolver404, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
@@ -49,10 +49,22 @@ class MoodyLoginView(LoginView):
 class MoodyPasswordResetView(PasswordResetView):
     success_url = settings.LOGIN_URL
     template_name = 'password_reset.html'
+    email_template_name = 'password_reset_email.html'
 
     def form_valid(self, form):
         messages.info(self.request, 'We have sent a password reset email to the address provided')
         return super().form_valid(form)
+
+
+class MoodyPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'password_change.html'
+    success_url = reverse_lazy('accounts:password-reset-complete')
+
+
+class MoodyPasswordResetDone(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        messages.info(self.request, 'Please login with your new password')
+        return settings.LOGIN_URL
 
 
 @method_decorator(login_required, name='dispatch')
