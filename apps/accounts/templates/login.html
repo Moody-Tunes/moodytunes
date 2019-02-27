@@ -16,6 +16,8 @@
 	{{ form.as_p }}
 	<button type="submit">Login</button>
 </form>
-<p class="create-account">Don't have an account? <a href="{% url 'accounts:create' %}">Create one here</a></p>
-<p class="reset-password">Forget your password? <a href="{% url 'accounts:reset-password' %}">Reset your password here</a></p>
+<div class="account-management-links">
+    <p class="create-account">Don't have an account? <a href="{% url 'accounts:create' %}">Create one here</a></p>
+    <p class="reset-password">Forget your password? <a href="{% url 'accounts:reset-password' %}">Reset your password here</a></p>
+</div>
 {% endblock %}
