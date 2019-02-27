@@ -465,3 +465,19 @@ class TestMoodyPasswordResetView(TestCase):
         self.assertIn('Enter a valid email address.', resp.context['form'].errors['email'])
 
         mock_send_mail.assert_not_called()
+
+
+class TestMoodyPasswordResetDone(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('accounts:password-reset-complete')
+
+    def test_happy_path(self):
+        expected_redirect = reverse('accounts:login')
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, expected_redirect)
+
+        # Get session messages for response
+        messages = [m.message for m in get_messages(resp.wsgi_request)]
+        self.assertIn('Please login with your new password', messages)
