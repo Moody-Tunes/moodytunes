@@ -48,6 +48,7 @@ class MoodyLoginView(LoginView):
 
 class MoodyPasswordResetView(PasswordResetView):
     success_url = settings.LOGIN_URL
+    template_name = 'password_reset.html'
 
     def form_valid(self, form):
         messages.info(self.request, 'We have sent a password reset email to the address provided')
