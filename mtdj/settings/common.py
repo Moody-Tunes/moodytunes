@@ -10,12 +10,11 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['moodytunes.vm'])
+SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 INTERNAL_IPS = ('127.0.0.1',)
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[SITE_HOSTNAME])
 
 APPEND_SLASH = True
-
-SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 
 WEBMASTER_EMAIL = env.str('MTDJ_WEBMASTER_EMAIL', default='foo@example.com')
 
@@ -116,8 +115,9 @@ CACHES.update({
 })
 
 AUTH_USER_MODEL = 'accounts.MoodyUser'
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -154,6 +154,9 @@ COMPRESS_PRECOMPILERS = (
 
 # Email settings
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')
+DEFAULT_FROM_EMAIL = SYSTEM_EMAIL_ADDRESS
+
+EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='__email-backend-not-set__')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

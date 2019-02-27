@@ -1,11 +1,14 @@
 import random
 import string
 
+from django.contrib.messages import get_messages
+
 from accounts.models import MoodyUser
 from tunes.models import Song, Emotion
 
 
 def generate_random_unicode_string(length):
+    # Generate a random string of non-ascii characters that is `length` characters long
     # From https://stackoverflow.com/questions/1477294/generate-random-utf-8-string-in-python
     # Credit: Jacob Wan
 
@@ -31,6 +34,15 @@ def generate_random_unicode_string(length):
     ]
 
     return ''.join(random.choice(alphabet) for _ in range(length))
+
+
+def get_messages_from_response(response):
+    """
+    Given a HttpResponse, pull the messages included in the session context from the object
+    :param response: (django.HttpResponse) Response returned from a test client call
+    :return: (list) Collection of messages from the response
+    """
+    return [m.message for m in get_messages(response.wsgi_request)]
 
 
 class SignalDisconnect(object):
@@ -102,9 +114,13 @@ class MoodyUtil(object):
         return song
 
     @staticmethod
-    def create_user(username='test', password=DEFAULT_USER_PASSWORD):
+    def create_user(username='test', password=DEFAULT_USER_PASSWORD, email=None):
         user, _ = MoodyUser.objects.get_or_create(username=username)
         user.set_password(password)
+
+        if email:
+            user.email = email
+
         user.save()
 
         return user
