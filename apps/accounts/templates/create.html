@@ -20,8 +20,9 @@
             {% endfor %}
         </div>
 	{% endif %}
+    <p>Email address is optional, we won't send you any spam mail! We use it for resetting your password if you forget it</p>
     <p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
-	<p>Username: {{ form.username }}</p>
+    <p>Username: {{ form.username }}</p>
     <p>Email: {{ form.email }}</p>
 	<p>Password: {{ form.password }}</p>
 	<p>Confirm password: {{ form.confirm_password }}</p>
