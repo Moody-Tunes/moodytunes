@@ -4,8 +4,8 @@
 {% load static %}
 
 {% block superhead %}
-    {% compress js %}
-        <script src="{% static 'accounts/js/password_confirmation.js' %}" defer></script>
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/update.less' %}">
     {% endcompress %}
 {% endblock %}
 
@@ -20,11 +20,9 @@
             {% endfor %}
         </div>
 	{% endif %}
-    <p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
-	<p>Password: {{ form.password }}</p>
-	<p>Confirm password: {{ form.confirm_password }}</p>
 	<button id="submit-button" type="submit">Update</button>
+    <a href="{{ password_reset_link }}"><button class="change-password-link" type="button">Update Password</button></a>
 </form>
 {% endblock %}

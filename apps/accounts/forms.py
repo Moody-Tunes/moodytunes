@@ -62,9 +62,9 @@ class UpdateUserForm(BaseUserForm):
 
         super().__init__(*args, **kwargs)
 
-        # Make updating password optional
-        self.fields['password'].required = False
-        self.fields['confirm_password'].required = False
+        # Remove ability to change password in form
+        del self.fields['password']
+        del self.fields['confirm_password']
 
     def clean_username(self):
         # If user is updating their username, need to check if it's already taken
