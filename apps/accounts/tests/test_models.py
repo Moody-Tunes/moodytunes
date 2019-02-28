@@ -1,5 +1,3 @@
-from unittest import mock
-
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.db.models.signals import post_save
