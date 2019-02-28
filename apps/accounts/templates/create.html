@@ -22,8 +22,9 @@
 	{% endif %}
     <p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 	<p>Username: {{ form.username }}</p>
+    <p>Email: {{ form.email }}</p>
 	<p>Password: {{ form.password }}</p>
 	<p>Confirm password: {{ form.confirm_password }}</p>
-	<button id="submit-button" type="submit">Submit</button>
+	<button id="submit-button" type="submit">Create</button>
 </form>
 {% endblock %}

@@ -115,9 +115,11 @@ class CreateUserView(View):
 
         if form.is_valid():
             user = MoodyUser.objects.create(username=form.cleaned_data['username'])
+            user.email = form.cleaned_data.get('email')
             user.set_password(form.cleaned_data['password'])
             user.save()
 
+            logger.info('Created new user: {}'.format(user.username))
             messages.info(request, 'Your account has been created.')
 
             return HttpResponseRedirect(reverse('accounts:login'))
