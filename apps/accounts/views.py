@@ -93,10 +93,6 @@ class UpdateInfoView(View):
             request.user.update_information(form.cleaned_data)
             messages.info(request, 'Your account information has been updated.')
 
-            # If user changed their password, they need to re-authenticate
-            if form.cleaned_data.get('password'):
-                messages.info(request, 'Please login with your new password.')
-
             return HttpResponseRedirect(reverse('accounts:profile'))
         else:
             return render(request, self.template_name, {'form': form})

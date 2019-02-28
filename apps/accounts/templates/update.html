@@ -3,12 +3,6 @@
 {% load compress %}
 {% load static %}
 
-{% block superhead %}
-    {% compress js %}
-        <script src="{% static 'accounts/js/password_confirmation.js' %}" defer></script>
-    {% endcompress %}
-{% endblock %}
-
 {% block content %}
 <h1>Update</h1>
 <form id="password-form" method="post">
@@ -20,11 +14,8 @@
             {% endfor %}
         </div>
 	{% endif %}
-    <p id="password-error" class="error-message" hidden>Please ensure your password and confirm password match!</p>
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
-	<p>Password: {{ form.password }}</p>
-	<p>Confirm password: {{ form.confirm_password }}</p>
 	<button id="submit-button" type="submit">Update</button>
 </form>
 {% endblock %}

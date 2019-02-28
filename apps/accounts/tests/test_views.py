@@ -101,21 +101,6 @@ class TestUpdateView(TestCase):
         self.assertEqual(user.username, update_data['username'])
         self.assertEqual(user.email, update_data['email'])
 
-    def test_updating_password_redirect_to_login(self):
-        user = MoodyUtil.create_user()
-        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
-
-        update_data = {
-            'username': user.username,
-            'password': 'superSecret123',
-            'confirm_password': 'superSecret123'
-        }
-
-        resp = self.client.post(self.url, data=update_data, follow=True)
-
-        expected_redirect = '{}?next={}'.format(reverse('accounts:login'), reverse('accounts:profile'))
-        self.assertRedirects(resp, expected_redirect)
-
     def test_updating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
         other_user = MoodyUtil.create_user(username='something-else')
