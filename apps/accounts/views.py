@@ -3,12 +3,15 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, resolve, Resolver404, reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.views import View
 from django.views.generic.base import TemplateView, RedirectView
 from rest_framework import generics
@@ -78,13 +81,28 @@ class UpdateInfoView(View):
     template_name = 'update.html'
 
     def get(self, request):
+        # Construct password reset link for user
+        # Logic for constructing uid64 and token are lifted from Django's password reset form
+        password_reset_link = reverse(
+            'accounts:password-reset-confirm',
+            kwargs={
+                'uidb64': urlsafe_base64_encode(force_bytes(self.request.user.pk)).decode(),
+                'token': default_token_generator.make_token(self.request.user)
+            }
+        )
+
         initial_data = {
             'username': self.request.user.username,
             'email': self.request.user.email
         }
 
         form = self.form_class(initial=initial_data, user=request.user)
-        return render(request, self.template_name, {'form': form})
+        context = {
+            'form': form,
+            'password_reset_link': password_reset_link
+        }
+
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, user=request.user)
