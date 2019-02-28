@@ -23,6 +23,7 @@ class BaseUserForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
+    email = forms.EmailField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
 
     def clean_password(self):
         new_password = self.cleaned_data.get('password')
@@ -56,8 +57,6 @@ class CreateUserForm(BaseUserForm):
 
 
 class UpdateUserForm(BaseUserForm):
-    email = forms.EmailField(required=False)
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
 
