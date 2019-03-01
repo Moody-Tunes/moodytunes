@@ -147,9 +147,15 @@ STATICFILES_FINDERS = (
 
 # Always compress static files with django_compressor
 COMPRESS_ENABLED = True
+UGLIFY_BINARY = env.str('MTDJ_UGLIFY_BINARY', default='/usr/local/bin/uglifyjs')
+UGLIFY_ARGUMENTS = env.str('MTDJ_UGLIFY_OPTIONS', default='-m')
 
 COMPRESS_PRECOMPILERS = (
    ('text/less', 'lessc {infile} {outfile}'),
+)
+
+COMPRESS_JS_FILTERS = (
+    'libs.compressors.UglifyJSFilter',
 )
 
 # Email settings

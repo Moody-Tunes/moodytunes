@@ -2,7 +2,6 @@ import os
 import sys
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
 from envparse import env
 
 # Load env file
