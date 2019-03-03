@@ -74,10 +74,24 @@ logger.error('You should have gone for the head')
 ### Static Files
 
 Static files are served through nginx in our setup. When you make changes to static files during development, you will
-need to run the management command to have Django collect your static files into the _static directory that nginx will
+need to run the management command to have Django collect your static files into the \_static directory that nginx will
 read when a request is made for a static file. Simply run the following command:
 
 `./manage.py collectstatic`
 
 after making changes to static files to have them collected and be available to serve. You will need to do this for
 every change made during development.
+
+### Running Daemon Processes
+
+We use `systemd` for managing the processes needed for running the site. We currently have configurations set up for gunicorn, celery, and celery_beat to run through `systemctl` in the background. To start the daemon, enter
+
+`sudo systemctl start {process_name}`
+
+You can verify the status through the command by entering
+
+`sudo systemctl status {process_name}`
+
+To halt the daemon, enter
+
+`sudo systemctl stop {process_name}`
