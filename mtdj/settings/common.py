@@ -163,6 +163,7 @@ SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytu
 DEFAULT_FROM_EMAIL = SYSTEM_EMAIL_ADDRESS
 
 EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='__email-backend-not-set__')
+EMAIL_FILE_PATH = '{}/django_emails/'.format(tempfile.gettempdir())  # For file-based email backend
 EMAIL_HOST = env.str('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_PORT = env.int('DJANGO_EMAIL_PORT', default=25)
 EMAIL_HOST_USER = env.str('DJANGO_EMAIL_HOST_USER', default='')
