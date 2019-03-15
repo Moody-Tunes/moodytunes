@@ -1,3 +1,5 @@
+import random
+
 from django import forms
 
 from accounts.models import UserSongVote
@@ -26,6 +28,12 @@ class BrowseForm(forms.Form):
         max_value=0.5,
         widget=RangeInput(attrs={'step': .05, 'class': 'slider', 'value': .15})
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Set the initial emotion to a random value to avoid the "default" option being overly selected
+        self.fields['emotion'].initial = random.choice(self.fields['emotion'].choices)
 
 
 class PlaylistForm(forms.Form):
