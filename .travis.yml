@@ -6,6 +6,6 @@ install:
   pip install -r requirements/common.txt
 
 script:
-  - coverage run coverage run -m pytest
+  - coverage run -m pytest
   - flake8
   - coverage report
