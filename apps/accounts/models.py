@@ -123,6 +123,7 @@ class UserSongVote(BaseModel):
     track what songs a user associates with a particular emotion.
     """
     CONTEXT_CHOICES = [
+        ('', '-----------'),
         ('PARTY', 'Listening to music at a party'),
         ('RELAX', 'Listening to music to relax'),
         ('WORK', 'Listening to music while working on a task'),
