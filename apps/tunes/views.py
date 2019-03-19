@@ -129,6 +129,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 user_id=self.request.user.id,
                 emotion__name=self.cleaned_data['emotion'],
                 song__code=self.cleaned_data['song_code'],
+                context=self.cleaned_data.get('context', ''),
                 vote=True
             )
 

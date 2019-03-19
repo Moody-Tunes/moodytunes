@@ -390,6 +390,43 @@ class TestVoteView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
+    def test_delete_with_duplicate_votes_for_different_contexts_is_allowed(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        # Create a vote for a song with one context
+        # (This is the one we'll delete in this test)
+        deleted_vote = UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            context='WORK',
+            vote=True
+        )
+
+        # Create a vote for the same song with a different context
+        # (This is one that should still be upvoted afterwards)
+        conistent_vote = UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=self.song,
+            context='PARTY',
+            vote=True
+        )
+
+        data = {
+            'emotion': emotion.name,
+            'song_code': self.song.code,
+            'context': 'WORK'
+        }
+
+        resp = self.api_client.delete(self.url, data=data, format='json')
+        deleted_vote.refresh_from_db()
+        conistent_vote.refresh_from_db()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertFalse(deleted_vote.vote)
+        self.assertTrue(conistent_vote.vote)
+
 
 class TestPlaylistView(TestCase):
     @classmethod
