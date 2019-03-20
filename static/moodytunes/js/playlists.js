@@ -4,8 +4,9 @@
     function deleteVote() {
         var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
+        var context = document.getElementById('id_context').value || undefined;
 
-        document.MoodyTunesClient.deleteVote(song, emotion, function(data) {
+        document.MoodyTunesClient.deleteVote(song, emotion, context, function(data) {
             // Disable buttons to prevent double votes for a track
             var songContainer = document.getElementById('song-' + song);
             songContainer.className += ' song-container-vote-delete';

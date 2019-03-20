@@ -61,6 +61,7 @@ class DeleteVoteRequestSerializer(serializers.Serializer):
 
     emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     song_code = serializers.CharField()
+    context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
 
 
 class PlaylistSongsRequestSerializer(serializers.Serializer):

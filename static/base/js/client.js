@@ -152,11 +152,12 @@
             };
             this.request('POST', '/tunes/vote/', {}, data, callback);
         },
-        deleteVote: function(songCode, emotion, callback) {
+        deleteVote: function(songCode, emotion, context, callback) {
             // "Unvote" a song the user has previously reported as making them feel the desired emotion
             var data = {
                 song_code: songCode,
-                emotion: emotion
+                emotion: emotion,
+                context: context,
             };
             this.request('DELETE', '/tunes/vote/', {}, data, callback);
         }
