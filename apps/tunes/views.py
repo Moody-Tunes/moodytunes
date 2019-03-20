@@ -135,10 +135,11 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
             vote.delete()
 
-            logger.info('Deleted vote for user {} with song {} and emotion {}'.format(
+            logger.info('Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
                 self.request.user.username,
                 self.cleaned_data['song_code'],
-                self.cleaned_data['emotion']
+                self.cleaned_data['emotion'],
+                self.cleaned_data.get('context'),
             ))
 
             return JsonResponse({'status': 'OK'})
