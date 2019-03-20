@@ -365,31 +365,6 @@ class TestVoteView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_vote_conflict(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-
-        UserSongVote.objects.create(
-            user=self.user,
-            emotion=emotion,
-            song=self.song,
-            vote=True
-        )
-        UserSongVote.objects.create(
-            user=self.user,
-            emotion=emotion,
-            song=self.song,
-            vote=True
-        )
-
-        data = {
-            'emotion': Emotion.HAPPY,
-            'song_code': self.song.code
-        }
-
-        resp = self.api_client.delete(self.url, data=data, format='json')
-
-        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
-
     def test_delete_with_duplicate_votes_for_different_contexts_is_allowed(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 

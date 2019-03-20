@@ -125,31 +125,34 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
     def destroy(self, request, *args, **kwargs):
         try:
-            vote = UserSongVote.objects.get(
+            votes = UserSongVote.objects.filter(
                 user_id=self.request.user.id,
                 emotion__name=self.cleaned_data['emotion'],
                 song__code=self.cleaned_data['song_code'],
-                context=self.cleaned_data.get('context', ''),
                 vote=True
             )
 
-            vote.delete()
+            if self.cleaned_data.get('context'):
+                votes = votes.filter(context=self.cleaned_data['context'])
 
-            logger.info('Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
-                self.request.user.username,
-                self.cleaned_data['song_code'],
-                self.cleaned_data['emotion'],
-                self.cleaned_data.get('context'),
-            ))
+            if not votes.exists():
+                raise UserSongVote.DoesNotExist()
+
+            for vote in votes:
+                vote.delete()
+
+                logger.info('Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
+                    self.request.user.username,
+                    self.cleaned_data['song_code'],
+                    self.cleaned_data['emotion'],
+                    self.cleaned_data.get('context'),
+                ))
 
             return JsonResponse({'status': 'OK'})
 
         except UserSongVote.DoesNotExist:
             logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
             raise Http404
-        except UserSongVote.MultipleObjectsReturned:
-            logger.warning('Conflict when trying to delete UserSongVote', extra={'request_data': self.cleaned_data})
-            return Response(status=status.HTTP_409_CONFLICT)
 
 
 class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
