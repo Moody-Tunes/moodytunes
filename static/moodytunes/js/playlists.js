@@ -13,6 +13,10 @@
             var button = songContainer.querySelectorAll('button')[0];  // We've only got the one delete button
             button.disabled = true;
             button.className += ' vote-button-delete-chosen';
+
+            // Update analytics after delete has been processed
+            var genre = document.getElementById('id_genre').value || undefined;
+            document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
         })
     }
 
@@ -132,7 +136,7 @@
         var context = document.getElementById('id_context').value || undefined;
 
         document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics)
+        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
     }
 
     var generatePlaylistButton = document.getElementById('generate-playlist');
