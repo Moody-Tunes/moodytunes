@@ -120,6 +120,8 @@ class Command(MoodyBaseCommand):
                     log_level=logging.ERROR
                 )
 
+                break
+
         return tracks
 
     def handle(self, *args, **options):
