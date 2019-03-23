@@ -1,6 +1,6 @@
 from unittest import mock
 
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from django.test import TestCase
 
 from tunes.management.commands.tunes_create_songs_from_spotify import Command as SpotifyCommand
@@ -80,13 +80,12 @@ class TestSpotifyCommand(TestCase):
         self.assertEqual(fail, 1)
 
     @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
-    def test_spotify_exception_raised_with_no_tracks(self, mock_spotify_request):
-        # This test ensures that having Spotify raise an Exception does not blow up the command
+    def test_script_raises_command_error_if_no_tracks_retrieved(self, mock_spotify_request):
+        # We'll raise an exception on the first request to ensure we don't get any tracks back
         mock_spotify_request.side_effect = SpotifyException('Test Spotify Exception')
 
-        call_command('tunes_create_songs_from_spotify')
-
-        self.assertEqual(Song.objects.count(), 0)
+        with self.assertRaises(CommandError):
+            call_command('tunes_create_songs_from_spotify')
 
     @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
     @mock.patch('libs.spotify.SpotifyClient.get_songs_from_playlist')
