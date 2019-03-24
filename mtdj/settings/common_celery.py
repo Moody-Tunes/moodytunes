@@ -10,6 +10,10 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'America/New_York'
 
+DJANGO_CELERY_RESULTS = {
+    'ALLOW_EDITS': False  # Disable editing results in admin interface
+}
+
 # Define periodic tasks here as key:value pairs
 # Key should be a string identifying the task to be run
 # Value should be a dictionary containing configurations for the periodic task
