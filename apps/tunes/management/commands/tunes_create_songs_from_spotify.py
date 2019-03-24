@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.management import CommandError
 
 from base.management.commands import MoodyBaseCommand
 from tunes.models import Song
@@ -20,7 +21,7 @@ class Command(MoodyBaseCommand):
         Given a list of parameters for Song records, create the objects in the database.
 
         :param tracks: (list) List of dictionaries containing data to store for Song objects
-        :return: Two tuple of amount of tracks that successfully processed and how many failed to process
+        :return: (tuple(int, int)) Number of tracks successfully processed and failed to process
         """
         success, fail = 0, 0
         for track in tracks:
@@ -50,7 +51,7 @@ class Command(MoodyBaseCommand):
         """
         Request, format, and return tracks from Spotify's API.
 
-        :return: (list[dict]) Track data for saving as Song records
+        :return: (list(dict)) Track data for saving as Song records
         """
         spotify = SpotifyClient(identifier=self._unique_id)
         tracks = []
@@ -104,9 +105,19 @@ class Command(MoodyBaseCommand):
             except SpotifyException as exc:
                 self.write_to_log_and_output(
                     'Error connecting to Spotify! Exception detail: {}. '
-                    'Got {} track(s) successfully. Proceeding to save phase...'.format(exc, len(tracks)),
+                    'Got {} track(s) successfully.'.format(exc, len(tracks)),
                     output_stream='stderr',
                     log_level=logging.WARNING
+                )
+
+                break
+
+            except Exception as exc:
+                self.write_to_log_and_output(
+                    'Unhandled exception when collecting songs from Spotify! Exception detail: {}. '
+                    'Got {} track(s) successfully.'.format(exc, len(tracks)),
+                    output_stream='stderr',
+                    log_level=logging.ERROR
                 )
 
                 break
@@ -117,6 +128,17 @@ class Command(MoodyBaseCommand):
         self.write_to_log_and_output('Starting run to create songs from Spotify')
 
         tracks = self.get_tracks_from_spotify()
+
+        if not tracks:
+            # If we didn't get any tracks back from Spotify, raise an exception
+            # This will get caught by the periodic task and retry the script again
+            self.write_to_log_and_output(
+                'Failed to fetch any tracks from Spotify',
+                output_stream='stderr',
+                log_level=logging.WARNING
+            )
+
+            raise CommandError('Failed to fetch any songs from Spotify')
 
         self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
 
