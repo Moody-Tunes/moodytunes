@@ -13,6 +13,7 @@ gunicorn==19.9.0
 psycopg2-binary==2.7.7
 python-json-logger==0.1.10
 pytest==4.3.1
+pytest-blockage==0.2.2
 pytest-django==3.4.8
 redis==3.2.0
 requests==2.20.0
