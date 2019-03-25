@@ -99,27 +99,36 @@
         return playButton
     }
 
+    function createSong(song) {
+        var songContainer = document.createElement('div');
+        songContainer.id = 'song-' + song.code;
+        songContainer.className = 'song-container';
+
+        songContainer.appendChild(createPlayButton(song));
+        songContainer.appendChild(createVoteButtons(song));
+
+        return songContainer;
+    }
+
     function displayBrowsePlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
-        var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
-
 
         // Clean out playlist if there are any old songs still present
-        while(playlistContainer.hasChildNodes()) {
+        while (playlistContainer.hasChildNodes()) {
             playlistContainer.removeChild(playlistContainer.firstChild);
         }
 
-        for (var i=0; i<data.length; i++) {
-            var song = data[i];
-            var songContainer = document.createElement('div');
-            songContainer.id = 'song-' + song.code;
-            songContainer.className = 'song-container';
+        // Check if response has any errors
+        if (data.errors) {
+            console.error('Got errors: ' + JSON.stringify(data.errors));
+        } else {
+            var noResultsFoundAlert = document.getElementById('alert-no-results');
+            noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
-            songContainer.appendChild(createPlayButton(song));
-            songContainer.appendChild(createVoteButtons(song));
-
-            playlistContainer.appendChild(songContainer);
+            // Build playlist from returned data
+            for (var i = 0; i < data.length; i++) {
+                playlistContainer.appendChild(createSong(data[i]));
+            }
         }
     }
 
