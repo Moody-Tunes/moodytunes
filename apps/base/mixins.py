@@ -30,6 +30,7 @@ class ValidateRequestDataMixin(MoodyMixin):
     def __init__(self):
         self.cleaned_data = {}  # Cleaned data for request
         self.data = None   # Used in cases where we're reading the request body (POST, DELETE)
+        self.errors = None  # Errors from the request
         super().__init__()
 
     def _clean_headers(self, headers):
@@ -82,6 +83,7 @@ class ValidateRequestDataMixin(MoodyMixin):
                 return True
             else:
                 self._log_bad_request(request, serializer)
+                self.errors = serializer.errors
                 return False
         else:
             raise AttributeError(
@@ -101,7 +103,7 @@ class GetRequestValidatorMixin(ValidateRequestDataMixin):
         if self._validate_request(request):
             return super(GetRequestValidatorMixin, self).get(request, *args, **kwargs)
         else:
-            return BadRequest()
+            return BadRequest(data={'errors': self.errors})
 
 
 class PostRequestValidatorMixin(ValidateRequestDataMixin):
