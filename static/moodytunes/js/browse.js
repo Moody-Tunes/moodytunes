@@ -46,6 +46,21 @@
         }
     }
 
+    function handleBadRequest(errors) {
+        var errorContainer = document.getElementById('playlist-error-container');
+        var errorList = document.createElement('ul');
+
+        for (var key in errors) {
+            if (errors.hasOwnProperty(key)) {
+                var error = document.createElement('li');
+                error.innerText = key + ': ' + errors[key];
+                errorList.appendChild(error);
+            }
+        }
+
+        errorContainer.appendChild(errorList);
+    }
+
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
@@ -120,7 +135,7 @@
 
         // Check if response has any errors
         if (data.errors) {
-            console.error('Got errors: ' + JSON.stringify(data.errors));
+            handleBadRequest(data.errors);
         } else {
             var noResultsFoundAlert = document.getElementById('alert-no-results');
             noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
