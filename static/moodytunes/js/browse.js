@@ -48,6 +48,12 @@
 
     function handleBadRequest(errors) {
         var errorContainer = document.getElementById('playlist-error-container');
+
+        // Clean out older errors
+        while (errorContainer.hasChildNodes()) {
+            errorContainer.removeChild(errorContainer.firstChild);
+        }
+
         var errorList = document.createElement('ul');
 
         for (var key in errors) {
