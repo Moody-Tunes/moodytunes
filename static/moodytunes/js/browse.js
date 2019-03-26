@@ -133,6 +133,8 @@
 
     function displayBrowsePlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
+        var noResultsFoundAlert = document.getElementById('alert-no-results');
+        noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         // Clean out playlist if there are any old songs still present
         while (playlistContainer.hasChildNodes()) {
@@ -143,7 +145,6 @@
         if (data.errors) {
             handleBadRequest(data.errors);
         } else {
-            var noResultsFoundAlert = document.getElementById('alert-no-results');
             noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
             // Build playlist from returned data
