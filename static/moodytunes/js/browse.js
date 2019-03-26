@@ -46,27 +46,6 @@
         }
     }
 
-    function handleBadRequest(errors) {
-        var errorContainer = document.getElementById('playlist-error-container');
-
-        // Clean out older errors
-        while (errorContainer.hasChildNodes()) {
-            errorContainer.removeChild(errorContainer.firstChild);
-        }
-
-        var errorList = document.createElement('ul');
-
-        for (var key in errors) {
-            if (errors.hasOwnProperty(key)) {
-                var error = document.createElement('li');
-                error.innerText = key + ': ' + errors[key];
-                errorList.appendChild(error);
-            }
-        }
-
-        errorContainer.appendChild(errorList);
-    }
-
     function voteOnSong() {
         var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
@@ -136,14 +115,10 @@
         var noResultsFoundAlert = document.getElementById('alert-no-results');
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
-        // Clean out playlist if there are any old songs still present
-        while (playlistContainer.hasChildNodes()) {
-            playlistContainer.removeChild(playlistContainer.firstChild);
-        }
+        document.PlaylistCurator.clearChildren(playlistContainer);
 
-        // Check if response has any errors
         if (data.errors) {
-            handleBadRequest(data.errors);
+            document.PlaylistCurator.displayRequestErrors(data.errors);
         } else {
             noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
