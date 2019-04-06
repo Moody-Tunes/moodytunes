@@ -167,8 +167,8 @@ EMAIL_BACKEND = env.str('DJANGO_EMAIL_BACKEND', default='django.core.mail.backen
 EMAIL_FILE_PATH = '{}/django_emails/'.format(tempfile.gettempdir())  # For file-based email backend
 EMAIL_HOST = env.str('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_PORT = env.int('DJANGO_EMAIL_PORT', default=25)
-EMAIL_HOST_USER = env.str('DJANGO_EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = env.str('DJANGO_EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_USER = env.str('DJANGO_EMAIL_USER', default='')
+EMAIL_HOST_PASSWORD = env.str('DJANGO_EMAIL_PASSWORD', default='')
 EMAIL_USE_TLS = env.bool('DJANGO_EMAIL_USE_TLS', default=True)
 
 REST_FRAMEWORK = {
