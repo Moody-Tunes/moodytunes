@@ -8,7 +8,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
-CELERY_TIMEZONE = 'America/New_York'
 
 DJANGO_CELERY_RESULTS = {
     'ALLOW_EDITS': False  # Disable editing results in admin interface
