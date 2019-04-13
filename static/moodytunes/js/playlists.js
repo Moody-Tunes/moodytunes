@@ -80,7 +80,7 @@
         var buttonContainer = document.getElementById('playlist-pagination-button-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
 
-        var songs = data.results;
+        var votes = data.results;
         var nextLink = data.next;
         var previousLink = data.previous;
 
@@ -93,8 +93,8 @@
         } else{
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-            for (var i=0; i<songs.length; i++) {
-                var vote = songs[i];
+            for (var i=0; i<votes.length; i++) {
+                var vote = votes[i];
                 var song = vote.song;
 
                 var songContainer = document.createElement('div');
