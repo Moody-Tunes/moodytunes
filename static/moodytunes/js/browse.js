@@ -115,7 +115,9 @@
         var noResultsFoundAlert = document.getElementById('alert-no-results');
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
+        // CLear out the previous errors and playlist
         document.PlaylistCurator.clearChildren(playlistContainer);
+        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
 
         if (data.errors) {
             document.PlaylistCurator.displayRequestErrors(data.errors);
