@@ -1,6 +1,11 @@
 'use strict';
 
 (function IIFE() {
+    function init() {
+        var generatePlaylistButton = document.getElementById('generate-playlist');
+        generatePlaylistButton.onclick = getEmotionPlaylist;
+    }
+
     function deleteVote() {
         var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
@@ -131,6 +136,5 @@
         document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
     }
 
-    var generatePlaylistButton = document.getElementById('generate-playlist');
-    generatePlaylistButton.onclick = getEmotionPlaylist;
+    init();
 })();

@@ -1,4 +1,11 @@
 (function IIFE() {
+    function init() {
+        setUpContextModal();
+        setUpJitterInput();
+        var generatePlaylistButton = document.getElementById('generate-playlist');
+        generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
+    }
+
     function setUpContextModal() {
         var modal = document.getElementById('context-modal');
         var closeModal = document.getElementById('close-modal');
@@ -135,8 +142,5 @@
         );
     }
 
-    setUpContextModal();
-    setUpJitterInput();
-    var generatePlaylistButton = document.getElementById('generate-playlist');
-    generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
+    init();
 })();
