@@ -98,7 +98,7 @@
         return buttonContainer;
     }
 
-    function createSong(song) {
+    function createSongContainer(song) {
         var songContainer = document.createElement('div');
         songContainer.id = 'song-' + song.code;
         songContainer.className = 'song-container';
@@ -124,7 +124,7 @@
 
             // Build playlist from returned data
             for (var i = 0; i < data.length; i++) {
-                playlistContainer.appendChild(createSong(data[i]));
+                playlistContainer.appendChild(createSongContainer(data[i]));
             }
         }
     }
