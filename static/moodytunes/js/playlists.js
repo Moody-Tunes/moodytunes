@@ -34,14 +34,6 @@
         return buttonContainer
     }
 
-    function createPlayButton(song) {
-        var playButton = document.createElement('iframe');
-        playButton.className = 'play-button';
-        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
-
-        return playButton
-    }
-
     function createPaginationButton(link, type) {
         var name = type.charAt(0).toUpperCase() + type.slice(1);
         var button = document.createElement('button');
@@ -109,7 +101,7 @@
                 songContainer.id = 'song-' + song.code;
                 songContainer.className = 'song-container';
 
-                songContainer.appendChild(createPlayButton(song));
+                songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
 
                 var descriptionContainer = document.createElement('p');
                 descriptionContainer.className = 'song-description-container';

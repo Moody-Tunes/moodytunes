@@ -32,5 +32,12 @@
 
             errorContainer.appendChild(errorList);
         },
+        createPlayButton: function(song) {
+            var playButton = document.createElement('iframe');
+            playButton.className = 'play-button';
+            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+
+            return playButton
+        }
     }
 })();

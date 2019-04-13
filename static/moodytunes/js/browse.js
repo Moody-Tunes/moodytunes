@@ -91,20 +91,12 @@
         return buttonContainer;
     }
 
-    function createPlayButton(song) {
-        var playButton = document.createElement('iframe');
-        playButton.className = 'play-button';
-        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
-
-        return playButton
-    }
-
     function createSong(song) {
         var songContainer = document.createElement('div');
         songContainer.id = 'song-' + song.code;
         songContainer.className = 'song-container';
 
-        songContainer.appendChild(createPlayButton(song));
+        songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
         songContainer.appendChild(createVoteButtons(song));
 
         return songContainer;
