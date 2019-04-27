@@ -34,7 +34,6 @@ form {
 .hClass(6);
 
 button {
-	box-shadow: inset 0 1px 0 0 @pureWhite;
 	background: linear-gradient(to bottom, @pureWhite 5%, #f6f6f6 100%);
 	border-radius: 6px;
 	border: 1px solid #dcdcdc;
@@ -45,16 +44,19 @@ button {
 	font-weight: bold;
 	padding: 6px 24px;
 	text-decoration: none;
-	text-shadow:0 1px 0 @pureWhite;
 
     &:disabled {
         top: 0 !important;
         background: #EEE !important;
         border: 1px solid #DDD;
-        text-shadow: 0 1px 1px white !important;
         color: #CCC !important;
         cursor: default !important;
     }
+}
+
+.warning-button {
+    background: @brightRed;
+    color: @pureWhite;
 }
 
 /* server message definitions */
