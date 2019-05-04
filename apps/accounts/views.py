@@ -74,16 +74,12 @@ class MoodyPasswordResetDone(RedirectView):
 class ProfileView(TemplateView):
     template_name = 'profile.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ProfileView, self).get_context_data(**kwargs)
 
-@method_decorator(login_required, name='dispatch')
-class UpdateInfoView(View):
-    form_class = UpdateUserForm
-    template_name = 'update.html'
-
-    def get(self, request):
         # Construct password reset link for user
         # Logic for constructing uid64 and token are lifted from Django's password reset form
-        password_reset_link = reverse(
+        context['password_reset_link'] = reverse(
             'accounts:password-reset-confirm',
             kwargs={
                 'uidb64': urlsafe_base64_encode(force_bytes(self.request.user.pk)).decode(),
@@ -91,16 +87,21 @@ class UpdateInfoView(View):
             }
         )
 
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class UpdateInfoView(View):
+    form_class = UpdateUserForm
+    template_name = 'update.html'
+
+    def get(self, request):
         initial_data = {
             'username': self.request.user.username,
             'email': self.request.user.email
         }
 
         form = self.form_class(initial=initial_data, user=request.user)
-        context = {
-            'form': form,
-            'password_reset_link': password_reset_link
-        }
+        context = {'form': form}
 
         return render(request, self.template_name, context)
 
