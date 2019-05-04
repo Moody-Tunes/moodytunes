@@ -207,6 +207,10 @@ LOGGING = {
             'format': '{levelname}: {name} - {message}',
             'style': '{',
         },
+        'gunicorn': {
+            'format': '{message}',
+            'style': '{'
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -230,12 +234,39 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
-        }
+        },
+        'gunicorn': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
+            'formatter': 'gunicorn',
+        },
+        'celery': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '{}/celery.log'.format(LOGGING_DIR),
+            'formatter': 'json',
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins', 'error_file'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+        'gunicorn': {
+            'handlers': ['gunicorn'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django_celery_beat': {
+            'handlers': ['celery'],
+            'level': 'INFO',
             'propagate': False,
         },
     },
