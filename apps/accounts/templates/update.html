@@ -3,14 +3,8 @@
 {% load compress %}
 {% load static %}
 
-{% block superhead %}
-    {% compress css %}
-        <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/update.less' %}">
-    {% endcompress %}
-{% endblock %}
-
 {% block content %}
-<h1>Update</h1>
+<h1>Update Account Information</h1>
 <form id="password-form" method="post">
 	{% csrf_token %}
 	{% if form.errors %}
@@ -23,6 +17,5 @@
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
 	<button id="submit-button" type="submit">Update</button>
-    <a href="{{ password_reset_link }}"><button class="change-password-link" type="button">Update Password</button></a>
 </form>
 {% endblock %}
