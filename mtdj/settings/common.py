@@ -251,7 +251,7 @@ LOGGING = {
         'gunicorn': {
             'handlers': ['gunicorn'],
             'level': 'INFO',
-            'propogate': False,
+            'propagate': False,
         }
     },
     'root': {
