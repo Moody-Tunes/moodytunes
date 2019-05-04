@@ -240,7 +240,13 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
             'formatter': 'gunicorn',
-        }
+        },
+        'celery': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '{}/celery.log'.format(LOGGING_DIR),
+            'formatter': 'json',
+        },
     },
     'loggers': {
         'django.request': {
@@ -252,7 +258,12 @@ LOGGING = {
             'handlers': ['gunicorn'],
             'level': 'INFO',
             'propagate': False,
-        }
+        },
+        'celery': {
+            'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
     'root': {
         'handlers': ['mail_admins', 'app_file', 'error_file'],
