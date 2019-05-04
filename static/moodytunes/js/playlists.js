@@ -98,7 +98,7 @@
 
         if (data.errors) {
             document.PlaylistCurator.displayRequestErrors(data.errors);
-        } else{
+        } else {
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
             for (var i=0; i<votes.length; i++) {
