@@ -52,10 +52,12 @@
     }
 
     function displayAnalytics(data) {
-        document.getElementById('analytics-emotion').innerText = data.emotion_name;
-        document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
-        document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
-        document.getElementById('analytics-total-songs').innerText = data.total_songs;
+        if (!data.errors){
+            document.getElementById('analytics-emotion').innerText = data.emotion_name;
+            document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
+            document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
+            document.getElementById('analytics-total-songs').innerText = data.total_songs;
+        }
     }
 
     function getPaginatedEmotionPlaylist() {
