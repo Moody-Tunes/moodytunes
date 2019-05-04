@@ -207,6 +207,10 @@ LOGGING = {
             'format': '{levelname}: {name} - {message}',
             'style': '{',
         },
+        'gunicorn': {
+            'format': '{message}',
+            'style': '{'
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -230,6 +234,12 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
+        },
+        'gunicorn': {
+            'level': 'INFO',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
+            'formatter': 'gunicorn',
         }
     },
     'loggers': {
@@ -238,6 +248,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'gunicorn': {
+            'handlers': ['gunicorn'],
+            'level': 'INFO',
+            'propogate': False,
+        }
     },
     'root': {
         'handlers': ['mail_admins', 'app_file', 'error_file'],
