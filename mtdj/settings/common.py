@@ -264,6 +264,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'django_celery_beat': {
+            'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
     'root': {
         'handlers': ['mail_admins', 'app_file', 'error_file'],
