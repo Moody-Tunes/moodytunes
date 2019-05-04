@@ -28,6 +28,10 @@ LOGGING['handlers'].update({
     },
 })
 
+# Django debug toolbar configuration
+INSTALLED_APPS.append('debug_toolbar')
+MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 LOGGING['root']['handlers'].append('console')
 LOGGING['root']['level'] = 'DEBUG'
