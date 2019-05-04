@@ -10,6 +10,7 @@
     {% endcompress %}
 
     {% compress js %}
+        <script src="{% static 'moodytunes/js/curator.js' %}" defer></script>
         <script src="{% static 'moodytunes/js/playlists.js' %}" defer></script>
     {% endcompress %}
 {% endblock %}
@@ -41,6 +42,7 @@
     </div>
     {{ form.as_p }}
     <button id="generate-playlist">Generate</button>
+    <div id="playlist-error-container"></div>
     <p id="alert-no-results" class="warning" hidden>No songs you have previously voted on fit the criteria specified</p>
 </div>
 <div id="playlist-display-container"></div>

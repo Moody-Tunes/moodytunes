@@ -1,6 +1,11 @@
 'use strict';
 
 (function IIFE() {
+    function init() {
+        var generatePlaylistButton = document.getElementById('generate-playlist');
+        generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
+    }
+
     function deleteVote() {
         var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
@@ -34,14 +39,6 @@
         return buttonContainer
     }
 
-    function createPlayButton(song) {
-        var playButton = document.createElement('iframe');
-        playButton.className = 'play-button';
-        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
-
-        return playButton
-    }
-
     function createPaginationButton(link, type) {
         var name = type.charAt(0).toUpperCase() + type.slice(1);
         var button = document.createElement('button');
@@ -55,10 +52,12 @@
     }
 
     function displayAnalytics(data) {
-        document.getElementById('analytics-emotion').innerText = data.emotion_name;
-        document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
-        document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
-        document.getElementById('analytics-total-songs').innerText = data.total_songs;
+        if (!data.errors){
+            document.getElementById('analytics-emotion').innerText = data.emotion_name;
+            document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
+            document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
+            document.getElementById('analytics-total-songs').innerText = data.total_songs;
+        }
     }
 
     function getPaginatedEmotionPlaylist() {
@@ -88,45 +87,46 @@
         var buttonContainer = document.getElementById('playlist-pagination-button-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
 
-        var songs = data.results;
+        var votes = data.results;
         var nextLink = data.next;
         var previousLink = data.previous;
-        noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-        // Clean out playlist if there are any old songs still present
-        while(playlistContainer.hasChildNodes()) {
-            playlistContainer.removeChild(playlistContainer.firstChild);
-        }
+        document.PlaylistCurator.clearChildren(playlistContainer);
+        document.PlaylistCurator.clearChildren(buttonContainer);
+        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
+        noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
-        // Remove previous buttons if they exists
-        while(buttonContainer.hasChildNodes()) {
-            buttonContainer.removeChild(buttonContainer.firstChild);
-        }
+        if (data.errors) {
+            document.PlaylistCurator.displayRequestErrors(data.errors);
+        } else {
+            noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-        for (var i=0; i<songs.length; i++) {
-            var vote = songs[i];
-            var song = vote.song;
+            for (var i=0; i<votes.length; i++) {
+                var vote = votes[i];
+                var song = vote.song;
 
-            var songContainer = document.createElement('div');
-            songContainer.id = 'song-' + song.code;
-            songContainer.className = 'song-container';
+                var songContainer = document.createElement('div');
+                songContainer.id = 'song-' + song.code;
+                songContainer.className = 'song-container';
 
-            songContainer.appendChild(createPlayButton(song));
+                songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
 
-            var descriptionContainer = document.createElement('p');
-            descriptionContainer.className = 'song-description-container';
-            descriptionContainer.innerText = vote.description;
-            songContainer.appendChild(descriptionContainer);
+                var descriptionContainer = document.createElement('p');
+                descriptionContainer.className = 'song-description-container';
+                descriptionContainer.innerText = vote.description;
+                songContainer.appendChild(descriptionContainer);
 
-            songContainer.appendChild(createDeleteButton(song.code));
+                songContainer.appendChild(createDeleteButton(song.code));
 
-            playlistContainer.appendChild(songContainer);
-        }
+                playlistContainer.appendChild(songContainer);
+            }
 
-        // Add buttons to retrieve paginated responses
-        if (nextLink || previousLink) {
-            buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
-            buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
+            // Add buttons to retrieve paginated responses
+            if (nextLink || previousLink) {
+                buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
+                buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
+            }
+
         }
     }
 
@@ -139,6 +139,5 @@
         document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
     }
 
-    var generatePlaylistButton = document.getElementById('generate-playlist');
-    generatePlaylistButton.onclick = getEmotionPlaylist;
+    init();
 })();

@@ -1,4 +1,11 @@
 (function IIFE() {
+    function init() {
+        setUpContextModal();
+        setUpJitterInput();
+        var generatePlaylistButton = document.getElementById('generate-playlist');
+        generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
+    }
+
     function setUpContextModal() {
         var modal = document.getElementById('context-modal');
         var closeModal = document.getElementById('close-modal');
@@ -91,35 +98,34 @@
         return buttonContainer;
     }
 
-    function createPlayButton(song) {
-        var playButton = document.createElement('iframe');
-        playButton.className = 'play-button';
-        playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+    function createSongContainer(song) {
+        var songContainer = document.createElement('div');
+        songContainer.id = 'song-' + song.code;
+        songContainer.className = 'song-container';
 
-        return playButton
+        songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
+        songContainer.appendChild(createVoteButtons(song));
+
+        return songContainer;
     }
 
     function displayBrowsePlaylist(data) {
         var playlistContainer = document.getElementById('playlist-display-container');
         var noResultsFoundAlert = document.getElementById('alert-no-results');
-        noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
+        noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
+        document.PlaylistCurator.clearChildren(playlistContainer);
+        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
 
-        // Clean out playlist if there are any old songs still present
-        while(playlistContainer.hasChildNodes()) {
-            playlistContainer.removeChild(playlistContainer.firstChild);
-        }
+        if (data.errors) {
+            document.PlaylistCurator.displayRequestErrors(data.errors);
+        } else {
+            noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
 
-        for (var i=0; i<data.length; i++) {
-            var song = data[i];
-            var songContainer = document.createElement('div');
-            songContainer.id = 'song-' + song.code;
-            songContainer.className = 'song-container';
-
-            songContainer.appendChild(createPlayButton(song));
-            songContainer.appendChild(createVoteButtons(song));
-
-            playlistContainer.appendChild(songContainer);
+            // Build playlist from returned data
+            for (var i = 0; i < data.length; i++) {
+                playlistContainer.appendChild(createSongContainer(data[i]));
+            }
         }
     }
 
@@ -136,8 +142,5 @@
         );
     }
 
-    setUpContextModal();
-    setUpJitterInput();
-    var generatePlaylistButton = document.getElementById('generate-playlist');
-    generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
+    init();
 })();

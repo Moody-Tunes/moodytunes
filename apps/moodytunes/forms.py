@@ -12,7 +12,7 @@ default_option = [('', '-----------')]
 
 def get_song_genre_choices():
     genres = Song.objects.all().values_list('genre', flat=True).distinct()
-    return [(genre, genre) for genre in genres] + default_option
+    return default_option + [(genre, genre) for genre in genres]
 
 
 class BrowseForm(forms.Form):
