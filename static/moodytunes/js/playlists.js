@@ -3,7 +3,7 @@
 (function IIFE() {
     function init() {
         var generatePlaylistButton = document.getElementById('generate-playlist');
-        generatePlaylistButton.onclick = getEmotionPlaylist;
+        generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
     function deleteVote() {
