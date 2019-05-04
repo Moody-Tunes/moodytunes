@@ -89,6 +89,7 @@ class ProfileView(TemplateView):
 
         return context
 
+
 @method_decorator(login_required, name='dispatch')
 class UpdateInfoView(View):
     form_class = UpdateUserForm
