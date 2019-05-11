@@ -14,6 +14,17 @@ SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 INTERNAL_IPS = ('127.0.0.1',)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[SITE_HOSTNAME])
 
+# Admins are defined in cradle with the `name, email;` pattern
+ADMINS = []
+admin_config = env.str('DJANGO_ADMINS', default='')
+
+if admin_config:
+    admins = admin_config.split(';')
+
+    for admin in admins:
+        name, email = admin.split(',')
+        ADMINS.append((name.strip(), email.strip()))
+
 APPEND_SLASH = True
 
 WEBMASTER_EMAIL = env.str('MTDJ_WEBMASTER_EMAIL', default='foo@example.com')
