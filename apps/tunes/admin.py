@@ -9,8 +9,9 @@ class EmotionAdmin(admin.ModelAdmin):
 
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('code', 'artist', 'name', 'valence', 'energy')
+    list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy')
     readonly_fields = ('code', 'artist', 'name', 'valence', 'energy')
+    list_filter = ('genre',)
 
 
 admin.site.register(Emotion, EmotionAdmin)
