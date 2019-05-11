@@ -13,6 +13,7 @@ DEBUG = env.bool('DJANGO_DEBUG', default=False)
 SITE_HOSTNAME = env.str('MTDJ_SITE_HOSTNAME', default='moodytunes.localhost')
 INTERNAL_IPS = ('127.0.0.1',)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[SITE_HOSTNAME])
+ADMINS = env.list('DJANGO_ADMINS', default=[])
 
 APPEND_SLASH = True
 
