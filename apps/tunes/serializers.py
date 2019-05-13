@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import UserSongVote
+from base.fields import CleanedChoiceField
 from tunes.models import Emotion, Song
 
 
@@ -39,34 +40,34 @@ class OptionsSerializer(serializers.Serializer):
 class BrowseSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/browse/"""
 
-    emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     genre = serializers.CharField(max_length=15, required=False)
     jitter = serializers.FloatField(min_value=0, max_value=1, required=False)
     limit = serializers.IntegerField(max_value=25, required=False)
-    context = serializers.ChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
+    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
 
 
 class VoteSongsRequestSerializer(serializers.Serializer):
     """Provides validation for POST /tunes/vote/"""
 
-    emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     song_code = serializers.CharField()
     vote = serializers.BooleanField()
-    context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
+    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
     description = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 
 class DeleteVoteRequestSerializer(serializers.Serializer):
     """Provides validation for DELETE /tunes/vote/"""
 
-    emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     song_code = serializers.CharField()
-    context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
+    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
 
 
 class PlaylistSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/playlist/"""
 
-    emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     genre = serializers.CharField(max_length=15, required=False)
-    context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
+    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
