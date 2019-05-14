@@ -34,6 +34,7 @@
         },
         createPlayButton: function(song) {
             var playButton = document.createElement('iframe');
+            playButton.setAttribute('allow', 'encrypted-media');
             playButton.className = 'play-button';
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
 
