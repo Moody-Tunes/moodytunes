@@ -10,9 +10,9 @@ from tunes.models import Emotion, Song
 default_option = [('', '-----------')]
 
 
-def get_song_genre_choices(user=None):
+def get_genre_choices(user=None):
     """
-    Return genre options for form field. If user is supplied, only return genres from user upvoted songs
+    Return genre choices for form field.
     :param user: (MoodyUser) If present, will only return genres from songs user has upvoted
     :return: (list[tuples]) List of options for genre field in forms
     """
@@ -23,12 +23,13 @@ def get_song_genre_choices(user=None):
         ).values_list('song__genre', flat=True).distinct()
     else:
         genres = Song.objects.all().values_list('genre', flat=True).distinct()
+
     return default_option + [(genre, genre) for genre in genres]
 
 
 class BrowseForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
-    genre = forms.ChoiceField(choices=get_song_genre_choices, required=False)
+    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     description = forms.CharField(required=False)
     jitter = forms.FloatField(
@@ -55,4 +56,4 @@ class PlaylistForm(forms.Form):
         super(PlaylistForm, self).__init__(*args, **kwargs)
 
         # Limit genre choices to those of songs the user has previously upvoted
-        self.fields['genre'].choices = get_song_genre_choices(user=user)
+        self.fields['genre'].choices = get_genre_choices(user=user)
