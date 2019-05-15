@@ -13,16 +13,16 @@ class FormView(TemplateView):
     """View class for including form on a page"""
     form_class = None
 
-    def get_context_data(self, form_kwargs=None, **kwargs):
+    def get_form_instance(self):
         """
-        Add an instance of the specified form class to the context dictionary
-        :param form_kwargs: (dict) Keyword arguments to pass to the form (if needed)
-        :return: (dict) Context dictionary for populating template
+        Return an instance of the specified form class.
+        Override this method if you need to pass any arguments to your form class constructor.
         """
-        if not form_kwargs:
-            form_kwargs = {}
+        return self.form_class()
 
+    def get_context_data(self, **kwargs):
+        """Add an instance of the specified form class to the context dictionary"""
         context = super().get_context_data(**kwargs)
-        context['form'] = self.form_class(**form_kwargs)
+        context['form'] = self.get_form_instance()
 
         return context

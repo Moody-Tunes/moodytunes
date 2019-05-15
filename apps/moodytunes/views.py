@@ -21,8 +21,6 @@ class EmotionPlaylistsView(FormView):
     template_name = 'playlists.html'
     form_class = PlaylistForm
 
-    def get_context_data(self, **kwargs):
-        # Need to pass request user to form for building genre options from votes
-        form_kwargs = {'user': self.request.user}
-
-        return super(EmotionPlaylistsView, self).get_context_data(form_kwargs, **kwargs)
+    def get_form_instance(self):
+        """Populate form instance with request user for filtering by song genres"""
+        return self.form_class(user=self.request.user)
