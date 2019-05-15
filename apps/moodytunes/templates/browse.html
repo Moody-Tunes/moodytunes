@@ -17,6 +17,7 @@
 {% block content %}
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
+    {% include 'full_songs_info.html' %}
     <p>Emotion: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
     <div class="help-tip">

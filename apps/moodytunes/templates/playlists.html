@@ -17,29 +17,30 @@
 
 {% block content %}
 <h1>Playlists For Emotion</h1>
-<div id= id="playlist-generator-container">
-    <div id="analytics-container">
-        <div class="help-tip">
-        <p>Energy and Valence are the attributes we use to measure a songs effective emotion. Valence is the "mood" of
-        the track, a lower value indicates a more negative mood and a higher value indicating a more positive mood.
-        Energy is the "intensity" of the track, with a lower value indicating a less intense track and a higher value
-        indicating a more intense track.</p>
-        </div>
-        <table id="analytics-table">
-            <tr>
-                <th>Emotion</th>
-                <th>Energy</th>
-                <th>Valence</th>
-                <th>Total Songs</th>
-            </tr>
-            <tr>
-                <td id="analytics-emotion"></td>
-                <td id="analytics-energy"></td>
-                <td id="analytics-valence"></td>
-                <td id="analytics-total-songs"></td>
-            </tr>
-        </table>
+<div id="analytics-container">
+    <div class="help-tip">
+    <p>Energy and Valence are the attributes we use to measure a songs effective emotion. Valence is the "mood" of
+    the track, a lower value indicates a more negative mood and a higher value indicating a more positive mood.
+    Energy is the "intensity" of the track, with a lower value indicating a less intense track and a higher value
+    indicating a more intense track.</p>
     </div>
+    <table id="analytics-table">
+        <tr>
+            <th>Emotion</th>
+            <th>Energy</th>
+            <th>Valence</th>
+            <th>Total Songs</th>
+        </tr>
+        <tr>
+            <td id="analytics-emotion"></td>
+            <td id="analytics-energy"></td>
+            <td id="analytics-valence"></td>
+            <td id="analytics-total-songs"></td>
+        </tr>
+    </table>
+</div>
+<div id= id="playlist-generator-container">
+    {% include 'full_songs_info.html' %}
     {{ form.as_p }}
     <button id="generate-playlist">Generate</button>
     <div id="playlist-error-container"></div>
