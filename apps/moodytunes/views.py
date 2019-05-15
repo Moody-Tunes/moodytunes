@@ -22,5 +22,4 @@ class EmotionPlaylistsView(FormView):
     form_class = PlaylistForm
 
     def get_form_instance(self):
-        """Populate form instance with request user for filtering by song genres"""
         return self.form_class(user=self.request.user)
