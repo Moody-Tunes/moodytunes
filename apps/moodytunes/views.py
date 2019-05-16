@@ -20,3 +20,6 @@ class BrowsePlaylistsView(FormView):
 class EmotionPlaylistsView(FormView):
     template_name = 'playlists.html'
     form_class = PlaylistForm
+
+    def get_form_instance(self):
+        return self.form_class(user=self.request.user)

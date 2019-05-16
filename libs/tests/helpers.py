@@ -3,7 +3,7 @@ import string
 
 from django.contrib.messages import get_messages
 
-from accounts.models import MoodyUser
+from accounts.models import MoodyUser, UserSongVote
 from tunes.models import Song, Emotion
 
 
@@ -124,3 +124,16 @@ class MoodyUtil(object):
         user.save()
 
         return user
+
+    @staticmethod
+    def create_user_song_vote(user, song, emotion, vote, context='', description=''):
+        vote = UserSongVote.objects.create(
+            user=user,
+            song=song,
+            emotion=emotion,
+            vote=vote,
+            context=context,
+            description=description
+        )
+
+        return vote
