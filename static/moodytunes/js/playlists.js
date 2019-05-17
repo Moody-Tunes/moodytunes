@@ -5,19 +5,23 @@
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
     var emotion;
+    var generateEmotionPlaylistId = 'generate-playlist';
+
+    // Cache options for previous request, used for refreshing playlist on delete of vote
+    var lastGenre,
+        lastContext;
 
     function init() {
-        var generatePlaylistButton = document.getElementById('generate-playlist');
+        var generatePlaylistButton = document.getElementById(generateEmotionPlaylistId);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
-    function deleteVote() {
+    function deleteVote(evt) {
         var song = this.dataset.song;
-        var context = document.getElementById('id_context').value || undefined;
 
-        document.MoodyTunesClient.deleteVote(song, emotion, context, function(data) {
+        document.MoodyTunesClient.deleteVote(song, lastEmotion, lastContext, function(data) {
             // Refresh playlist to reflect removal of song from playlist
-            getEmotionPlaylist();
+            getEmotionPlaylist(evt);
         })
     }
 
@@ -126,13 +130,30 @@
         }
     }
 
-    function getEmotionPlaylist() {
-        emotion = document.getElementById('id_emotion').value;
-        var genre = document.getElementById('id_genre').value || undefined;
-        var context = document.getElementById('id_context').value || undefined;
+    function getEmotionPlaylist(evt) {
+        var requestEmotion,
+            requestGenre,
+            requestContext;
 
-        document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
+        if (evt.target.id !== generateEmotionPlaylistId) {
+            // Pull request parameters from form options
+            requestEmotion = document.getElementById('id_emotion').value;
+            requestGenre = document.getElementById('id_genre').value || undefined;
+            requestContext = document.getElementById('id_context').value || undefined;
+
+            // Cache request parameters
+            emotion = requestEmotion;
+            lastGenre = requestGenre;
+            lastContext = requestContext;
+        } else {
+            // Used cached paremeters for persistent queries (on delete vote requests)
+            requestEmotion = emotion;
+            requestGenre = lastGenre;
+            requestContext = lastContext;
+        }
+
+        document.MoodyTunesClient.getEmotionPlaylist(requestEmotion, requestGenre, requestContext, displayEmotionPlaylist);
+        document.MoodyTunesClient.getUserAnalytics(requestEmotion, requestGenre, requestContext, displayAnalytics);
     }
 
     init();
