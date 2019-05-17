@@ -75,11 +75,7 @@
 
         fetch(url, options)
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Bad response from ' + url);
-                }
+                return response.json();
             }).then((json) => {
                 displayEmotionPlaylist(json);
             });
