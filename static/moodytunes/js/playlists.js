@@ -100,8 +100,7 @@
         } else {
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-            for (var i=0; i<votes.length; i++) {
-                var vote = votes[i];
+            votes.forEach(function (vote) {
                 var song = vote.song;
 
                 var songContainer = document.createElement('div');
@@ -118,14 +117,13 @@
                 songContainer.appendChild(createDeleteButton(song.code));
 
                 playlistContainer.appendChild(songContainer);
-            }
+            });
 
             // Add buttons to retrieve paginated responses
             if (nextLink || previousLink) {
                 buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
                 buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
             }
-
         }
     }
 
