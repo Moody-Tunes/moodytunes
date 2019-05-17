@@ -150,7 +150,7 @@
             lastGenre = requestGenre;
             lastContext = requestContext;
         } else {
-            // Used cached paremeters for persistent queries (on delete vote requests)
+            // Used cached parameters for persistent queries (on delete vote requests)
             requestEmotion = emotion;
             requestGenre = lastGenre;
             requestContext = lastContext;
