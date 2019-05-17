@@ -134,29 +134,25 @@
     }
 
     function getEmotionPlaylist(evt) {
-        var requestEmotion,
-            requestGenre,
-            requestContext;
+        var genre,
+            context;
 
         if (evt.target === generatePlaylistButton) {
             // Pull request parameters from form options
-            requestEmotion = document.getElementById('id_emotion').value;
-            requestGenre = document.getElementById('id_genre').value || undefined;
-            requestContext = document.getElementById('id_context').value || undefined;
+            emotion = document.getElementById('id_emotion').value;
+            genre = document.getElementById('id_genre').value || undefined;
+            context = document.getElementById('id_context').value || undefined;
 
-            // Cache request parameters
-            emotion = requestEmotion;
-            lastGenre = requestGenre;
-            lastContext = requestContext;
-        } else {
+            lastGenre = genre;
+            lastContext = context;
+        } else{
             // Used cached parameters for persistent queries (on delete vote requests)
-            requestEmotion = emotion;
-            requestGenre = lastGenre;
-            requestContext = lastContext;
+            genre = lastGenre;
+            context = lastContext;
         }
 
-        document.MoodyTunesClient.getEmotionPlaylist(requestEmotion, requestGenre, requestContext, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(requestEmotion, requestGenre, requestContext, displayAnalytics);
+        document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
+        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
     }
 
     init();
