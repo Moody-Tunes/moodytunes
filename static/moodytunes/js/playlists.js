@@ -17,12 +17,16 @@
     }
 
     function deleteVote(evt) {
-        var song = this.dataset.song;
+        var confirmVal = confirm('Are you sure you want to remove this song from your playlist?');
 
-        document.MoodyTunesClient.deleteVote(song, lastEmotion, lastContext, function(data) {
-            // Refresh playlist to reflect removal of song from playlist
-            getEmotionPlaylist(evt);
-        })
+        if (confirmVal) {
+            var song = this.dataset.song;
+
+            document.MoodyTunesClient.deleteVote(song, lastEmotion, lastContext, function(data) {
+                // Refresh playlist to reflect removal of song from playlist
+                getEmotionPlaylist(evt);
+            })
+        }
     }
 
     function createDeleteButton(song) {
