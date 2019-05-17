@@ -135,7 +135,7 @@
             requestGenre,
             requestContext;
 
-        if (evt.target.id !== generateEmotionPlaylistId) {
+        if (evt.target.id === generateEmotionPlaylistId) {
             // Pull request parameters from form options
             requestEmotion = document.getElementById('id_emotion').value;
             requestGenre = document.getElementById('id_genre').value || undefined;
