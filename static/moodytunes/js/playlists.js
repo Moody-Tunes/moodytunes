@@ -5,14 +5,13 @@
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
     var emotion;
-    var generateEmotionPlaylistId = 'generate-playlist';
+    var generatePlaylistButton = document.getElementById('generate-playlist');
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
     var lastGenre,
         lastContext;
 
     function init() {
-        var generatePlaylistButton = document.getElementById(generateEmotionPlaylistId);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
@@ -139,7 +138,7 @@
             requestGenre,
             requestContext;
 
-        if (evt.target.id === generateEmotionPlaylistId) {
+        if (evt.target === generatePlaylistButton) {
             // Pull request parameters from form options
             requestEmotion = document.getElementById('id_emotion').value;
             requestGenre = document.getElementById('id_genre').value || undefined;
