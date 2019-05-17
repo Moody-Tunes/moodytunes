@@ -16,16 +16,8 @@
         var context = document.getElementById('id_context').value || undefined;
 
         document.MoodyTunesClient.deleteVote(song, emotion, context, function(data) {
-            // Disable buttons to prevent double votes for a track
-            var songContainer = document.getElementById('song-' + song);
-            songContainer.className += ' song-container-vote-delete';
-            var button = songContainer.querySelectorAll('button')[0];  // We've only got the one delete button
-            button.disabled = true;
-            button.className += ' vote-button-delete-chosen';
-
-            // Update analytics after delete has been processed
-            var genre = document.getElementById('id_genre').value || undefined;
-            document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
+            // Refresh playlist to reflect removal of song from playlist
+            getEmotionPlaylist();
         })
     }
 
