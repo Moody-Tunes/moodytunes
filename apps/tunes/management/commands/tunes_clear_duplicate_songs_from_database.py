@@ -22,6 +22,27 @@ class Command(MoodyBaseCommand):
             'created'
         )
 
+    def reassign_votes_for_dupe_song_to_canonical_song(self, canonical_song, dupe_song):
+        """
+        Reassign all votes for the duplicate song to the canonical song
+        If a user has voted on both the canonical song and duplicate song, only keep the vote for the canonical song
+        :param canonical_song: (Song) Song we will persist in our database for a given name and artist
+        :param dupe_song: (Song) Song marked as a duplicate of the canonical song
+        """
+        dupe_votes = dupe_song.usersongvote_set.count()
+
+        for vote in dupe_song.usersongvote_set.iterator():
+            import pdb; pdb.set_trace()
+            if vote.user.usersongvote_set.filter(song=canonical_song).exists():
+                vote.delete()
+            else:
+                vote.song = canonical_song
+                vote.save()
+
+        self.write_to_log_and_output(
+            'Reassigned {} votes for song {} to song {}'.format(dupe_votes, dupe_song.code, canonical_song.code)
+        )
+
     def handle(self, *args, **options):
         self.write_to_log_and_output('Starting process to clear duplicate songs from database')
         songs = Song.objects.prefetch_related('usersongvote_set').all()
@@ -41,12 +62,7 @@ class Command(MoodyBaseCommand):
 
                 # Reassign votes for duplicate songs to the canonical song
                 for dupe_song in duplicate_songs:
-
-                    dupe_votes = dupe_song.usersongvote_set.count()
-                    dupe_song.usersongvote_set.update(song=song)
-                    self.write_to_log_and_output(
-                        'Reassigned {} votes for song {} to song {}'.format(dupe_votes, dupe_song.code, song.code)
-                    )
+                    self.reassign_votes_for_dupe_song_to_canonical_song(song, dupe_song)
 
                 duplicate_songs.delete()
                 self.write_to_log_and_output('Deleted {} duplicate songs of song {}'.format(dupe_count, song.code))
