@@ -3,6 +3,7 @@ from django.db import models
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
+from utils import average
 
 
 class UserPrefetchManager(UserManager):
@@ -101,20 +102,18 @@ class UserEmotion(BaseModel):
 
         super().save(*args, **kwargs)
 
-    def update_emotion_boundaries(self, valence, energy, reset=False):
+    def update_attributes(self):
         """
-        Given the valence and energy of a song, recompute boundaries for the given emotion box
-        :param valence: (float) Representation of song mood
-        :param energy: (float) Representation of song intensity
-        :param change: (bool) Flag to denote resetting the boundaries for a record. Used in the case a user "unvotes"
-        a song to reset the boundaries for that emotion
+        Update the attributes for this user/emotion mapping to the average of the attributes of the songs the user has
+        upvoted as making them feel this emotion. If the user doesn't have any upvotes for this emotion, the attributes
+        will be set to `None` and reset to the emotion defaults in the save() call
         """
-        if reset:
-            self.valence = 2 * self.valence - valence
-            self.energy = 2 * self.energy - energy
-        else:
-            self.valence = (self.valence + valence) / 2
-            self.energy = (self.energy + energy) / 2
+        votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
+        valences = votes.values_list('song__valence', flat=True)
+        energies = votes.values_list('song__energy', flat=True)
+
+        self.valence = average(valences)
+        self.energy = average(energies)
         self.save()
 
 
@@ -149,11 +148,7 @@ class UserSongVote(BaseModel):
     def delete(self, *args, **kwargs):
         # Update the user_emotion boundaries for the given emotion
         user_emot = self.user.useremotion_set.get(emotion=self.emotion)
-        user_emot.update_emotion_boundaries(
-            self.song.valence,
-            self.song.energy,
-            reset=True
-        )
+        user_emot.update_attributes()
 
         # We don't actually want to delete these records, so just set the vote value to false
         self.vote = False
