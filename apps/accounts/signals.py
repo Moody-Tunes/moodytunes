@@ -36,10 +36,7 @@ def update_user_boundaries(sender, instance, created, *args, **kwargs):
     )
 
     if instance.vote and created:
-        user_emot.update_emotion_boundaries(
-            instance.song.valence,
-            instance.song.energy
-        )
+        user_emot.update_attributes()
 
 
 post_save.connect(

@@ -26,8 +26,8 @@ class TestUpdateUserBoundariesSignal(TestCase):
         cls.song = util.create_song()
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-    @mock.patch('accounts.models.UserEmotion.update_emotion_boundaries')
-    def test_upvoting_song_updates_boundaries(self, mock_update):
+    @mock.patch('accounts.models.UserEmotion.update_attributes')
+    def test_upvoting_song_updates_attributes(self, mock_update):
         vote = UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
@@ -35,14 +35,14 @@ class TestUpdateUserBoundariesSignal(TestCase):
             vote=True
         )
 
-        mock_update.assert_called_once_with(self.song.valence, self.song.energy)
+        mock_update.assert_called_once()
 
         # If we save the vote again, we shouldn't trigger another update
         vote.save()
         self.assertEqual(mock_update.call_count, 1)
 
-    @mock.patch('accounts.models.UserEmotion.update_emotion_boundaries')
-    def test_downvoting_song_does_not_update_boundaries(self, mock_update):
+    @mock.patch('accounts.models.UserEmotion.update_attributes')
+    def test_downvoting_song_does_not_update_attributes(self, mock_update):
         UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
