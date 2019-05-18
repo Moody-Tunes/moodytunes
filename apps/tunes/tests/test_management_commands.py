@@ -1,3 +1,4 @@
+import copy
 from unittest import mock
 
 from django.core.management import call_command, CommandError
@@ -66,6 +67,17 @@ class TestSpotifyCommand(TestCase):
         success, fail = self.command.save_songs_to_database([self.track_data])
         self.assertEqual(success, 0)
         self.assertEqual(fail, 1)
+
+    def test_save_songs_to_database_same_song_with_different_song_codes(self):
+        dupe_song = copy.deepcopy(self.track_data)
+        dupe_song['code'] = 'some-other-code'
+
+        success, fail = self.command.save_songs_to_database([self.track_data, dupe_song])
+        songs_for_data = Song.objects.filter(name=self.track_data['name'], artist=self.track_data['artist'])
+
+        self.assertEqual(success, 1)
+        self.assertEqual(fail, 1)
+        self.assertEqual(songs_for_data.count(), 1)
 
     def test_save_songs_to_database_invalid_song_data(self):
         # Missing certain fields
