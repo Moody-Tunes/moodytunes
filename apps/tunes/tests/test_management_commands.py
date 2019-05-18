@@ -4,10 +4,11 @@ from unittest import mock
 from django.core.management import call_command, CommandError
 from django.test import TestCase
 
+from tunes.management.commands.tunes_clear_duplicate_songs_from_database import Command as ClearDupesCommand
 from tunes.management.commands.tunes_create_songs_from_spotify import Command as SpotifyCommand
-from tunes.models import Song
+from tunes.models import Emotion, Song
 from libs.spotify import SpotifyException
-from libs.tests.helpers import generate_random_unicode_string
+from libs.tests.helpers import generate_random_unicode_string, MoodyUtil
 
 
 @mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
@@ -140,3 +141,70 @@ class TestSpotifyCommand(TestCase):
         call_command('tunes_create_songs_from_spotify')
 
         self.assertEqual(Song.objects.count(), 1)
+
+
+@mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
+class TestDeleteDupeSongsCommand(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.command = ClearDupesCommand()
+        cls.user = MoodyUtil.create_user()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.canonical_song = MoodyUtil.create_song(energy=.75, valence=.85)
+        cls.dupe_song = MoodyUtil.create_song(energy=.50, valence=.60)
+        cls.song_name = cls.canonical_song.name
+        cls.song_artist = cls.canonical_song.artist
+
+    def test_get_duplicate_songs_returns_duplicates(self):
+        dupe_songs = self.command.get_duplicate_songs_for_song(self.canonical_song)
+
+        self.assertIn(self.dupe_song, dupe_songs)
+
+    def test_get_duplicate_songs_does_not_include_canonical_song(self):
+        song = MoodyUtil.create_song(name='Solo Song', artist='Solo Artist')
+        dupe_songs = self.command.get_duplicate_songs_for_song(song)
+
+        self.assertFalse(dupe_songs.exists())
+
+    def test_reassign_votes_assigns_dupe_song_votes_to_canonical_song(self):
+        vote = MoodyUtil.create_user_song_vote(self.user, self.dupe_song, self.emotion, True)
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+
+        vote.refresh_from_db()
+        self.assertEqual(vote.song, self.canonical_song)
+
+    def test_reassign_votes_deletes_dupe_song_votes(self):
+        MoodyUtil.create_user_song_vote(self.user, self.dupe_song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.canonical_song, self.emotion, True)
+
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+
+        existing_songs_for_canonical_song = self.user.usersongvote_set.filter(song=self.canonical_song)
+        self.assertEqual(existing_songs_for_canonical_song.count(), 1)
+
+    def test_reassign_votes_does_not_alter_user_emotion_attributes(self):
+        MoodyUtil.create_user_song_vote(self.user, self.canonical_song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.dupe_song, self.emotion, True)
+
+        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
+        old_energy = user_emotion.energy
+        old_valence = user_emotion.valence
+
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+
+        user_emotion.refresh_from_db()
+
+        self.assertEqual(user_emotion.energy, old_energy)
+        self.assertEqual(user_emotion.valence, old_valence)
+
+    def test_command_deletes_duplicate_songs(self):
+        call_command('tunes_clear_duplicate_songs_from_database')
+
+        self.assertFalse(Song.objects.filter(code=self.dupe_song.code).exists())
+
+    def test_no_duplicate_songs_does_not_delete_any_songs(self):
+        MoodyUtil.create_song(name='Other Song', artist='Other Artist')
+
+        call_command('tunes_clear_duplicate_songs_from_database')
+
+        self.assertEqual(Song.objects.count(), 2)
