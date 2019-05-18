@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.test import TestCase
 
 from accounts.models import MoodyUser, UserEmotion, UserSongVote
-from accounts.signals import create_user_emotion_records, update_user_boundaries
+from accounts.signals import create_user_emotion_records, update_user_attributes
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
 from libs.utils import average
@@ -43,8 +43,8 @@ class TestUserEmotion(TestCase):
         user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
-        dispatch_uid = 'user_song_vote_post_save_update_useremotion_boundaries'
-        with SignalDisconnect(post_save, update_user_boundaries,
+        dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
+        with SignalDisconnect(post_save, update_user_attributes,
                               UserSongVote, dispatch_uid):
             UserSongVote.objects.create(
                 user=self.user,

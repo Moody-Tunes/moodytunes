@@ -18,7 +18,7 @@ class TestCreateUserEmotionRecordsSignal(TestCase):
             self.assertTrue(user.useremotion_set.filter(emotion__name=emotion.name).exists())
 
 
-class TestUpdateUserBoundariesSignal(TestCase):
+class TestUpdateUserAttributesSignal(TestCase):
     @classmethod
     def setUpTestData(cls):
         util = MoodyUtil()

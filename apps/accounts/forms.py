@@ -76,7 +76,7 @@ class UpdateUserForm(BaseUserForm):
         return username
 
 
-class UpdateUserEmotionBoundariesForm(forms.ModelForm):
+class UpdateUserEmotionAttributesForm(forms.ModelForm):
     class Meta:
         model = UserEmotion
         fields = ('energy', 'valence')

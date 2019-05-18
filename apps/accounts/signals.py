@@ -22,7 +22,7 @@ post_save.connect(
 )
 
 
-def update_user_boundaries(sender, instance, created, *args, **kwargs):
+def update_user_attributes(sender, instance, created, *args, **kwargs):
     # Get the boundary record for the given user and emotion
     # We should always call this to ensure that if we add new emotions, we'll auto
     # create the corresponding record when a user starts to browse for songs in
@@ -40,7 +40,7 @@ def update_user_boundaries(sender, instance, created, *args, **kwargs):
 
 
 post_save.connect(
-    update_user_boundaries,
+    update_user_attributes,
     sender=UserSongVote,
-    dispatch_uid='user_song_vote_post_save_update_useremotion_boundaries'
+    dispatch_uid='user_song_vote_post_save_update_useremotion_attributes'
 )

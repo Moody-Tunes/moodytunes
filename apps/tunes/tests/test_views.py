@@ -211,7 +211,7 @@ class TestVoteView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_upvoting_on_song_updates_user_emotion_boundaries(self):
+    def test_upvoting_on_song_updates_user_emotion_attributes(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         pre_energy = user_emotion.energy
         pre_valence = user_emotion.valence
@@ -230,7 +230,7 @@ class TestVoteView(TestCase):
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
 
-    def test_downvoting_song_does_not_update_user_emotion_boundaries(self):
+    def test_downvoting_song_does_not_update_user_emotion_attributes(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         pre_energy = user_emotion.energy
         pre_valence = user_emotion.valence
