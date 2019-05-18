@@ -26,9 +26,8 @@ class Command(MoodyBaseCommand):
 
             if duplicate_songs.exists():
                 dupe_count = duplicate_songs.count()
-                self.write_to_log_and_output(
-                    'Found {} duplicate songs for song {}'.format(dupe_count, song.code)
-                )
+                self.write_to_log_and_output('Found {} duplicate songs for song {}'.format(dupe_count, song.code))
+
                 # Reassign votes for duplicate songs to the canonical song
                 for dupe_song in duplicate_songs:
                     dupe_votes = dupe_song.usersongvote_set.count()
