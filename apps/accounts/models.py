@@ -3,7 +3,7 @@ from django.db import models
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
-from utils import average
+from libs.utils import average
 
 
 class UserPrefetchManager(UserManager):
