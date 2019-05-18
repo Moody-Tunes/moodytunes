@@ -22,7 +22,14 @@ class Command(MoodyBaseCommand):
                 self.write_to_log_and_output('Skipping song {} as it already has been deleted'.format(song.code))
                 continue
 
-            duplicate_songs = Song.objects.filter(name=song.name, artist=song.artist).exclude(code=song.code)
+            duplicate_songs = Song.objects.filter(
+                name=song.name,
+                artist=song.artist
+            ).exclude(
+                code=song.code
+            ).order_by(
+                'created'
+            )
 
             if duplicate_songs.exists():
                 dupe_count = duplicate_songs.count()
