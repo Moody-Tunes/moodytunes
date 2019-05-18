@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import TestCase
 
@@ -19,12 +19,21 @@ class TestUserEmot(TestCase):
                               settings.AUTH_USER_MODEL, dispatch_uid):
             cls.user = MoodyUtil.create_user(username='test_user')
 
-    def test_uniqueness_on_user_emot_fields(self):
+    def test_uniqueness_on_user_emotion_fields(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         UserEmotion.objects.create(user=self.user, emotion=emotion)
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             UserEmotion.objects.create(user=self.user, emotion=emotion)
+
+    def test_validate_attributes_raises_error_on_invalid_values(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        user_emotion = UserEmotion.objects.create(user=self.user, emotion=emotion)
+
+        with self.assertRaises(ValidationError):
+            user_emotion.energy = 12
+            user_emotion.valence = 12
+            user_emotion.save()
 
     def test_update_emotion_boundaries(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)

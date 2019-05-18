@@ -97,6 +97,8 @@ class UserEmotion(BaseModel):
         if not self.valence:
             self.valence = self.emotion.valence
 
+        self.full_clean()
+
         super().save(*args, **kwargs)
 
     def update_emotion_boundaries(self, valence, energy, reset=False):
