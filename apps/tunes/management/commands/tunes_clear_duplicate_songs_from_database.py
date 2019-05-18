@@ -11,9 +11,19 @@ class Command(MoodyBaseCommand):
         super(Command, self).__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
 
+    def get_duplicate_songs_for_song(self, song):
+        """Return all songs in the database that are duplicates of the specified song"""
+        return Song.objects.filter(
+            name=song.name,
+            artist=song.artist
+        ).exclude(
+            code=song.code
+        ).order_by(
+            'created'
+        )
+
     def handle(self, *args, **options):
         self.write_to_log_and_output('Starting process to clear duplicate songs from database')
-
         songs = Song.objects.prefetch_related('usersongvote_set').all()
 
         for song in songs.iterator():
@@ -22,21 +32,16 @@ class Command(MoodyBaseCommand):
                 self.write_to_log_and_output('Skipping song {} as it already has been deleted'.format(song.code))
                 continue
 
-            duplicate_songs = Song.objects.filter(
-                name=song.name,
-                artist=song.artist
-            ).exclude(
-                code=song.code
-            ).order_by(
-                'created'
-            )
+            duplicate_songs = self.get_duplicate_songs_for_song(song)
 
             if duplicate_songs.exists():
+
                 dupe_count = duplicate_songs.count()
                 self.write_to_log_and_output('Found {} duplicate songs for song {}'.format(dupe_count, song.code))
 
                 # Reassign votes for duplicate songs to the canonical song
                 for dupe_song in duplicate_songs:
+
                     dupe_votes = dupe_song.usersongvote_set.count()
                     dupe_song.usersongvote_set.update(song=song)
                     self.write_to_log_and_output(
