@@ -75,8 +75,8 @@ class MoodyUser(BaseModel, AbstractUser):
 class UserEmotion(BaseModel):
     """
     Represents a mapping between a particular user and an emotion. This allows
-    us to store separate boundaries for each user for each emotion. Unless
-    values are specified upon creation, the boundaries will be set to the
+    us to store separate attributes for each user for each emotion. Unless
+    values are specified upon creation, the attributes will be set to the
     defaults defined in the `Emotion` table.
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
@@ -146,7 +146,7 @@ class UserSongVote(BaseModel):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
 
     def delete(self, *args, **kwargs):
-        # Update the user_emotion boundaries for the given emotion
+        # Update the user_emotion attributes for the given emotion
         user_emot = self.user.useremotion_set.get(emotion=self.emotion)
         user_emot.update_attributes()
 
