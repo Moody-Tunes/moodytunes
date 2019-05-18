@@ -5,8 +5,8 @@ from tunes.models import Song
 
 def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=None):
     """
-    Return a `QuerySet` of `Song` records whose attributes match the desired attribute boundaries as
-    governed from a user's `UserEmotion` record for a given `Emotion`
+    Return a `QuerySet` of `Song` records whose energy and valence are within the specified range. Used to build a
+    playlist of songs for given song attributes.
 
     :param energy: (float) Energy estimate of `Song` records returned
     :param valence: (float) Valence estimate of `Song` records returned
