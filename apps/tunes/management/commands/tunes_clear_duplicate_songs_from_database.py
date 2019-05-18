@@ -47,8 +47,6 @@ class Command(MoodyBaseCommand):
                 self.write_to_log_and_output('Deleted {} duplicate songs of song {}'.format(dupe_count, song.code))
 
             else:
-                self.write_to_log_and_output(
-                    'Song {} does not have any duplicate songs. Skipping...'.format(song.code)
-                )
+                self.write_to_log_and_output('Song {} does not have any duplicate songs. Skipping...'.format(song.code))
 
         self.write_to_log_and_output('Done process of clearing duplicate songs from database')
