@@ -32,7 +32,6 @@ class Command(MoodyBaseCommand):
         dupe_votes = dupe_song.usersongvote_set.count()
 
         for vote in dupe_song.usersongvote_set.iterator():
-            import pdb; pdb.set_trace()
             if vote.user.usersongvote_set.filter(song=canonical_song).exists():
                 vote.delete()
             else:
