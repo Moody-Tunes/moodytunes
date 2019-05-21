@@ -97,7 +97,7 @@ class TestUserEmotion(TestCase):
 class TestMoodyUser(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user =  MoodyUser.objects.create(username='test_user')
+        cls.user = MoodyUser.objects.create(username='test_user')
 
     def test_update_information(self):
         data = {
@@ -159,7 +159,7 @@ class TestUserSongVote(TestCase):
         test_song_2 = MoodyUtil.create_song(valence=.45, energy=.95)
 
         # Create votes for each song
-        vote1 =MoodyUtil.create_user_song_vote(self.user, test_song, self.emotion, True)
+        vote1 = MoodyUtil.create_user_song_vote(self.user, test_song, self.emotion, True)
         vote2 = MoodyUtil.create_user_song_vote(self.user, test_song_2, self.emotion, True)
         vote3 = MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
 
