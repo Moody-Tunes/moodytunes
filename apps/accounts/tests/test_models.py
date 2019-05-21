@@ -120,20 +120,45 @@ class TestUserSongVote(TestCase):
         cls.song = util.create_song()
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-    def test_deleting_vote_updates_attributes(self):
+    def test_deleting_vote_updates_attributes_to_average_of_upvotes(self):
         user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        test_song = MoodyUtil.create_song(valence=.75, energy=.85)
+        test_song_2 = MoodyUtil.create_song(valence=.45, energy=.95)
+        test_song_3 = MoodyUtil.create_song(valence=.50, energy=.85)
 
-        expected_new_energy = user_emot.energy
-        expected_new_valence = user_emot.valence
+        # Create votes for each song
+        MoodyUtil.create_user_song_vote(self.user, test_song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, test_song_2, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, test_song_3, self.emotion, False)  # Should not be factored in
+        vote_to_delete = MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
 
-        vote = UserSongVote.objects.create(
-            user=self.user,
-            emotion=self.emotion,
-            song=self.song,
-            vote=True
-        )
+        expected_new_energy = average([test_song.energy, test_song_2.energy])
+        expected_new_valence = average([test_song.valence, test_song_2.valence])
 
-        vote.delete()
+        vote_to_delete.delete()
+
+        user_emot.refresh_from_db()
+
+        self.assertEqual(user_emot.energy, expected_new_energy)
+        self.assertEqual(user_emot.valence, expected_new_valence)
+
+    def test_deleting_all_votes_updates_attributes_to_defaults(self):
+        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        test_song = MoodyUtil.create_song(valence=.75, energy=.85)
+        test_song_2 = MoodyUtil.create_song(valence=.45, energy=.95)
+
+        # Create votes for each song
+        vote1 =MoodyUtil.create_user_song_vote(self.user, test_song, self.emotion, True)
+        vote2 = MoodyUtil.create_user_song_vote(self.user, test_song_2, self.emotion, True)
+        vote3 = MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+
+        # Deleting all upvotes should reset attributes to emotion defaults
+        expected_new_energy = self.emotion.energy
+        expected_new_valence = self.emotion.valence
+
+        vote1.delete()
+        vote2.delete()
+        vote3.delete()
 
         user_emot.refresh_from_db()
 
