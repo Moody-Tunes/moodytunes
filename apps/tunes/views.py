@@ -67,7 +67,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
         # If context not provided or the previous query on votes for context did return any votes,
         # determine attributes from the base attributes for the user and emotion
-        if not energy or not valence:
+        if energy is None or valence is None:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
             energy = user_emotion.energy
             valence = user_emotion.valence
