@@ -16,8 +16,7 @@ class TestUserEmotion(TestCase):
         # Disable signal that creates UserEmotion records on user creation
         # so we can create ones during testing
         dispatch_uid = 'user_post_save_create_useremotion_records'
-        with SignalDisconnect(post_save, create_user_emotion_records,
-                              settings.AUTH_USER_MODEL, dispatch_uid):
+        with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
             cls.user = MoodyUtil.create_user(username='test_user')
 
     def test_uniqueness_on_user_emotion_fields(self):
@@ -44,8 +43,7 @@ class TestUserEmotion(TestCase):
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
         dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
-        with SignalDisconnect(post_save, update_user_attributes,
-                              UserSongVote, dispatch_uid):
+        with SignalDisconnect(post_save, update_user_attributes, UserSongVote, dispatch_uid):
             UserSongVote.objects.create(
                 user=self.user,
                 emotion=emotion,
