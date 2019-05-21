@@ -1,13 +1,17 @@
 'use strict';
 
 (function IIFE() {
+    // Global variables for API requests to backend
+    // Made global to ensure that the same options used in the request are
+    // used in requests for voting on songs
+    var emotion;
+
     function init() {
         var generatePlaylistButton = document.getElementById('generate-playlist');
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
     function deleteVote() {
-        var emotion = document.getElementById('id_emotion').value;
         var song = this.dataset.song;
         var context = document.getElementById('id_context').value || undefined;
 
@@ -131,7 +135,7 @@
     }
 
     function getEmotionPlaylist() {
-        var emotion = document.getElementById('id_emotion').value;
+        emotion = document.getElementById('id_emotion').value;
         var genre = document.getElementById('id_genre').value || undefined;
         var context = document.getElementById('id_context').value || undefined;
 
