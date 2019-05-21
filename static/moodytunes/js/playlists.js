@@ -40,8 +40,8 @@
             cancelDeleteVoteButton.disabled = true;
             document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
                 getEmotionPlaylist(evt);
+                hideConfirmDeleteModal();
             });
-            hideConfirmDeleteModal();
         });
     }
 
