@@ -67,13 +67,15 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         if self.cleaned_data.get('genre'):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
 
-        user_votes = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
+        user_votes = self.request.user.usersongvote_set.filter(emotion__name=self.cleaned_data['emotion'])
 
         # If a context is provided, only exclude songs a user has voted on for that context
+        # This allows a song to be a candidate for multiple playlists
+        # Songs in WORK context could  also be in PARTY context, maybe?
         if self.cleaned_data.get('context'):
-            user_votes = [vote for vote in user_votes if vote.context == self.cleaned_data['context']]
+            user_votes = user_votes.filter(context=self.cleaned_data['context'])
 
-        previously_voted_song_ids = [vote.song.id for vote in user_votes]
+        previously_voted_song_ids = user_votes.values_list('song__id', flat=True)
 
         return queryset.exclude(id__in=previously_voted_song_ids)
 
