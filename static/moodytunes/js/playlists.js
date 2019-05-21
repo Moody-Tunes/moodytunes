@@ -6,26 +6,43 @@
     // used in requests for voting on songs
     var emotion;
     var generatePlaylistButton = document.getElementById('generate-playlist');
+    var confirmDeleteModal = document.getElementById('delete-confirm-modal');
+    var closeModal = document.getElementById('close-modal');
+    var cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
+    var confirmDeleteVoteButton = document.getElementById('delete-vote');
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
     var lastGenre,
         lastContext;
 
+    function hideConfirmDeleteModal() {
+        confirmDeleteModal.style.display = 'none';
+    }
+
+    function showConfirmDeleteModal() {
+        confirmDeleteModal.style.display = 'block';
+    }
+
     function init() {
+        closeModal.addEventListener('click', hideConfirmDeleteModal);
+        cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
-    function deleteVote(evt) {
-        var confirmVal = confirm('Are you sure you want to remove this song from your playlist?');
+    function confirmDeleteVote(evt) {
+        confirmDeleteVoteButton.disabled = false;
+        var song = this.dataset.song;
+        showConfirmDeleteModal();
 
-        if (confirmVal) {
-            var song = this.dataset.song;
-
-            document.MoodyTunesClient.deleteVote(song, lastEmotion, lastContext, function(data) {
-                // Refresh playlist to reflect removal of song from playlist
+        confirmDeleteVoteButton.addEventListener('click', function () {
+            evt.target.disabled = true;
+            confirmDeleteVoteButton.disabled = true;
+            cancelDeleteVoteButton.disabled = true;
+            document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
                 getEmotionPlaylist(evt);
-            })
-        }
+            });
+            hideConfirmDeleteModal();
+        });
     }
 
     function createDeleteButton(song) {
@@ -36,7 +53,7 @@
         button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
-        button.addEventListener('click', deleteVote);
+        button.addEventListener('click', confirmDeleteVote);
         buttonContainer.appendChild(button);
 
         return buttonContainer
