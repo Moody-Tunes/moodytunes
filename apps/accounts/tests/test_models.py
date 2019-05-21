@@ -95,19 +95,32 @@ class TestUserEmotion(TestCase):
 
 
 class TestMoodyUser(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user =  MoodyUser.objects.create(username='test_user')
+
     def test_update_information(self):
-        user = MoodyUser.objects.create(username='test_user')
         data = {
             'username': 'new_name',
+            'foo': 'bar',  # Invalid value, just to ensure method doesn't blow up
             'email': 'foo@example.com',
-            'foo': 'bar'  # Invalid value, just to ensure method doesn't blow up
         }
 
-        user.update_information(data)
-        user.refresh_from_db()
+        self.user.update_information(data)
+        self.user.refresh_from_db()
 
-        self.assertEqual(user.username, data['username'])
-        self.assertEqual(user.email, data['email'])
+        self.assertEqual(self.user.username, data['username'])
+        self.assertEqual(self.user.email, data['email'])
+
+    def test_get_user_emotion_with_valid_emotion_returns_user_emotion_object(self):
+        user_emot = self.user.get_user_emotion_record(Emotion.HAPPY)
+
+        self.assertIsInstance(user_emot, UserEmotion)
+
+    def test_get_user_emotion_with_invalid_emotion_returns_none(self):
+        user_emot = self.user.get_user_emotion_record('bad-emotion')
+
+        self.assertIsNone(user_emot)
 
 
 class TestUserSongVote(TestCase):
