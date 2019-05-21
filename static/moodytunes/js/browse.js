@@ -1,4 +1,9 @@
 (function IIFE() {
+    // Global variables for API requests to backend
+    // Made global to ensure that the same options used in the request are
+    // used in requests for voting on songs
+    var emotion;
+
     function init() {
         setUpContextModal();
         setUpJitterInput();
@@ -54,7 +59,6 @@
     }
 
     function voteOnSong() {
-        var emotion = document.getElementById('id_emotion').value;
         var context = sessionStorage.context;
         var description = sessionStorage.description;
         var song = this.dataset.song;
@@ -133,7 +137,7 @@
         var limit = undefined; // We don't want people to set the limit themselves, keep it at the default
 
         var context = sessionStorage.context;
-        var emotion = document.getElementById('id_emotion').value;
+        emotion = document.getElementById('id_emotion').value;
         var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
 
