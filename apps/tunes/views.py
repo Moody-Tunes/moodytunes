@@ -25,6 +25,7 @@ from tunes.serializers import (
     VoteSongsRequestSerializer,
 )
 from tunes.utils import generate_browse_playlist
+from libs.utils import average
 
 logger = logging.getLogger(__name__)
 
@@ -46,16 +47,34 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     def filter_queryset(self, queryset):
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
+        energy = None
+        valence = None
 
         # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
             jitter = self.default_jitter
 
-        user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+        # Try to use votes for this emotion and context to generate attributes for songs to return
+        if self.cleaned_data.get('context'):
+            votes = self.request.user.usersongvote_set.filter(
+                emotion__name=self.cleaned_data['emotion'],
+                context=self.cleaned_data['context']
+            )
+
+            if votes.exists():
+                energy = average(votes.values_list('song__energy', flat=True))
+                valence = average(votes.values_list('song__valence', flat=True))
+
+        # If context not provided or the previous query on votes for context did return any votes,
+        # determine attributes from the base attributes for the user and emotion
+        if not energy or not valence:
+            user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+            energy = user_emotion.energy
+            valence = user_emotion.valence
 
         return generate_browse_playlist(
-            user_emotion.energy,
-            user_emotion.valence,
+            energy,
+            valence,
             limit=limit,
             jitter=jitter,
             songs=queryset
