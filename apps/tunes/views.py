@@ -54,19 +54,20 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         if jitter is None:
             jitter = self.default_jitter
 
-        # Try to use votes for this emotion and context to generate attributes for songs to return
+        # Try to use upvotes for this emotion and context to generate attributes for songs to return
         if self.cleaned_data.get('context'):
             votes = self.request.user.usersongvote_set.filter(
                 emotion__name=self.cleaned_data['emotion'],
-                context=self.cleaned_data['context']
+                context=self.cleaned_data['context'],
+                vote=True
             )
 
             if votes.exists():
                 energy = average(votes.values_list('song__energy', flat=True))
                 valence = average(votes.values_list('song__valence', flat=True))
 
-        # If context not provided or the previous query on votes for context did return any votes,
-        # determine attributes from the base attributes for the user and emotion
+        # If context not provided or the previous query on upvotes for context did return any votes,
+        # determine attributes from the attributes for the user and emotion
         if energy is None or valence is None:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
             energy = user_emotion.energy
