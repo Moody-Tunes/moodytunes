@@ -151,7 +151,7 @@ class TestDeleteDupeSongsCommand(TestCase):
         cls.user = MoodyUtil.create_user()
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
         cls.canonical_song = MoodyUtil.create_song(energy=.75, valence=.85)
-        cls.dupe_song = MoodyUtil.create_song(energy=.50, valence=.60)
+        cls.dupe_song = MoodyUtil.create_song(energy=.75, valence=.85)
         cls.song_name = cls.canonical_song.name
         cls.song_artist = cls.canonical_song.artist
 
