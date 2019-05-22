@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 from accounts.models import UserSongVote
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
 
 
 class TestBrowseView(TestCase):
@@ -213,8 +214,7 @@ class TestVoteView(TestCase):
 
     def test_upvoting_on_song_updates_user_emotion_attributes(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-        pre_energy = user_emotion.energy
-        pre_valence = user_emotion.valence
+        new_song = MoodyUtil.create_song(energy=.75, valence=.65)
 
         data = {
             'emotion': Emotion.HAPPY,
@@ -223,9 +223,16 @@ class TestVoteView(TestCase):
         }
         self.api_client.post(self.url, data=data, format='json')
 
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': new_song.code,
+            'vote': True
+        }
+        self.api_client.post(self.url, data=data, format='json')
+
         user_emotion.refresh_from_db()
-        expected_energy = (pre_energy + self.song.energy) / 2
-        expected_valence = (pre_valence + self.song.valence) / 2
+        expected_energy = average([self.song.energy, new_song.energy])
+        expected_valence = average([self.song.valence, new_song.valence])
 
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
