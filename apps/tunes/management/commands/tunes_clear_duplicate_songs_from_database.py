@@ -1,9 +1,9 @@
 import logging
 
-from django.conf import settings
 from django.db.models.signals import post_save
 
-from accounts.signals import create_user_emotion_records
+from accounts.models import UserSongVote
+from accounts.signals import update_user_attributes
 from base.management.commands import MoodyBaseCommand
 from tests.helpers import SignalDisconnect
 from tunes.models import Song
@@ -38,13 +38,13 @@ class Command(MoodyBaseCommand):
 
         for vote in dupe_song.usersongvote_set.iterator():
             if vote.user.usersongvote_set.filter(song=canonical_song).exists():
-                vote.delete(update_boundaries=False)
+                vote.delete()
             else:
                 vote.song = canonical_song
 
                 # Disable signal to update user emotion boundaries
-                dispatch_uid = 'user_post_save_create_useremotion_records'
-                with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
+                dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
+                with SignalDisconnect(post_save, update_user_attributes, UserSongVote, dispatch_uid):
                     vote.save()
 
         self.write_to_log_and_output(
