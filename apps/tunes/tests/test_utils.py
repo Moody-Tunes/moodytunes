@@ -50,8 +50,10 @@ class TestGenerateBrowsePlaylist(TestCase):
         generate_browse_playlist(energy, valence, songs=songs_mock)
 
         songs_mock.filter.assert_called_once_with(
-            energy=energy,
-            valence=valence
+            energy__gte=energy,
+            energy__lte=energy,
+            valence__gte=valence,
+            valence__lte=valence
         )
 
     def test_limit_on_playlist(self):

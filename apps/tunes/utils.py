@@ -29,18 +29,12 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
         valence_lower_limit -= jitter
         valence_upper_limit += jitter
 
-        playlist = songs.filter(
-            energy__gte=energy_lower_limit,
-            energy__lte=energy_upper_limit,
-            valence__gte=valence_lower_limit,
-            valence__lte=valence_upper_limit
-        )
-
-    else:
-        playlist = songs.filter(
-            energy=energy,
-            valence=valence
-        )
+    playlist = songs.filter(
+        energy__gte=energy_lower_limit,
+        energy__lte=energy_upper_limit,
+        valence__gte=valence_lower_limit,
+        valence__lte=valence_upper_limit
+    )
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
