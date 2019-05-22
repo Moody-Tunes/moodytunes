@@ -5,28 +5,46 @@
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
     var emotion;
+    var generatePlaylistButton = document.getElementById('generate-playlist');
+    var confirmDeleteModal = document.getElementById('delete-confirm-modal');
+    var closeModal = document.getElementById('close-modal');
+    var cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
+    var confirmDeleteVoteButton = document.getElementById('delete-vote');
+
+    // Cache options for previous request, used for refreshing playlist on delete of vote
+    var lastGenre,
+        lastContext;
+
+    function hideConfirmDeleteModal() {
+        confirmDeleteModal.style.display = 'none';
+    }
+
+    function showConfirmDeleteModal() {
+        confirmDeleteModal.style.display = 'block';
+    }
+
+    function deleteVote(evt) {
+        var song = confirmDeleteVoteButton.dataset.song;
+        confirmDeleteVoteButton.disabled = true;
+        cancelDeleteVoteButton.disabled = true;
+        document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
+            getEmotionPlaylist(evt);
+            hideConfirmDeleteModal();
+        });
+    }
 
     function init() {
-        var generatePlaylistButton = document.getElementById('generate-playlist');
+        closeModal.addEventListener('click', hideConfirmDeleteModal);
+        cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
+        confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
-    function deleteVote() {
-        var song = this.dataset.song;
-        var context = document.getElementById('id_context').value || undefined;
-
-        document.MoodyTunesClient.deleteVote(song, emotion, context, function(data) {
-            // Disable buttons to prevent double votes for a track
-            var songContainer = document.getElementById('song-' + song);
-            songContainer.className += ' song-container-vote-delete';
-            var button = songContainer.querySelectorAll('button')[0];  // We've only got the one delete button
-            button.disabled = true;
-            button.className += ' vote-button-delete-chosen';
-
-            // Update analytics after delete has been processed
-            var genre = document.getElementById('id_genre').value || undefined;
-            document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
-        })
+    function confirmDeleteVote() {
+        cancelDeleteVoteButton.disabled = false;
+        confirmDeleteVoteButton.disabled = false;
+        confirmDeleteVoteButton.dataset.song = this.dataset.song;
+        showConfirmDeleteModal();
     }
 
     function createDeleteButton(song) {
@@ -37,7 +55,7 @@
         button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
-        button.addEventListener('click', deleteVote);
+        button.addEventListener('click', confirmDeleteVote);
         buttonContainer.appendChild(button);
 
         return buttonContainer
@@ -76,11 +94,7 @@
 
         fetch(url, options)
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Bad response from ' + url);
-                }
+                return response.json();
             }).then((json) => {
                 displayEmotionPlaylist(json);
             });
@@ -105,8 +119,7 @@
         } else {
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-            for (var i=0; i<votes.length; i++) {
-                var vote = votes[i];
+            votes.forEach(function (vote) {
                 var song = vote.song;
 
                 var songContainer = document.createElement('div');
@@ -119,25 +132,36 @@
                 descriptionContainer.className = 'song-description-container';
                 descriptionContainer.innerText = vote.description;
                 songContainer.appendChild(descriptionContainer);
-
                 songContainer.appendChild(createDeleteButton(song.code));
 
                 playlistContainer.appendChild(songContainer);
-            }
+            });
 
             // Add buttons to retrieve paginated responses
             if (nextLink || previousLink) {
                 buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
                 buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
             }
-
         }
     }
 
-    function getEmotionPlaylist() {
-        emotion = document.getElementById('id_emotion').value;
-        var genre = document.getElementById('id_genre').value || undefined;
-        var context = document.getElementById('id_context').value || undefined;
+    function getEmotionPlaylist(evt) {
+        var genre,
+            context;
+
+        if (evt.target === generatePlaylistButton) {
+            // Pull request parameters from form options
+            emotion = document.getElementById('id_emotion').value;
+            genre = document.getElementById('id_genre').value || undefined;
+            context = document.getElementById('id_context').value || undefined;
+
+            lastGenre = genre;
+            lastContext = context;
+        } else{
+            // Used cached parameters for persistent queries (on delete vote requests)
+            genre = lastGenre;
+            context = lastContext;
+        }
 
         document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
         document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
