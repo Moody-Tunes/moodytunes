@@ -23,16 +23,13 @@ class TestGenerateBrowsePlaylist(TestCase):
         valence = .75
         jitter = .2
 
-        energy_lower_limit = energy_upper_limit = energy
-        valence_lower_limit = valence_upper_limit = valence
-
         generate_browse_playlist(energy, valence, jitter=jitter, songs=songs_mock)
 
-        energy_lower_limit -= jitter
-        energy_upper_limit += jitter
+        energy_lower_limit = energy - jitter
+        energy_upper_limit = energy + jitter
 
-        valence_lower_limit -= jitter
-        valence_upper_limit += jitter
+        valence_lower_limit = valence - jitter
+        valence_upper_limit = valence + jitter
 
         songs_mock.filter.assert_called_once_with(
             energy__gte=energy_lower_limit,
