@@ -387,7 +387,7 @@ class TestVoteView(TestCase):
 
         # Create a vote for the same song with a different context
         # (This is one that should still be upvoted afterwards)
-        conistent_vote = UserSongVote.objects.create(
+        consistent_vote = UserSongVote.objects.create(
             user=self.user,
             emotion=emotion,
             song=self.song,
@@ -403,11 +403,11 @@ class TestVoteView(TestCase):
 
         resp = self.api_client.delete(self.url, data=data, format='json')
         deleted_vote.refresh_from_db()
-        conistent_vote.refresh_from_db()
+        consistent_vote.refresh_from_db()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(deleted_vote.vote)
-        self.assertTrue(conistent_vote.vote)
+        self.assertTrue(consistent_vote.vote)
 
 
 class TestPlaylistView(TestCase):
