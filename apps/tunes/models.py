@@ -9,8 +9,7 @@ class Emotion(BaseModel):
     Represents an "emotion" in the context of our offered moods we allow users
     to select from. `energy` and `valence` are the associated Song attribute
     points to use in suggesting songs for for a given emotion. These values must be
-    between 0 <= value <= 1. Emotions MAY overlap with other emotion
-    boundaries.
+    between 0 <= value <= 1. Emotions MAY overlap with other emotion boundaries.
 
     Emotion.name will be the three character value we store in the database.
     To get the full name of an emotion, use the `full_name` property on an

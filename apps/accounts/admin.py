@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from accounts.forms import UpdateUserEmotionBoundariesForm
+from accounts.forms import UpdateUserEmotionAttributesForm
 from accounts.models import MoodyUser, UserEmotion, UserSongVote
 
 
@@ -11,7 +11,7 @@ class MoodyUserAdmin(admin.ModelAdmin):
 
 
 class UserEmotionAdmin(admin.ModelAdmin):
-    form = UpdateUserEmotionBoundariesForm
+    form = UpdateUserEmotionAttributesForm
     list_display = ('user', 'emotion', 'energy', 'valence')
     readonly_fields = ('user', 'emotion')
     list_filter = ('emotion',)
