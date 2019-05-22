@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import UserSongVote
 from tunes.models import Emotion
+from tunes.views import BrowseView
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
 
@@ -84,6 +85,19 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), params['limit'])
+
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_playlist_uses_default_jitter_if_not_provided(self, mock_generate_playlist):
+        song = MoodyUtil.create_song()
+        mock_generate_playlist.return_value = [song]
+
+        params = {'emotion': Emotion.HAPPY}
+        self.api_client.get(self.url, data=params)
+
+        call_kwargs = mock_generate_playlist.mock_calls[0][2]
+        called_jitter = call_kwargs['jitter']
+
+        self.assertEqual(called_jitter, BrowseView.default_jitter)
 
     def test_playlist_excludes_previously_voted_songs(self):
         voted_song = MoodyUtil.create_song()
