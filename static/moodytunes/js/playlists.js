@@ -23,26 +23,28 @@
         confirmDeleteModal.style.display = 'block';
     }
 
+    function deleteVote(evt) {
+        var song = confirmDeleteVoteButton.dataset.song;
+        confirmDeleteVoteButton.disabled = true;
+        cancelDeleteVoteButton.disabled = true;
+        document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
+            getEmotionPlaylist(evt);
+            hideConfirmDeleteModal();
+        });
+    }
+
     function init() {
         closeModal.addEventListener('click', hideConfirmDeleteModal);
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
+        confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
     }
 
-    function confirmDeleteVote(evt) {
+    function confirmDeleteVote() {
+        cancelDeleteVoteButton.disabled = false;
         confirmDeleteVoteButton.disabled = false;
-        var song = this.dataset.song;
+        confirmDeleteVoteButton.dataset.song = this.dataset.song;
         showConfirmDeleteModal();
-
-        confirmDeleteVoteButton.addEventListener('click', function () {
-            evt.target.disabled = true;
-            confirmDeleteVoteButton.disabled = true;
-            cancelDeleteVoteButton.disabled = true;
-            document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
-                getEmotionPlaylist(evt);
-                hideConfirmDeleteModal();
-            });
-        });
     }
 
     function createDeleteButton(song) {
