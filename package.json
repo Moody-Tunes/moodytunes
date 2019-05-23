@@ -1,0 +1,24 @@
+{
+  "name": "moodytunes",
+  "version": "1.0.0",
+  "description": "npm dependencies for moodytunes",
+  "main": "index.js",
+  "dependencies": {
+    "less": "^3.9.0",
+    "uglify-es": "github:mishoo/UglifyJS2#harmony"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Moody-Tunes/moodytunes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Moody-Tunes/moodytunes/issues"
+  },
+  "homepage": "https://github.com/Moody-Tunes/moodytunes#readme"
+}
