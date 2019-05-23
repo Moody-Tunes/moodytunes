@@ -27,12 +27,12 @@ class Command(MoodyBaseCommand):
             'created'
         )
 
-    def reassign_votes_for_dupe_song_to_canonical_song(self, canonical_song, dupe_song):
+    def reassign_votes_for_dupe_song_to_canonical_song(self, dupe_song, canonical_song):
         """
         Reassign all votes for the duplicate song to the canonical song
         If a user has voted on both the canonical song and duplicate song, only keep the vote for the canonical song
-        :param canonical_song: (Song) Song we will persist in our database for a given name and artist
         :param dupe_song: (Song) Song marked as a duplicate of the canonical song
+        :param canonical_song: (Song) Song we will persist in our database for a given name and artist
         """
         dupe_votes = dupe_song.usersongvote_set.count()
 
@@ -70,7 +70,7 @@ class Command(MoodyBaseCommand):
 
                 # Reassign votes for duplicate songs to the canonical song
                 for dupe_song in duplicate_songs:
-                    self.reassign_votes_for_dupe_song_to_canonical_song(song, dupe_song)
+                    self.reassign_votes_for_dupe_song_to_canonical_song(dupe_song, song)
 
                 duplicate_songs.delete()
                 self.write_to_log_and_output('Deleted {} duplicate songs of song {}'.format(dupe_count, song.code))

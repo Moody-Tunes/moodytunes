@@ -168,7 +168,7 @@ class TestDeleteDupeSongsCommand(TestCase):
 
     def test_reassign_votes_assigns_dupe_song_votes_to_canonical_song(self):
         vote = MoodyUtil.create_user_song_vote(self.user, self.dupe_song, self.emotion, True)
-        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.dupe_song, self.canonical_song)
 
         vote.refresh_from_db()
         self.assertEqual(vote.song, self.canonical_song)
@@ -177,7 +177,7 @@ class TestDeleteDupeSongsCommand(TestCase):
         MoodyUtil.create_user_song_vote(self.user, self.dupe_song, self.emotion, True)
         MoodyUtil.create_user_song_vote(self.user, self.canonical_song, self.emotion, True)
 
-        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.dupe_song, self.canonical_song)
 
         existing_songs_for_canonical_song = self.user.usersongvote_set.filter(song=self.canonical_song)
         self.assertEqual(existing_songs_for_canonical_song.count(), 1)
@@ -190,7 +190,7 @@ class TestDeleteDupeSongsCommand(TestCase):
         old_energy = user_emotion.energy
         old_valence = user_emotion.valence
 
-        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.canonical_song, self.dupe_song)
+        self.command.reassign_votes_for_dupe_song_to_canonical_song(self.dupe_song, self.canonical_song)
 
         user_emotion.refresh_from_db()
 
