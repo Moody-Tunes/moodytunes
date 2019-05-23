@@ -200,6 +200,7 @@ class TestDeleteDupeSongsCommand(TestCase):
     def test_command_deletes_duplicate_songs(self):
         call_command('tunes_clear_duplicate_songs_from_database')
 
+        self.assertTrue(Song.objects.filter(code=self.canonical_song.code).exists())
         self.assertFalse(Song.objects.filter(code=self.dupe_song.code).exists())
 
     def test_no_duplicate_songs_does_not_delete_any_songs(self):
