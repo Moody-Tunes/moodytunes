@@ -90,7 +90,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         user_votes = self.request.user.usersongvote_set.filter(emotion__name=self.cleaned_data['emotion'])
 
         # If a context is provided, only exclude songs a user has voted on for that context
-        # This allows a song to be a candidate for multiple playlists
+        # This allows a song to be a candidate for multiple context playlists for a particular emotion
         # Songs in WORK context could also be in PARTY context, maybe?
         if self.cleaned_data.get('context'):
             user_votes = user_votes.filter(context=self.cleaned_data['context'])
