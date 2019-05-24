@@ -8,4 +8,3 @@ install:
 script:
   - pytest
   - flake8
-  - coverage report
