@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -6,6 +8,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import UserSongVote
 from tunes.models import Emotion
+from tunes.views import BrowseView
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
 
@@ -83,6 +86,19 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), params['limit'])
 
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_playlist_uses_default_jitter_if_not_provided(self, mock_generate_playlist):
+        song = MoodyUtil.create_song()
+        mock_generate_playlist.return_value = [song]
+
+        params = {'emotion': Emotion.HAPPY}
+        self.api_client.get(self.url, data=params)
+
+        call_kwargs = mock_generate_playlist.mock_calls[0][2]
+        called_jitter = call_kwargs['jitter']
+
+        self.assertEqual(called_jitter, BrowseView.default_jitter)
+
     def test_playlist_excludes_previously_voted_songs(self):
         voted_song = MoodyUtil.create_song()
         not_voted_song = MoodyUtil.create_song()
@@ -129,6 +145,33 @@ class TestBrowseView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
         self.assertEqual(resp_data[0]['code'], song.code)
+
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_playlist_for_context_is_generated_with_upvoted_song_attributes_for_context(self, mock_generate_playlist):
+        context = 'WORK'
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        song = MoodyUtil.create_song(energy=.5, valence=.75)
+        upvote_song_for_context = MoodyUtil.create_song(energy=.75, valence=.95)
+        downvote_song_for_context = MoodyUtil.create_song(energy=.6, valence=.75)
+        mock_generate_playlist.return_value = [upvote_song_for_context]
+
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, upvote_song_for_context, emotion, True, context=context)
+        MoodyUtil.create_user_song_vote(self.user, downvote_song_for_context, emotion, False, context=context)
+
+        params = {
+            'emotion': emotion.name,
+            'jitter': 0,
+            'context': context
+        }
+        self.api_client.get(self.url, data=params)
+
+        call_args = mock_generate_playlist.mock_calls[0][1]
+        called_energy = call_args[0]
+        called_valence = call_args[1]
+
+        self.assertEqual(called_energy, upvote_song_for_context.energy)
+        self.assertEqual(called_valence, upvote_song_for_context.valence)
 
 
 class TestVoteView(TestCase):

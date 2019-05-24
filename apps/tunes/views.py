@@ -25,6 +25,7 @@ from tunes.serializers import (
     VoteSongsRequestSerializer,
 )
 from tunes.utils import generate_browse_playlist
+from libs.utils import average
 
 logger = logging.getLogger(__name__)
 
@@ -46,16 +47,35 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     def filter_queryset(self, queryset):
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
+        energy = None
+        valence = None
 
         # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
             jitter = self.default_jitter
 
-        user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+        # Try to use upvotes for this emotion and context to generate attributes for songs to return
+        if self.cleaned_data.get('context'):
+            votes = self.request.user.usersongvote_set.filter(
+                emotion__name=self.cleaned_data['emotion'],
+                context=self.cleaned_data['context'],
+                vote=True
+            )
+
+            if votes.exists():
+                energy = average(votes.values_list('song__energy', flat=True))
+                valence = average(votes.values_list('song__valence', flat=True))
+
+        # If context not provided or the previous query on upvotes for context did return any votes,
+        # determine attributes from the attributes for the user and emotion
+        if energy is None or valence is None:
+            user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
+            energy = user_emotion.energy
+            valence = user_emotion.valence
 
         return generate_browse_playlist(
-            user_emotion.energy,
-            user_emotion.valence,
+            energy,
+            valence,
             limit=limit,
             jitter=jitter,
             songs=queryset
@@ -67,13 +87,15 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         if self.cleaned_data.get('genre'):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
 
-        user_votes = self.request.user.get_user_song_vote_records(self.cleaned_data['emotion'])
+        user_votes = self.request.user.usersongvote_set.filter(emotion__name=self.cleaned_data['emotion'])
 
         # If a context is provided, only exclude songs a user has voted on for that context
+        # This allows a song to be a candidate for multiple context playlists for a particular emotion
+        # Songs in WORK context could also be in PARTY context, maybe?
         if self.cleaned_data.get('context'):
-            user_votes = [vote for vote in user_votes if vote.context == self.cleaned_data['context']]
+            user_votes = user_votes.filter(context=self.cleaned_data['context'])
 
-        previously_voted_song_ids = [vote.song.id for vote in user_votes]
+        previously_voted_song_ids = user_votes.values_list('song__id', flat=True)
 
         return queryset.exclude(id__in=previously_voted_song_ids)
 
