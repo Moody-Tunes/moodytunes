@@ -32,18 +32,14 @@ virtual environment. You can do this by passing the `--recreate` flag to tox.
 `tox -r [--recreate]`
 
 We use the [coverage](https://coverage.readthedocs.io/en/v4.5.x/) package to report how much of our codebase has unit
-test coverage. After running the tests using tox, you can see a report of the current coverage by running
+test coverage. After running the tests using tox, you can see a report of the current test coverage by running
 
 `coverage report`
 
-after running tox. If you would like to see a detailed output of the coverage (like what exact lines were hit) you can
-generate an HTML report by running
-
-`coverage html`
-
-This will generate a directory in the project root with files corresponding to each code file in the project. Open the
-index.html file in any browser of your choice to view the source files for the project, their coverage percentage, and
-what lines have (or have not) been tested.
+after running tox. If you would like to see a detailed output of the coverage (like what exact lines were hit) the
+pytest coverage plugin we use generates HTML files of code test coverage after a test run. These files are available in
+the `htmlcov` directory in the project.Open the index.html file in any browser of your choice to view the source files
+for the project, their coverage percentage, and what lines have (or have not) been tested.
 
 NOTE: Your build will fail and any pull request rejected if the total coverage is less than 80% after the Travis build
 is finished. If you *need* to circumvent this, you can cover any code that doesn't need to be tested with pragmas:
