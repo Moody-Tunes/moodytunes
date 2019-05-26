@@ -59,6 +59,18 @@ class TestBrowseSongsRequestSerializer(TestCase):
         serializer = BrowseSongsRequestSerializer(data=data)
         self.assertFalse(serializer.is_valid())
 
+    def test_return_last_set_skips_emotion_required_check(self):
+        data = {'return_last': True}
+
+        serializer = BrowseSongsRequestSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_return_last_disabled_fails_on_no_emotion(self):
+        data = {'return_last': False}
+
+        serializer = BrowseSongsRequestSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+
 
 class TestPlaylistSongsRequestSerializer(TestCase):
     def test_valid_emotion_name_is_valid(self):
