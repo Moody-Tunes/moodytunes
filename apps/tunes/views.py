@@ -70,6 +70,14 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         return cache.get(cache_key)
 
     def filter_queryset(self, queryset):
+        if self.cleaned_data.get('return_last'):
+            playlist = self._retrieve_cached_browse_playlist()
+
+            if playlist:
+                return playlist
+            else:
+                raise ValidationError({'errors': {'return_last': 'Could not find cached playlist'}})
+
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
         energy = None
@@ -111,6 +119,11 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         return playlist
 
     def get_queryset(self):
+        # If we should return the last seen playlist, shortcut this function
+        # We'll return the last seen playlist from the filter_playlist() function
+        if self.cleaned_data.get('return_last'):
+            return None
+
         queryset = super(BrowseView, self).get_queryset()
 
         if self.cleaned_data.get('genre'):
