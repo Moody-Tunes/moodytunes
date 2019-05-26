@@ -1,5 +1,9 @@
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+from django.utils import timezone
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
@@ -80,6 +84,16 @@ class SpotifyUserAuth(BaseModel):
     user = models.ForeignKey(MoodyUser, on_delete=models.PROTECT)
     spotify_user_id = models.CharField(max_length=50, unique=True)
     last_refreshed = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def should_updated_access_token(self):
+        """
+        Spotify access tokens are good for one hour. If the access token has not been updated in this time period,
+        indicate that the access token should be updated
+        :return: (bool) True if the access token has been updated since the last hour, False if not
+        """
+        spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
+        return self.last_refreshed < spotify_auth_timeout
 
 
 class UserEmotion(BaseModel):
