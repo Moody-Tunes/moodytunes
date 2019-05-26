@@ -98,6 +98,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mtdj.wsgi.application'
 
+FIELD_ENCRYPTION_KEY = env.str('MTDJ_ENCRYPTED_FIELDS_KEY', default='__encrypted-field-key-not-set__')
+
 DATABASES = {
     'default': {
         'ENGINE': env.str('MTDJ_DATABASE_ENGINE', default='django.db.backends.postgresql'),
