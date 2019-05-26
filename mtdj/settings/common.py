@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'django_celery_beat',
     'django_celery_results',
+    'encrypted_model_fields',
     'rest_framework',
 ]
 
