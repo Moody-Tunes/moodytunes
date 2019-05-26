@@ -128,6 +128,8 @@ CACHES.update({
     }
 })
 
+BROWSE_PLAYLIST_CACHE_TIMEOUT = 60 * 10  # 10 minutes
+
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
