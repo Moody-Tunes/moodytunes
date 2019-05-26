@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
@@ -7,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import UserSongVote
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
 from tunes.views import BrowseView
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
@@ -172,6 +173,53 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(called_energy, upvote_song_for_context.energy)
         self.assertEqual(called_valence, upvote_song_for_context.valence)
+
+    def test_make_cache_key_returns_expected_cache_key(self):
+        request = mock.Mock()
+        request.user = self.user
+        view = BrowseView()
+        view.request = request
+
+        expected_cache_key = 'browse:{}'.format(self.user.username)
+        self.assertEqual(view._make_cache_key(), expected_cache_key)
+
+    @mock.patch('tunes.views.cache')
+    def test_cache_browse_playlist_calls_cache_with_expected_arguments(self, mock_cache):
+        request = mock.Mock()
+        request.user = self.user
+        view = BrowseView()
+        view.request = request
+
+        playlist = Song.objects.all()
+        cache_key = 'browse:{}'.format(self.user.username)
+        view._cache_browse_playlist(playlist)
+
+        mock_cache.set.assert_called_once_with(cache_key, playlist, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
+
+    @mock.patch('tunes.views.cache')
+    def test_retrieve_cached_playlist_returns_cached_playlist(self, mock_cache):
+        request = mock.Mock()
+        request.user = self.user
+        view = BrowseView()
+        view.request = request
+
+        playlist = Song.objects.all()
+        mock_cache.get.return_value = playlist
+
+        returned_playlist = view._retrieve_cached_browse_playlist()
+        self.assertEqual(playlist, returned_playlist)
+
+    @mock.patch('tunes.views.cache')
+    def test_retrieve_cached_playlist_returns_None_if_no_playlist_cached(self, mock_cache):
+        request = mock.Mock()
+        request.user = self.user
+        view = BrowseView()
+        view.request = request
+
+        mock_cache.get.return_value = None
+
+        returned_playlist = view._retrieve_cached_browse_playlist()
+        self.assertIsNone(returned_playlist)
 
 
 class TestVoteView(TestCase):
