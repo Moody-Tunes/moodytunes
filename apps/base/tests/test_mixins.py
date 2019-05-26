@@ -8,7 +8,7 @@ from base.mixins import ValidateRequestDataMixin
 from libs.tests.helpers import MoodyUtil
 
 
-class TestValidateRequestDataMixing(TestCase):
+class TestValidateRequestDataMixin(TestCase):
     def setUp(self):
         self.mixin = ValidateRequestDataMixin()
         self.factory = APIRequestFactory()
