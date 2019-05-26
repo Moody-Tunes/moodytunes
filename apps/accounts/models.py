@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils import timezone
+from encrypted_model_fields.fields import EncryptedCharField
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
@@ -83,6 +84,8 @@ class SpotifyUserAuth(BaseModel):
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.PROTECT)
     spotify_user_id = models.CharField(max_length=50, unique=True)
+    access_token = EncryptedCharField(max_length=100)
+    refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
 
     @property

@@ -147,6 +147,19 @@ class TestSpotifyUserAuth(TestCase):
 
         self.assertTrue(user_auth.should_updated_access_token)
 
+    def test_encrypted_fields_return_values_on_access(self):
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        self.assertEqual(user_auth.access_token, acces_token)
+        self.assertEqual(user_auth.refresh_token, refresh_token)
+
 
 class TestUserSongVote(TestCase):
     @classmethod
