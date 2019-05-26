@@ -61,6 +61,14 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         cache_key = self._make_cache_key()
         cache.set(cache_key, playlist, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
 
+    def _retrieve_cached_browse_playlist(self):
+        """
+        Retrieve the cached playlist for user if one exists, else return None
+        :return: Cached browse playlist or None
+        """
+        cache_key = self._make_cache_key()
+        return cache.get(cache_key)
+
     def filter_queryset(self, queryset):
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
@@ -90,7 +98,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             energy = user_emotion.energy
             valence = user_emotion.valence
 
-        playlist =  generate_browse_playlist(
+        playlist = generate_browse_playlist(
             energy,
             valence,
             limit=limit,
