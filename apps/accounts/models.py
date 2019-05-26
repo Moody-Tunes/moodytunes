@@ -72,6 +72,16 @@ class MoodyUser(BaseModel, AbstractUser):
         self.save()
 
 
+class SpotifyUserAuth(BaseModel):
+    """
+    Represent a mapping of a user in our system to a Spotify account.
+    Used to authenticate on behalf of a user when connecting with the Spotify API.
+    """
+    user = models.ForeignKey(MoodyUser, on_delete=models.PROTECT)
+    spotify_user_id = models.CharField(max_length=50, unique=True)
+    last_refreshed = models.DateTimeField(auto_now_add=True)
+
+
 class UserEmotion(BaseModel):
     """
     Represents a mapping between a particular user and an emotion. This allows
