@@ -8,6 +8,9 @@ omit =
     */migrations/*
     */tests/*
     *__init__*.py
+    .tox/*
+    mtdj/*
+    manage.py
 
 [report]
 fail_under = 80

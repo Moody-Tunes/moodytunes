@@ -1,5 +1,4 @@
 celery[redis]==4.2.1
-coverage==4.5.2
 Django==2.1.7
 django-compressor==2.2
 django-celery-beat==1.4.0
@@ -14,6 +13,7 @@ psycopg2-binary==2.7.7
 python-json-logger==0.1.10
 pytest==4.3.1
 pytest-blockage==0.2.2
+pytest-cov==2.7.1
 pytest-django==3.4.8
 redis==3.2.0
 requests==2.20.0
