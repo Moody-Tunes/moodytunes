@@ -36,9 +36,9 @@ test coverage. After running the tests using tox, you can see a report of the cu
 
 `coverage report`
 
-after running tox. If you would like to see a detailed output of the coverage (like what exact lines were hit) the
+after tox has finished its run. If you would like to see a detailed output of the coverage (like what exact lines were hit) the
 pytest coverage plugin we use generates HTML files of code test coverage after a test run. These files are available in
-the `htmlcov` directory in the project.Open the index.html file in any browser of your choice to view the source files
+the `htmlcov` directory in the project. Open the index.html file in any browser of your choice to view the source files
 for the project, their coverage percentage, and what lines have (or have not) been tested.
 
 NOTE: Your build will fail and any pull request rejected if the total coverage is less than 80% after the Travis build
