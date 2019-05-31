@@ -175,23 +175,3 @@ class TestUserSongVote(TestCase):
 
         self.assertEqual(user_emot.energy, expected_new_energy)
         self.assertEqual(user_emot.valence, expected_new_valence)
-
-    def test_passing_no_update_flag_does_not_reset_boundaries(self):
-        vote = UserSongVote.objects.create(
-            user=self.user,
-            emotion=self.emotion,
-            song=self.song,
-            vote=True
-        )
-
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
-
-        expected_new_energy = user_emot.energy
-        expected_new_valence = user_emot.valence
-
-        vote.delete(update_boundaries=False)
-
-        user_emot.refresh_from_db()
-
-        self.assertEqual(user_emot.energy, expected_new_energy)
-        self.assertEqual(user_emot.valence, expected_new_valence)
