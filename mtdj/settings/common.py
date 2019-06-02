@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'django_celery_beat',
     'django_celery_results',
+    'encrypted_model_fields',
     'rest_framework',
 ]
 
@@ -96,6 +97,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mtdj.wsgi.application'
+
+FIELD_ENCRYPTION_KEY = env.str('MTDJ_ENCRYPTED_FIELDS_KEY', default='__encrypted-field-key-not-set__')
 
 DATABASES = {
     'default': {

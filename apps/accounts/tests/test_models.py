@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django.utils import timezone
 from django.test import TestCase
 
-from accounts.models import MoodyUser, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_attributes
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
@@ -121,6 +124,41 @@ class TestMoodyUser(TestCase):
         user_emot = self.user.get_user_emotion_record('bad-emotion')
 
         self.assertIsNone(user_emot)
+
+
+class TestSpotifyUserAuth(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+
+    def test_should_updated_access_token_returns_false_for_recently_created_records(self):
+        user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
+        self.assertFalse(user_auth.should_updated_access_token)
+
+    def test_should_update_access_token_returns_false_for_tokens_refreshed_in_boundary(self):
+        user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
+        user_auth.last_refreshed = timezone.now() - timedelta(minutes=30)
+
+        self.assertFalse(user_auth.should_updated_access_token)
+
+    def test_should_update_access_token_returns_true_for_tokens_refreshed_passed_boundary(self):
+        user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
+        user_auth.last_refreshed = timezone.now() - timedelta(days=7)
+
+        self.assertTrue(user_auth.should_updated_access_token)
+
+    def test_encrypted_fields_return_values_on_access(self):
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        self.assertEqual(user_auth.access_token, acces_token)
+        self.assertEqual(user_auth.refresh_token, refresh_token)
 
 
 class TestUserSongVote(TestCase):
