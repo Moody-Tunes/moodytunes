@@ -1,6 +1,7 @@
 from base64 import b64encode
 import logging
 import random
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.cache import cache
@@ -286,3 +287,25 @@ class SpotifyClient(object):
                     })
 
         return tracks
+
+    def build_spotify_oauth_confirm_link(self, redirect_uri, state, scopes):
+        """
+        First step in the Spotify user authorization flow. This builds the request to authorize the application with
+        Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
+        authorization need to be made client-side.
+
+        :param redirect_uri: (str) Valid URI in our application. Fully qualified and added to Spotify whitelist
+        :param state: (str) State to pass in request. Used for validating redirect URI against request
+        :param scopes: (list) List of scopes to specify when authorizing the application
+
+        :return: (str) URL for Spotify OAuth confirmation
+        """
+        params = {
+            'client_id': settings.SPOTIFY['client_id'],
+            'response_type': 'code',
+            'scopes': ' '.join(scopes),
+            'redirect_uri': redirect_uri,
+            'state': state
+        }
+
+        return '{url}?{params}'.format(url=settings.SPOTIFY['user_auth_url'], params=urlencode(params))

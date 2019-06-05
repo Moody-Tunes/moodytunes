@@ -4,7 +4,8 @@ from envparse import env
 # Spotify Definitions
 SPOTIFY = {
     'api_url': env.str('MTDJ_SPOTIFY_API_URL', default='https://api.spotify.com/v1'),
-    'auth_url': env.str('MTDJ_SPOTIFY_API_URL', default='https://accounts.spotify.com/api/token'),
+    'auth_url': env.str('MTDJ_SPOTIFY_AUTH_URL', default='https://accounts.spotify.com/api/token'),
+    'user_auth_url': env.str('MTDJ_SPOTIFY_USER_AUTH_URL', default='https://accounts.spotify.com/authorize'),
     'client_id': env.str('MTDJ_SPOTIFY_CLIENT_ID', default='__spotify_client_id_not_set__'),
     'secret_key': env.str('MTDJ_SPOTIFY_SECRET_KEY', default='__spotify_secret_key_not_set__'),
     'categories': env.list('MTDJ_SPOTIFY_CATEGORIES', default=['hiphop', 'rock', 'chill']),
