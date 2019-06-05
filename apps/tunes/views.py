@@ -51,6 +51,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             playlist = cached_playlist_manager.retrieve_cached_browse_playlist(self.request.user)
 
             if playlist:
+                # Filter out songs user has already voted on from the playlist
+                # to prevent double votes on songs
+                user_voted_songs = self.request.user.usersongvote_set.all().values_list('song__code', flat=True)
+                playlist = [song for song in playlist if song.code not in user_voted_songs]
                 return playlist
             else:
                 raise ValidationError({'errors': {'return_last': 'Could not find cached playlist'}})
