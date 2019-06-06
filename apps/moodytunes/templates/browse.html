@@ -6,6 +6,7 @@
 {% block superhead %}
     {% compress css %}
         <link rel="stylesheet" type="text/less" href="{% static 'moodytunes/less/playlist.less' %}">
+        <link rel="stylesheet" type="text/less" href="{% static 'moodytunes/less/browse.less' %}">
     {% endcompress %}
 
     {% compress js %}
@@ -18,6 +19,7 @@
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
+    <button id="use-cached-playlist" {% if not cached_playlist_exists %} disabled {% endif %}>Last Playlist</button>
     <p>Emotion: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
     <div class="help-tip">
@@ -27,7 +29,6 @@
     <p>Jitter: <span id="jitter-value"></span> {{ form.jitter }} </p>
     <button id="set-context-button">Set Context</button>
     <button id="generate-playlist">Browse</button>
-    <button id="use-cached-playlist" {% if not cached_playlist_exists %} disabled {% endif %}>Use Last Playlist</button>
     <div id="playlist-error-container"></div>
     <p id="alert-no-results" class="warning" hidden>We were unable to find any songs for you to browse. Please try a different set of criteria</p>
 </div>
