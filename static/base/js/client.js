@@ -131,7 +131,7 @@
             // Retrieve the last viewed browse playlist for the user
             var paramas = {
                 return_last: true
-            }
+            };
 
             this.request('GET', '/tunes/browse', paramas, {}, callback);
         },
