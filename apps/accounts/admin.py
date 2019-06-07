@@ -24,6 +24,7 @@ class UserSongVoteAdmin(admin.ModelAdmin):
     list_display = ('user', 'song', 'emotion', 'vote', 'context')
     readonly_fields = ('user', 'song', 'emotion', 'vote', 'context', 'description')
     list_filter = ('emotion', 'vote', 'context')
+    search_fields = ('user__username',)
 
     def has_add_permission(self, request):
         return False
