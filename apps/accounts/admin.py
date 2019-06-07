@@ -21,9 +21,9 @@ class UserEmotionAdmin(admin.ModelAdmin):
 
 
 class UserSongVoteAdmin(admin.ModelAdmin):
-    list_display = ('user', 'song', 'emotion', 'vote')
-    readonly_fields = ('user', 'song', 'emotion', 'vote')
-    list_filter = ('emotion', 'vote')
+    list_display = ('user', 'song', 'emotion', 'vote', 'context')
+    readonly_fields = ('user', 'song', 'emotion', 'vote', 'context', 'description')
+    list_filter = ('emotion', 'vote', 'context')
 
     def has_add_permission(self, request):
         return False
