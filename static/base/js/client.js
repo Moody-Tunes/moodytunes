@@ -127,13 +127,9 @@
 
             this.request('GET', '/tunes/browse/', params, {}, callback);
         },
-        getCachedBrowsePlaylsit: function(callback) {
+        getCachedBrowsePlaylist: function(callback) {
             // Retrieve the last viewed browse playlist for the user
-            var paramas = {
-                return_last: true
-            };
-
-            this.request('GET', '/tunes/browse', paramas, {}, callback);
+            this.request('GET', '/tunes/last/', {}, {}, callback);
         },
         getEmotionPlaylist: function(emotion, genre, context, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
