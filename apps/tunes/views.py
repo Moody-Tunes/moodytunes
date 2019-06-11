@@ -95,7 +95,12 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             songs=queryset
         )
 
-        cached_playlist_manager.cache_browse_playlist(self.request.user, playlist)
+        cached_playlist_manager.cache_browse_playlist(
+            self.request.user,
+            playlist,
+            self.cleaned_data['emotion'],
+            self.cleaned_data.get('context')
+        )
 
         return playlist
 

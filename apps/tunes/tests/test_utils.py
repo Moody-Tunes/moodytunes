@@ -79,11 +79,15 @@ class TestCachedPlaylistManager(TestCase):
     @mock.patch('tunes.utils.cache')
     def test_cache_browse_playlist_calls_cache_with_expected_arguments(self, mock_cache):
         MoodyUtil.create_song()
-        playlist = Song.objects.all()
+        data = {
+            'emotion': 'HPY',
+            'context': 'WORK',
+            'songs': Song.objects.all()
+        }
         cache_key = 'browse:{}'.format(self.user.username)
-        self.manager.cache_browse_playlist(self.user, playlist)
+        self.manager.cache_browse_playlist(self.user, data['songs'], data['emotion'], data['context'])
 
-        mock_cache.set.assert_called_once_with(cache_key, playlist, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
+        mock_cache.set.assert_called_once_with(cache_key, data, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
 
     @mock.patch('tunes.utils.cache')
     def test_retrieve_cached_playlist_returns_cached_playlist(self, mock_cache):
