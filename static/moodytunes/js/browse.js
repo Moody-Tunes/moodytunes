@@ -63,7 +63,7 @@
     function generateLastBrowsePlaylist() {
         document.MoodyTunesClient.getCachedBrowsePlaylist(function (data) {
             emotion = data.emotion;
-            sessionStorage.context = data.context;
+            sessionStorage.context = data.context || '';
             displayBrowsePlaylist(data.songs);
         });
     }
