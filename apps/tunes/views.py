@@ -154,7 +154,7 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'songs': playlist
             }
         else:
-            raise ValidationError({'errors': {'return_last': 'Could not find cached playlist'}})
+            raise ValidationError({'errors': 'Could not find cached playlist'})
 
 
 class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):
