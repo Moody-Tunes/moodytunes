@@ -152,7 +152,7 @@
         var genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, false, displayBrowsePlaylist
+            emotion, jitter, limit, genre, context, displayBrowsePlaylist
         );
     }
 
