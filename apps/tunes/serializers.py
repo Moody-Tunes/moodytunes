@@ -25,7 +25,7 @@ class SongSerializer(serializers.ModelSerializer):
 class LastPlaylistSerializer(serializers.Serializer):
     emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
-    songs = SongSerializer(many=True)
+    songs = SongSerializer(many=True, read_only=True)
 
 
 class VoteSerializer(serializers.ModelSerializer):
