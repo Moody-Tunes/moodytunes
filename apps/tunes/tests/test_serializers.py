@@ -1,11 +1,12 @@
 from django.test import TestCase
 
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
     PlaylistSongsRequestSerializer,
-    VoteSongsRequestSerializer
+    VoteSongsRequestSerializer,
+    LastPlaylistSerializer
 )
 from libs.tests.helpers import MoodyUtil
 
@@ -129,5 +130,31 @@ class TestVoteSongsRequestSerializer(TestCase):
             'vote': True
         }
         serializer = VoteSongsRequestSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+
+
+class TestLastPlaylistSerializer(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.song = MoodyUtil.create_song()
+        cls.emotion = Emotion.HAPPY
+        cls.context = 'WORK'
+
+    def test_data_with_context_is_valid(self):
+        data = {
+            'emotion': self.emotion,
+            'context': self.context,
+            'songs': [self.song]
+        }
+        serializer = LastPlaylistSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_data_without_context_is_valid(self):
+        data = {
+            'emotion': self.emotion,
+            'songs': [self.song]
+        }
+        serializer = LastPlaylistSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
