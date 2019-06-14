@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import UserSongVote
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
 from tunes.views import BrowseView
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
@@ -172,6 +172,70 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(called_energy, upvote_song_for_context.energy)
         self.assertEqual(called_valence, upvote_song_for_context.valence)
+
+
+class TestLastPlaylistView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:last')
+        cls.api_client = APIClient()
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+
+    def setUp(self):
+        self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    @mock.patch('tunes.utils.cache')
+    def test_passing_use_cached_playlist_parameter_returns_cached_playlist(self, mock_cache):
+        cached_data = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK',
+            'songs': Song.objects.all()
+        }
+        mock_cache.get.return_value = cached_data
+
+        resp = self.api_client.get(self.url)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_json['songs'][0]['code'], self.song.code)
+        self.assertEqual(resp_json['emotion'], cached_data['emotion'])
+        self.assertEqual(resp_json['context'], cached_data['context'])
+
+    @mock.patch('tunes.utils.cache')
+    def test_passing_use_cached_playlist_parameter_returns_bad_request_if_no_playlist_found(self, mock_cache):
+        mock_cache.get.return_value = None
+        expected_error = 'Could not find cached playlist'
+
+        params = {'return_last': True}
+        resp = self.api_client.get(self.url, params)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp_json['errors'], expected_error)
+
+    @mock.patch('tunes.utils.cache')
+    def test_cached_playlist_filters_songs_user_voted_on(self, mock_cache):
+        voted_song = MoodyUtil.create_song()
+        cached_data = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK',
+            'songs': Song.objects.all()
+        }
+        mock_cache.get.return_value = cached_data
+
+        MoodyUtil.create_user_song_vote(
+            self.user,
+            voted_song,
+            Emotion.objects.get(name=Emotion.HAPPY),
+            True
+        )
+
+        params = {'return_last': True}
+        resp = self.api_client.get(self.url, params)
+        resp_json = resp.json()
+
+        self.assertNotIn(voted_song, resp_json['songs'])
 
 
 class TestVoteView(TestCase):

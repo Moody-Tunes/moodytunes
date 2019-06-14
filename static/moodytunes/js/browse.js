@@ -8,7 +8,9 @@
         setUpContextModal();
         setUpJitterInput();
         var generatePlaylistButton = document.getElementById('generate-playlist');
+        var returnLastPlaylist = document.getElementById('use-cached-playlist');
         generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
+        returnLastPlaylist.addEventListener('click', generateLastBrowsePlaylist);
     }
 
     function setUpContextModal() {
@@ -56,6 +58,14 @@
             var jitterValue = Number.parseFloat(this.value);
             jitterOutput.innerText = jitterValue.toFixed(2);
         }
+    }
+
+    function generateLastBrowsePlaylist() {
+        document.MoodyTunesClient.getCachedBrowsePlaylist(function (data) {
+            emotion = data.emotion;
+            sessionStorage.context = data.context || '';
+            displayBrowsePlaylist(data.songs);
+        });
     }
 
     function voteOnSong() {

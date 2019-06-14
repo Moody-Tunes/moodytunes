@@ -1,8 +1,10 @@
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase
 
-from tunes.utils import generate_browse_playlist
+from tunes.models import Song
+from tunes.utils import CachedPlaylistManager, generate_browse_playlist
 from libs.tests.helpers import MoodyUtil
 
 
@@ -62,3 +64,43 @@ class TestGenerateBrowsePlaylist(TestCase):
         playlist = generate_browse_playlist(energy, valence, limit=5)
 
         self.assertEqual(len(playlist), 5)
+
+
+class TestCachedPlaylistManager(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.manager = CachedPlaylistManager()
+
+    def test_make_cache_key_returns_expected_cache_key(self):
+        expected_cache_key = 'browse:{}'.format(self.user.username)
+        self.assertEqual(self.manager._make_cache_key(self.user), expected_cache_key)
+
+    @mock.patch('tunes.utils.cache')
+    def test_cache_browse_playlist_calls_cache_with_expected_arguments(self, mock_cache):
+        MoodyUtil.create_song()
+        data = {
+            'emotion': 'HPY',
+            'context': 'WORK',
+            'songs': Song.objects.all()
+        }
+        cache_key = 'browse:{}'.format(self.user.username)
+        self.manager.cache_browse_playlist(self.user, data['songs'], data['emotion'], data['context'])
+
+        mock_cache.set.assert_called_once_with(cache_key, data, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
+
+    @mock.patch('tunes.utils.cache')
+    def test_retrieve_cached_playlist_returns_cached_playlist(self, mock_cache):
+        MoodyUtil.create_song()
+        playlist = Song.objects.all()
+        mock_cache.get.return_value = playlist
+
+        returned_playlist = self.manager.retrieve_cached_browse_playlist(self.user)
+        self.assertEqual(playlist, returned_playlist)
+
+    @mock.patch('tunes.utils.cache')
+    def test_retrieve_cached_playlist_returns_None_if_no_playlist_cached(self, mock_cache):
+        mock_cache.get.return_value = None
+
+        returned_playlist = self.manager.retrieve_cached_browse_playlist(self.user)
+        self.assertIsNone(returned_playlist)

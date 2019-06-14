@@ -6,6 +6,7 @@
 {% block superhead %}
     {% compress css %}
         <link rel="stylesheet" type="text/less" href="{% static 'moodytunes/less/playlist.less' %}">
+        <link rel="stylesheet" type="text/less" href="{% static 'moodytunes/less/browse.less' %}">
     {% endcompress %}
 
     {% compress js %}
@@ -18,6 +19,7 @@
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
+    <button id="use-cached-playlist" {% if not cached_playlist_exists %} disabled {% endif %}>Last Playlist</button>
     <p>Emotion: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
     <div class="help-tip">

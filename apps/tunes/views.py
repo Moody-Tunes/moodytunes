@@ -23,8 +23,9 @@ from tunes.serializers import (
     DeleteVoteRequestSerializer,
     PlaylistSongsRequestSerializer,
     VoteSongsRequestSerializer,
+    LastPlaylistSerializer
 )
-from tunes.utils import generate_browse_playlist
+from tunes.utils import CachedPlaylistManager, generate_browse_playlist
 from libs.utils import average
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     get_request_serializer = BrowseSongsRequestSerializer
 
     def filter_queryset(self, queryset):
+        cached_playlist_manager = CachedPlaylistManager()
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
         energy = None
@@ -73,13 +75,22 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             energy = user_emotion.energy
             valence = user_emotion.valence
 
-        return generate_browse_playlist(
+        playlist = generate_browse_playlist(
             energy,
             valence,
             limit=limit,
             jitter=jitter,
             songs=queryset
         )
+
+        cached_playlist_manager.cache_browse_playlist(
+            self.request.user,
+            playlist,
+            self.cleaned_data['emotion'],
+            self.cleaned_data.get('context')
+        )
+
+        return playlist
 
     def get_queryset(self):
         queryset = super(BrowseView, self).get_queryset()
@@ -98,6 +109,35 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         previously_voted_song_ids = user_votes.values_list('song__id', flat=True)
 
         return queryset.exclude(id__in=previously_voted_song_ids)
+
+
+class LastPlaylistView(generics.RetrieveAPIView):
+    """
+    Return a JSON response of the cached user playlist if one exists. If a cached playlist is not found,
+    will return a 400 Bad Request.
+    """
+    serializer_class = LastPlaylistSerializer
+
+    def get_object(self):
+        cached_playlist_manager = CachedPlaylistManager()
+        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist(self.request.user)
+
+        if cached_playlist:
+            emotion = cached_playlist['emotion']
+            playlist = cached_playlist['songs']
+            context = cached_playlist.get('context')
+
+            # Filter out songs user has already voted on from the playlist
+            # to prevent double votes on songs
+            user_voted_songs = self.request.user.usersongvote_set.all().values_list('song__code', flat=True)
+            playlist = [song for song in playlist if song.code not in user_voted_songs]
+            return {
+                'emotion': emotion,
+                'context': context,
+                'songs': playlist
+            }
+        else:
+            raise ValidationError({'errors': 'Could not find cached playlist'})
 
 
 class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):
@@ -131,12 +171,15 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
         try:
             UserSongVote.objects.create(**vote_data)
-            logger.info('Saved vote for user {} voting on song {} with desired emotion {}. Outcome: {}'.format(
-                self.request.user.username,
-                song.code,
-                self.cleaned_data['emotion'],
-                vote_data['vote']
-            ))
+            logger.info(
+                'Saved vote for user {} voting on song {} with desired emotion {} and context {}. Outcome: {}'.format(
+                    self.request.user.username,
+                    song.code,
+                    self.cleaned_data['emotion'],
+                    self.cleaned_data.get('context'),
+                    vote_data['vote']
+                )
+            )
 
             return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 

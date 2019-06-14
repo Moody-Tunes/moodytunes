@@ -22,6 +22,12 @@ class SongSerializer(serializers.ModelSerializer):
         fields = ('artist', 'name', 'genre', 'code')
 
 
+class LastPlaylistSerializer(serializers.Serializer):
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
+    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
+    songs = SongSerializer(many=True, read_only=True)
+
+
 class VoteSerializer(serializers.ModelSerializer):
     song = SongSerializer()
     emotion = EmotionSerializer()
