@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from tunes.models import Emotion, Song
+from tunes.models import Emotion
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
