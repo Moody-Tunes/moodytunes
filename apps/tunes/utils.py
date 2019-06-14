@@ -50,11 +50,12 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
 
 
 class CachedPlaylistManager(object):
-    """Facilitates caching previous user browse playlists"""
+    """Facilitates caching and retrieving the last previous user browse playlists"""
 
     def _make_cache_key(self, user):
         """
         Make a cache key for storing the last previously seen playlist for the user
+        :param user: (MoodyUser) User in our system to create a cache key
         :return: (str) Cache key to use in storing/retrieving last seen playlist for user
         """
         return 'browse:{}'.format(user.username)
@@ -77,6 +78,7 @@ class CachedPlaylistManager(object):
     def retrieve_cached_browse_playlist(self, user):
         """
         Retrieve the cached playlist for user if one exists, else return None
+        :param user: (MoodyUser) User in our system to use in cache functionality
         :return: Cached browse playlist or None
         """
         cache_key = self._make_cache_key(user)
