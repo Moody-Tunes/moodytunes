@@ -171,12 +171,15 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
         try:
             UserSongVote.objects.create(**vote_data)
-            logger.info('Saved vote for user {} voting on song {} with desired emotion {}. Outcome: {}'.format(
-                self.request.user.username,
-                song.code,
-                self.cleaned_data['emotion'],
-                vote_data['vote']
-            ))
+            logger.info(
+                'Saved vote for user {} voting on song {} with desired emotion {} and context {}. Outcome: {}'.format(
+                    self.request.user.username,
+                    song.code,
+                    self.cleaned_data['emotion'],
+                    self.cleaned_data.get('context'),
+                    vote_data['vote']
+                )
+            )
 
             return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
