@@ -25,7 +25,8 @@ class SongSerializer(serializers.ModelSerializer):
 class LastPlaylistSerializer(serializers.Serializer):
     emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
-    songs = SongSerializer(many=True, read_only=True)
+    description = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    playlist = SongSerializer(many=True, read_only=True)
 
 
 class VoteSerializer(serializers.ModelSerializer):
@@ -51,6 +52,7 @@ class BrowseSongsRequestSerializer(serializers.Serializer):
     jitter = serializers.FloatField(min_value=0, max_value=1, required=False)
     limit = serializers.IntegerField(max_value=25, required=False)
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
+    description = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 
 class VoteSongsRequestSerializer(serializers.Serializer):

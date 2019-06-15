@@ -82,10 +82,11 @@ class TestCachedPlaylistManager(TestCase):
         data = {
             'emotion': 'HPY',
             'context': 'WORK',
-            'songs': Song.objects.all()
+            'description': '',
+            'playlist': Song.objects.all()
         }
         cache_key = 'browse:{}'.format(self.user.username)
-        self.manager.cache_browse_playlist(self.user, data['songs'], data['emotion'], data['context'])
+        self.manager.cache_browse_playlist(self.user, **data)
 
         mock_cache.set.assert_called_once_with(cache_key, data, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
 

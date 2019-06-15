@@ -64,7 +64,8 @@
         document.MoodyTunesClient.getCachedBrowsePlaylist(function (data) {
             emotion = data.emotion;
             sessionStorage.context = data.context || '';
-            displayBrowsePlaylist(data.songs);
+            sessionStorage.description = data.description || '';
+            displayBrowsePlaylist(data.playlist);
         });
     }
 
@@ -147,12 +148,13 @@
         var limit = undefined; // We don't want people to set the limit themselves, keep it at the default
 
         var context = sessionStorage.context;
+        var description = sessionStorage.description;
         emotion = document.getElementById('id_emotion').value;
         var jitter = document.getElementById('id_jitter').value;
         var genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, displayBrowsePlaylist
+            emotion, jitter, limit, genre, context, description, displayBrowsePlaylist
         );
     }
 

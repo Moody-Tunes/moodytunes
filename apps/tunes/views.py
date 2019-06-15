@@ -87,7 +87,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             self.request.user,
             playlist,
             self.cleaned_data['emotion'],
-            self.cleaned_data.get('context')
+            self.cleaned_data.get('context'),
+            self.cleaned_data.get('description')
         )
 
         return playlist
@@ -124,8 +125,9 @@ class LastPlaylistView(generics.RetrieveAPIView):
 
         if cached_playlist:
             emotion = cached_playlist['emotion']
-            playlist = cached_playlist['songs']
+            playlist = cached_playlist['playlist']
             context = cached_playlist.get('context')
+            description = cached_playlist.get('description')
 
             # Filter out songs user has already voted on from the playlist
             # to prevent double votes on songs
@@ -134,7 +136,8 @@ class LastPlaylistView(generics.RetrieveAPIView):
             return {
                 'emotion': emotion,
                 'context': context,
-                'songs': playlist
+                'description': description,
+                'playlist': playlist
             }
         else:
             raise ValidationError({'errors': 'Could not find cached playlist'})

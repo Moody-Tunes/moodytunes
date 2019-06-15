@@ -145,7 +145,7 @@ class TestLastPlaylistSerializer(TestCase):
         data = {
             'emotion': self.emotion,
             'context': self.context,
-            'songs': [self.song]
+            'playlist': [self.song]
         }
         serializer = LastPlaylistSerializer(data=data)
         self.assertTrue(serializer.is_valid())
@@ -153,7 +153,7 @@ class TestLastPlaylistSerializer(TestCase):
     def test_data_without_context_is_valid(self):
         data = {
             'emotion': self.emotion,
-            'songs': [self.song]
+            'playlist': [self.song]
         }
         serializer = LastPlaylistSerializer(data=data)
 
