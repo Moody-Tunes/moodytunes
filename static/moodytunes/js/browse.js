@@ -64,7 +64,8 @@
         document.MoodyTunesClient.getCachedBrowsePlaylist(function (data) {
             emotion = data.emotion;
             sessionStorage.context = data.context || '';
-            displayBrowsePlaylist(data.songs);
+            sessionStorage.description = data.description || '';
+            displayBrowsePlaylist(data.playlist);
         });
     }
 
