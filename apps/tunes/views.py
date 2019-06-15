@@ -134,7 +134,7 @@ class LastPlaylistView(generics.RetrieveAPIView):
             return {
                 'emotion': emotion,
                 'context': context,
-                'songs': playlist
+                'playlist': playlist
             }
         else:
             raise ValidationError({'errors': 'Could not find cached playlist'})

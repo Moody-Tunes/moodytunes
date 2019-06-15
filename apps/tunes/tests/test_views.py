@@ -198,7 +198,7 @@ class TestLastPlaylistView(TestCase):
         resp_json = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_json['songs'][0]['code'], self.song.code)
+        self.assertEqual(resp_json['playlist'][0]['code'], self.song.code)
         self.assertEqual(resp_json['emotion'], cached_data['emotion'])
         self.assertEqual(resp_json['context'], cached_data['context'])
 
@@ -235,7 +235,7 @@ class TestLastPlaylistView(TestCase):
         resp = self.api_client.get(self.url, params)
         resp_json = resp.json()
 
-        self.assertNotIn(voted_song, resp_json['songs'])
+        self.assertNotIn(voted_song, resp_json['playlist'])
 
 
 class TestVoteView(TestCase):
