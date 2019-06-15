@@ -157,7 +157,12 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         try:
             song = Song.objects.get(code=self.cleaned_data['song_code'])
         except (Song.DoesNotExist, Song.MultipleObjectsReturned):
-            logger.warning('Unable to retrieve song with code {}'.format(self.cleaned_data['song_code']))
+            logger.warning(
+                'Unable to retrieve song with code {}'.format(self.cleaned_data['song_code']),
+                extra={
+                    'fingerprint': 'tunes.VoteView.create.song_not_found'
+                }
+            )
 
             raise Http404('No song exists with code: {}'.format(self.cleaned_data['song_code']))
 
@@ -175,19 +180,26 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         try:
             UserSongVote.objects.create(**vote_data)
             logger.info(
-                'Saved vote for user {} voting on song {} with desired emotion {} and context {}. Outcome: {}'.format(
+                'Saved vote for user {} voting on song {}'.format(
                     self.request.user.username,
                     song.code,
-                    self.cleaned_data['emotion'],
-                    self.cleaned_data.get('context'),
-                    vote_data['vote']
-                )
+                ),
+                extra={
+                    'vote_data': vote_data,
+                    'fingerprint': 'tunes.VoteView.create.created_new_vote'
+                }
             )
 
             return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
         except IntegrityError:
-            logger.warning('Bad data supplied to VoteView.create: {}'.format(vote_data))
+            logger.warning(
+                'Bad data supplied to VoteView.create from {}'.format(self.request.user.username),
+                extra={
+                    'vote_data': vote_data,
+                    'fingerprint': 'tunes.VoteView.create.bad_vote_data'
+                }
+            )
 
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
