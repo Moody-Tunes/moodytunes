@@ -190,7 +190,7 @@ class TestLastPlaylistView(TestCase):
         cached_data = {
             'emotion': Emotion.HAPPY,
             'context': 'WORK',
-            'songs': Song.objects.all()
+            'playlist': Song.objects.all()
         }
         mock_cache.get.return_value = cached_data
 
@@ -220,7 +220,7 @@ class TestLastPlaylistView(TestCase):
         cached_data = {
             'emotion': Emotion.HAPPY,
             'context': 'WORK',
-            'songs': Song.objects.all()
+            'playlist': Song.objects.all()
         }
         mock_cache.get.return_value = cached_data
 
