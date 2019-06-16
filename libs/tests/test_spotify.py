@@ -357,3 +357,12 @@ class TestSpotifyClient(TestCase):
 
         user_tokens = self.spotify_client.get_access_and_refresh_tokens('code', 'redirect/uri')
         self.assertDictEqual(user_tokens, resp_data)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_refresh_access_token(self, mock_request):
+        resp_data = {'access_token': 'some:access:token'}
+        mock_request.return_value = resp_data
+
+        access_token = self.spotify_client.refresh_access_token('some:refresh:token')
+
+        self.assertEqual(access_token, resp_data['access_token'])
