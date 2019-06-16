@@ -345,3 +345,15 @@ class TestSpotifyClient(TestCase):
 
         self.assertIsNone(new_track.get('energy'))
         self.assertIsNone(new_track.get('valence'))
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_user_tokens(self, mock_request):
+        resp_data = {
+            'access_token': 'some:access:token',
+            'refresh_token': 'some:refresh:token'
+        }
+
+        mock_request.return_value = resp_data
+
+        user_tokens = self.spotify_client.get_access_and_refresh_tokens('code', 'redirect/uri')
+        self.assertDictEqual(user_tokens, resp_data)
