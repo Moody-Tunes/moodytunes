@@ -64,8 +64,9 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
+            logger.info('{} - Successful request made to {}.'.format(self.fingerprint, url))
             logger.debug(
-                '{} - Successful request made to {}.'.format(self.fingerprint, url, response),
+                '{} - Successful request made to {}.'.format(self.fingerprint, url),
                 extra={'response_data': response}
             )
 
