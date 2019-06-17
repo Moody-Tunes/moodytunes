@@ -1,5 +1,6 @@
 from unittest import mock
 
+from base64 import b64encode
 from django.conf import settings
 from django.test import TestCase, override_settings
 
@@ -19,16 +20,32 @@ class TestSpotifyClient(TestCase):
         # Clear seen songs cache from SpotifyClient instance
         self.spotify_client.seen_songs = []
 
-    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_make_auth_access_token_request_happy_path(self, mock_request):
         mock_request.return_value = {'access_token': self.auth_code}
 
+        # Calculate encoded auth header expected by Spotify
+        auth_val = '{client_id}:{secret_key}'.format(
+            client_id='test-spotify-client-id',
+            secret_key='test-spotify-secret_key'
+        )
+
+        auth_val = bytes(auth_val, encoding='utf-8')
+        auth_header = b64encode(auth_val)
+
+        expected_headers = {'Authorization': 'Basic {}'.format(auth_header.decode('utf8'))}
+        expected_request_data = {'grant_type': 'client_credentials'}
+
         auth = self.spotify_client._make_auth_access_token_request()
 
+        mock_request.assert_called_once_with(
+            'POST',
+            'https://accounts.spotify.com/api/token',
+            data=expected_request_data,
+            headers=expected_headers
+        )
         self.assertEqual(auth, self.auth_code)
 
-    @override_settings(SPOTIFY={'client_id': 'foo', 'secret_key': 'bar', 'auth_url': 'https://example.com'})
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_make_auth_access_token_request_auth_code_not_found(self, mock_request):
         mock_request.return_value = {}
