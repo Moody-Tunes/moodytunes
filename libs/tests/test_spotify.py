@@ -348,6 +348,10 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_user_tokens(self, mock_request):
+        request_data = {
+            'code': 'some-code',
+            'redirect_uri': 'redirect/uri',
+        }
         resp_data = {
             'access_token': 'some:access:token',
             'refresh_token': 'some:refresh:token'
@@ -355,14 +359,28 @@ class TestSpotifyClient(TestCase):
 
         mock_request.return_value = resp_data
 
-        user_tokens = self.spotify_client.get_access_and_refresh_tokens('code', 'redirect/uri')
+        user_tokens = self.spotify_client.get_access_and_refresh_tokens(**request_data)
+
+        request_data.update({'grant_type': 'authorization_code'})  # Update with constant grant_type from Spotify
+        mock_request.assert_called_once_with(
+            'POST',
+            'https://accounts.spotify.com/api/token',
+            data=request_data
+        )
         self.assertDictEqual(user_tokens, resp_data)
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_refresh_access_token(self, mock_request):
+        request_data = {'refresh_token': 'some:refresh:token'}
         resp_data = {'access_token': 'some:access:token'}
         mock_request.return_value = resp_data
 
-        access_token = self.spotify_client.refresh_access_token('some:refresh:token')
+        access_token = self.spotify_client.refresh_access_token(**request_data)
 
+        request_data.update({'grant_type': 'refresh_token'})  # Update with constant grant_type from Spotify
+        mock_request.assert_called_once_with(
+            'POST',
+            'https://accounts.spotify.com/api/token',
+            data=request_data
+        )
         self.assertEqual(access_token, resp_data['access_token'])
