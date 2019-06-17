@@ -2,7 +2,7 @@ from unittest import mock
 
 from base64 import b64encode
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from requests.exceptions import HTTPError
 
