@@ -57,29 +57,33 @@ class TestSpotifyClient(TestCase):
     @mock.patch('django.core.cache.cache.set')
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
-    def test_get_auth_token_not_in_cache(self, mock_access_request, mock_cache_get, mock_cache_set):
+    def test_get_auth_token_not_in_cache_returns_token(self, mock_access_request, mock_cache_get, mock_cache_set):
         mock_cache_get.return_value = None
         mock_access_request.return_value = self.auth_code
 
-        self.spotify_client._get_auth_access_token()
-        mock_access_request.assert_called_with()
-        mock_cache_set.assert_called_with(
+        code = self.spotify_client._get_auth_access_token()
+
+        mock_access_request.assert_called_once_with()
+        mock_cache_set.assert_called_once_with(
             settings.SPOTIFY['auth_cache_key'],
             self.auth_code,
             settings.SPOTIFY['auth_cache_key_timeout']
         )
+        self.assertEqual(code, self.auth_code)
 
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
-    def test_get_auth_token_found_in_cache(self, mock_access_request, mock_cache):
+    def test_get_auth_token_found_in_cache_returns_token(self, mock_access_request, mock_cache):
         mock_cache.return_value = self.auth_code
 
-        self.spotify_client._get_auth_access_token()
+        code = self.spotify_client._get_auth_access_token()
+
         mock_access_request.assert_not_called()
+        self.assertEqual(code, self.auth_code)
 
     @mock.patch('django.core.cache.cache.get')
     @mock.patch('libs.spotify.SpotifyClient._make_auth_access_token_request')
-    def test_get_auth_token_fails(self, mock_access_request, mock_cache_get):
+    def test_get_auth_token_raises_spotify_exception_on_failure(self, mock_access_request, mock_cache_get):
         mock_cache_get.return_value = None
         mock_access_request.return_value = None
 
