@@ -1,7 +1,6 @@
 from unittest import mock
 
 from base64 import b64encode
-from django.conf import settings
 from django.test import TestCase
 
 from requests.exceptions import HTTPError
@@ -65,9 +64,9 @@ class TestSpotifyClient(TestCase):
 
         mock_access_request.assert_called_once_with()
         mock_cache_set.assert_called_once_with(
-            settings.SPOTIFY['auth_cache_key'],
+            'spotify:auth-token',
             self.auth_code,
-            settings.SPOTIFY['auth_cache_key_timeout']
+            3600
         )
         self.assertEqual(code, self.auth_code)
 
@@ -161,18 +160,18 @@ class TestSpotifyClient(TestCase):
 
         resp = self.spotify_client.get_playlists_for_category('category', 1)
 
-        self.assertEqual(resp, expected_resp)
         mock_request.assert_called_with(
             'GET',
             '{api_url}/browse/categories/{category_id}/playlists'.format(
-                api_url=settings.SPOTIFY['api_url'],
+                api_url='https://api.spotify.com/v1',
                 category_id='category'
             ),
             params={
-                'country': settings.COUNTRY_CODE,
+                'country': 'US',
                 'limit': 1
             }
         )
+        self.assertEqual(resp, expected_resp)
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_songs_from_playlist_happy_path(self, mock_request):
