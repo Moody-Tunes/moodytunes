@@ -92,7 +92,7 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    def test_spotify_request_happy_path(self, mock_auth, mock_request):
+    def test_make_spotify_request_happy_path(self, mock_auth, mock_request):
         dummy_response = {'status': 200, 'content': 'OK'}
         dummy_params = {'query': 'param'}
         dummy_data = {'key': 'value'}
@@ -104,7 +104,7 @@ class TestSpotifyClient(TestCase):
         mock_auth.return_value = self.auth_code
         mock_request.return_value = mock_response
 
-        self.spotify_client._make_spotify_request('GET', '/dummy_endpoint', data=dummy_data, params=dummy_params)
+        resp = self.spotify_client._make_spotify_request('GET', '/dummy_endpoint', data=dummy_data, params=dummy_params)
 
         mock_request.assert_called_with(
             'GET',
@@ -113,10 +113,11 @@ class TestSpotifyClient(TestCase):
             data=dummy_data,
             headers={'Authorization': 'Bearer {}'.format(self.auth_code)}
         )
+        self.assertDictEqual(resp, dummy_response)
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    def test_spotify_request_raises_http_error(self, mock_auth, mock_request):
+    def test_make_spotify_request_raises_spotify_exception_on_http_error(self, mock_auth, mock_request):
         mock_response = mock.Mock()
         mock_response.raise_for_status.side_effect = HTTPError
 
@@ -128,7 +129,7 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    def test_spotify_request_raises_base_exception(self, mock_auth, mock_request):
+    def test_make_spotify_request_raises_spotify_exception_on_base_exception(self, mock_auth, mock_request):
         mock_response = mock.Mock()
         mock_response.raise_for_status.side_effect = Exception
 
