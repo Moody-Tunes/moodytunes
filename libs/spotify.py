@@ -329,9 +329,7 @@ class SpotifyClient(object):
             'redirect_uri': redirect_uri
         }
 
-        url = settings.SPOTIFY['auth_url']
-
-        response = self._make_spotify_request('POST', url, data=data)
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
 
         return {
             'access_token': response['access_token'],
@@ -352,8 +350,6 @@ class SpotifyClient(object):
             'refresh_token': refresh_token
         }
 
-        url = settings.SPOTIFY['auth_url']
-
-        response = self._make_spotify_request('POST', url, data=data)
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
 
         return response['access_token']
