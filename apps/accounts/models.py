@@ -182,6 +182,12 @@ class UserSongVote(BaseModel):
         user_emot.update_attributes()
 
 
+class UnprocessedSuggestionsManager(models.Manager):
+    """Manager to operate on song suggestions that have not been processed"""
+    def get_queryset(self):
+        return super().get_queryset().filter(processed=False)
+
+
 class UserSuggestedSong(BaseModel):
     """
     Stores songs that users have suggested to be added to the site. Will be used by the management command to fetch
@@ -189,7 +195,9 @@ class UserSuggestedSong(BaseModel):
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
     code = models.CharField(max_length=36, db_index=True, unique=True)
-    processed = models.BooleanField(default=False)
+    processed = models.BooleanField(default=False, db_index=True)
+
+    unprocessed_suggestions = UnprocessedSuggestionsManager()
 
     def delete(self, using=None, keep_parents=False):
         """
