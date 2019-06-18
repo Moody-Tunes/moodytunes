@@ -197,6 +197,7 @@ class UserSuggestedSong(BaseModel):
     code = models.CharField(max_length=36, db_index=True, unique=True)
     processed = models.BooleanField(default=False, db_index=True)
 
+    objects = models.Manager()
     unprocessed_suggestions = UnprocessedSuggestionsManager()
 
     def delete(self, using=None, keep_parents=False):
