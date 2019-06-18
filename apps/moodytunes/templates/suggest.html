@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Suggest A Song</h1>
+    <p>Want to see a song on our site? Suggest a new song by submitting a Spotify song code in the following field</p>
+    <form name="suggest-song-form" method="post">
+        {% csrf_token %}
+        <p>{{ form.code.errors }}</p>
+        <p>{{ form.code }}</p>
+        <button type="submit">Suggest Song</button>
+    </form>
+{% endblock %}
