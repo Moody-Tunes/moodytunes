@@ -1,6 +1,7 @@
 from base64 import b64encode
 import logging
 import random
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.cache import cache
@@ -63,8 +64,9 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
+            logger.info('{} - Successful request made to {}.'.format(self.fingerprint, url))
             logger.debug(
-                '{} - Successful request made to {}.'.format(self.fingerprint, url, response),
+                '{} - Successful request made to {}.'.format(self.fingerprint, url),
                 extra={'response_data': response}
             )
 
@@ -286,3 +288,69 @@ class SpotifyClient(object):
                     })
 
         return tracks
+
+    def build_spotify_oauth_confirm_link(self, redirect_uri, state, scopes):
+        """
+        First step in the Spotify user authorization flow. This builds the request to authorize the application with
+        Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
+        authorization need to be made client-side.
+
+        :param redirect_uri: (str) Valid URI in our application. Fully qualified and added to Spotify whitelist
+        :param state: (str) State to pass in request. Used for validating redirect URI against request
+        :param scopes: (list) List of scopes to specify when authorizing the application
+
+        :return: (str) URL for Spotify OAuth confirmation
+        """
+        params = {
+            'client_id': settings.SPOTIFY['client_id'],
+            'response_type': 'code',
+            'scopes': ' '.join(scopes),
+            'redirect_uri': redirect_uri,
+            'state': state
+        }
+
+        return '{url}?{params}'.format(url=settings.SPOTIFY['user_auth_url'], params=urlencode(params))
+
+    def get_access_and_refresh_tokens(self, code, redirect_uri):
+        """
+        Make a request to the Spotify authorization endpoint to obtain the access and refresh tokens for a user after
+        they have granted our application permission to Spotify on their behalf.
+
+        :param code: (str) Authorization code returned from initial request to SPOTIFY['user_auth_url']
+        :param redirect_uri: (str)
+            This parameter is used for validation only (there is no actual redirection).
+            The value of this parameter must exactly match the value of redirect_uri
+            supplied when requesting the authorization code.
+
+        :return: (dict) Access and refresh token for the user: to be saved in the database
+        """
+        data = {
+            'grant_type': 'authorization_code',  # Constant; From Spotify documentation
+            'code': code,
+            'redirect_uri': redirect_uri
+        }
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+
+        return {
+            'access_token': response['access_token'],
+            'refresh_token': response['refresh_token']
+        }
+
+    def refresh_access_token(self, refresh_token):
+        """
+        Refresh application on behalf of user given a refresh token. On a successful response, will return an
+        access token for the user good for the timeout period for Spotify authentication (One hour.)
+
+        :param refresh_token: (str) Refresh token for user (stored in `SpotifyUserAuth`
+
+        :return: (str) New access token for user
+        """
+        data = {
+            'grant_type': 'refresh_token',  # Constant; From Spotify documentation
+            'refresh_token': refresh_token
+        }
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+
+        return response['access_token']
