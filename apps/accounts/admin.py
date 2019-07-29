@@ -29,6 +29,7 @@ class UserSongVoteAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+
 admin.site.register(MoodyUser, MoodyUserAdmin)
 admin.site.register(UserEmotion, UserEmotionAdmin)
 admin.site.register(UserSongVote, UserSongVoteAdmin)

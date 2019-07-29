@@ -468,7 +468,7 @@ class TestSpotifyClient(TestCase):
             }
         }
 
-        mock_album_data ={
+        mock_album_data = {
             'genres': ['HipHop']
         }
 
