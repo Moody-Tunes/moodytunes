@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 from django.test import TestCase
 
-from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote, UserSuggestedSong
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_attributes
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
@@ -213,25 +213,3 @@ class TestUserSongVote(TestCase):
 
         self.assertEqual(user_emot.energy, expected_new_energy)
         self.assertEqual(user_emot.valence, expected_new_valence)
-
-
-class TestUserSuggestedSong(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = MoodyUtil.create_user()
-        cls.code = 'spotify:song:code-1'
-
-    def test_delete_sets_processed_to_true(self):
-        suggestion = UserSuggestedSong.objects.create(user=self.user, code=self.code)
-        suggestion.delete()
-        suggestion.refresh_from_db()
-
-        self.assertTrue(suggestion.processed)
-
-    def test_unprocessed_manager_only_returns_unprocessed_suggestions(self):
-        processed_suggestion = UserSuggestedSong.objects.create(user=self.user, code=self.code, processed=True)
-        unprocessed_suggestion = UserSuggestedSong.objects.create(user=self.user, code='spotify:song:code-2')
-        suggestions = UserSuggestedSong.unprocessed_suggestions.all()
-
-        self.assertIn(unprocessed_suggestion, suggestions)
-        self.assertNotIn(processed_suggestion, suggestions)

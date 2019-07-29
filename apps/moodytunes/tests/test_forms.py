@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from accounts.models import UserSuggestedSong
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
@@ -130,16 +129,6 @@ class TestSuggestSongForm(TestCase):
         song = MoodyUtil.create_song()
 
         data = {'code': song.code}
-        form = SuggestSongForm(data)
-
-        self.assertFalse(form.is_valid())
-
-    def test_suggestion_for_suggested_song_is_invalid(self):
-        user = MoodyUtil.create_user()
-        suggested_code = 'spotify:track:6JVU5TollB4mTzMkb5d8Z9'
-        UserSuggestedSong.objects.create(user=user, code=suggested_code)
-
-        data = {'code': suggested_code}
         form = SuggestSongForm(data)
 
         self.assertFalse(form.is_valid())

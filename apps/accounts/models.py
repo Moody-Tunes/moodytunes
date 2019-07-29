@@ -180,30 +180,3 @@ class UserSongVote(BaseModel):
         # Update attributes for the emotion for user after deleting vote
         user_emot = self.user.get_user_emotion_record(self.emotion.name)
         user_emot.update_attributes()
-
-
-class UnprocessedSuggestionsManager(models.Manager):
-    """Manager to operate on song suggestions that have not been processed"""
-    def get_queryset(self):
-        return super().get_queryset().filter(processed=False)
-
-
-class UserSuggestedSong(BaseModel):
-    """
-    Stores songs that users have suggested to be added to the site. Will be used by the management command to fetch
-    songs from Spotify to pickup songs that users on our site want to see.
-    """
-    user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
-    code = models.CharField(max_length=36, db_index=True, unique=True)
-    processed = models.BooleanField(default=False, db_index=True)
-
-    objects = models.Manager()
-    unprocessed_suggestions = UnprocessedSuggestionsManager()
-
-    def delete(self, using=None, keep_parents=False):
-        """
-        We want to track what songs users have suggested (and what users have suggested songs) so we
-        will 'soft delete' records in this table.
-        """
-        self.processed = True
-        self.save()

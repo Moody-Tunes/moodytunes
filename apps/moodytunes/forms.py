@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-from accounts.models import UserSongVote, UserSuggestedSong
+from accounts.models import UserSongVote
 from base.forms import RangeInput
 from tunes.models import Emotion, Song
 
@@ -72,13 +72,6 @@ class SuggestSongForm(forms.Form):
             self.add_error(
                 'code',
                 ValidationError('Song already exists in our system')
-            )
-
-        # Ensure song has not already been requested
-        if UserSuggestedSong.unprocessed_suggestions.filter(code=code).exists():
-            self.add_error(
-                'code',
-                ValidationError('Song has already been suggested')
             )
 
         return code

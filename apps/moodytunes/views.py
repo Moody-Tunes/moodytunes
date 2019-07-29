@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
-from accounts.models import UserSuggestedSong
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from tunes.utils import CachedPlaylistManager
@@ -51,25 +50,5 @@ class SuggestSongView(FormView):
     form_class = SuggestSongForm
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            code = form.cleaned_data['code']
-            UserSuggestedSong.objects.create(user=request.user, code=code)
-
-            logger.info(
-                'Saved suggestion for song {} by user {}'.format(code, request.user.username),
-                extra={'fingerprint': 'added_suggested_song'}
-            )
-            messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
-
-            return HttpResponseRedirect(reverse('moodytunes:suggest'))
-        else:
-            logger.warning(
-                'User {} suggested an invalid song; Errors: {}'.format(
-                    request.user.username,
-                    form.errors
-                ),
-                extra={'fingerprint': 'invalid_suggested_song'}
-            )
-            return render(request, self.template_name, context={'form': form})
+        #TODO: Use task to fetch and add song to database
+        pass

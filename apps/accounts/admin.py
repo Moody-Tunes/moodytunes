@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from accounts.forms import UpdateUserEmotionAttributesForm
-from accounts.models import MoodyUser, UserEmotion, UserSongVote, UserSuggestedSong
+from accounts.models import MoodyUser, UserEmotion, UserSongVote
 
 
 class MoodyUserAdmin(admin.ModelAdmin):
@@ -29,18 +29,6 @@ class UserSongVoteAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-
-class UserSuggestedSongAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'processed')
-    readonly_fields = ('user', 'code', 'processed')
-    list_filter = ('processed',)
-    search_fields = ('user__username',)
-
-    def has_add_permission(self, request):
-        return False
-
-
 admin.site.register(MoodyUser, MoodyUserAdmin)
 admin.site.register(UserEmotion, UserEmotionAdmin)
 admin.site.register(UserSongVote, UserSongVoteAdmin)
-admin.site.register(UserSuggestedSong, UserSuggestedSongAdmin)
