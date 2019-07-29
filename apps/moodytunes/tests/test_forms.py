@@ -132,3 +132,9 @@ class TestSuggestSongForm(TestCase):
         form = SuggestSongForm(data)
 
         self.assertFalse(form.is_valid())
+
+    def test_invalid_song_code_is_invalid(self):
+        data = {'code': 'some-fake-code'}
+        form = SuggestSongForm(data)
+
+        self.assertFalse(form.is_valid())
