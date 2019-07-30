@@ -66,10 +66,7 @@ class SuggestSongView(FormView):
             return HttpResponseRedirect(reverse('moodytunes:suggest'))
         else:
             logger.warning(
-                'User {} suggested an invalid song; Errors: {}'.format(
-                    request.user.username,
-                    form.errors
-                ),
+                'User {} suggested an invalid song code'.format(request.user.username),
                 extra={'fingerprint': 'invalid_suggested_song'}
             )
             return render(request, self.template_name, context={'form': form})

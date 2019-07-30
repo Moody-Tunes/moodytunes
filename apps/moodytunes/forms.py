@@ -62,7 +62,12 @@ class PlaylistForm(forms.Form):
 
 
 class SuggestSongForm(forms.Form):
-    code = forms.CharField(max_length=36, validators=[RegexValidator(r'spotify:track:([a-zA-Z0-9]){22}')])
+    code = forms.CharField(
+        max_length=36,
+        validators=[
+            RegexValidator(r'spotify:track:([a-zA-Z0-9]){22}', message='Please enter a valid Spotify code'),
+        ]
+    )
 
     def clean_code(self):
         code = self.cleaned_data['code']
