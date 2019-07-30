@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
+{% load compress %}
+{% load static %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'moodytunes/less/suggest.less' %}">
+    {% endcompress %}
+
+    {% compress js %}
+        <script src="{% static 'moodytunes/js/suggest.js' %}" defer></script>
+    {% endcompress %}
+{% endblock %}
+
 {% block content %}
     <h1>Suggest A Song</h1>
     <p>Want to see a song on our site? Suggest a new song by submitting a Spotify song code in the following field</p>
@@ -9,4 +22,9 @@
         <p>{{ form.code }}</p>
         <button type="submit">Suggest Song</button>
     </form>
+    <button id="show-help">How do I find the song code?</button>
+    <div id="help-container" hidden>
+        <p>You can find the song code by going to the Spotify application and clicking the Copy Spotify URI from the share tab</p>
+        <img src="{% static 'moodytunes/imgs/spotify_song_uri.png' %}"/>
+    </div>
 {% endblock %}
