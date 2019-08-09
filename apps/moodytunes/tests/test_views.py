@@ -1,7 +1,9 @@
+import tempfile
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from rest_framework import status
 
 from libs.tests.helpers import MoodyUtil
 
@@ -61,3 +63,21 @@ class TestSuggestSongView(TestCase):
         self.client.post(self.url, data)
 
         mock_task.assert_not_called()
+
+    # django-ratelimit relies on cache, so we need to use some temporary cache system for tracking requests
+    @override_settings(CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir())
+        }
+    })
+    @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay', mock.Mock())
+    def test_requests_are_rate_limited_after_max_requests_processed(self):
+        for _ in range(3):
+            data = {'code': MoodyUtil._generate_song_code()}
+            self.client.post(self.url, data)
+
+        data = {'code': MoodyUtil._generate_song_code()}
+        resp = self.client.post(self.url, data)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)

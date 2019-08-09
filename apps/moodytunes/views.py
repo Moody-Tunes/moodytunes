@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from ratelimit.mixins import RatelimitMixin
 
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
@@ -46,9 +47,14 @@ class EmotionPlaylistsView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class SuggestSongView(FormView):
+class SuggestSongView(RatelimitMixin, FormView):
     template_name = 'suggest.html'
     form_class = SuggestSongForm
+
+    ratelimit_key = 'user'
+    ratelimit_rate = '3/m'
+    ratelimit_method = 'POST'
+    ratelimit_block = True
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -58,7 +64,7 @@ class SuggestSongView(FormView):
             fetch_song_from_spotify.delay(code, username=request.user.username)
 
             logger.info(
-                'Added suggestion for song {} by user {}'.format(code, request.user.username),
+                'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
                 extra={'fingerprint': 'added_suggested_song'}
             )
             messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
