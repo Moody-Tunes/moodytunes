@@ -55,7 +55,7 @@ class SuggestSongView(FormView):
 
         if form.is_valid():
             code = form.cleaned_data['code']
-            fetch_song_from_spotify.delay(code)
+            fetch_song_from_spotify.delay(code, username=request.user.username)
 
             logger.info(
                 'Added suggestion for song {} by user {}'.format(code, request.user.username),
