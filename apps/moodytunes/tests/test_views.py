@@ -45,7 +45,7 @@ class TestSuggestSongView(TestCase):
         data = {'code': 'spotify:track:2E0Y5LQdiqrPDJJoEyfSqC'}
         self.client.post(self.url, data)
 
-        mock_task.assert_called_once_with('spotify:track:2E0Y5LQdiqrPDJJoEyfSqC')
+        mock_task.assert_called_once_with('spotify:track:2E0Y5LQdiqrPDJJoEyfSqC', username=self.user.username)
 
     @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay')
     def test_task_not_called_for_duplicate_song(self, mock_task):
