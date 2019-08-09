@@ -33,5 +33,9 @@ def fetch_song_from_spotify(self, spotify_code, username='anonymous'):
         # Decode track data name/artist from unicode to string
         song_data['name'] = song_data['name'].decode('utf-8')
         song_data['artist'] = song_data['artist'].decode('utf-8')
-        Song.objects.get_or_create(code=song_data['code'], defaults=song_data)
-        logger.info('{} - Created song {} in database'.format(signature, spotify_code))
+        _, created = Song.objects.get_or_create(code=song_data['code'], defaults=song_data)
+
+        if created:
+            logger.info('{} - Created song {} in database'.format(signature, spotify_code))
+        else:
+            logger.info('{} - Did not create song {} in database, song already exists'.format(signature, spotify_code))
