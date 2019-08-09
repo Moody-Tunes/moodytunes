@@ -25,7 +25,7 @@ def fetch_song_from_spotify(self, spotify_code):
         track_data = client.get_attributes_for_track(spotify_code)
         song_data = client.get_audio_features_for_tracks([track_data])[0]
     except SpotifyException:
-        logger.warning('{} - Failed to fetch song from Spotify. Retrying'.format(signature))
+        logger.warning('{} - Failed to fetch song data from Spotify. Retrying'.format(signature), exc_info=True)
         self.retry()
 
     if song_data:
