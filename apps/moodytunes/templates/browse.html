@@ -19,7 +19,6 @@
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
-    <p><a href="{% url 'moodytunes:suggest' %}">Suggest a new song for our site</a></p>
     <button id="use-cached-playlist" {% if not cached_playlist_exists %} disabled {% endif %}>Last Playlist</button>
     <p>Emotion: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
