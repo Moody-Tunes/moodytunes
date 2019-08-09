@@ -10,13 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 @task(bind=True, max_retries=3, default_retry_delay=60*15)
-def fetch_song_from_spotify(self, spotify_code):
+def fetch_song_from_spotify(self, spotify_code, username='anonymous'):
     """
     Use Spotify API to fetch song data for a given song and save the song to the database
 
     :param spotify_code: (str) Spotify URI for the song to be created
+    :param username: (str) [Optional] Username for the user that requested this song
     """
-    signature = 'fetch_song_from_spotify'
+    signature = 'fetch_song_from_spotify-{}-{}'.format(username, spotify_code)
     client = SpotifyClient(identifier=signature)
     song_data = None
 
