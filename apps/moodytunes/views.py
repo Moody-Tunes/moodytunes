@@ -54,9 +54,13 @@ class SuggestSongView(RatelimitMixin, FormView):
     ratelimit_key = 'user'
     ratelimit_rate = '3/m'
     ratelimit_method = 'POST'
-    ratelimit_block = True
 
     def post(self, request, *args, **kwargs):
+        # Check if request is rate limited,
+        if getattr(request, 'limited', False):
+            messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
+            return HttpResponseRedirect(reverse('moodytunes:suggest'))
+
         form = self.form_class(request.POST)
 
         if form.is_valid():

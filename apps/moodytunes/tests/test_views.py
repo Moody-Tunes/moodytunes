@@ -3,9 +3,8 @@ from unittest import mock
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from rest_framework import status
 
-from libs.tests.helpers import MoodyUtil
+from libs.tests.helpers import MoodyUtil, get_messages_from_response
 
 
 class TestBrowsePlaylistsView(TestCase):
@@ -80,4 +79,7 @@ class TestSuggestSongView(TestCase):
         data = {'code': MoodyUtil._generate_song_code()}
         resp = self.client.post(self.url, data)
 
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertEqual(last_message, 'You have submitted too many suggestions! Try again in a minute')
