@@ -18,6 +18,12 @@ def fetch_song_from_spotify(self, spotify_code, username='anonymous'):
     :param username: (str) [Optional] Username for the user that requested this song
     """
     signature = 'fetch_song_from_spotify-{}-{}'.format(username, spotify_code)
+
+    # Early exit: if song already exists in our system don't do the work to fetch it
+    if Song.objects.filter(code=spotify_code).exists():
+        logger.info('{} - Song with code {} already exists in database'.format(signature, spotify_code))
+        return
+
     client = SpotifyClient(identifier=signature)
     song_data = None
 

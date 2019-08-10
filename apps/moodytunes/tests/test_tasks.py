@@ -5,6 +5,7 @@ from django.test import TestCase
 from moodytunes.tasks import fetch_song_from_spotify
 from tunes.models import Song
 from libs.spotify import SpotifyException
+from libs.tests.helpers import MoodyUtil
 
 
 class TestFetchSongFromSpotify(TestCase):
@@ -40,3 +41,13 @@ class TestFetchSongFromSpotify(TestCase):
         fetch_song_from_spotify.run(song_code)
 
         mock_retry.assert_called_once()
+
+    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    def test_task_does_not_call_spotify_if_song_already_exists(self, mock_get_attributes, mock_get_features):
+        song = MoodyUtil.create_song()
+
+        fetch_song_from_spotify.run(song.code)
+
+        mock_get_attributes.assert_not_called()
+        mock_get_features.assert_not_called()
