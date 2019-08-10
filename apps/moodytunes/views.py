@@ -58,6 +58,10 @@ class SuggestSongView(RatelimitMixin, FormView):
     def post(self, request, *args, **kwargs):
         # Check if request is rate limited,
         if getattr(request, 'limited', False):
+            logger.warning(
+                'User {} has been rate limited from suggesting songs'.format(request.user.username),
+                extra={'fingerprint': 'rate_limited_suggested_song'}
+            )
             messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
             return HttpResponseRedirect(reverse('moodytunes:suggest'))
 
