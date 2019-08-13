@@ -111,7 +111,7 @@ class SpotifyClient(object):
             else:
                 logger.warning('{} - Unable to retrieve access token from Spotify'.format(self.fingerprint))
 
-                raise SpotifyException('Unable to retrieve Spotify access token')
+                raise SpotifyException('{} - Unable to retrieve Spotify access token'.format(self.fingerprint))
 
         return access_token
 
