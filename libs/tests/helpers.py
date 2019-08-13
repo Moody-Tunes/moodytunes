@@ -89,19 +89,20 @@ class MoodyUtil(object):
     DEFAULT_USER_PASSWORD = 'test'
 
     @staticmethod
-    def create_song(**kwargs):
-        def generate_song_code():
-            """Return a mocked Spotify song code"""
-            sample = [random.choice(string.ascii_letters) for _ in range(22)]
-            code = ''.join(sample)
-            return 'spotify:track:{}'.format(code)
+    def _generate_song_code():
+        """Return a mocked Spotify song code"""
+        sample = [random.choice(string.ascii_letters) for _ in range(22)]
+        code = ''.join(sample)
+        return 'spotify:track:{}'.format(code)
 
+    @staticmethod
+    def create_song(**kwargs):
         emotion = kwargs.get('emotion') or Emotion.objects.get(name=Emotion.HAPPY)
         energy = kwargs.get('energy') or emotion.energy
         valence = kwargs.get('valence') or emotion.valence
 
         params = {
-            'code': generate_song_code(),
+            'code': MoodyUtil._generate_song_code(),
             'name': kwargs.get('name', 'Test Song'),
             'genre': kwargs.get('genre', 'Test Genre'),
             'artist': kwargs.get('artist', 'Test Artist'),

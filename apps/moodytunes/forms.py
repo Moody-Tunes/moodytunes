@@ -1,6 +1,8 @@
 import random
 
 from django import forms
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 
 from accounts.models import UserSongVote
 from base.forms import RangeInput
@@ -57,3 +59,24 @@ class PlaylistForm(forms.Form):
 
         # Limit genre choices to those of songs the user has previously upvoted
         self.fields['genre'].choices = get_genre_choices(user=user)
+
+
+class SuggestSongForm(forms.Form):
+    code = forms.CharField(
+        max_length=36,
+        validators=[
+            RegexValidator(r'spotify:track:([a-zA-Z0-9]){22}', message='Please enter a valid Spotify code'),
+        ]
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        # Ensure song is not already in our system
+        if Song.objects.filter(code=code).exists():
+            self.add_error(
+                'code',
+                ValidationError('Song already exists in our system')
+            )
+
+        return code

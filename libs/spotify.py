@@ -354,3 +354,33 @@ class SpotifyClient(object):
         response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
 
         return response['access_token']
+
+    def get_attributes_for_track(self, uri):
+        """
+        Fetch song metadata for a singular track
+
+        :param uri: (str) URI of song to search for on Spotify
+
+        :return: (dict) Dictionary of data for the song
+        """
+        song_id = uri.split(':')[2]  # Only need the last ID from the URI
+        url = '{api_url}/tracks/{id}'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            id=song_id
+        )
+
+        track = self._make_spotify_request('GET', url)
+
+        payload = {
+            'name': track['name'].encode('utf-8'),
+            'artist': track['artists'][0]['name'].encode('utf-8'),
+            'code': uri
+        }
+
+        # Fetch genre for track, need to lookup from album
+        album_url = track['album']['href']
+        album_data = self._make_spotify_request('GET', album_url)
+        if album_data.get('genres'):
+            payload.update({'genre': album_data['genres'][0]})
+
+        return payload

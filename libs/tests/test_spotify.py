@@ -430,3 +430,60 @@ class TestSpotifyClient(TestCase):
             data=request_data
         )
         self.assertEqual(access_token, resp_data['access_token'])
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_attributes_for_track_no_genre(self, mock_request):
+        mock_song_code = 'spotify:track:1234567'
+        mock_track_data = {
+            'name': 'Sickfit',
+            'artists': [{'name': 'Madlib'}],
+            'album': {
+                'href': 'https://example.com/album'
+            }
+        }
+
+        expected_song_data = {
+            'name': 'Sickfit'.encode('utf-8'),
+            'artist': 'Madlib'.encode('utf-8'),
+            'code': mock_song_code
+        }
+
+        mock_request.side_effect = [
+            mock_track_data,
+            {}
+        ]
+
+        song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
+
+        self.assertDictEqual(song_data, expected_song_data)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_attributes_for_track_with_genre(self, mock_request):
+        mock_song_code = 'spotify:track:1234567'
+        mock_track_data = {
+            'name': 'Sickfit',
+            'artists': [{'name': 'Madlib'}],
+            'album': {
+                'href': 'https://example.com/album'
+            }
+        }
+
+        mock_album_data = {
+            'genres': ['HipHop']
+        }
+
+        expected_song_data = {
+            'name': 'Sickfit'.encode('utf-8'),
+            'artist': 'Madlib'.encode('utf-8'),
+            'code': mock_song_code,
+            'genre': 'HipHop'
+        }
+
+        mock_request.side_effect = [
+            mock_track_data,
+            mock_album_data
+        ]
+
+        song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
+
+        self.assertDictEqual(song_data, expected_song_data)

@@ -5,6 +5,7 @@ django-celery-beat==1.4.0
 django-celery-results==1.0.4
 django-encrypted-model-fields==0.5.8
 django-extensions==2.1.0
+django-ratelimit==2.0.0
 django-redis==4.10.0
 djangorestframework==3.9.1
 envparse==0.2.0
