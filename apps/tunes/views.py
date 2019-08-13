@@ -140,6 +140,7 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'playlist': playlist
             }
         else:
+            logger.warning('No cached browse playlist found for user {}'.format(self.request.user.username))
             raise ValidationError({'errors': 'Could not find cached playlist'})
 
 
