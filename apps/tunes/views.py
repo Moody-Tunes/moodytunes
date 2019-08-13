@@ -220,7 +220,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 'Unable to find UserSongVote to delete',
                 extra={
                     'request_data': self.cleaned_data,
-                    'fingerprint': 'tunes.VoteView.destroy.unvote_fail_missing_vite'
+                    'fingerprint': 'tunes.VoteView.destroy.unvote_fail_missing_vote'
                 }
             )
             raise Http404()
