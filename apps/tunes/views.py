@@ -140,6 +140,7 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'playlist': playlist
             }
         else:
+            logger.warning('No cached browse playlist found for user {}'.format(self.request.user.username))
             raise ValidationError({'errors': 'Could not find cached playlist'})
 
 
@@ -204,35 +205,40 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
     def destroy(self, request, *args, **kwargs):
-        try:
-            votes = UserSongVote.objects.filter(
-                user_id=self.request.user.id,
-                emotion__name=self.cleaned_data['emotion'],
-                song__code=self.cleaned_data['song_code'],
-                vote=True
+        votes = UserSongVote.objects.filter(
+            user_id=self.request.user.id,
+            emotion__name=self.cleaned_data['emotion'],
+            song__code=self.cleaned_data['song_code'],
+            vote=True
+        )
+
+        if self.cleaned_data.get('context'):
+            votes = votes.filter(context=self.cleaned_data['context'])
+
+        if not votes.exists():
+            logger.warning(
+                'Unable to find UserSongVote to delete',
+                extra={
+                    'request_data': self.cleaned_data,
+                    'fingerprint': 'tunes.VoteView.destroy.unvote_fail_missing_vote'
+                }
             )
+            raise Http404()
 
-            if self.cleaned_data.get('context'):
-                votes = votes.filter(context=self.cleaned_data['context'])
+        for vote in votes:
+            vote.delete()
 
-            if not votes.exists():
-                raise UserSongVote.DoesNotExist()
-
-            for vote in votes:
-                vote.delete()
-
-                logger.info('Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
+            logger.info(
+                'Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
                     self.request.user.username,
                     self.cleaned_data['song_code'],
                     self.cleaned_data['emotion'],
                     self.cleaned_data.get('context'),
-                ))
+                ),
+                extra={'fingerprint': 'tunes.VoteView.destroy.unvote_success'}
+            )
 
-            return JsonResponse({'status': 'OK'})
-
-        except UserSongVote.DoesNotExist:
-            logger.warning('Unable to find UserSongVote to delete', extra={'request_data': self.cleaned_data})
-            raise Http404
+        return JsonResponse({'status': 'OK'})
 
 
 class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):

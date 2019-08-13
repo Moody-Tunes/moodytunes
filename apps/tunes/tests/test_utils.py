@@ -40,7 +40,7 @@ class TestGenerateBrowsePlaylist(TestCase):
             valence__lte=valence_upper_limit
         )
 
-    def test_no_jitter_query_use_params_passed(self):
+    def test_no_jitter_query_uses_params_passed(self):
         songs_mock = mock.MagicMock()
 
         energy = .5
