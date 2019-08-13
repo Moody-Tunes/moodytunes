@@ -377,10 +377,4 @@ class SpotifyClient(object):
             'code': uri
         }
 
-        # Fetch genre for track, need to lookup from album
-        album_url = track['album']['href']
-        album_data = self._make_spotify_request('GET', album_url)
-        if album_data.get('genres'):
-            payload.update({'genre': album_data['genres'][0]})
-
         return payload
