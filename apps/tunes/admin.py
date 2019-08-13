@@ -34,12 +34,18 @@ class EmotionAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'energy', 'valence')
     readonly_fields = ('name',)
 
+    def has_add_permission(self, request):
+        return False
+
 
 class SongAdmin(admin.ModelAdmin):
     list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy')
     readonly_fields = ('code', 'artist', 'name', 'valence', 'energy')
     list_filter = (NullGenreFilter, 'genre')
     form = GenreFormField
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.register(Emotion, EmotionAdmin)
