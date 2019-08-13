@@ -82,12 +82,12 @@ class SpotifyClient(object):
                 }
             )
 
-            raise SpotifyException('Received HTTP Error requesting {}'.format(url))
+            raise SpotifyException('{} - Received HTTP Error requesting {}'.format(self.fingerprint, url))
 
         except Exception:
             logger.exception('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
 
-            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
+            raise SpotifyException('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
 
         return response
 
