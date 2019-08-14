@@ -1,8 +1,59 @@
 from django.test import TestCase
 
-from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
+from moodytunes.forms import get_genre_choices, BrowseForm, PlaylistForm, SuggestSongForm
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+
+
+class TestGetGenreChoices(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.default_choice = ('', '-----------')
+
+    def test_method_returns_all_song_genres(self):
+        hiphop_song = MoodyUtil.create_song(genre='hiphop')
+        rock_song = MoodyUtil.create_song(genre='rock')
+
+        expected_choices = [
+            self.default_choice,
+            (hiphop_song.genre, hiphop_song.genre),
+            (rock_song.genre, rock_song.genre)
+        ]
+
+        choices = get_genre_choices()
+
+        self.assertEqual(choices, expected_choices)
+
+    def test_method_returns_genres_for_songs_user_upvoted(self):
+        user = MoodyUtil.create_user()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        upvoted_song = MoodyUtil.create_song(genre='hiphop')
+        downvoted_song = MoodyUtil.create_song(genre='rock')
+
+        MoodyUtil.create_user_song_vote(user, upvoted_song, emotion, True)
+        MoodyUtil.create_user_song_vote(user, downvoted_song, emotion, False)
+
+        expected_choices = [
+            self.default_choice,
+            (upvoted_song.genre, upvoted_song.genre),
+        ]
+
+        choices = get_genre_choices(user=user)
+
+        self.assertEqual(choices, expected_choices)
+
+    def test_method_omits_empty_genre(self):
+        song_with_genre = MoodyUtil.create_song(genre='hiphop')
+        MoodyUtil.create_song(genre='')
+
+        expected_choices = [
+            self.default_choice,
+            (song_with_genre.genre, song_with_genre.genre),
+        ]
+
+        choices = get_genre_choices()
+
+        self.assertEqual(choices, expected_choices)
 
 
 class TestBrowseForm(TestCase):
