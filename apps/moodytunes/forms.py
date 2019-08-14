@@ -26,7 +26,7 @@ def get_genre_choices(user=None):
     else:
         genres = Song.objects.all().values_list('genre', flat=True).distinct()
 
-    return default_option + [(genre, genre) for genre in genres]
+    return default_option + [(genre, genre) for genre in genres if genre]
 
 
 class BrowseForm(forms.Form):
