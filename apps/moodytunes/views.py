@@ -14,6 +14,8 @@ from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import fetch_song_from_spotify
 from tunes.utils import CachedPlaylistManager
+from libs.spotify import SpotifyClient
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +94,18 @@ class SuggestSongView(RatelimitMixin, FormView):
 
 
 class SpotifyAuthenticationView(TemplateView):
-    pass
+    template_name = 'spotify_auth.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
+
+        spotify_client = SpotifyClient()
+        context['spotify_auth_url'] = spotify_client.build_spotify_oauth_confirm_link(
+            state='user={}'.format(self.request.user.id),
+            scopes=['playlist-modify-private']
+        )
+
+        return context
 
 
 class SpotifyAuthenticationCallbackView(View):

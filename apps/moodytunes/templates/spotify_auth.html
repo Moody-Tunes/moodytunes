@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Authenticate With Spotify</h1>
+    <p>Click the link below to authenticate MoodyTunes with Spotify</p>
+    <button><a href="{{ spotify_auth_url }}">Authenticate</a></button>
+{% endblock %}
