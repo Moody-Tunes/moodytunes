@@ -8,7 +8,7 @@ urlpatterns = [
     path('playlists/', views.EmotionPlaylistsView.as_view(), name='playlists'),
     path('suggest/', views.SuggestSongView.as_view(), name='suggest'),
     path('spotify/authorize/', views.SpotifyAuthenticationView.as_view(), name='spotify-auth'),
-    path('spotify/callback/', views.SpotifyAuthenticationCallback.as_view(), name='spotify-auth-callback'),
-    path('spotify/success/', views.SpotifyAuthenticationSuccess.as_view(), name='spotify-auth-success'),
-    path('spotify/failure/', views.SpotifyAuthenticationFailure.as_view(), name='spotify-auth-failure')
+    path('spotify/callback/', views.SpotifyAuthenticationCallbackView.as_view(), name='spotify-auth-callback'),
+    path('spotify/success/', views.SpotifyAuthenticationSuccessView.as_view(), name='spotify-auth-success'),
+    path('spotify/failure/', views.SpotifyAuthenticationFailureView.as_view(), name='spotify-auth-failure')
 ]

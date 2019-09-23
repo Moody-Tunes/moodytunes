@@ -95,13 +95,13 @@ class SpotifyAuthenticationView(TemplateView):
     pass
 
 
-class SpotifyAuthenticationCallback(View):
+class SpotifyAuthenticationCallbackView(View):
     pass
 
 
-class SpotifyAuthenticationSuccess(View):
+class SpotifyAuthenticationSuccessView(View):
     pass
 
 
-class SpotifyAuthenticationFailure(View):
+class SpotifyAuthenticationFailureView(View):
     pass
