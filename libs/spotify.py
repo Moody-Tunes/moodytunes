@@ -310,23 +310,19 @@ class SpotifyClient(object):
 
         return '{url}?{params}'.format(url=settings.SPOTIFY['user_auth_url'], params=urlencode(params))
 
-    def get_access_and_refresh_tokens(self, code, redirect_uri):
+    def get_access_and_refresh_tokens(self, code):
         """
         Make a request to the Spotify authorization endpoint to obtain the access and refresh tokens for a user after
         they have granted our application permission to Spotify on their behalf.
 
         :param code: (str) Authorization code returned from initial request to SPOTIFY['user_auth_url']
-        :param redirect_uri: (str)
-            This parameter is used for validation only (there is no actual redirection).
-            The value of this parameter must exactly match the value of redirect_uri
-            supplied when requesting the authorization code.
 
         :return: (dict) Access and refresh token for the user: to be saved in the database
         """
         data = {
             'grant_type': 'authorization_code',  # Constant; From Spotify documentation
             'code': code,
-            'redirect_uri': redirect_uri
+            'redirect_uri': settings.SPOTIFY['auth_redirect_uri']
         }
 
         response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
