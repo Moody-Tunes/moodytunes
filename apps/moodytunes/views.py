@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.generic import TemplateView
 from ratelimit.mixins import RatelimitMixin
 
@@ -88,3 +89,19 @@ class SuggestSongView(RatelimitMixin, FormView):
                 extra={'fingerprint': 'invalid_suggested_song'}
             )
             return render(request, self.template_name, context={'form': form})
+
+
+class SpotifyAuthenticationView(TemplateView):
+    pass
+
+
+class SpotifyAuthenticationCallback(View):
+    pass
+
+
+class SpotifyAuthenticationSuccess(View):
+    pass
+
+
+class SpotifyAuthenticationFailure(View):
+    pass
