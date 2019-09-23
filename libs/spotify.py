@@ -289,13 +289,12 @@ class SpotifyClient(object):
 
         return tracks
 
-    def build_spotify_oauth_confirm_link(self, redirect_uri, state, scopes):
+    def build_spotify_oauth_confirm_link(self, state, scopes):
         """
         First step in the Spotify user authorization flow. This builds the request to authorize the application with
         Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
         authorization need to be made client-side.
 
-        :param redirect_uri: (str) Valid URI in our application. Fully qualified and added to Spotify whitelist
         :param state: (str) State to pass in request. Used for validating redirect URI against request
         :param scopes: (list) List of scopes to specify when authorizing the application
 
@@ -305,7 +304,7 @@ class SpotifyClient(object):
             'client_id': settings.SPOTIFY['client_id'],
             'response_type': 'code',
             'scopes': ' '.join(scopes),
-            'redirect_uri': redirect_uri,
+            'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
             'state': state
         }
 

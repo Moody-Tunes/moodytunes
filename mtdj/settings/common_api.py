@@ -13,6 +13,7 @@ SPOTIFY = {
     'max_songs_from_category': env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_CATEGORY', default=25),
     'max_playlist_from_category': env.int('MTDJ_SPOTIFY_MAX_PLAYLISTS_FROM_CATEGORY', default=10),
     'auth_cache_key': env.str('MTDJ_SPOTIFY_AUTH_CACHE_KEY', default='spotify:auth-token'),
+    'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/moodytunes/spotify/callback/'),
     'auth_cache_key_timeout': 60 * 60,  # Authorization token is good for one hour
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
 }

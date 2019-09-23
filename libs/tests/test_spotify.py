@@ -369,19 +369,18 @@ class TestSpotifyClient(TestCase):
         self.assertIsNone(new_track.get('valence'))
 
     def test_build_spotify_oauth_confirm_link(self):
-        query_params = {
-            'redirect_uri': '/redirect/uri',
+        params = {
             'state': 'user_id=1',
             'scopes': ['view-playlist', 'edit-playlist']
         }
 
-        url = self.spotify_client.build_spotify_oauth_confirm_link(**query_params)
+        url = self.spotify_client.build_spotify_oauth_confirm_link(**params)
 
         # Turn each query param to list, in the way urlparse will return
         query_params = {
             'client_id': ['test-spotify-client-id'],
             'response_type': ['code'],
-            'redirect_uri': ['/redirect/uri'],
+            'redirect_uri': ['https://moodytunes.vm/moodytunes/spotify/callback/'],
             'state': ['user_id=1'],
             'scopes': ['view-playlist edit-playlist']
         }
