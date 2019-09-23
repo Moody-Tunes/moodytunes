@@ -358,6 +358,21 @@ class SpotifyClient(object):
 
         return response['access_token']
 
+    def get_user_profile(self, access_token):
+        """
+        Get data on the user from Spotify API /me endpoint
+
+        :param access_token: (str) OAuth token from Spotify for the user
+
+        :return: (dict) Payload for the given user
+        """
+        url = '{api_url}/me'.format(api_url=settings.SPOTIFY['api_url'])
+        headers = {'Authorization': 'Bearer {}'.format(access_token)}
+
+        response = self._make_spotify_request('GET', url, headers=headers)
+
+        return response
+
     def get_attributes_for_track(self, uri):
         """
         Fetch song metadata for a singular track

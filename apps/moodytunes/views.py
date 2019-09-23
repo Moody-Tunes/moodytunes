@@ -124,12 +124,15 @@ class SpotifyAuthenticationCallbackView(View):
             spotify_client = SpotifyClient()
             tokens = spotify_client.get_access_and_refresh_tokens(code)
 
+            # Get Spotify username from profile data
+            profile_data = spotify_client.get_user_profile(tokens['access_token'])
+
             # Create SpotifyAuth record from data
             SpotifyUserAuth.objects.create(
                 user=user,
                 access_token=tokens['access_token'],
                 refresh_token=tokens['refresh_token'],
-                spotify_user_id='test_user'  # TODO: How can we figure out Spotify user ID?
+                spotify_user_id=profile_data['id']
             )
 
             logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
