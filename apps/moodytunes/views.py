@@ -10,6 +10,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from ratelimit.mixins import RatelimitMixin
 
+from accounts.models import MoodyUser, SpotifyUserAuth
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import fetch_song_from_spotify
@@ -101,7 +102,7 @@ class SpotifyAuthenticationView(TemplateView):
 
         spotify_client = SpotifyClient()
         context['spotify_auth_url'] = spotify_client.build_spotify_oauth_confirm_link(
-            state='user={}'.format(self.request.user.id),
+            state='user:{}'.format(self.request.user.id),
             scopes=['playlist-modify-private']
         )
 
@@ -109,11 +110,35 @@ class SpotifyAuthenticationView(TemplateView):
 
 
 class SpotifyAuthenticationCallbackView(View):
-    pass
+
+    def get(self, request, *args, **kwargs):
+        if 'code' in request.GET:
+            code = request.GET['code']
+            state = request.GET['state']
+
+            # Parse MoodyUser primary key from state
+            user_id = state.split(':')[1]
+            user = MoodyUser.objects.get(pk=user_id)
+
+            # Get access and refresh tokens for user
+            spotify_client = SpotifyClient()
+            tokens = spotify_client.get_access_and_refresh_tokens(code)
+
+            # Create SpotifyAuth record from data
+            SpotifyUserAuth.objects.create(
+                user=user,
+                access_token=tokens['access_token'],
+                refresh_token=tokens['refresh_token'],
+                spotify_user_id='test_user'  # TODO: How can we figure out Spotify user ID?
+            )
+
+            logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
+
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
 
-class SpotifyAuthenticationSuccessView(View):
-    pass
+class SpotifyAuthenticationSuccessView(TemplateView):
+    template_name = 'spotify_auth_success.html'
 
 
 class SpotifyAuthenticationFailureView(View):

@@ -115,11 +115,11 @@ class SpotifyClient(object):
 
         return access_token
 
-    def _make_auth_access_token_request(self):
+    def _make_authorization_header(self):
         """
-        Get an access token from Spotify for authentication
+        Build the Basic Authorization header used for Spotify API authentication
 
-        :return: (str) Token used for authentication with Spotify
+        :return: (str) Base 64 encoded string that contains the client ID and client secret key for application
         """
         auth_val = '{client_id}:{secret_key}'.format(
             client_id=settings.SPOTIFY['client_id'],
@@ -128,9 +128,15 @@ class SpotifyClient(object):
         auth_val = bytes(auth_val, encoding='utf-8')
         auth_header = b64encode(auth_val)
 
-        headers = {
-            'Authorization': 'Basic {}'.format(auth_header.decode('utf8'))
-        }
+        return {'Authorization': 'Basic {}'.format(auth_header.decode('utf8'))}
+
+    def _make_auth_access_token_request(self):
+        """
+        Get an access token from Spotify for authentication
+
+        :return: (str) Token used for authentication with Spotify
+        """
+        headers = self._make_authorization_header()
 
         data = {'grant_type': 'client_credentials'}
 
@@ -322,10 +328,12 @@ class SpotifyClient(object):
         data = {
             'grant_type': 'authorization_code',  # Constant; From Spotify documentation
             'code': code,
-            'redirect_uri': settings.SPOTIFY['auth_redirect_uri']
+            'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
         }
 
-        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+        headers = self._make_authorization_header()
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data, headers=headers)
 
         return {
             'access_token': response['access_token'],

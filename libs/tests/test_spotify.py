@@ -393,7 +393,7 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_user_tokens(self, mock_request):
-        request_data = {'code': 'some-code',}
+        request_data = {'code': 'some-code'}
         resp_data = {
             'access_token': 'some:access:token',
             'refresh_token': 'some:refresh:token'
@@ -408,10 +408,14 @@ class TestSpotifyClient(TestCase):
             'code': request_data['code'],
             'redirect_uri': 'https://moodytunes.vm/moodytunes/spotify/callback/'
         }
+
+        expected_headers = self.spotify_client._make_authorization_header()
+
         mock_request.assert_called_once_with(
             'POST',
             'https://accounts.spotify.com/api/token',
-            data=expected_request_data
+            data=expected_request_data,
+            headers=expected_headers
         )
         self.assertDictEqual(user_tokens, resp_data)
 
