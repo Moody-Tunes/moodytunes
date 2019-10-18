@@ -94,6 +94,7 @@ class SuggestSongView(RatelimitMixin, FormView):
             return render(request, self.template_name, context={'form': form})
 
 
+@method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationView(TemplateView):
     template_name = 'spotify_auth.html'
 
@@ -109,6 +110,7 @@ class SpotifyAuthenticationView(TemplateView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationCallbackView(View):
 
     def get(self, request, *args, **kwargs):
@@ -151,9 +153,11 @@ class SpotifyAuthenticationCallbackView(View):
             return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
 
 
+@method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationSuccessView(TemplateView):
     template_name = 'spotify_auth_success.html'
 
 
+@method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
