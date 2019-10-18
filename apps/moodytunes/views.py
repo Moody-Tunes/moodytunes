@@ -118,6 +118,12 @@ class SpotifyAuthenticationCallbackView(View):
             code = request.GET['code']
             user = request.user
 
+            # Early exit: if we already have a SpotifyAuth record for the user, exit
+            if SpotifyUserAuth.objects.filter(user=user).exists():
+                messages.info(request, 'You have already authenticated with Spotify!')
+
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+
             # Get access and refresh tokens for user
             spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
             tokens = spotify_client.get_access_and_refresh_tokens(code)
