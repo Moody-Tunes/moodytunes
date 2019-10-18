@@ -72,6 +72,14 @@ class SpotifyClient(object):
             )
 
         except requests.exceptions.HTTPError:
+            response_data = None
+
+            # Try to parse error message from response
+            try:
+                response_data = response.json()
+            except Exception:
+                pass
+
             logger.exception(
                 '{} - Received HTTPError requesting {}'.format(self.fingerprint, url),
                 extra={
@@ -80,7 +88,7 @@ class SpotifyClient(object):
                     'params': params,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
-                    'response_data': response.json(),
+                    'response_data': response_data,
                 }
             )
 
