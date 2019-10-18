@@ -382,7 +382,7 @@ class TestSpotifyClient(TestCase):
             'response_type': ['code'],
             'redirect_uri': ['https://moodytunes.vm/moodytunes/spotify/callback/'],
             'state': ['user_id=1'],
-            'scopes': ['view-playlist edit-playlist']
+            'scope': ['view-playlist edit-playlist']
         }
         request = parse.urlparse(url)
         request_url = '{}://{}{}'.format(request.scheme, request.netloc, request.path)

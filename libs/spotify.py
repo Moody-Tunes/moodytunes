@@ -309,7 +309,7 @@ class SpotifyClient(object):
         params = {
             'client_id': settings.SPOTIFY['client_id'],
             'response_type': 'code',
-            'scopes': ' '.join(scopes),
+            'scope': ' '.join(scopes),
             'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
             'state': state
         }
