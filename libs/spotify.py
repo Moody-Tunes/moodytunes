@@ -1,4 +1,5 @@
 from base64 import b64encode
+import json
 import logging
 import random
 from urllib.parse import urlencode
@@ -397,3 +398,33 @@ class SpotifyClient(object):
         }
 
         return payload
+
+    def create_playlist(self, auth_code, spotify_user_id, playlist_name):
+        """
+        Create a playlist for the given Spotify user. Note that this creates an empty playlist,
+        a subsequent API call should be made to populate the playlist with songs.
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param spotify_user_id: (str) Spotify username for the given user
+        :param playlist_name: (str) Name of the playlist to be created
+
+        :return: (str) Spotify playlist ID for the created playlist
+        """
+        url = '{api_url}/users/{user_id}/playlists'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            user_id=spotify_user_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {
+            'name': playlist_name,
+            'public': False
+        }
+
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+
+        return resp['id']
