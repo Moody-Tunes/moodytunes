@@ -6,13 +6,17 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.generic import TemplateView
 from ratelimit.mixins import RatelimitMixin
 
+from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import fetch_song_from_spotify
 from tunes.utils import CachedPlaylistManager
+from libs.spotify import SpotifyClient
+
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +92,78 @@ class SuggestSongView(RatelimitMixin, FormView):
                 extra={'fingerprint': 'invalid_suggested_song'}
             )
             return render(request, self.template_name, context={'form': form})
+
+
+@method_decorator(login_required, name='dispatch')
+class SpotifyAuthenticationView(TemplateView):
+    template_name = 'spotify_auth.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
+
+        spotify_client = SpotifyClient()
+        context['spotify_auth_url'] = spotify_client.build_spotify_oauth_confirm_link(
+            state='user:{}'.format(self.request.user.id),
+            scopes=['playlist-modify-private']
+        )
+
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class SpotifyAuthenticationCallbackView(View):
+
+    def get(self, request, *args, **kwargs):
+        if 'code' in request.GET:
+            code = request.GET['code']
+            user = request.user
+
+            # Early exit: if we already have a SpotifyAuth record for the user, exit
+            if SpotifyUserAuth.objects.filter(user=user).exists():
+                messages.info(request, 'You have already authenticated with Spotify!')
+
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+
+            # Get access and refresh tokens for user
+            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
+            tokens = spotify_client.get_access_and_refresh_tokens(code)
+
+            # Get Spotify username from profile data
+            profile_data = spotify_client.get_user_profile(tokens['access_token'])
+
+            # Create SpotifyAuth record from data
+            SpotifyUserAuth.objects.create(
+                user=user,
+                access_token=tokens['access_token'],
+                refresh_token=tokens['refresh_token'],
+                spotify_user_id=profile_data['id']
+            )
+
+            logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
+
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+
+        else:
+            logger.warning(
+                'User {} failed Spotify Oauth confirmation'.format(request.user.username),
+                extra={'error': request.GET['error']}
+            )
+
+            # Map error code to human-friendly display
+            error_messages = {
+                'access_denied': 'You rejected to link MoodyTunes to Spotify. Please select Accept next time.'
+            }
+
+            messages.error(request, error_messages.get(request.GET['error'], request.GET['error']))
+
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+
+
+@method_decorator(login_required, name='dispatch')
+class SpotifyAuthenticationSuccessView(TemplateView):
+    template_name = 'spotify_auth_success.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class SpotifyAuthenticationFailureView(TemplateView):
+    template_name = 'spotify_auth_failure.html'

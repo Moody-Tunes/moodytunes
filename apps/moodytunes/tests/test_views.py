@@ -4,6 +4,7 @@ from unittest import mock
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from accounts.models import SpotifyUserAuth
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 
 
@@ -83,3 +84,65 @@ class TestSuggestSongView(TestCase):
         last_message = messages[-1]
 
         self.assertEqual(last_message, 'You have submitted too many suggestions! Try again in a minute')
+
+
+class TestSpotifyAuthenticationCallbackView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.url = reverse('moodytunes:spotify-auth-callback')
+        cls.success_url = reverse('moodytunes:spotify-auth-success')
+        cls.failure_url = reverse('moodytunes:spotify-auth-failure')
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_happy_path(self, mock_spotify):
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.return_value = {
+            'access_token': 'test-access-token',
+            'refresh_token': 'test-refresh-token'
+        }
+
+        spotify_client.get_user_profile.return_value = {'id': 'test-user-id'}
+
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code'}
+        resp = self.client.get(self.url, data=query_params)
+
+        self.assertRedirects(resp, self.success_url)
+        self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
+
+    def test_error_in_callback_returns_error_page(self):
+        query_params = {'error': 'access_denied'}
+        resp = self.client.get(self.url, data=query_params)
+
+        self.assertRedirects(resp, self.failure_url)
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_duplicate_attempts_results_in_success(self, mock_spotify):
+        SpotifyUserAuth.objects.create(
+            user=self.user,
+            access_token='test-access-token',
+            refresh_token='test-refresh-token',
+            spotify_user_id='test-user-id'
+        )
+
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.return_value = {
+            'access_token': 'test-access-token',
+            'refresh_token': 'test-refresh-token'
+        }
+
+        spotify_client.get_user_profile.return_value = {'id': 'test-user-id'}
+
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code'}
+        resp = self.client.get(self.url, data=query_params)
+
+        self.assertRedirects(resp, self.success_url)
+        self.assertEqual(SpotifyUserAuth.objects.filter(user=self.user).count(), 1)

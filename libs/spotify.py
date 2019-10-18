@@ -115,11 +115,11 @@ class SpotifyClient(object):
 
         return access_token
 
-    def _make_auth_access_token_request(self):
+    def _make_authorization_header(self):
         """
-        Get an access token from Spotify for authentication
+        Build the Basic Authorization header used for Spotify API authentication
 
-        :return: (str) Token used for authentication with Spotify
+        :return: (str) Base 64 encoded string that contains the client ID and client secret key for application
         """
         auth_val = '{client_id}:{secret_key}'.format(
             client_id=settings.SPOTIFY['client_id'],
@@ -128,9 +128,15 @@ class SpotifyClient(object):
         auth_val = bytes(auth_val, encoding='utf-8')
         auth_header = b64encode(auth_val)
 
-        headers = {
-            'Authorization': 'Basic {}'.format(auth_header.decode('utf8'))
-        }
+        return {'Authorization': 'Basic {}'.format(auth_header.decode('utf8'))}
+
+    def _make_auth_access_token_request(self):
+        """
+        Get an access token from Spotify for authentication
+
+        :return: (str) Token used for authentication with Spotify
+        """
+        headers = self._make_authorization_header()
 
         data = {'grant_type': 'client_credentials'}
 
@@ -289,13 +295,12 @@ class SpotifyClient(object):
 
         return tracks
 
-    def build_spotify_oauth_confirm_link(self, redirect_uri, state, scopes):
+    def build_spotify_oauth_confirm_link(self, state, scopes):
         """
         First step in the Spotify user authorization flow. This builds the request to authorize the application with
         Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
         authorization need to be made client-side.
 
-        :param redirect_uri: (str) Valid URI in our application. Fully qualified and added to Spotify whitelist
         :param state: (str) State to pass in request. Used for validating redirect URI against request
         :param scopes: (list) List of scopes to specify when authorizing the application
 
@@ -305,32 +310,30 @@ class SpotifyClient(object):
             'client_id': settings.SPOTIFY['client_id'],
             'response_type': 'code',
             'scopes': ' '.join(scopes),
-            'redirect_uri': redirect_uri,
+            'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
             'state': state
         }
 
         return '{url}?{params}'.format(url=settings.SPOTIFY['user_auth_url'], params=urlencode(params))
 
-    def get_access_and_refresh_tokens(self, code, redirect_uri):
+    def get_access_and_refresh_tokens(self, code):
         """
         Make a request to the Spotify authorization endpoint to obtain the access and refresh tokens for a user after
         they have granted our application permission to Spotify on their behalf.
 
         :param code: (str) Authorization code returned from initial request to SPOTIFY['user_auth_url']
-        :param redirect_uri: (str)
-            This parameter is used for validation only (there is no actual redirection).
-            The value of this parameter must exactly match the value of redirect_uri
-            supplied when requesting the authorization code.
 
         :return: (dict) Access and refresh token for the user: to be saved in the database
         """
         data = {
             'grant_type': 'authorization_code',  # Constant; From Spotify documentation
             'code': code,
-            'redirect_uri': redirect_uri
+            'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
         }
 
-        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+        headers = self._make_authorization_header()
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data, headers=headers)
 
         return {
             'access_token': response['access_token'],
@@ -354,6 +357,21 @@ class SpotifyClient(object):
         response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
 
         return response['access_token']
+
+    def get_user_profile(self, access_token):
+        """
+        Get data on the user from Spotify API /me endpoint
+
+        :param access_token: (str) OAuth token from Spotify for the user
+
+        :return: (dict) Payload for the given user
+        """
+        url = '{api_url}/me'.format(api_url=settings.SPOTIFY['api_url'])
+        headers = {'Authorization': 'Bearer {}'.format(access_token)}
+
+        response = self._make_spotify_request('GET', url, headers=headers)
+
+        return response
 
     def get_attributes_for_track(self, uri):
         """

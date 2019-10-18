@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     'django_celery_results',
     'encrypted_model_fields',
     'rest_framework',
+    'waffle',
 ]
 
 OUR_APPS = [
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'waffle.middleware.WaffleMiddleware',
 ]
 
 # Security middleware definitions

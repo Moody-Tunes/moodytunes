@@ -369,19 +369,18 @@ class TestSpotifyClient(TestCase):
         self.assertIsNone(new_track.get('valence'))
 
     def test_build_spotify_oauth_confirm_link(self):
-        query_params = {
-            'redirect_uri': '/redirect/uri',
+        params = {
             'state': 'user_id=1',
             'scopes': ['view-playlist', 'edit-playlist']
         }
 
-        url = self.spotify_client.build_spotify_oauth_confirm_link(**query_params)
+        url = self.spotify_client.build_spotify_oauth_confirm_link(**params)
 
         # Turn each query param to list, in the way urlparse will return
         query_params = {
             'client_id': ['test-spotify-client-id'],
             'response_type': ['code'],
-            'redirect_uri': ['/redirect/uri'],
+            'redirect_uri': ['https://moodytunes.vm/moodytunes/spotify/callback/'],
             'state': ['user_id=1'],
             'scopes': ['view-playlist edit-playlist']
         }
@@ -394,10 +393,7 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_user_tokens(self, mock_request):
-        request_data = {
-            'code': 'some-code',
-            'redirect_uri': 'redirect/uri',
-        }
+        request_data = {'code': 'some-code'}
         resp_data = {
             'access_token': 'some:access:token',
             'refresh_token': 'some:refresh:token'
@@ -407,11 +403,19 @@ class TestSpotifyClient(TestCase):
 
         user_tokens = self.spotify_client.get_access_and_refresh_tokens(**request_data)
 
-        request_data.update({'grant_type': 'authorization_code'})  # Update with constant grant_type from Spotify
+        expected_request_data = {
+            'grant_type': 'authorization_code',
+            'code': request_data['code'],
+            'redirect_uri': 'https://moodytunes.vm/moodytunes/spotify/callback/'
+        }
+
+        expected_headers = self.spotify_client._make_authorization_header()
+
         mock_request.assert_called_once_with(
             'POST',
             'https://accounts.spotify.com/api/token',
-            data=request_data
+            data=expected_request_data,
+            headers=expected_headers
         )
         self.assertDictEqual(user_tokens, resp_data)
 
