@@ -78,7 +78,8 @@ class SpotifyClient(object):
                     'data': data,
                     'params': params,
                     'response_code': response.status_code,
-                    'response_reason': response.reason
+                    'response_reason': response.reason,
+                    'response_data': response.json(),
                 }
             )
 
