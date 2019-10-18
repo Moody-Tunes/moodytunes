@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from ratelimit.mixins import RatelimitMixin
 
-from accounts.models import MoodyUser, SpotifyUserAuth
+from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import fetch_song_from_spotify
