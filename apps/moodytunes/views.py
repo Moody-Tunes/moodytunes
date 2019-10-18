@@ -135,10 +135,25 @@ class SpotifyAuthenticationCallbackView(View):
 
             return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
+        else:
+            logger.warning(
+                'User {} failed Spotify Oauth confirmation'.format(request.user.username),
+                extra={'error': request.GET['error']}
+            )
+
+            # Map error code to human-friendly display
+            error_messages = {
+                'access_denied': 'You rejected to link MoodyTunes to Spotify. Please select Accept next time.'
+            }
+
+            messages.error(request, error_messages.get(request.GET['error'], request.GET['error']))
+
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+
 
 class SpotifyAuthenticationSuccessView(TemplateView):
     template_name = 'spotify_auth_success.html'
 
 
-class SpotifyAuthenticationFailureView(View):
-    pass
+class SpotifyAuthenticationFailureView(TemplateView):
+    template_name = 'spotify_auth_failure.html'
