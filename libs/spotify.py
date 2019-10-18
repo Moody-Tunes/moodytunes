@@ -436,3 +436,28 @@ class SpotifyClient(object):
         resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
 
         return resp['id']
+
+
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs):
+        """
+        Add songs to a specified playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify playlist ID to add songs to
+        :param songs: (list) Collection of Spotify track URIs to add to playlist
+        """
+        url = '{api_url}/playlists/{playlist_id}/tracks'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            playlist_id=playlist_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {'uris': songs}
+
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+
+        return resp
