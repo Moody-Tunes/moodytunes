@@ -114,11 +114,7 @@ class SpotifyAuthenticationCallbackView(View):
     def get(self, request, *args, **kwargs):
         if 'code' in request.GET:
             code = request.GET['code']
-            state = request.GET['state']
-
-            # Parse MoodyUser primary key from state
-            user_id = state.split(':')[1]
-            user = MoodyUser.objects.get(pk=user_id)
+            user = request.user
 
             # Get access and refresh tokens for user
             spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
