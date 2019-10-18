@@ -121,7 +121,7 @@ class SpotifyAuthenticationCallbackView(View):
             user = MoodyUser.objects.get(pk=user_id)
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient()
+            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
             tokens = spotify_client.get_access_and_refresh_tokens(code)
 
             # Get Spotify username from profile data
