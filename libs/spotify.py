@@ -437,7 +437,6 @@ class SpotifyClient(object):
 
         return resp['id']
 
-
     def add_songs_to_playlist(self, auth_code, playlist_id, songs):
         """
         Add songs to a specified playlist
