@@ -364,7 +364,9 @@ class SpotifyClient(object):
             'refresh_token': refresh_token
         }
 
-        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+        headers = self._make_authorization_header()
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], headers=headers,data=data)
 
         return response['access_token']
 
