@@ -8,6 +8,7 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
+from libs.spotify import SpotifyClient
 from libs.utils import average
 
 
@@ -100,6 +101,16 @@ class SpotifyUserAuth(BaseModel):
         """
         spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
         return self.last_refreshed < spotify_auth_timeout
+
+    def refresh_access_token(self):
+        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
+        spotfiy = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
+        access_token = spotfiy.refresh_access_token(self.refresh_token)
+
+        self.access_token = access_token
+        self.last_refreshed = timezone.now()
+
+        self.save()
 
 
 class UserEmotion(BaseModel):
