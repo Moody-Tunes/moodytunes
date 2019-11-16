@@ -169,6 +169,17 @@ COMPRESS_ENABLED = True
 UGLIFY_BINARY = env.str('MTDJ_UGLIFY_BINARY', default='node_modules/uglify-es/bin/uglifyjs')
 UGLIFY_ARGUMENTS = env.str('MTDJ_UGLIFY_OPTIONS', default='-m')
 
+"""
+NOTE: COMPRESS_OFFLINE determines whether static files should be checked and recompiled as part of the
+request/response cycle. We DO NOT want to do this in prod, for two reasons:
+    1. We compile static files during deployment, so any files that were changed are recompiled
+    2. We DO NOT want the gunicorn process to be writing to the _static directory
+Essentially, we want the production application to just use whatever files are in the cache (use the offline compressed
+files.) We do want development to compress on the fly, so that engineers don't need to recompile every time they make
+a change to static files.
+"""
+COMPRESS_OFFLINE = env.bool('MTDJ_COMPRESS_OFFLINE', default=False)
+
 COMPRESS_PRECOMPILERS = (
    ('text/less', 'node_modules/less/bin/lessc {infile} {outfile}'),
 )
