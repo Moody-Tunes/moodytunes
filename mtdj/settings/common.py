@@ -178,7 +178,7 @@ Essentially, we want the production application to just use whatever files are i
 files.) We do want development to compress on the fly, so that engineers don't need to recompile every time they make
 a change to static files.
 """
-COMPRESS_OFFLINE = env.bool('MTDJ_COMPRESS_OFFILINE', default=False)
+COMPRESS_OFFLINE = env.bool('MTDJ_COMPRESS_OFFLINE', default=False)
 
 COMPRESS_PRECOMPILERS = (
    ('text/less', 'node_modules/less/bin/lessc {infile} {outfile}'),
