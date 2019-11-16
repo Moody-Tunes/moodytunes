@@ -69,14 +69,16 @@ logger.error('You should have gone for the head')
 
 ### Static Files
 
-Static files are served through nginx in our setup. When you make changes to static files during development, you will
-need to run the management command to have Django collect your static files into the \_static directory that nginx will
-read when a request is made for a static file. Simply run the following command:
+Static files are served through the nginx webserver in our configuration. When you make changes to static files during
+development, they should automatically be picked up by the [django-compressor](https://github.com/django-compressor/django-compressor)
+plugin that will regenerate the static file served to the frontend. If you add a new static file to a template, you may
+need to run
 
 `./manage.py collectstatic`
 
-after making changes to static files to have them collected and be available to serve. You will need to do this for
-every change made during development.
+to notify Django that there is a new static file to be collected. Our static files live in the `static/` directory located
+in the project root. Please namespace the file under the appropriate app name. For example, if you are adding a LESS
+file in a template that lives in the mooydytunes app, please place the file in the `static/moodytunes/less/` directory
 
 ### Running Daemon Processes
 
