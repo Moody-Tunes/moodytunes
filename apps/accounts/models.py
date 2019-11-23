@@ -88,6 +88,9 @@ class SpotifyUserAuth(BaseModel):
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return '{} - {}'.format(self.user.username, self.spotify_user_id)
+
     @property
     def should_updated_access_token(self):
         """
