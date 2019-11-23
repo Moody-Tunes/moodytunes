@@ -456,7 +456,7 @@ class TestMoodyPasswordResetView(TestCase):
 class TestMoodyPasswordResetConfirmView(TestCase):
     def test_happy_path(self):
         user = MoodyUtil.create_user(email='foo@example.com')
-        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = PasswordResetTokenGenerator().make_token(user)
 
         url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
@@ -482,7 +482,7 @@ class TestMoodyPasswordResetConfirmView(TestCase):
 
     def test_non_matching_passwords_are_rejected(self):
         user = MoodyUtil.create_user(email='foo@example.com')
-        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = PasswordResetTokenGenerator().make_token(user)
 
         url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
