@@ -82,7 +82,7 @@ class ProfileView(TemplateView):
         context['password_reset_link'] = reverse(
             'accounts:password-reset-confirm',
             kwargs={
-                'uidb64': urlsafe_base64_encode(force_bytes(self.request.user.pk)).decode(),
+                'uidb64': urlsafe_base64_encode(force_bytes(self.request.user.pk)),
                 'token': default_token_generator.make_token(self.request.user)
             }
         )
