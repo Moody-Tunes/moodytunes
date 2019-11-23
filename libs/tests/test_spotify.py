@@ -1,3 +1,4 @@
+import json
 from base64 import b64encode
 from unittest import mock
 from urllib import parse
@@ -465,3 +466,58 @@ class TestSpotifyClient(TestCase):
         song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
 
         self.assertDictEqual(song_data, expected_song_data)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_create_playlist(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        spotify_user_id = 'spotify:user:id'
+        playlist_name = 'My Cool Playlist'
+        playlist_id = 'spotify:playlist:id'
+
+        mock_request.return_value = {'id': playlist_id}
+
+        expected_headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        expected_data = {
+            'name': playlist_name,
+            'public': False
+        }
+
+        retrieved_playlist_id = self.spotify_client.create_playlist(auth_code, spotify_user_id, playlist_name)
+
+        self.assertEqual(retrieved_playlist_id, playlist_id)
+        mock_request.assert_called_once_with(
+            'POST',
+            'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
+            headers=expected_headers,
+            data=json.dumps(expected_data)
+        )
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_add_songs_to_playlist(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        playlist_id = 'spotify:playlist:id'
+        songs = ['spotify:track:1', 'spotify:track:2']
+        mock_response = {'resp': 'OK'}
+
+        mock_request.return_value = mock_response
+
+        expected_headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        expected_data = {'uris': songs}
+
+        retrieved_response = self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
+
+        self.assertEqual(retrieved_response, mock_response)
+        mock_request.assert_called_once_with(
+            'POST',
+            'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
+            headers=expected_headers,
+            data=json.dumps(expected_data)
+        )
