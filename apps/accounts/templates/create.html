@@ -3,6 +3,8 @@
 {% load compress %}
 {% load static %}
 
+{% block title %}Create User{% endblock %}
+
 {% block superhead %}
     {% compress js %}
         <script src="{% static 'accounts/js/password_confirmation.js' %}" defer></script>
