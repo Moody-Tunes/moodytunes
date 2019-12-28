@@ -13,6 +13,14 @@ class HomePageView(RedirectView):
 class LandingPageView(TemplateView):
     template_name = 'landing_page.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(LandingPageView, self).get_context_data(**kwargs)
+        context['login_link'] = settings.LOGIN_URL
+        context['create_account_link'] = reverse('accounts:create')
+        context['about_link'] = reverse('moodytunes:about')
+
+        return context
+
 
 class FormView(TemplateView):
     """View class for including form on a page"""
