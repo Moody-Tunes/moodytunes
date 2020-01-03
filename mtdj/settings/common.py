@@ -6,7 +6,7 @@ from . import BASE_DIR
 from .common_api import *
 from .common_celery import *
 
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
+SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
@@ -73,6 +73,11 @@ MIDDLEWARE = [
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Enable HSTS header for site
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_PRELOAD = True  # Include site in HSTS preload list
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_SECURE = True  # Add `secure` flag when setting session cookie
