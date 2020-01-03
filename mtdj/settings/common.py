@@ -6,7 +6,7 @@ from . import BASE_DIR
 from .common_api import *
 from .common_celery import *
 
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='__insecure_installation__')
+SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='')
 
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
