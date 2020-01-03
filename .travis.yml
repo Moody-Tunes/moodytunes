@@ -1,6 +1,14 @@
 language: python
+
 python:
   - "3.6"
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'CREATE DATABASE mtdj_local;' -U postgres
+  - psql -c 'ALTER USER mtdj CREATEDB;' -U postgres
 
 install:
   pip install -r requirements/common.txt
