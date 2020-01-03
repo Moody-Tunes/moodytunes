@@ -29,13 +29,13 @@ class TestFilterDuplicateVotesOnSongs(TestCase):
             context='WORK'
         )
 
-        user_votes = self.user.get_user_song_vote_records(self.emotion.name)
+        user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
         filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
 
         self.assertEqual(filtered_votes.count(), 1)
 
     def test_filter_passed_no_votes_returns_empty_queryset(self):
-        user_votes = self.user.get_user_song_vote_records(self.emotion.name)
+        user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
         filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
 
         self.assertEqual(filtered_votes.count(), 0)

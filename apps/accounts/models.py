@@ -50,18 +50,6 @@ class MoodyUser(BaseModel, AbstractUser):
 
         return None
 
-    def get_user_song_vote_records(self, emotion_name):
-        """
-        Return the list of UserSongVote records for a given emotion. This is done in Python to take advantage of
-        `prefetch_related` caching. Note that you would need to prefetch the `useresongvote_set` related manager;
-        this will happen for you if you make your query using the `MoodyUser.prefetch_manager` manager.
-
-        :param emotion_name: (str) `Emotion.name` constant to retrieve
-
-        :return: (list) Collection of votes for the given emotion
-        """
-        return [vote for vote in self.usersongvote_set.all() if vote.emotion.name == emotion_name]
-
     def update_information(self, data):
         """
         Given a dictionary of CLEAN DATA, update the user information accordingly.
