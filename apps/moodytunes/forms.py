@@ -24,7 +24,7 @@ def get_genre_choices(user=None):
             vote=True
         ).values_list('song__genre', flat=True).distinct()
     else:
-        genres = Song.objects.all().values_list('genre', flat=True).distinct()
+        genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
 
     return default_option + [(genre, genre) for genre in genres if genre]
 

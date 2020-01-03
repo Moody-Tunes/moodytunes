@@ -24,14 +24,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 COMPRESS_ENABLED = False
 COMPRESS_PRECOMPILERS = ()
 
-# Use sqlite3 database for testing
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }
-}
-
 # Use fake Spotify tokens during tests to ensure no requests to API are made
 SPOTIFY.update({
     'client_id': 'test-spotify-client-id',

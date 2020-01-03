@@ -7,8 +7,11 @@ def filter_duplicate_votes_on_song_from_playlist(user_votes):
     even if there are multiple votes for the song)
 
     :param user_votes: (QuerySet) Collection of votes a user has previously voted as making them feel an Emotion
+
     :return: (Queryset) Collection of votes without duplicate votes for the same song
     """
+    # TODO: Can we use Django ORM functions instead of iterating over a QuerySet?
+
     votes = []
     already_added_songs = []
 
