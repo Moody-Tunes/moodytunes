@@ -360,10 +360,11 @@ class TestVoteView(TestCase):
         }
         self.api_client.post(self.url, data=data, format='json')
 
-        user_emotion.refresh_from_db()
-        expected_energy = average([self.song.energy, new_song.energy])
-        expected_valence = average([self.song.valence, new_song.valence])
+        votes = UserSongVote.objects.filter(user=self.user, vote=True)
+        expected_energy = average(votes, 'song__energy')
+        expected_valence = average(votes, 'song__valence')
 
+        user_emotion.refresh_from_db()
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
 

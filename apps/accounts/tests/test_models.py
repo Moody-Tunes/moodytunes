@@ -63,8 +63,10 @@ class TestUserEmotion(TestCase):
                 vote=True
             )
 
-        expected_new_energy = average([song.energy, song2.energy])
-        expected_new_valence = average([song.valence, song2.valence])
+        votes = UserSongVote.objects.filter(user=self.user)
+
+        expected_new_energy = average(votes, 'song__energy')
+        expected_new_valence = average(votes, 'song__valence')
 
         user_emot.update_attributes()
         self.assertEqual(user_emot.energy, expected_new_energy)
@@ -221,10 +223,11 @@ class TestUserSongVote(TestCase):
         MoodyUtil.create_user_song_vote(self.user, test_song_3, self.emotion, False)  # Should not be factored in
         vote_to_delete = MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
 
-        expected_new_energy = average([test_song.energy, test_song_2.energy])
-        expected_new_valence = average([test_song.valence, test_song_2.valence])
-
         vote_to_delete.delete()
+
+        upvoted_votes = UserSongVote.objects.filter(user=self.user, vote=True)
+        expected_new_energy = average(upvoted_votes, 'song__energy')
+        expected_new_valence = average(upvoted_votes, 'song__valence')
 
         user_emot.refresh_from_db()
 

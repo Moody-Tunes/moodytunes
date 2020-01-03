@@ -170,8 +170,8 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
-            energy = average(votes_for_emotion.values_list('song__energy', flat=True))
-            valence = average(votes_for_emotion.values_list('song__valence', flat=True))
+            energy = average(votes_for_emotion, 'song__energy')
+            valence = average(votes_for_emotion, 'song__valence')
 
         data = {
             'emotion': emotion.name,

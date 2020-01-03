@@ -190,13 +190,14 @@ class TestAnalyticsView(TestCase):
         UserSongVote.objects.create(user=self.user, emotion=emotion, song=downvoted_song, vote=False)
 
         working_songs = [upvoted_song_1, upvoted_song_2]
-        user_votes = self.user.get_user_song_vote_records(emotion.name)
+        votes = UserSongVote.objects.filter(user=self.user, vote=True)
+
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'energy': average([vote.song.energy for vote in user_votes if vote.vote]),
-            'valence': average([vote.song.valence for vote in user_votes if vote.vote]),
+            'energy': average(votes, 'song__energy'),
+            'valence': average(votes, 'song__valence'),
             'total_songs': len(working_songs)
         }
 

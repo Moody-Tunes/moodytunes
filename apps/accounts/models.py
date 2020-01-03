@@ -160,11 +160,9 @@ class UserEmotion(BaseModel):
         will be set to `None` and reset to the emotion defaults in the save() call
         """
         votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
-        valences = votes.values_list('song__valence', flat=True)
-        energies = votes.values_list('song__energy', flat=True)
 
-        self.valence = average(valences)
-        self.energy = average(energies)
+        self.valence = average(votes, 'song__valence')
+        self.energy = average(votes, 'song__energy')
         self.save()
 
 
