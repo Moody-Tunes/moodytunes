@@ -1,4 +1,5 @@
 from datetime import timedelta
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -8,7 +9,11 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
+from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
+
+
+logger = getLogger(__name__)
 
 
 class UserPrefetchManager(UserManager):
@@ -100,6 +105,22 @@ class SpotifyUserAuth(BaseModel):
         """
         spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
         return self.last_refreshed < spotify_auth_timeout
+
+    def refresh_access_token(self):
+        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
+        spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
+
+        try:
+            access_token = spotify_client.refresh_access_token(self.refresh_token)
+
+            self.access_token = access_token
+            self.last_refreshed = timezone.now()
+
+            self.save()
+        except SpotifyException:
+            logger.warning('Unable to refresh access token for {}'.format(self.user.username), exc_info=True)
+
+            raise
 
 
 class UserEmotion(BaseModel):

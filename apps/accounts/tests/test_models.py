@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -8,6 +9,7 @@ from django.test import TestCase
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_attributes
+from spotify import SpotifyException
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
 from libs.utils import average
@@ -159,6 +161,44 @@ class TestSpotifyUserAuth(TestCase):
 
         self.assertEqual(user_auth.access_token, acces_token)
         self.assertEqual(user_auth.refresh_token, refresh_token)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_refresh_access_token_happy_path(self, mock_refresh_access_token):
+        refresh_access_token = 'mock:spotify:access:token'
+        mock_refresh_access_token.return_value = refresh_access_token
+
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        old_last_refreshed = user_auth.last_refreshed
+
+        user_auth.refresh_access_token()
+        user_auth.refresh_from_db()
+
+        self.assertEqual(user_auth.access_token, refresh_access_token)
+        self.assertGreater(user_auth.last_refreshed, old_last_refreshed)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_refresh_access_token_raises_exception(self, mock_refresh_access_token):
+        mock_refresh_access_token.side_effect = SpotifyException
+
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        with self.assertRaises(SpotifyException):
+            user_auth.refresh_access_token()
 
 
 class TestUserSongVote(TestCase):
