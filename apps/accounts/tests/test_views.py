@@ -427,7 +427,7 @@ class TestMoodyPasswordResetView(TestCase):
             'email': 'foo@example.com',
             'domain': 'testserver',
             'site_name': 'testserver',
-            'uid': 'MQ',
+            'uid': urlsafe_base64_encode(force_bytes(self.user.pk)),
             'user': self.user,
             'token': mock_token_generator(),
             'protocol': 'http'
