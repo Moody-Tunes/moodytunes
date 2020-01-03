@@ -8,6 +8,7 @@ services:
 
 before_script:
   - psql -c 'CREATE DATABASE mtdj_local;' -U postgres
+  - psql -c 'CREATE USER mtdj;' -U postgres
   - psql -c 'ALTER USER mtdj CREATEDB;' -U postgres
 
 install:
