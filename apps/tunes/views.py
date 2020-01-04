@@ -65,8 +65,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             )
 
             if votes.exists():
-                energy = average(votes.values_list('song__energy', flat=True))
-                valence = average(votes.values_list('song__valence', flat=True))
+                energy = average(votes, 'song__energy')
+                valence = average(votes, 'song__valence')
 
         # If context not provided or the previous query on upvotes for context did return any votes,
         # determine attributes from the attributes for the user and emotion

@@ -1,16 +1,21 @@
-def average(collection):
+from django.core.exceptions import FieldError
+from django.db.models import Avg
+
+
+def average(collection, criteria):
     """
-    Given a list of numbers, calculate the average of the set
-    :param collection: (list) List of values to calculate average of
-    :return: (float) Average of list elements to two decimal points
-    :raises: `ValueError` if non-number values are passed in the `collection`
+    Given a QuerySey of records, calculate the average for a given attribute of the set
+    :param collection: (QuerySet) Queryset of records
+    :param criteria: (str) Desired field for calculated average
+
+    :return: (float)
     """
-    if not collection:
+    if not collection.exists():
         return None
 
-    all_nums = all([type(ele) == int or type(ele) == float for ele in collection])
+    try:
+        val = collection.aggregate(Avg(criteria))['{}__avg'.format(criteria)]
+        return round(val, 2)
 
-    if not all_nums:
-        raise ValueError('Received a non numeric type, the only types accepted are `float` and `int`')
-
-    return round(sum(collection) / len(collection), 2)
+    except FieldError:
+        raise ValueError('{} does not have an attribute {}'.format(collection.model, criteria))

@@ -12,6 +12,7 @@
     {% endcompress %}
 
     {% compress js %}
+        <script src="{% static 'moodytunes/js/client.js' %}" defer></script>
         <script src="{% static 'moodytunes/js/curator.js' %}" defer></script>
         <script src="{% static 'moodytunes/js/playlists.js' %}" defer></script>
     {% endcompress %}

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -8,7 +9,11 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
+from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
+
+
+logger = getLogger(__name__)
 
 
 class UserPrefetchManager(UserManager):
@@ -45,18 +50,6 @@ class MoodyUser(BaseModel, AbstractUser):
 
         return None
 
-    def get_user_song_vote_records(self, emotion_name):
-        """
-        Return the list of UserSongVote records for a given emotion. This is done in Python to take advantage of
-        `prefetch_related` caching. Note that you would need to prefetch the `useresongvote_set` related manager;
-        this will happen for you if you make your query using the `MoodyUser.prefetch_manager` manager.
-
-        :param emotion_name: (str) `Emotion.name` constant to retrieve
-
-        :return: (list) Collection of votes for the given emotion
-        """
-        return [vote for vote in self.usersongvote_set.all() if vote.emotion.name == emotion_name]
-
     def update_information(self, data):
         """
         Given a dictionary of CLEAN DATA, update the user information accordingly.
@@ -92,7 +85,7 @@ class SpotifyUserAuth(BaseModel):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
 
     @property
-    def should_updated_access_token(self):
+    def should_update_access_token(self):
         """
         Spotify access tokens are good for one hour. If the access token has not been updated in this time period,
         indicate that the access token should be updated
@@ -100,6 +93,22 @@ class SpotifyUserAuth(BaseModel):
         """
         spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
         return self.last_refreshed < spotify_auth_timeout
+
+    def refresh_access_token(self):
+        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
+        spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
+
+        try:
+            access_token = spotify_client.refresh_access_token(self.refresh_token)
+
+            self.access_token = access_token
+            self.last_refreshed = timezone.now()
+
+            self.save()
+        except SpotifyException:
+            logger.warning('Unable to refresh access token for {}'.format(self.user.username), exc_info=True)
+
+            raise
 
 
 class UserEmotion(BaseModel):
@@ -139,11 +148,9 @@ class UserEmotion(BaseModel):
         will be set to `None` and reset to the emotion defaults in the save() call
         """
         votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
-        valences = votes.values_list('song__valence', flat=True)
-        energies = votes.values_list('song__energy', flat=True)
 
-        self.valence = average(valences)
-        self.energy = average(energies)
+        self.valence = average(votes, 'song__valence')
+        self.energy = average(votes, 'song__energy')
         self.save()
 
 

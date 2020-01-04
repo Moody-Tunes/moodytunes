@@ -1,4 +1,5 @@
 from base64 import b64encode
+import json
 import logging
 import random
 from urllib.parse import urlencode
@@ -71,6 +72,14 @@ class SpotifyClient(object):
             )
 
         except requests.exceptions.HTTPError:
+            response_data = None
+
+            # Try to parse error message from response
+            try:
+                response_data = response.json()
+            except Exception:
+                pass
+
             logger.exception(
                 '{} - Received HTTPError requesting {}'.format(self.fingerprint, url),
                 extra={
@@ -78,7 +87,8 @@ class SpotifyClient(object):
                     'data': data,
                     'params': params,
                     'response_code': response.status_code,
-                    'response_reason': response.reason
+                    'response_reason': response.reason,
+                    'response_data': response_data,
                 }
             )
 
@@ -309,7 +319,7 @@ class SpotifyClient(object):
         params = {
             'client_id': settings.SPOTIFY['client_id'],
             'response_type': 'code',
-            'scopes': ' '.join(scopes),
+            'scope': ' '.join(scopes),
             'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
             'state': state
         }
@@ -354,7 +364,9 @@ class SpotifyClient(object):
             'refresh_token': refresh_token
         }
 
-        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], data=data)
+        headers = self._make_authorization_header()
+
+        response = self._make_spotify_request('POST', settings.SPOTIFY['auth_url'], headers=headers, data=data)
 
         return response['access_token']
 
@@ -396,3 +408,57 @@ class SpotifyClient(object):
         }
 
         return payload
+
+    def create_playlist(self, auth_code, spotify_user_id, playlist_name):
+        """
+        Create a playlist for the given Spotify user. Note that this creates an empty playlist,
+        a subsequent API call should be made to populate the playlist with songs.
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param spotify_user_id: (str) Spotify username for the given user
+        :param playlist_name: (str) Name of the playlist to be created
+
+        :return: (str) Spotify playlist ID for the created playlist
+        """
+        url = '{api_url}/users/{user_id}/playlists'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            user_id=spotify_user_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {
+            'name': playlist_name,
+            'public': False
+        }
+
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+
+        return resp['id']
+
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs):
+        """
+        Add songs to a specified playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify playlist ID to add songs to
+        :param songs: (list) Collection of Spotify track URIs to add to playlist
+        """
+        url = '{api_url}/playlists/{playlist_id}/tracks'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            playlist_id=playlist_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {'uris': songs}
+
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+
+        return resp

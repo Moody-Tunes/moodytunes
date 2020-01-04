@@ -1,24 +1,35 @@
 from django.test import TestCase
 
+from tunes.models import Song
 from libs.utils import average
+from libs.tests.helpers import MoodyUtil
 
 
 class TestAverage(TestCase):
-    def test_happy_path(self):
-        collection = [.5, .5]
-        expected_average = .5
+    @classmethod
+    def setUpTestData(cls):
+        cls.song_1 = MoodyUtil.create_song(energy=.5, valence=.75)
+        cls.song_2 = MoodyUtil.create_song(energy=.65, valence=.45)
 
-        calculated_average = average(collection)
-        self.assertEqual(calculated_average, expected_average)
+    def test_average_computes_proper_average_for_attribute(self):
+        collection = Song.objects.all()
+        expected_valence = .6
+        expected_energy = .57
 
-    def test_empty_list_returns_null(self):
-        collection = []
+        calculated_valence = average(collection, 'valence')
+        self.assertEqual(calculated_valence, expected_valence)
 
-        calculated_average = average(collection)
+        calculated_energy = average(collection, 'energy')
+        self.assertEqual(calculated_energy, expected_energy)
+
+    def test_empty_queryset_returns_null(self):
+        collection = Song.objects.none()
+
+        calculated_average = average(collection, 'valence')
         self.assertIsNone(calculated_average)
 
-    def test_non_number_passed_raises_value_error(self):
-        collection = [0.5, 'Hello World!', 0.5]
+    def test_invalid_attribute_rasies_exception(self):
+        collection = Song.objects.all()
 
         with self.assertRaises(ValueError):
-            average(collection)
+            average(collection, 'foo')

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -8,6 +9,7 @@ from django.test import TestCase
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_attributes
+from spotify import SpotifyException
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
 from libs.utils import average
@@ -61,8 +63,10 @@ class TestUserEmotion(TestCase):
                 vote=True
             )
 
-        expected_new_energy = average([song.energy, song2.energy])
-        expected_new_valence = average([song.valence, song2.valence])
+        votes = UserSongVote.objects.filter(user=self.user)
+
+        expected_new_energy = average(votes, 'song__energy')
+        expected_new_valence = average(votes, 'song__valence')
 
         user_emot.update_attributes()
         self.assertEqual(user_emot.energy, expected_new_energy)
@@ -133,19 +137,19 @@ class TestSpotifyUserAuth(TestCase):
 
     def test_should_updated_access_token_returns_false_for_recently_created_records(self):
         user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
-        self.assertFalse(user_auth.should_updated_access_token)
+        self.assertFalse(user_auth.should_update_access_token)
 
     def test_should_update_access_token_returns_false_for_tokens_refreshed_in_boundary(self):
         user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
         user_auth.last_refreshed = timezone.now() - timedelta(minutes=30)
 
-        self.assertFalse(user_auth.should_updated_access_token)
+        self.assertFalse(user_auth.should_update_access_token)
 
     def test_should_update_access_token_returns_true_for_tokens_refreshed_passed_boundary(self):
         user_auth = SpotifyUserAuth.objects.create(user=self.user, spotify_user_id='test_user')
         user_auth.last_refreshed = timezone.now() - timedelta(days=7)
 
-        self.assertTrue(user_auth.should_updated_access_token)
+        self.assertTrue(user_auth.should_update_access_token)
 
     def test_encrypted_fields_return_values_on_access(self):
         acces_token = 'access:token'
@@ -159,6 +163,44 @@ class TestSpotifyUserAuth(TestCase):
 
         self.assertEqual(user_auth.access_token, acces_token)
         self.assertEqual(user_auth.refresh_token, refresh_token)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_refresh_access_token_happy_path(self, mock_refresh_access_token):
+        refresh_access_token = 'mock:spotify:access:token'
+        mock_refresh_access_token.return_value = refresh_access_token
+
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        old_last_refreshed = user_auth.last_refreshed
+
+        user_auth.refresh_access_token()
+        user_auth.refresh_from_db()
+
+        self.assertEqual(user_auth.access_token, refresh_access_token)
+        self.assertGreater(user_auth.last_refreshed, old_last_refreshed)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_refresh_access_token_raises_exception(self, mock_refresh_access_token):
+        mock_refresh_access_token.side_effect = SpotifyException
+
+        acces_token = 'access:token'
+        refresh_token = 'refresh_token'
+        user_auth = SpotifyUserAuth.objects.create(
+            user=self.user,
+            spotify_user_id='test_user',
+            access_token=acces_token,
+            refresh_token=refresh_token
+        )
+
+        with self.assertRaises(SpotifyException):
+            user_auth.refresh_access_token()
 
 
 class TestUserSongVote(TestCase):
@@ -181,10 +223,11 @@ class TestUserSongVote(TestCase):
         MoodyUtil.create_user_song_vote(self.user, test_song_3, self.emotion, False)  # Should not be factored in
         vote_to_delete = MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
 
-        expected_new_energy = average([test_song.energy, test_song_2.energy])
-        expected_new_valence = average([test_song.valence, test_song_2.valence])
-
         vote_to_delete.delete()
+
+        upvoted_votes = UserSongVote.objects.filter(user=self.user, vote=True)
+        expected_new_energy = average(upvoted_votes, 'song__energy')
+        expected_new_valence = average(upvoted_votes, 'song__valence')
 
         user_emot.refresh_from_db()
 
