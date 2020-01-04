@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import serializers
 
 from accounts.models import UserSongVote
@@ -63,6 +65,12 @@ class VoteSongsRequestSerializer(serializers.Serializer):
     vote = serializers.BooleanField()
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
     description = serializers.CharField(max_length=100, required=False, allow_blank=True)
+
+    def validate_description(self, value):
+        if value and not re.match(r"^[a-zA-Z0-9_.?!, ]*$", value):
+            raise serializers.ValidationError('Value must only contain alphanumeric characters')
+
+        return value
 
 
 class DeleteVoteRequestSerializer(serializers.Serializer):

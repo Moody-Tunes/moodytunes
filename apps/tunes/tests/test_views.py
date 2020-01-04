@@ -444,6 +444,30 @@ class TestVoteView(TestCase):
         resp = self.api_client.post(self.url, data=data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_vote_with_punctuation_is_valid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'description': 'This is awesome!?,.',
+            'vote': True
+        }
+
+        resp = self.api_client.post(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+    def test_vote_with_xss_for_description_is_invalid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'description': '<script>console.log("HACKED")</script>',
+            'vote': True
+        }
+
+        resp = self.api_client.post(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_delete_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
