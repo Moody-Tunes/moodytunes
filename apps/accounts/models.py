@@ -85,7 +85,7 @@ class SpotifyUserAuth(BaseModel):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
 
     @property
-    def should_updated_access_token(self):
+    def should_update_access_token(self):
         """
         Spotify access tokens are good for one hour. If the access token has not been updated in this time period,
         indicate that the access token should be updated
