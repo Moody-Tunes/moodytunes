@@ -1,6 +1,8 @@
 import random
 
 from django import forms
+from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
@@ -15,7 +17,9 @@ default_option = [('', '-----------')]
 def get_genre_choices(user=None):
     """
     Return genre choices for form field.
+
     :param user: (MoodyUser) If present, will only return genres from songs user has upvoted
+
     :return: (list[tuples]) List of options for genre field in forms
     """
     if user:
@@ -24,7 +28,11 @@ def get_genre_choices(user=None):
             vote=True
         ).values_list('song__genre', flat=True).distinct()
     else:
-        genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
+        if cache.get(settings.GENRE_CHOICES_CACHE_KEY):
+            genres = cache.get(settings.GENRE_CHOICES_CACHE_KEY)
+        else:
+            genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
+            cache.set(settings.GENRE_CHOICES_CACHE_KEY, genres, settings.GENRE_CHOICES_CACHE_TIMEOUT)
 
     return default_option + [(genre, genre) for genre in genres if genre]
 
