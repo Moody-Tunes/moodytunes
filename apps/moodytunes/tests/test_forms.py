@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import TestCase
 
 from moodytunes.forms import get_genre_choices, BrowseForm, PlaylistForm, SuggestSongForm
@@ -54,6 +56,18 @@ class TestGetGenreChoices(TestCase):
         choices = get_genre_choices()
 
         self.assertEqual(choices, expected_choices)
+
+    @mock.patch('tunes.models.Song.objects.all')
+    @mock.patch('django.core.cache.cache.get')
+    def test_method_uses_cached_return_value_if_present(self, mock_cache, mock_song_lookup):
+        genres = ['foo']
+        mock_cache.return_value = genres
+
+        expected_genres = [('', '-----------'), ('foo', 'foo')]
+        returned_genres = get_genre_choices()
+
+        self.assertEqual(returned_genres, expected_genres)
+        mock_song_lookup.assert_not_called()
 
 
 class TestBrowseForm(TestCase):
