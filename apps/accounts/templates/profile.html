@@ -12,7 +12,9 @@
 
 {% block content %}
 <h1>Profile</h1>
+{% localtime on %}
 <p>Hello {{ user.username }}! You last logged in {{ user.last_login|date:"M d, Y" }} at {{ user.last_login|localtime|date:"f A e" }}</p>
+{% endlocaltime %}
 <h3>Account Options</h3>
 <ul>
     <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>
