@@ -265,7 +265,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 1,
+            'backupCount': 5,
             'maxBytes': 10000000  # 10MB
         },
         'error_file': {
@@ -273,7 +273,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 1,
+            'backupCount': 5,
             'maxBytes': 10000000  # 10MB
         },
         'gunicorn': {
@@ -281,7 +281,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
             'formatter': 'gunicorn',
-            'backupCount': 1,
+            'backupCount': 5,
             'maxBytes': 10000000  # 10MB
         },
         'celery': {
@@ -289,7 +289,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/celery.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 1,
+            'backupCount': 5,
             'maxBytes': 10000000  # 10MB
         },
     },
