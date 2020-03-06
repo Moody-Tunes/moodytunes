@@ -92,4 +92,4 @@ class SuggestSongForm(forms.Form):
 
 class ExportPlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
-    playlist_name = forms.CharField(max_length=100)
+    playlist_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Playlist Name'}))
