@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'django_celery_beat',
     'django_celery_results',
+    'django_hosts',
     'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
@@ -60,6 +61,7 @@ OUR_APPS = [
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -69,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 # Security middleware definitions
@@ -88,6 +91,8 @@ SESSION_COOKIE_HTTPONLY = True  # Add `HttpOnly` flag when setting session cooki
 CSRF_COOKIE_SECURE = True  # Add `secure` flag when setting CSRF cookie
 
 ROOT_URLCONF = 'mtdj.urls'
+ROOT_HOSTCONF = 'mtdj.hosts'
+DEFAULT_HOST = 'www'
 
 TEMPLATES = [
     {
