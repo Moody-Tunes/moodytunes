@@ -14,6 +14,7 @@ from accounts.models import SpotifyUserAuth, UserSongVote
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
 from moodytunes.tasks import fetch_song_from_spotify
+from tunes.models import Emotion
 from tunes.tasks import create_spotify_playlist_from_songs
 from tunes.utils import CachedPlaylistManager
 from libs.spotify import SpotifyClient
@@ -186,10 +187,25 @@ class ExportPlayListView(FormView):
 
         if form.is_valid():
             playlist_name = form.cleaned_data['playlist_name']
-            emotion = form.cleaned_data['emotion']
+            emotion_name = form.cleaned_data['emotion']
+
             songs = UserSongVote.objects.filter(
-                user=request.user, emotion__name=emotion, vote=True
+                user=request.user, emotion__name=emotion_name, vote=True
             ).values_list('song__code', flat=True)
+
+            if not songs.exists():
+                emotion = Emotion.objects.get(name=emotion_name)
+                emotion_fullname = emotion.full_name
+
+                messages.error(
+                    request,
+                    'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                        emotion_fullname.lower()
+                    )
+                )
+
+                return HttpResponseRedirect(reverse('moodytunes:export'))
+
             songs = list(songs)
 
             auth = SpotifyUserAuth.objects.get(user=self.request.user)
