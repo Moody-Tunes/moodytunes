@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load compress %}
+{% load static %}
+
+{% block title %}Export Playlist{% endblock %}
+
+{% block content %}
+    <h1>Export Playlist</h1>
+    <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the emotion you want to export and
+    the name of the playlist and it will be added to your Spotify account!</p>
+    <form name="export-playlist-form" method="post">
+        {% csrf_token %}
+        <p>{{ form.emotion.errors }}</p>
+        <p>{{ form.emotion }}</p>
+        <p>{{ form.playlist_name.errors }}</p>
+        <p>{{ form.playlist_name }}</p>
+        <button type="submit">Export Playlist</button>
+    </form>
+{% endblock %}

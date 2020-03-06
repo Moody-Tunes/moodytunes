@@ -10,10 +10,11 @@ from django.views import View
 from django.views.generic import TemplateView
 from ratelimit.mixins import RatelimitMixin
 
-from accounts.models import SpotifyUserAuth
+from accounts.models import SpotifyUserAuth, UserSongVote
 from base.views import FormView
-from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
+from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
 from moodytunes.tasks import fetch_song_from_spotify
+from tunes.tasks import create_spotify_playlist_from_songs
 from tunes.utils import CachedPlaylistManager
 from libs.spotify import SpotifyClient
 
@@ -167,3 +168,40 @@ class SpotifyAuthenticationSuccessView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class ExportPlayListView(FormView):
+    template_name = 'export.html'
+    form_class = ExportPlaylistForm
+
+    def get(self, request, *args, **kwargs):
+        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+
+        return super(ExportPlayListView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            playlist_name = form.cleaned_data['playlist_name']
+            emotion = form.cleaned_data['emotion']
+            songs = UserSongVote.objects.filter(
+                user=request.user, emotion__name=emotion, vote=True
+            ).values_list('song__code', flat=True)
+            songs = list(songs)
+
+            auth = SpotifyUserAuth.objects.get(user=self.request.user)
+            if auth.should_update_access_token:
+                # TODO: Move this functionality to SpotifyUserAuth model
+                spotify = SpotifyClient()
+                access_token = spotify.refresh_access_token(auth.refresh_token)
+                auth.access_token = access_token
+                auth.save()
+
+            create_spotify_playlist_from_songs.delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
+
+            messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
+
+            return HttpResponseRedirect(reverse('moodytunes:export'))
