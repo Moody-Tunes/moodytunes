@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from ratelimit.mixins import RatelimitMixin
 
 from accounts.models import SpotifyUserAuth, UserSongVote
@@ -162,8 +162,9 @@ class SpotifyAuthenticationCallbackView(View):
 
 
 @method_decorator(login_required, name='dispatch')
-class SpotifyAuthenticationSuccessView(TemplateView):
-    template_name = 'spotify_auth_success.html'
+class SpotifyAuthenticationSuccessView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('moodytunes:export')
 
 
 @method_decorator(login_required, name='dispatch')
