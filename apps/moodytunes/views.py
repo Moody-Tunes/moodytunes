@@ -194,11 +194,7 @@ class ExportPlayListView(FormView):
 
             auth = SpotifyUserAuth.objects.get(user=self.request.user)
             if auth.should_update_access_token:
-                # TODO: Move this functionality to SpotifyUserAuth model
-                spotify = SpotifyClient()
-                access_token = spotify.refresh_access_token(auth.refresh_token)
-                auth.access_token = access_token
-                auth.save()
+                auth.refresh_access_token()
 
             create_spotify_playlist_from_songs.delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
 
