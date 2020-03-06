@@ -13,9 +13,8 @@ from ratelimit.mixins import RatelimitMixin
 from accounts.models import SpotifyUserAuth, UserSongVote
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
-from moodytunes.tasks import fetch_song_from_spotify
+from moodytunes.tasks import create_spotify_playlist_from_songs, fetch_song_from_spotify
 from tunes.models import Emotion
-from tunes.tasks import create_spotify_playlist_from_songs
 from tunes.utils import CachedPlaylistManager
 from libs.spotify import SpotifyClient
 
