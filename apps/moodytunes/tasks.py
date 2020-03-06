@@ -59,6 +59,7 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
 
     """
     spotify = SpotifyClient()
+    playlist_id = ''
 
     try:
         logger.info('Creating playlist for user {}'.format(spotify_user_id))
@@ -71,10 +72,13 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
     try:
         logger.info('Adding songs to playlist {}'.format(playlist_id))
         spotify.add_songs_to_playlist(auth_code, playlist_id, songs)
-        logger.info('Added songs to playlist {} successfully'.format(playlist_id))
+        logger.info(
+            'Added songs to playlist {} successfully'.format(playlist_id),
+            extra={'fingerprint': 'created_playlist_success'}
+        )
     except SpotifyException:
-        logger.warning('Error adding songs to playlist {} for user {}, retrying...'.format(
-            playlist_id,
-            spotify_user_id
-        ))
+        logger.warning(
+            'Error adding songs to playlist {} for user {}, retrying...'.format(playlist_id, spotify_user_id),
+            extra={'fingerprint': 'created_playlist_failed'}
+        )
         self.retry()
