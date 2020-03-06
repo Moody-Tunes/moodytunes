@@ -39,7 +39,7 @@
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:suggest' %}">Suggest Song</a>
 
                     {% flag 'spotify_auth' %}
-                        <a class="navbar-child navbar-user" href="{% url 'moodytunes:spotify-auth' %}">Authenticate With Spotify</a>
+                        <a class="navbar-child navbar-user" href="{% url 'moodytunes:export' %}">Export Playlist</a>
                     {% endflag %}
                 {% endif %}
             </div>

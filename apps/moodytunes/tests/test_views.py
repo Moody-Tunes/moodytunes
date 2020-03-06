@@ -91,7 +91,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
         cls.url = reverse('moodytunes:spotify-auth-callback')
-        cls.success_url = reverse('moodytunes:spotify-auth-success')
+        cls.success_url = reverse('moodytunes:export')
         cls.failure_url = reverse('moodytunes:spotify-auth-failure')
 
     def setUp(self):
@@ -110,7 +110,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code'}
-        resp = self.client.get(self.url, data=query_params)
+        resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
         self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
@@ -142,7 +142,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code'}
-        resp = self.client.get(self.url, data=query_params)
+        resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
         self.assertEqual(SpotifyUserAuth.objects.filter(user=self.user).count(), 1)
