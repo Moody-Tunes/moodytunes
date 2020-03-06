@@ -7,8 +7,8 @@
 
 {% block content %}
     <h1>Export Playlist</h1>
-    <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the emotion you want to export and
-    the name of the playlist and it will be added to your Spotify account!</p>
+    <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the emotion of the playlist you want to
+    export and  the name of the playlist to be created and it will be added to your Spotify account!</p>
     <form name="export-playlist-form" method="post">
         {% csrf_token %}
         <p>{{ form.emotion.errors }}</p>
