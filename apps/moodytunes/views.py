@@ -7,13 +7,14 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from ratelimit.mixins import RatelimitMixin
 
-from accounts.models import SpotifyUserAuth
+from accounts.models import SpotifyUserAuth, UserSongVote
 from base.views import FormView
-from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import fetch_song_from_spotify
+from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
+from moodytunes.tasks import create_spotify_playlist_from_songs, fetch_song_from_spotify
+from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
 from libs.spotify import SpotifyClient
 
@@ -160,10 +161,66 @@ class SpotifyAuthenticationCallbackView(View):
 
 
 @method_decorator(login_required, name='dispatch')
-class SpotifyAuthenticationSuccessView(TemplateView):
-    template_name = 'spotify_auth_success.html'
+class SpotifyAuthenticationSuccessView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('moodytunes:export')
 
 
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class ExportPlayListView(FormView):
+    template_name = 'export.html'
+    form_class = ExportPlaylistForm
+
+    def get(self, request, *args, **kwargs):
+        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+            return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+
+        return super(ExportPlayListView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            playlist_name = form.cleaned_data['playlist_name']
+            emotion_name = form.cleaned_data['emotion']
+            genre = form.cleaned_data['genre']
+            context = form.cleaned_data['context']
+
+            songs = UserSongVote.objects.filter(user=request.user, emotion__name=emotion_name, vote=True)
+
+            if genre:
+                songs = songs.filter(song__genre=genre)
+
+            if context:
+                songs = songs.filter(song__genre=context)
+
+            if not songs.exists():
+                emotion = Emotion.objects.get(name=emotion_name)
+                emotion_fullname = emotion.full_name
+
+                messages.error(
+                    request,
+                    'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                        emotion_fullname.lower()
+                    )
+                )
+
+                return HttpResponseRedirect(reverse('moodytunes:export'))
+
+            songs = songs.values_list('song__code', flat=True)
+            songs = list(songs)
+
+            auth = SpotifyUserAuth.objects.get(user=self.request.user)
+            if auth.should_update_access_token:
+                auth.refresh_access_token()
+
+            create_spotify_playlist_from_songs.delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
+
+            messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
+
+            return HttpResponseRedirect(reverse('moodytunes:export'))

@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'django_celery_beat',
     'django_celery_results',
+    'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
     'waffle',
@@ -66,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
 ]
 
@@ -262,27 +264,35 @@ LOGGING = {
         },
         'app_file': {
             'level': 'INFO',
-            'class': 'logging.handlers.WatchedFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
+            'backupCount': 5,
+            'maxBytes': 10000000  # 10MB
         },
         'error_file': {
             'level': 'ERROR',
-            'class': 'logging.handlers.WatchedFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
+            'backupCount': 5,
+            'maxBytes': 10000000  # 10MB
         },
         'gunicorn': {
             'level': 'INFO',
-            'class': 'logging.handlers.WatchedFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
             'formatter': 'gunicorn',
+            'backupCount': 5,
+            'maxBytes': 10000000  # 10MB
         },
         'celery': {
             'level': 'INFO',
-            'class': 'logging.handlers.WatchedFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': '{}/celery.log'.format(LOGGING_DIR),
             'formatter': 'json',
+            'backupCount': 5,
+            'maxBytes': 10000000  # 10MB
         },
     },
     'loggers': {
@@ -313,3 +323,7 @@ LOGGING = {
         'propagate': False,
     },
 }
+
+# GeoIP Database files
+GEOIP_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.dat')
+GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
