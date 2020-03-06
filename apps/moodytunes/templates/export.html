@@ -13,6 +13,10 @@
         {% csrf_token %}
         <p>{{ form.emotion.errors }}</p>
         <p>{{ form.emotion }}</p>
+        <p>{{ form.genre.errors }}</p>
+        <p>{{ form.genre }}</p>
+        <p>{{ form.context.errors }}</p>
+        <p>{{ form.context }}</p>
         <p>{{ form.playlist_name.errors }}</p>
         <p>{{ form.playlist_name }}</p>
         <button type="submit">Export Playlist</button>

@@ -189,10 +189,16 @@ class ExportPlayListView(FormView):
         if form.is_valid():
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']
+            genre = form.cleaned_data['genre']
+            context = form.cleaned_data['context']
 
-            songs = UserSongVote.objects.filter(
-                user=request.user, emotion__name=emotion_name, vote=True
-            ).values_list('song__code', flat=True)
+            songs = UserSongVote.objects.filter(user=request.user, emotion__name=emotion_name, vote=True)
+
+            if genre:
+                songs = songs.filter(song__genre=genre)
+
+            if context:
+                songs = songs.filter(song__genre=context)
 
             if not songs.exists():
                 emotion = Emotion.objects.get(name=emotion_name)
@@ -207,6 +213,7 @@ class ExportPlayListView(FormView):
 
                 return HttpResponseRedirect(reverse('moodytunes:export'))
 
+            songs = songs.values_list('song__code', flat=True)
             songs = list(songs)
 
             auth = SpotifyUserAuth.objects.get(user=self.request.user)
