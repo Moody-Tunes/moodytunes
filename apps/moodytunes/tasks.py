@@ -65,7 +65,11 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
         playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
         logger.info('Created playlist for user {} successfully'.format(spotify_user_id))
     except SpotifyException:
-        logger.exception('Error creating playlist for user {}'.format(spotify_user_id))
+        logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
+            'spotify_user_id': spotify_user_id,
+            'playlist_name': playlist_name,
+            'songs': songs
+        })
         raise
 
     try:
@@ -76,5 +80,9 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
             extra={'fingerprint': 'created_playlist_success'}
         )
     except SpotifyException:
-        logger.exception('Error adding songs to playlist {} for user {}'.format(playlist_id, spotify_user_id))
+        logger.exception('Error adding songs to playlist {} for user {}'.format(playlist_id, spotify_user_id), extra={
+            'spotify_user_id': spotify_user_id,
+            'playlist_name': playlist_name,
+            'songs': songs
+        })
         raise
