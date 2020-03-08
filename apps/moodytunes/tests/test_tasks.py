@@ -63,7 +63,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    def test_happy_path(self, mock_create_playlist, mock_add_songs_to_playlist):
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_happy_path(self, mock_get_user_playlists, mock_create_playlist, mock_add_songs_to_playlist):
+        mock_get_user_playlists.return_value = {'items': []}
+
         playlist_id = 'spotify:playlist:id'
         mock_create_playlist.return_value = playlist_id
 
@@ -74,7 +77,15 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    def test_create_playlist_exception_raises_exception(self, mock_create_playlist, mock_add_songs_to_playlist):
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_create_playlist_exception_raises_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist
+    ):
+        mock_get_user_playlists.return_value = {'items': []}
+
         mock_create_playlist.side_effect = SpotifyException
 
         with self.assertRaises(SpotifyException):
@@ -84,10 +95,76 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    def test_add_songs_to_playlist_raises_exception(self, mock_create_playlist, mock_add_songs_to_playlist):
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_add_songs_to_playlist_raises_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist
+    ):
+        mock_get_user_playlists.return_value = {'items': []}
+
         playlist_id = 'spotify:playlist:id'
         mock_create_playlist.return_value = playlist_id
+
         mock_add_songs_to_playlist.side_effect = SpotifyException
 
         with self.assertRaises(SpotifyException):
             create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+
+    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_found_playlist_does_not_create_new_playlist(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist
+    ):
+        playlist_id = 'spotify:playlist:id'
+        mock_get_user_playlists.return_value = {'items': [{'name': self.playlist_name, 'id': playlist_id}]}
+
+        create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+
+        mock_get_user_playlists.assert_called_once_with(self.auth_code, self.spotify_user_id)
+        mock_create_playlist.assert_not_called()
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
+
+    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_playlist_not_found_creates_new_playlist(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist
+    ):
+        playlist_id = 'spotify:playlist:id'
+        mock_get_user_playlists.return_value = {'items': [{'name': 'some_other_playlist', 'id': '12345'}]}
+
+        mock_create_playlist.return_value = playlist_id
+
+        create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+
+        mock_get_user_playlists.assert_called_once_with(self.auth_code, self.spotify_user_id)
+        mock_create_playlist.assert_called_once_with(self.auth_code, self.spotify_user_id, self.playlist_name)
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
+
+    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
+    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    def test_error_finding_playlist_creates_new_playlist(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist
+    ):
+        mock_get_user_playlists.side_effect = SpotifyException
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+
+        mock_create_playlist.assert_called_once_with(self.auth_code, self.spotify_user_id, self.playlist_name)
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
