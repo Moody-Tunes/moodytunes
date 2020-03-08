@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -133,16 +134,28 @@ class SpotifyAuthenticationCallbackView(View):
             profile_data = spotify_client.get_user_profile(tokens['access_token'])
 
             # Create SpotifyAuth record from data
-            SpotifyUserAuth.objects.create(
-                user=user,
-                access_token=tokens['access_token'],
-                refresh_token=tokens['refresh_token'],
-                spotify_user_id=profile_data['id']
-            )
+            try:
+                SpotifyUserAuth.objects.create(
+                    user=user,
+                    access_token=tokens['access_token'],
+                    refresh_token=tokens['refresh_token'],
+                    spotify_user_id=profile_data['id']
+                )
 
-            logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
+                logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
 
-            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+            except IntegrityError:
+                logger.error('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                    user.username,
+                    profile_data['id']
+                ))
+
+                messages.error(request, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
+                    profile_data['id']
+                ))
+
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
 
         else:
             logger.warning(
@@ -217,6 +230,7 @@ class ExportPlayListView(FormView):
 
             auth = SpotifyUserAuth.objects.get(user=self.request.user)
             if auth.should_update_access_token:
+                logger.info('Refreshing access token for {} to export playlist'.format(auth.user.username))
                 auth.refresh_access_token()
 
             create_spotify_playlist_from_songs.delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
