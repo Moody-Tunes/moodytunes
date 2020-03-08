@@ -146,3 +146,28 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         self.assertRedirects(resp, self.success_url)
         self.assertEqual(SpotifyUserAuth.objects.filter(user=self.user).count(), 1)
+
+
+class TestExportView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.user_with_no_auth = MoodyUtil.create_user(username='no-auth')
+        cls.url = reverse('moodytunes:export')
+
+        cls.spotify_auth = SpotifyUserAuth.objects.create(
+            user=cls.user,
+            access_token='test-access-token',
+            refresh_token='test-refresh-token',
+            spotify_user_id='test-user-id'
+        )
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_user_with_no_auth_redirect_to_auth_page(self):
+        self.client.logout()
+        self.client.login(username=self.user_with_no_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
