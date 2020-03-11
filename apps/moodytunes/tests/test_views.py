@@ -90,7 +90,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
-        cls.other_user = MoodyUtil.create_user(username='other_user')
         cls.url = reverse('moodytunes:spotify-auth-callback')
         cls.success_url = reverse('moodytunes:export')
         cls.failure_url = reverse('moodytunes:spotify-auth-failure')
@@ -124,7 +123,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
 
     @mock.patch('moodytunes.views.SpotifyClient')
-    def test_duplicate_attempts_for_same_moody_user_results_in_success(self, mock_spotify):
+    def test_duplicate_attempts_results_in_success(self, mock_spotify):
         SpotifyUserAuth.objects.create(
             user=self.user,
             access_token='test-access-token',
@@ -147,30 +146,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         self.assertRedirects(resp, self.success_url)
         self.assertEqual(SpotifyUserAuth.objects.filter(user=self.user).count(), 1)
-
-    @mock.patch('moodytunes.views.SpotifyClient')
-    def test_duplicate_attempts_with_different_moody_users_results_in_failure(self, mock_spotify):
-        SpotifyUserAuth.objects.create(
-            user=self.other_user,
-            access_token='test-access-token',
-            refresh_token='test-refresh-token',
-            spotify_user_id='test-user-id'
-        )
-
-        spotify_client = mock.Mock()
-        spotify_client.get_access_and_refresh_tokens.return_value = {
-            'access_token': 'test-access-token',
-            'refresh_token': 'test-refresh-token'
-        }
-
-        spotify_client.get_user_profile.return_value = {'id': 'test-user-id'}
-
-        mock_spotify.return_value = spotify_client
-
-        query_params = {'code': 'test-spotify-code'}
-        resp = self.client.get(self.url, data=query_params, follow=True)
-
-        self.assertRedirects(resp, self.failure_url)
 
 
 class TestExportView(TestCase):
