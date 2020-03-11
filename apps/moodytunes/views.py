@@ -210,7 +210,7 @@ class ExportPlayListView(FormView):
                 songs = songs.filter(song__genre=genre)
 
             if context:
-                songs = songs.filter(song__genre=context)
+                songs = songs.filter(context=context)
 
             if not songs.exists():
                 emotion = Emotion.objects.get(name=emotion_name)
