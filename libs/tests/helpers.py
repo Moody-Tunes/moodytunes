@@ -39,7 +39,9 @@ def generate_random_unicode_string(length):
 def get_messages_from_response(response):
     """
     Given a HttpResponse, pull the messages included in the session context from the object
+
     :param response: (django.HttpResponse) Response returned from a test client call
+
     :return: (list) Collection of messages from the response
     """
     return [m.message for m in get_messages(response.wsgi_request)]
@@ -54,6 +56,7 @@ class SignalDisconnect(object):
     ```
     with SignalDisconnect(post_save, my_signal_method, myModel, my_dispatch_uid):
         # Do work without the signal
+    ```
 
     `signal` is a Django Signal objects (post_save, pre_init)
     `method` is the method connected to the signal

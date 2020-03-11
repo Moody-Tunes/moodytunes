@@ -59,15 +59,37 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
 
     """
     spotify = SpotifyClient()
-    playlist_id = ''
+    playlist_id = None
 
     try:
-        logger.info('Creating playlist for user {}'.format(spotify_user_id))
-        playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
-        logger.info('Created playlist for user {} successfully'.format(spotify_user_id))
+        logger.info('Checking if user {} has playlist with name {}'.format(spotify_user_id, playlist_name))
+        resp = spotify.get_user_playlists(auth_code, spotify_user_id)
+        playlists = resp['items']
+
+        for playlist in playlists:
+            if playlist['name'] == playlist_name:
+                logger.info('Found existing playlist with name {} for user {}'.format(playlist_name, spotify_user_id))
+                playlist_id = playlist['id']
+                break
     except SpotifyException:
-        logger.warning('Error creating playlist for user {}, retrying...'.format(spotify_user_id))
-        self.retry()
+        logger.exception('Error getting playlist for user {}'.format(spotify_user_id), extra={
+            'spotify_user_id': spotify_user_id,
+            'playlist_name': playlist_name,
+            'songs': songs
+        })
+
+    if playlist_id is None:
+        try:
+            logger.info('Creating playlist for user {} with name {}'.format(spotify_user_id, playlist_name))
+            playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
+            logger.info('Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name))
+        except SpotifyException:
+            logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
+                'spotify_user_id': spotify_user_id,
+                'playlist_name': playlist_name,
+                'songs': songs
+            })
+            raise
 
     try:
         logger.info('Adding songs to playlist {}'.format(playlist_id))
@@ -77,8 +99,9 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
             extra={'fingerprint': 'created_playlist_success'}
         )
     except SpotifyException:
-        logger.warning(
-            'Error adding songs to playlist {} for user {}, retrying...'.format(playlist_id, spotify_user_id),
-            extra={'fingerprint': 'created_playlist_failed'}
-        )
-        self.retry()
+        logger.exception('Error adding songs to playlist {} for user {}'.format(playlist_id, spotify_user_id), extra={
+            'spotify_user_id': spotify_user_id,
+            'playlist_name': playlist_name,
+            'songs': songs
+        })
+        raise

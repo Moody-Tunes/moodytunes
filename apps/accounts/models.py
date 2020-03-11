@@ -99,6 +99,15 @@ class SpotifyUserAuth(BaseModel):
         spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
 
         try:
+            logger.info(
+                'Refreshing access token for {}'.format(self.user.username),
+                extra={
+                    'fingerprint': 'accounts.SpotifyUserAuth.refresh_access_token',
+                    'moodytunes_username': self.user.username,
+                    'spotify_username': self.spotify_user_id
+                }
+            )
+
             access_token = spotify_client.refresh_access_token(self.refresh_token)
 
             self.access_token = access_token
