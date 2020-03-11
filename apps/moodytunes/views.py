@@ -135,7 +135,7 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Create SpotifyAuth record from data
             try:
-                SpotifyUserAuth.objects.create(
+                SpotifyUserAuth.objects.get_or_create(
                     user=user,
                     access_token=tokens['access_token'],
                     refresh_token=tokens['refresh_token'],
@@ -146,7 +146,7 @@ class SpotifyAuthenticationCallbackView(View):
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
             except IntegrityError:
-                logger.error('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                logger.exception('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
                     user.username,
                     profile_data['id']
                 ))
