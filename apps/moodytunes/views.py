@@ -11,10 +11,11 @@ from django.views import View
 from django.views.generic import TemplateView, RedirectView
 from ratelimit.mixins import RatelimitMixin
 
-from accounts.models import SpotifyUserAuth, UserSongVote
+from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
 from moodytunes.tasks import create_spotify_playlist_from_songs, fetch_song_from_spotify
+from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
 from libs.spotify import SpotifyClient
@@ -204,31 +205,20 @@ class ExportPlayListView(FormView):
             genre = form.cleaned_data['genre']
             context = form.cleaned_data['context']
 
-            songs = UserSongVote.objects.filter(user=request.user, emotion__name=emotion_name, vote=True)
+            songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
 
-            if genre:
-                songs = songs.filter(song__genre=genre)
-
-            if context:
-                songs = songs.filter(context=context)
-
-            if not songs.exists():
+            if not songs:
                 emotion = Emotion.objects.get(name=emotion_name)
                 emotion_fullname = emotion.full_name
-
-                messages.error(
-                    request,
-                    'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
-                        emotion_fullname.lower()
-                    )
+                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                    emotion_fullname.lower()
                 )
+
+                messages.error(request, msg)
 
                 return HttpResponseRedirect(reverse('moodytunes:export'))
 
-            songs = songs.values_list('song__code', flat=True).distinct()
-            songs = list(songs)
-
-            auth = SpotifyUserAuth.objects.get(user=self.request.user)
+            auth = SpotifyUserAuth.objects.get(user=request.user)
             if auth.should_update_access_token:
                 logger.info('Refreshing access token for {} to export playlist'.format(auth.user.username))
                 auth.refresh_access_token()
