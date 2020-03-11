@@ -8,7 +8,7 @@ from django.test import TestCase
 from requests.exceptions import HTTPError
 
 from libs.spotify import SpotifyClient, SpotifyException
-from tests.helpers import generate_random_unicode_string
+from libs.tests.helpers import generate_random_unicode_string
 
 
 class TestSpotifyClient(TestCase):
