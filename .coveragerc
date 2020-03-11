@@ -8,6 +8,8 @@ omit =
     */migrations/*
     */tests/*
     *__init__*.py
+    */admin.py
+    */apps.py
     .tox/*
     mtdj/*
     manage.py
