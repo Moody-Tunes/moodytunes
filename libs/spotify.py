@@ -409,6 +409,29 @@ class SpotifyClient(object):
 
         return payload
 
+    def get_user_playlists(self, auth_code, spotify_user_id):
+        """
+        Get all playlists for the given Spotify user.
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param spotify_user_id: (str) Spotify username for the given user
+
+        :return: (dict) Spotify response for all users playlists
+        """
+        url = '{api_url}/users/{user_id}/playlists'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            user_id=spotify_user_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        resp = self._make_spotify_request('GET', url, headers=headers)
+
+        return resp
+
     def create_playlist(self, auth_code, spotify_user_id, playlist_name):
         """
         Create a playlist for the given Spotify user. Note that this creates an empty playlist,
@@ -432,7 +455,7 @@ class SpotifyClient(object):
 
         data = {
             'name': playlist_name,
-            'public': False
+            'public': True
         }
 
         resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
@@ -459,6 +482,6 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+        resp = self._make_spotify_request('PUT', url, headers=headers, data=json.dumps(data))
 
         return resp

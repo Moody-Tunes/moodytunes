@@ -8,7 +8,7 @@ from django.test import TestCase
 from requests.exceptions import HTTPError
 
 from libs.spotify import SpotifyClient, SpotifyException
-from tests.helpers import generate_random_unicode_string
+from libs.tests.helpers import generate_random_unicode_string
 
 
 class TestSpotifyClient(TestCase):
@@ -468,6 +468,28 @@ class TestSpotifyClient(TestCase):
         self.assertDictEqual(song_data, expected_song_data)
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_users_playlist(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        spotify_user_id = 'spotify:user:id'
+
+        mock_resp = {'items': [{'name': 'test-playlist', 'id': '12345'}]}
+        mock_request.return_value = mock_resp
+
+        expected_headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        resp = self.spotify_client.get_user_playlists(auth_code, spotify_user_id)
+
+        self.assertEqual(resp, mock_resp)
+        mock_request.assert_called_once_with(
+            'GET',
+            'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
+            headers=expected_headers,
+        )
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_create_playlist(self, mock_request):
         auth_code = 'spotify-auth-id'
         spotify_user_id = 'spotify:user:id'
@@ -483,7 +505,7 @@ class TestSpotifyClient(TestCase):
 
         expected_data = {
             'name': playlist_name,
-            'public': False
+            'public': True
         }
 
         retrieved_playlist_id = self.spotify_client.create_playlist(auth_code, spotify_user_id, playlist_name)
@@ -516,7 +538,7 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(retrieved_response, mock_response)
         mock_request.assert_called_once_with(
-            'POST',
+            'PUT',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
             headers=expected_headers,
             data=json.dumps(expected_data)

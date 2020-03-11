@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from accounts.models import UserSongVote
 from accounts.signals import update_user_attributes
 from base.management.commands import MoodyBaseCommand
-from tests.helpers import SignalDisconnect
+from libs.tests.helpers import SignalDisconnect
 from tunes.models import Song
 
 
