@@ -225,7 +225,7 @@ class ExportPlayListView(FormView):
 
                 return HttpResponseRedirect(reverse('moodytunes:export'))
 
-            songs = songs.values_list('song__code', flat=True)
+            songs = songs.values_list('song__code', flat=True).distinct()
             songs = list(songs)
 
             auth = SpotifyUserAuth.objects.get(user=self.request.user)
