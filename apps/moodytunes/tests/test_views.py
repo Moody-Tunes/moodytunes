@@ -170,7 +170,13 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         query_params = {'code': 'test-spotify-code'}
         resp = self.client.get(self.url, data=query_params, follow=True)
 
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
         self.assertRedirects(resp, self.failure_url)
+        self.assertEqual(last_message, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
+            'test-user-id'
+        ))
 
 
 class TestExportView(TestCase):
