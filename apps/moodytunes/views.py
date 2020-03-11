@@ -146,7 +146,7 @@ class SpotifyAuthenticationCallbackView(View):
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
             except IntegrityError:
-                logger.error('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                logger.exception('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
                     user.username,
                     profile_data['id']
                 ))
