@@ -238,3 +238,7 @@ class ExportPlayListView(FormView):
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
             return HttpResponseRedirect(reverse('moodytunes:export'))
+
+        else:
+            messages.error(request, 'Please submit a valid request')
+            return HttpResponseRedirect(reverse('moodytunes:export'))
