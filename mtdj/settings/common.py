@@ -150,7 +150,7 @@ GENRE_CHOICES_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
