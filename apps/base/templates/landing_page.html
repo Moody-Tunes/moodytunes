@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load compress %}
+{% load static %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'base/less/landing.less' %}">
+    {% endcompress %}
+{% endblock %}
+
+{% block content %}
+    <h1>MoodyTunes</h1>
+    <div id="landing-header" class="landing-section">
+        <h3>Welcome to MoodyTunes, the site to find music for your mood!</h3>
+        <div id="landing-action-buttons">
+            <a href="{{ login_link }}"><button class="login-button">Login</button></a>
+            <a href="{{ create_account_link }}"><button class="login-button call-to-action-button">Create Account</button></a>
+        </div>
+    </div>
+    <div id="landing-about" class="landing-section">
+        <h2>What is MoodyTunes?</h2>
+        <p>Moodytunes helps you find the songs to fit your desired mood. By selecting a desired mood and voting on what
+        songs make you feel that particular emotion, we build a playlist of songs for you that you can listen to any time.
+        We then use that playlist to learn more about what kind of songs make you feel that emotion to better suggest
+        songs to you in the future.</p>
+    </div>
+    <div id="landing-signup" class="landing-section">
+        <h2>How Do I Get Started?</h2>
+        <p>To get started, simply create an account through our account creation page. Once your account has been
+        created, you can immediately start browsing songs by desired emotion and building your playlists! If you
+        happen to have a Spotify account, you can optionally login to Spotify through our site to listen to full songs
+        on our site.</p>
+    </div>
+{% endblock %}
