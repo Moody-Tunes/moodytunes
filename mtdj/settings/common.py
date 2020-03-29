@@ -134,13 +134,11 @@ CACHES = {
             'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
         },
         'KEY_PREFIX': 'mtdj'
-    }}
-
-CACHES.update({
+    },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
-})
+}
 
 GENRE_CHOICES_CACHE_KEY = 'song-genre-choices'
 
