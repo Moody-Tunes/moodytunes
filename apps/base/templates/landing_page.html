@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 
+{% load compress %}
+{% load static %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'base/less/landing.less' %}">
+    {% endcompress %}
+{% endblock %}
+
 {% block content %}
     <h1>MoodyTunes</h1>
     <div id="landing-header" class="landing-section">
