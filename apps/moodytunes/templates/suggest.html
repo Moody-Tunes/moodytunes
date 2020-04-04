@@ -22,7 +22,7 @@
         {% csrf_token %}
         <p>{{ form.code.errors }}</p>
         <p>{{ form.code }}</p>
-        <button type="submit">Suggest Song</button>
+        <button type="submit" class="call-to-action-button">Suggest Song</button>
     </form>
     <button id="show-help">How do I find the song code?</button>
     <div id="help-container" hidden>
