@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -74,20 +74,11 @@ class MoodyPasswordResetDone(RedirectView):
 class ProfileView(TemplateView):
     template_name = 'profile.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(ProfileView, self).get_context_data(**kwargs)
 
-        # Construct password reset link for user
-        # Logic for constructing uid64 and token are lifted from Django's password reset form
-        context['password_reset_link'] = reverse(
-            'accounts:password-reset-confirm',
-            kwargs={
-                'uidb64': urlsafe_base64_encode(force_bytes(self.request.user.pk)),
-                'token': default_token_generator.make_token(self.request.user)
-            }
-        )
-
-        return context
+@method_decorator(login_required, name='dispatch')
+class MoodyPasswordChangeView(PasswordChangeView):
+    template_name = 'password_change.html'
+    success_url = reverse_lazy('accounts:password-reset-complete')
 
 
 @method_decorator(login_required, name='dispatch')
