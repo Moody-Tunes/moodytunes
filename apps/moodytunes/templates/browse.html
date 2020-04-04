@@ -31,7 +31,7 @@
     </div>
     <p>Jitter: <span id="jitter-value"></span> {{ form.jitter }} </p>
     <button id="set-context-button">Set Context</button>
-    <button id="generate-playlist">Browse</button>
+    <button id="generate-playlist" class="call-to-action-button">Browse</button>
     <div id="playlist-error-container"></div>
     <p id="alert-no-results" class="warning" hidden>We were unable to find any songs for you to browse. Please try a different set of criteria</p>
 </div>
@@ -43,7 +43,7 @@
         <p>Context: {{ form.context }}</p>
         <p>Description: {{ form.description }}</p>
         <button id="clear-context" class="warning-button">Clear Context</button>
-        <button id="submit-context">Set Context</button>
+        <button id="submit-context" class="call-to-action-button">Set Context</button>
     </div>
 </div>
 <div id="playlist-display-container"></div>

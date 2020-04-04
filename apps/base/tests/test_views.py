@@ -20,4 +20,4 @@ class TestHomePageView(TestCase):
     def test_anonymous_user_redirect(self):
         resp = self.client.get(self.url)
 
-        self.assertRedirects(resp, reverse('accounts:login'))
+        self.assertRedirects(resp, reverse('landing-page'))

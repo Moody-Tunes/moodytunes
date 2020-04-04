@@ -134,13 +134,11 @@ CACHES = {
             'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
         },
         'KEY_PREFIX': 'mtdj'
-    }}
-
-CACHES.update({
+    },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
-})
+}
 
 GENRE_CHOICES_CACHE_KEY = 'song-genre-choices'
 
@@ -150,7 +148,7 @@ GENRE_CHOICES_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/logout/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

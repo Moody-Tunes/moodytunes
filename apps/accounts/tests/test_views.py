@@ -3,7 +3,7 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -57,6 +57,26 @@ class TestLoginView(TestCase):
         resp = self.client.post(url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestLogoutView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.app_url = 'https://moodytuns.vm/accounts/logout/'
+        cls.admin_url = 'https://admin.moodytunes.vm/logout/'
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_logout_from_app_site_redirects_to_app_login_page(self):
+        resp = self.client.get(self.app_url, follow=True)
+        self.assertIn('login.html', resp.template_name)
+
+    @override_settings(DEFAULT_HOST='admin')
+    def test_logout_from_admin_site_redirects_to_admin_login_page(self):
+        resp = self.client.get(self.admin_url, follow=True)
+        self.assertIn('admin/login.html', resp.template_name)
 
 
 class TestProfileView(TestCase):

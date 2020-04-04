@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.urls import reverse
 from django.views.generic.base import RedirectView, TemplateView
 
 
@@ -6,7 +7,19 @@ class HomePageView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             return settings.LOGIN_REDIRECT_URL
-        return settings.LOGIN_URL
+        return reverse('landing-page')
+
+
+class LandingPageView(TemplateView):
+    template_name = 'landing_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(LandingPageView, self).get_context_data(**kwargs)
+        context['login_link'] = settings.LOGIN_URL
+        context['create_account_link'] = reverse('accounts:create')
+        context['about_link'] = reverse('moodytunes:about')
+
+        return context
 
 
 class FormView(TemplateView):
