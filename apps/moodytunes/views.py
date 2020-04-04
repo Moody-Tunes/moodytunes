@@ -177,6 +177,7 @@ class SpotifyAuthenticationCallbackView(View):
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationSuccessView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
+        messages.info(self.request, 'You have successfully authorized Moodytunes with Spotify!')
         return reverse('moodytunes:export')
 
 
