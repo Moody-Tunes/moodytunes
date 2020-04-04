@@ -3,7 +3,8 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView, \
+    LogoutView
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -44,6 +45,17 @@ class MoodyLoginView(LoginView):
             # redirect and raise an exception indicating suspicious operation
             logger.error('Suspicious redirect detected for {}'.format(redirect_url))
             raise SuspiciousOperation
+
+
+@method_decorator(login_required, name='dispatch')
+class MoodyLogoutView(LogoutView):
+    def get_next_page(self):
+        if self.request.host.name == 'www':
+            self.next_page = '/accounts/login'
+        elif self.request.host.name == 'admin':
+            self.next_page = '/'
+
+        return super(MoodyLogoutView, self).get_next_page()
 
 
 class MoodyPasswordResetView(PasswordResetView):

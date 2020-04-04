@@ -1,4 +1,3 @@
-from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from accounts import views
@@ -6,7 +5,7 @@ from accounts import views
 urlpatterns = [
     # Authentication views
     path('login/', views.MoodyLoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.MoodyLogoutView.as_view(), name='logout'),
     path('password_change', views.MoodyPasswordChangeView.as_view(), name='change-password'),
     path('reset_password/', views.MoodyPasswordResetView.as_view(), name='reset-password'),
     path(
