@@ -368,6 +368,20 @@ class TestVoteView(TestCase):
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
 
+    def test_submitting_duplicate_vote_not_allowed(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'vote': True
+        }
+
+        self.api_client.post(self.url, data=data, format='json')
+
+        # Duplicate request should not be allowed
+        resp = self.api_client.post(self.url, data=data, format='json')
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_downvoting_song_does_not_update_user_emotion_attributes(self):
         user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         pre_energy = user_emotion.energy

@@ -188,6 +188,9 @@ class UserSongVote(BaseModel):
     )
     vote = models.BooleanField()
 
+    class Meta:
+        unique_together = ('user', 'song', 'emotion', 'context')
+
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
 
