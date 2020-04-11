@@ -2,7 +2,7 @@ from datetime import timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
