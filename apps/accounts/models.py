@@ -16,16 +16,6 @@ from libs.utils import average
 logger = getLogger(__name__)
 
 
-class UserPrefetchManager(UserManager):
-    """Manager to automatically `prefetch_related` records when querying the MoodyUser model"""
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related(
-            'useremotion_set__emotion',
-            'usersongvote_set__emotion',
-            'usersongvote_set__song',
-        )
-
-
 class MoodyUser(BaseModel, AbstractUser):
     """
     Represents a user in our system. Extends Django auth features and includes
