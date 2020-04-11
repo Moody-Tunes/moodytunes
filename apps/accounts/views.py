@@ -155,7 +155,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         genre = self.cleaned_data.get('genre')
 
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
-        votes_for_emotion = UserSongVote.objects.filter(
+        votes_for_emotion = UserSongVote.objects.prefetch_related('song').filter(
             user=self.request.user,
             emotion=emotion,
             vote=True
