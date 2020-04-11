@@ -32,6 +32,10 @@ LOGGING['handlers'].update({
 INSTALLED_APPS.append('debug_toolbar')
 MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
+# Django silk profiler configuration
+MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
+INSTALLED_APPS.append('silk')
+
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 LOGGING['root']['handlers'].append('console')
 LOGGING['root']['level'] = 'DEBUG'
