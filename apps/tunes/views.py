@@ -260,7 +260,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             user=self.request.user,
             emotion__name=emotion,
             vote=True
-        ).order_by('created')
+        )
 
         return filter_duplicate_votes_on_song_from_playlist(user_votes)
 
