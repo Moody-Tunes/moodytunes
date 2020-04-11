@@ -31,24 +31,20 @@ class MoodyUser(BaseModel, AbstractUser):
     Represents a user in our system. Extends Django auth features and includes
     logic needed in course of site flow.
     """
-    prefetch_manager = UserPrefetchManager()
 
     def get_user_emotion_record(self, emotion_name):
         """
-        Return the UserEmotion record for a given name. This is done in Python to take advantage of `prefetch_related`
-        caching. Note that you would need to prefetch the `useremotion_set` related manager; this will happen for you
-        if you make your query using the `MoodyUser.prefetch_manager` manager.
+        Return the UserEmotion record for a given Emotion name.
 
         :param emotion_name: (str) `Emotion.name` constant to retrieve
-        :> return:
-            - `UserEmotion` record for the given `emotion_name`
-            - `None` if `emotion_name` is not valid
-        """
-        for user_emotion in self.useremotion_set.all():
-            if user_emotion.emotion.name == emotion_name:
-                return user_emotion
 
-        return None
+        :return: (UserEmotion)
+        """
+        try:
+            return self.useremotion_set.get(emotion__name=emotion_name)
+        except UserEmotion.DoesNotExist:
+            logger.error('User {} has no UserEmotion record for {}'.format(self.username, emotion_name))
+            return None
 
     def update_information(self, data):
         """
