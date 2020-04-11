@@ -23,7 +23,7 @@ CELERY_TASK_ALWAYS_EAGER = True
 LOGGING['handlers'].update({
     'console': {
         'level': 'DEBUG',
-        'class': 'libs.moody_logging.StackInfoHandler',
+        'class': 'logging.StreamHandler',
         'formatter': 'simple',
     },
 })

@@ -2,8 +2,7 @@ import logging
 import traceback
 
 
-class StackInfoHandler(logging.StreamHandler):
-
+class StackInfoHandler(logging.FileHandler):
     log_trim = 6
     middleware_trim = 30
 
