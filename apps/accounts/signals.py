@@ -1,18 +1,14 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 
-from accounts.models import UserEmotion, UserSongVote
-from tunes.models import Emotion
+from accounts.models import UserSongVote
+from accounts.tasks import create_user_emotion_records_for_user
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
     # Post save signal to create UserEmotion records for a user on creation
     if created:
-        for emotion in Emotion.objects.all().iterator():
-            UserEmotion.objects.create(
-                user=instance,
-                emotion=emotion
-            )
+        create_user_emotion_records_for_user.delay(instance.pk)
 
 
 post_save.connect(
