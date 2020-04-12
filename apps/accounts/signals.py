@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 
 from accounts.models import UserSongVote
-from accounts.tasks import create_user_emotion_records_for_user
+from accounts.tasks import create_user_emotion_records_for_user, update_user_emotion_record_attributes
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
@@ -20,19 +20,7 @@ post_save.connect(
 
 def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
     if instance.vote and created:
-        # We should always call get_or_create to ensure that if we add new emotions, we'll auto
-        # create the corresponding UserEmotion record the first time a user votes on a song
-        # for the emotion
-
-        user_emotion, _ = instance.user.useremotion_set.get_or_create(
-            emotion__name=instance.emotion.name,
-            defaults={
-                'user': instance.user,
-                'emotion': instance.emotion
-            }
-        )
-
-        user_emotion.update_attributes()
+        update_user_emotion_record_attributes.delay(instance.pk)
 
 
 post_save.connect(

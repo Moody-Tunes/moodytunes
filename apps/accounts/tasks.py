@@ -2,7 +2,7 @@ from logging import getLogger
 
 from celery.task import task
 
-from accounts.models import MoodyUser, UserEmotion
+from accounts.models import MoodyUser, UserEmotion, UserSongVote
 from tunes.models import Emotion
 
 logger = getLogger(__name__)
@@ -28,3 +28,35 @@ def create_user_emotion_records_for_user(self, user_id):
             user=user,
             emotion=emotion
         )
+
+@task(bind=True, max_retries=3, default_retry_delay=60*15)
+def update_user_emotion_record_attributes(self, vote_id):
+    """
+    Update UserEmotion attributes for an upvoted song
+
+    :param vote_id: (int) Primary key for vote record
+
+    """
+    try:
+        vote = UserSongVote.objects.get(pk=vote_id)
+    except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
+        logger.exception('Unable to fetch UserSongVote with pk={}'.format(vote_id))
+        raise
+
+    # We should always call get_or_create to ensure that if we add new emotions, we'll auto
+    # create the corresponding UserEmotion record the first time a user votes on a song
+    # for the emotion
+    user_emotion, _ = vote.user.useremotion_set.get_or_create(
+        emotion__name=vote.emotion.name,
+        defaults={
+            'user': vote.user,
+            'emotion': vote.emotion
+        }
+    )
+
+    logger.info('Updating UserEmotion attributes for user {} for emotion'.format(
+        vote.user.username,
+        vote.emotion.full_name
+    ))
+
+    user_emotion.update_attributes()
