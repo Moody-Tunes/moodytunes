@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.test import TestCase
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
-from accounts.signals import create_user_emotion_records, update_user_attributes
+from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from spotify import SpotifyException
 from tunes.models import Emotion
 from libs.tests.helpers import SignalDisconnect, MoodyUtil
@@ -48,7 +48,7 @@ class TestUserEmotion(TestCase):
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
         dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
-        with SignalDisconnect(post_save, update_user_attributes, UserSongVote, dispatch_uid):
+        with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
             UserSongVote.objects.create(
                 user=self.user,
                 emotion=emotion,

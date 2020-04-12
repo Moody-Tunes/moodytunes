@@ -2,7 +2,7 @@ from datetime import timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
@@ -16,39 +16,25 @@ from libs.utils import average
 logger = getLogger(__name__)
 
 
-class UserPrefetchManager(UserManager):
-    """Manager to automatically `prefetch_related` records when querying the MoodyUser model"""
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related(
-            'useremotion_set__emotion',
-            'usersongvote_set__emotion',
-            'usersongvote_set__song',
-        )
-
-
 class MoodyUser(BaseModel, AbstractUser):
     """
     Represents a user in our system. Extends Django auth features and includes
     logic needed in course of site flow.
     """
-    prefetch_manager = UserPrefetchManager()
 
     def get_user_emotion_record(self, emotion_name):
         """
-        Return the UserEmotion record for a given name. This is done in Python to take advantage of `prefetch_related`
-        caching. Note that you would need to prefetch the `useremotion_set` related manager; this will happen for you
-        if you make your query using the `MoodyUser.prefetch_manager` manager.
+        Return the UserEmotion record for a given Emotion name.
 
         :param emotion_name: (str) `Emotion.name` constant to retrieve
-        :> return:
-            - `UserEmotion` record for the given `emotion_name`
-            - `None` if `emotion_name` is not valid
-        """
-        for user_emotion in self.useremotion_set.all():
-            if user_emotion.emotion.name == emotion_name:
-                return user_emotion
 
-        return None
+        :return: (UserEmotion)
+        """
+        try:
+            return self.useremotion_set.get(emotion__name=emotion_name)
+        except UserEmotion.DoesNotExist:
+            logger.error('User {} has no UserEmotion record for {}'.format(self.username, emotion_name))
+            return None
 
     def update_information(self, data):
         """
@@ -187,6 +173,9 @@ class UserSongVote(BaseModel):
         blank=True
     )
     vote = models.BooleanField()
+
+    class Meta:
+        unique_together = ('user', 'song', 'emotion', 'context')
 
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)

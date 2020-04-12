@@ -3,7 +3,7 @@ import logging
 from django.db.models.signals import post_save
 
 from accounts.models import UserSongVote
-from accounts.signals import update_user_attributes
+from accounts.signals import update_user_emotion_attributes
 from base.management.commands import MoodyBaseCommand
 from libs.tests.helpers import SignalDisconnect
 from tunes.models import Song
@@ -44,7 +44,7 @@ class Command(MoodyBaseCommand):
 
                 # Disable signal to update user emotion boundaries
                 dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
-                with SignalDisconnect(post_save, update_user_attributes, UserSongVote, dispatch_uid):
+                with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
                     vote.save()
 
         self.write_to_log_and_output(
