@@ -29,6 +29,7 @@ def create_user_emotion_records_for_user(self, user_id):
             emotion=emotion
         )
 
+
 @task(bind=True, max_retries=3, default_retry_delay=60*15)
 def update_user_emotion_record_attributes(self, vote_id):
     """
