@@ -1,5 +1,6 @@
 -r common.txt
 
 django-debug-toolbar==2.2
+django-silk==4.0.1
 ipython==7.13.0
 tox==3.14.6

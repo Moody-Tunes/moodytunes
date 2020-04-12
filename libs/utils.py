@@ -10,11 +10,12 @@ def average(collection, criteria):
 
     :return: (float)
     """
-    if not collection.exists():
-        return None
-
     try:
         val = collection.aggregate(Avg(criteria))['{}__avg'.format(criteria)]
+
+        if val is None:
+            return None
+
         return round(val, 2)
 
     except FieldError:

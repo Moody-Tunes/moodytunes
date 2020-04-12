@@ -297,6 +297,11 @@ LOGGING = {
             'backupCount': 5,
             'maxBytes': 10000000  # 10MB
         },
+        'database': {
+            'level': 'DEBUG',
+            'class': 'libs.moody_logging.StackInfoHandler',
+            'filename': '{}/database.log'.format(LOGGING_DIR)
+        }
     },
     'loggers': {
         'django.request': {

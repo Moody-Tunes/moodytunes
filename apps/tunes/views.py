@@ -247,7 +247,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     on the songs as making them feel the given emotion.
     """
     serializer_class = VoteSerializer
-    queryset = UserSongVote.objects.all()
+    queryset = UserSongVote.objects.prefetch_related('emotion', 'song').all()
     pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
@@ -260,7 +260,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             user=self.request.user,
             emotion__name=emotion,
             vote=True
-        ).order_by('created')
+        )
 
         return filter_duplicate_votes_on_song_from_playlist(user_votes)
 
