@@ -12,7 +12,7 @@ class MoodyUserAdmin(admin.ModelAdmin):
 
 class UserEmotionAdmin(admin.ModelAdmin):
     form = UpdateUserEmotionAttributesForm
-    list_display = ('user', 'emotion', 'energy', 'valence')
+    list_display = ('user', 'emotion', 'energy', 'valence', 'danceability')
     readonly_fields = ('user', 'emotion')
     list_filter = ('emotion',)
 

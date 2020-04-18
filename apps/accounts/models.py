@@ -117,6 +117,7 @@ class UserEmotion(BaseModel):
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
     energy = models.FloatField(validators=[validate_decimal_value])
     valence = models.FloatField(validators=[validate_decimal_value])
+    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
 
     class Meta:
         unique_together = ('user', 'emotion')
@@ -125,12 +126,9 @@ class UserEmotion(BaseModel):
         return '{} - {}'.format(self.user, self.emotion)
 
     def save(self, *args, **kwargs):
-        # Set energy and valence to emotion defaults
-        if not self.energy:
-            self.energy = self.emotion.energy
-
-        if not self.valence:
-            self.valence = self.emotion.valence
+        self.energy = self.energy or self.emotion.energy
+        self.valence = self.valence or self.emotion.valence
+        self.danceability = self.danceability or self.emotion.danceability
 
         self.full_clean()
 
@@ -146,6 +144,7 @@ class UserEmotion(BaseModel):
 
         self.valence = average(votes, 'song__valence')
         self.energy = average(votes, 'song__energy')
+        self.danceability = average(votes, 'song__danceability')
         self.save()
 
 

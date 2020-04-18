@@ -293,14 +293,16 @@ class SpotifyClient(object):
                 if track_data:
                     valence = track_data.get('valence')
                     energy = track_data.get('energy')
+                    danceability = track_data.get('danceability')
 
                     # Skip tracks that don't have both attributes we're looking for
-                    if not all([valence, energy]):
+                    if not all([valence, energy, danceability]):
                         continue
 
                     track.update({
                         'valence': valence,
-                        'energy': energy
+                        'energy': energy,
+                        'danceability': danceability
                     })
 
         return tracks

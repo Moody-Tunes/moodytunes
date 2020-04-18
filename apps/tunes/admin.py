@@ -31,7 +31,7 @@ class GenreFormField(forms.ModelForm):
 
 
 class EmotionAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'energy', 'valence')
+    list_display = ('full_name', 'energy', 'valence', 'danceability')
     readonly_fields = ('name',)
 
     def has_add_permission(self, request):

@@ -5,6 +5,7 @@
   "fields": {
     "energy": "0.26",
     "valence": "0.22",
+    "danceability": "0.10",
     "name": "MEL"
   }
 },
@@ -14,6 +15,7 @@
   "fields": {
     "energy": "0.46",
     "valence": "0.44",
+    "danceability": "0.30",
     "name": "CLM"
   }
 },
@@ -23,6 +25,7 @@
   "fields": {
     "energy": "0.69",
     "valence": "0.66",
+    "danceability": "0.50",
     "name": "HPY"
   }
 },
@@ -32,6 +35,7 @@
   "fields": {
     "energy": "0.84",
     "valence": "0.81",
+    "danceability": "0.70",
     "name": "EXC"
   }
 }
