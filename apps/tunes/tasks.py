@@ -5,7 +5,7 @@ from celery.task import task
 from django.core.management import call_command
 
 from tunes.models import Song
-from libs.spotify import SpotifyClient
+from libs.spotify import SpotifyClient, SpotifyException
 
 logger = getLogger(__name__)
 
@@ -26,7 +26,7 @@ def create_songs_from_spotify_task(self):
         self.retry(exc=exc)
 
 
-@task(bind=True)
+@task(bind=True, max_retries=3, default_retry_delay=60*1)
 def update_song_danceabilty(self, song_id):
     """
     Update song record with danceability data from Spotify
@@ -40,13 +40,24 @@ def update_song_danceabilty(self, song_id):
         raise
 
     logger.info('Fetching danceability value for song {}'.format(song.code))
-
     spotify_client = SpotifyClient(identifier='update_song_danceability_{}'.format(song.code))
-    song_data = {'code': song.code}
-    attributes = spotify_client.get_audio_features_for_tracks([song_data])
-    danceability = attributes[0]['danceability']
 
-    song.danceability = danceability
-    song.save()
+    try:
+        song_data = {'code': song.code}
+        attributes = spotify_client.get_audio_features_for_tracks([song_data])
+        danceability = attributes[0]['danceability']
+
+        song.danceability = danceability
+        song.save()
+
+    except SpotifyException as exc:
+        logger.warning(
+            'SpotifyError encountered trying to get attributes for song {}'.format(song.code),
+            exc_info=True
+        )
+        self.retry(exc=exc)
+    except Exception:
+        logger.exception('Exception encounter trying to get attributes for song {}'.format(song.code))
+        raise
 
     logger.info('Successfully updated danceability for song {}'.format(song.code))
