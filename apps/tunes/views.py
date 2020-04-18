@@ -49,8 +49,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         cached_playlist_manager = CachedPlaylistManager()
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
+
         energy = None
         valence = None
+        danceability = None
 
         # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
@@ -67,17 +69,20 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             if votes.exists():
                 energy = average(votes, 'song__energy')
                 valence = average(votes, 'song__valence')
+                danceability = average(votes, 'song__danceability')
 
         # If context not provided or the previous query on upvotes for context did return any votes,
         # determine attributes from the attributes for the user and emotion
-        if energy is None or valence is None:
+        if energy is None or valence is None or valence is None:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
             energy = user_emotion.energy
             valence = user_emotion.valence
+            danceability = user_emotion.danceability
 
         playlist = generate_browse_playlist(
             energy,
             valence,
+            danceability,
             limit=limit,
             jitter=jitter,
             songs=queryset
