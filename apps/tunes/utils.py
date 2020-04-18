@@ -47,6 +47,9 @@ def generate_browse_playlist(energy, valence, danceability, strategy=None, limit
         'danceability__lte': danceability_upper_limit
     }
 
+    # Use a singular attribute for generating browse playlist if specified
+    # Instead of using all attributes for filtering songs, only use one of
+    # the datapoints we have for song emotion affect
     if strategy:
         if strategy not in settings.BROWSE_PLAYLIST_STRATEGIES:
             raise ValueError(
