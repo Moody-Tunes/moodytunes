@@ -55,7 +55,7 @@ def update_user_emotion_record_attributes(self, vote_id):
         }
     )
 
-    logger.info('Updating UserEmotion attributes for user {} for emotion'.format(
+    logger.info('Updating UserEmotion attributes for user {} for emotion {}'.format(
         vote.user.username,
         vote.emotion.full_name
     ))
