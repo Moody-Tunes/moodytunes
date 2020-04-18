@@ -1,5 +1,7 @@
 import logging
+import random
 
+from django.conf import settings
 from django.db import IntegrityError
 from django.http import Http404, JsonResponse
 from rest_framework import generics, status
@@ -53,6 +55,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         energy = None
         valence = None
         danceability = None
+        strategy = random.choice(settings.BROWSE_PLAYLIST_STRATEGIES)
 
         # Should be able to supply 0 for jitter, so we'll check explicitly for None
         if jitter is None:
@@ -83,6 +86,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             energy,
             valence,
             danceability,
+            strategy=strategy,
             limit=limit,
             jitter=jitter,
             songs=queryset
