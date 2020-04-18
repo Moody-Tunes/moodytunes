@@ -327,7 +327,8 @@ class TestSpotifyClient(TestCase):
         mock_request.return_value = {
             'audio_features': [{
                 'valence': .5,
-                'energy': .5
+                'energy': .5,
+                'danceability': .5
             }]
         }
 
@@ -336,6 +337,7 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(new_track['energy'], .5)
         self.assertEqual(new_track['valence'], .5)
+        self.assertEqual(new_track['danceability'], .5)
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_audio_features_handles_missing_track_data(self, mock_request):
@@ -351,6 +353,7 @@ class TestSpotifyClient(TestCase):
 
         self.assertIsNone(new_track.get('energy'))
         self.assertIsNone(new_track.get('valence'))
+        self.assertIsNone(new_track.get('danceability'))
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request):
@@ -368,6 +371,7 @@ class TestSpotifyClient(TestCase):
 
         self.assertIsNone(new_track.get('energy'))
         self.assertIsNone(new_track.get('valence'))
+        self.assertIsNone(new_track.get('danceability'))
 
     def test_build_spotify_oauth_confirm_link(self):
         params = {
