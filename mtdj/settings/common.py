@@ -335,3 +335,6 @@ LOGGING = {
 # GeoIP Database files
 GEOIP_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.dat')
 GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
+
+# Strategies for generating browse playlist
+BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']

@@ -10,6 +10,7 @@ class AnalyticsSerializer(serializers.Serializer):
     genre = serializers.CharField(max_length=15, required=False)
     energy = serializers.FloatField(min_value=0, max_value=1)
     valence = serializers.FloatField(min_value=0, max_value=1)
+    danceability = serializers.FloatField(min_value=0, max_value=1)
     total_songs = serializers.IntegerField()
 
 

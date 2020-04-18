@@ -6,13 +6,15 @@ from django.core.cache import cache
 from tunes.models import Song
 
 
-def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=None):
+def generate_browse_playlist(energy, valence, danceability, strategy=None, limit=None, jitter=None, songs=None):
     """
     Return a `QuerySet` of `Song` records whose energy and valence are within the specified range. Used to build a
     playlist of songs for given song attributes.
 
     :param energy: (float) Energy estimate of `Song` records returned
     :param valence: (float) Valence estimate of `Song` records returned
+    :param danceability: (float) Danceability estimate of `Song` records returned
+    :param strategy: (str) Attribute to use in filtering playlist
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
     :param songs: (QuerySet) Optional queryset of songs to filter
@@ -21,6 +23,7 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
     """
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
+    danceability_lower_limit = danceability_upper_limit = danceability
 
     if songs is None:
         songs = Song.objects.all()
@@ -32,12 +35,30 @@ def generate_browse_playlist(energy, valence, limit=None, jitter=None, songs=Non
         valence_lower_limit -= jitter
         valence_upper_limit += jitter
 
-    playlist = songs.filter(
-        energy__gte=energy_lower_limit,
-        energy__lte=energy_upper_limit,
-        valence__gte=valence_lower_limit,
-        valence__lte=valence_upper_limit
-    )
+        danceability_lower_limit -= jitter
+        danceability_upper_limit += jitter
+
+    params = {
+        'energy__gte': energy_lower_limit,
+        'energy__lte': energy_upper_limit,
+        'valence__gte': valence_lower_limit,
+        'valence__lte': valence_upper_limit,
+        'danceability__gte': danceability_lower_limit,
+        'danceability__lte': danceability_upper_limit
+    }
+
+    # Use a singular attribute for generating browse playlist if specified
+    # Instead of using all attributes for filtering songs, only use one of
+    # the datapoints we have for song emotion affect
+    if strategy:
+        if strategy not in settings.BROWSE_PLAYLIST_STRATEGIES:
+            raise ValueError(
+                'Invalid strategy, must be one of: {}'.format(', '.join(settings.BROWSE_PLAYLIST_STRATEGIES))
+            )
+
+        params = {key: params[key] for key in params if key.startswith(strategy)}
+
+    playlist = songs.filter(**params)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
