@@ -89,6 +89,7 @@ class Song(BaseModel):
     code = models.CharField(max_length=36, db_index=True, unique=True)
     valence = models.FloatField(validators=[validate_decimal_value])
     energy = models.FloatField(validators=[validate_decimal_value])
+    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
 
     def __str__(self):
         return '{}: {}'.format(self.artist, self.name)
