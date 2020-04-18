@@ -52,6 +52,7 @@ class Emotion(BaseModel):
 
     energy = models.FloatField(validators=[validate_decimal_value])
     valence = models.FloatField(validators=[validate_decimal_value])
+    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,
