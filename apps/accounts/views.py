@@ -151,6 +151,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     def get_object(self):
         energy = None
         valence = None
+        danceability = None
         context = self.cleaned_data.get('context')
         genre = self.cleaned_data.get('genre')
 
@@ -174,6 +175,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             energy = average(votes, 'song__energy')
             valence = average(votes, 'song__valence')
+            danceability = average(votes, 'song__danceability')
 
         data = {
             'emotion': emotion.name,
@@ -181,6 +183,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             'genre': genre,
             'energy': energy,
             'valence': valence,
+            'danceability': danceability,
             'total_songs': votes_for_emotion.count()
         }
 
