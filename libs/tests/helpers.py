@@ -103,6 +103,7 @@ class MoodyUtil(object):
         emotion = kwargs.get('emotion') or Emotion.objects.get(name=Emotion.HAPPY)
         energy = kwargs.get('energy') or emotion.energy
         valence = kwargs.get('valence') or emotion.valence
+        danceability = kwargs.get('danceability') or emotion.danceability
 
         params = {
             'code': MoodyUtil._generate_song_code(),
@@ -111,6 +112,7 @@ class MoodyUtil(object):
             'artist': kwargs.get('artist', 'Test Artist'),
             'energy': energy,
             'valence': valence,
+            'danceability': danceability
         }
 
         song, _ = Song.objects.get_or_create(**params)
