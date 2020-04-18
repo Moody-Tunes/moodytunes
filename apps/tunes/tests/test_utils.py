@@ -75,6 +75,37 @@ class TestGenerateBrowsePlaylist(TestCase):
 
         self.assertEqual(len(playlist), 5)
 
+    def test_strategy_passed_filters_only_by_strategy_attribute(self):
+        songs_mock = mock.MagicMock()
+
+        energy = .5
+        valence = .75
+        danceability = .65
+        jitter = .2
+        strategy = 'energy'
+
+        generate_browse_playlist(energy, valence, danceability, strategy=strategy, jitter=jitter, songs=songs_mock)
+
+        energy_lower_limit = energy - jitter
+        energy_upper_limit = energy + jitter
+
+        songs_mock.filter.assert_called_once_with(
+            energy__gte=energy_lower_limit,
+            energy__lte=energy_upper_limit,
+        )
+
+    def test_invalid_strategy_passed_raises_exception(self):
+        songs_mock = mock.MagicMock()
+
+        energy = .5
+        valence = .75
+        danceability = .65
+        jitter = .2
+        strategy = 'invalid'
+
+        with self.assertRaises(ValueError):
+            generate_browse_playlist(energy, valence, danceability, strategy=strategy, jitter=jitter, songs=songs_mock)
+
 
 class TestCachedPlaylistManager(TestCase):
     @classmethod
