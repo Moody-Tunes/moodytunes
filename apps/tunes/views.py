@@ -203,9 +203,10 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         try:
             UserSongVote.objects.create(**vote_data)
             logger.info(
-                'Saved vote for user {} voting on song {}'.format(
+                'Saved vote for user {} voting on song {} for emotion {}'.format(
                     self.request.user.username,
                     song.code,
+                    emotion.full_name
                 ),
                 extra={
                     'vote_data': vote_data,
