@@ -218,6 +218,7 @@ class TestAnalyticsView(TestCase):
             'genre': None,
             'energy': average(votes, 'song__energy'),
             'valence': average(votes, 'song__valence'),
+            'danceability': average(votes, 'song__danceability'),
             'total_songs': len(working_songs)
         }
 
@@ -255,6 +256,7 @@ class TestAnalyticsView(TestCase):
             'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
+            'danceability': expected_song.danceability,
             'total_songs': 1,
         }
 
@@ -274,6 +276,7 @@ class TestAnalyticsView(TestCase):
             'genre': None,
             'energy': None,
             'valence': None,
+            'danceability': None,
             'total_songs': 0
         }
 
@@ -312,6 +315,7 @@ class TestAnalyticsView(TestCase):
             'genre': None,
             'energy': user_emotion.energy,
             'valence': user_emotion.valence,
+            'danceability': user_emotion.danceability,
             'total_songs': 1,
         }
 
@@ -350,6 +354,7 @@ class TestAnalyticsView(TestCase):
             'genre': None,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
+            'danceability': expected_song.danceability,
             'total_songs': 1,
         }
 
@@ -408,6 +413,7 @@ class TestAnalyticsView(TestCase):
             'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
+            'danceability': expected_song.danceability,
             'total_songs': 1,
         }
 

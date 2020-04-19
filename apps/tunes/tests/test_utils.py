@@ -13,7 +13,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         song = MoodyUtil.create_song(valence=.5, energy=.75)
         outlier_song = MoodyUtil.create_song(valence=.25, energy=.30)
 
-        playlist = generate_browse_playlist(song.energy, song.valence)
+        playlist = generate_browse_playlist(song.energy, song.valence, song.danceability)
 
         self.assertIn(song, playlist)
         self.assertNotIn(outlier_song, playlist)
@@ -23,9 +23,10 @@ class TestGenerateBrowsePlaylist(TestCase):
 
         energy = .5
         valence = .75
+        danceability = .65
         jitter = .2
 
-        generate_browse_playlist(energy, valence, jitter=jitter, songs=songs_mock)
+        generate_browse_playlist(energy, valence, danceability, jitter=jitter, songs=songs_mock)
 
         energy_lower_limit = energy - jitter
         energy_upper_limit = energy + jitter
@@ -33,11 +34,16 @@ class TestGenerateBrowsePlaylist(TestCase):
         valence_lower_limit = valence - jitter
         valence_upper_limit = valence + jitter
 
+        danceability_lower_limit = danceability - jitter
+        danceability_upper_limit = danceability + jitter
+
         songs_mock.filter.assert_called_once_with(
             energy__gte=energy_lower_limit,
             energy__lte=energy_upper_limit,
             valence__gte=valence_lower_limit,
-            valence__lte=valence_upper_limit
+            valence__lte=valence_upper_limit,
+            danceability__gte=danceability_lower_limit,
+            danceability__lte=danceability_upper_limit
         )
 
     def test_no_jitter_query_uses_params_passed(self):
@@ -45,25 +51,60 @@ class TestGenerateBrowsePlaylist(TestCase):
 
         energy = .5
         valence = .75
+        danceability = .65
 
-        generate_browse_playlist(energy, valence, songs=songs_mock)
+        generate_browse_playlist(energy, valence, danceability, songs=songs_mock)
 
         songs_mock.filter.assert_called_once_with(
             energy__gte=energy,
             energy__lte=energy,
             valence__gte=valence,
-            valence__lte=valence
+            valence__lte=valence,
+            danceability__gte=danceability,
+            danceability__lte=danceability,
         )
 
     def test_limit_on_playlist(self):
         energy = .5
         valence = .75
+        danceability = .65
         for _ in range(10):
-            MoodyUtil.create_song(energy=energy, valence=valence)
+            MoodyUtil.create_song(energy=energy, valence=valence, danceability=danceability)
 
-        playlist = generate_browse_playlist(energy, valence, limit=5)
+        playlist = generate_browse_playlist(energy, valence, danceability, limit=5)
 
         self.assertEqual(len(playlist), 5)
+
+    def test_strategy_passed_filters_only_by_strategy_attribute(self):
+        songs_mock = mock.MagicMock()
+
+        energy = .5
+        valence = .75
+        danceability = .65
+        jitter = .2
+        strategy = 'energy'
+
+        generate_browse_playlist(energy, valence, danceability, strategy=strategy, jitter=jitter, songs=songs_mock)
+
+        energy_lower_limit = energy - jitter
+        energy_upper_limit = energy + jitter
+
+        songs_mock.filter.assert_called_once_with(
+            energy__gte=energy_lower_limit,
+            energy__lte=energy_upper_limit,
+        )
+
+    def test_invalid_strategy_passed_raises_exception(self):
+        songs_mock = mock.MagicMock()
+
+        energy = .5
+        valence = .75
+        danceability = .65
+        jitter = .2
+        strategy = 'invalid'
+
+        with self.assertRaises(ValueError):
+            generate_browse_playlist(energy, valence, danceability, strategy=strategy, jitter=jitter, songs=songs_mock)
 
 
 class TestCachedPlaylistManager(TestCase):
