@@ -82,6 +82,19 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             valence = user_emotion.valence
             danceability = user_emotion.danceability
 
+        logger.info(
+            'Generating browse playlist for user {}'.format(self.request.user.username),
+            extra={
+                'fingerprint': 'tunes.views.BrowseView.get.generate_playlist',
+                'user_id': self.request.user.pk,
+                'emotion': self.cleaned_data['emotion'],
+                'strategy': strategy,
+                'energy': energy,
+                'valence': valence,
+                'danceability': danceability
+            }
+        )
+
         playlist = generate_browse_playlist(
             energy,
             valence,
@@ -190,9 +203,10 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         try:
             UserSongVote.objects.create(**vote_data)
             logger.info(
-                'Saved vote for user {} voting on song {}'.format(
+                'Saved vote for user {} voting on song {} for emotion {}'.format(
                     self.request.user.username,
                     song.code,
+                    emotion.full_name
                 ),
                 extra={
                     'vote_data': vote_data,
@@ -238,13 +252,15 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             vote.delete()
 
             logger.info(
-                'Deleted vote for user {} with song {} and emotion {}; Context: {}'.format(
+                'Deleted vote for user {} with song {} and emotion {}'.format(
                     self.request.user.username,
                     self.cleaned_data['song_code'],
                     self.cleaned_data['emotion'],
-                    self.cleaned_data.get('context'),
                 ),
-                extra={'fingerprint': 'tunes.VoteView.destroy.unvote_success'}
+                extra={
+                    'fingerprint': 'tunes.VoteView.destroy.unvote_success',
+                    'data': self.cleaned_data
+                }
             )
 
         return JsonResponse({'status': 'OK'})
