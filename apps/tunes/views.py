@@ -85,7 +85,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         logger.info(
             'Generating browse playlist for user {}'.format(self.request.user.username),
             extra={
-                'fingerprint': 'tunes.views.BrowseView.generate_playlist',
+                'fingerprint': 'tunes.views.BrowseView.get.generate_playlist',
                 'user_id': self.request.user.pk,
                 'emotion': self.cleaned_data['emotion'],
                 'strategy': strategy,
