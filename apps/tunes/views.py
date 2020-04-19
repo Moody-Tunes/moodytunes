@@ -82,6 +82,19 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             valence = user_emotion.valence
             danceability = user_emotion.danceability
 
+        logger.info(
+            'Generating browse playlist for user {}'.format(self.request.user.username),
+            extra={
+                'fingerprint': 'tunes.views.BrowseView.generate_playlist',
+                'user_id': self.request.user.pk,
+                'emotion': self.cleaned_data['emotion'],
+                'strategy': strategy,
+                'energy': energy,
+                'valence': valence,
+                'danceability': danceability
+            }
+        )
+
         playlist = generate_browse_playlist(
             energy,
             valence,
