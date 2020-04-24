@@ -340,3 +340,6 @@ GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
 
 # Strategies for generating browse playlist
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
+
+# User-Agent families that are like Chrome
+CHROME_USER_AGENT_FAMILIES = ['Chrome', 'Chromium']
