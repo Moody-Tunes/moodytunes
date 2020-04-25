@@ -92,7 +92,7 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
                 'playlist_name': playlist_name,
                 'songs': songs
             })
-            raise
+            self.retry()
 
     try:
         logger.info('Adding songs to playlist {}'.format(playlist_id))
@@ -108,4 +108,4 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
             'playlist_name': playlist_name,
             'songs': songs
         })
-        raise
+        self.retry()
