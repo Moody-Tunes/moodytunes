@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_hosts',
+    'django_user_agents',
     'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
@@ -72,6 +73,7 @@ MIDDLEWARE = [
     'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware'
 ]
 
 # Security middleware definitions
@@ -267,35 +269,27 @@ LOGGING = {
         },
         'app_file': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'error_file': {
             'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'gunicorn': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
             'formatter': 'gunicorn',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'celery': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/celery.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'database': {
             'level': 'DEBUG',
@@ -338,3 +332,6 @@ GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
 
 # Strategies for generating browse playlist
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
+
+# User-Agent families that are like Chrome
+CHROME_USER_AGENT_FAMILIES = ['Chrome', 'Chromium']
