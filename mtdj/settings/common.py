@@ -273,7 +273,7 @@ LOGGING = {
             'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
             'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
+            'maxBytes': 1000000  # 10MB
         },
         'error_file': {
             'level': 'ERROR',

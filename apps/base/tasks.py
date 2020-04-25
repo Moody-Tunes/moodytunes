@@ -12,3 +12,8 @@ def clear_expired_sessions():
     logger.info('Calling django management command to clear expired sessions')
 
     call_command('clearsessions')
+
+@task()
+def write_log_to_file():
+    for _ in range(10000):
+        logger.info('Hello World!')
