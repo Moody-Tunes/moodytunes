@@ -63,16 +63,16 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
         # Try to use upvotes for this emotion and context to generate attributes for songs to return
         if self.cleaned_data.get('context'):
-            votes = self.request.user.usersongvote_set.filter(
-                emotion__name=self.cleaned_data['emotion'],
-                context=self.cleaned_data['context'],
-                vote=True
+            context_vote_data = UserSongVote.get_attributes_for_emotion_and_context(
+                self.request.user.id,
+                self.cleaned_data['emotion'],
+                self.cleaned_data['context']
             )
 
-            if votes.exists():
-                energy = average(votes, 'song__energy')
-                valence = average(votes, 'song__valence')
-                danceability = average(votes, 'song__danceability')
+            if context_vote_data['count']:
+                energy = round(context_vote_data['avg_energy'], 2)
+                valence = round(context_vote_data['avg_valence'], 2)
+                danceability = round(context_vote_data['avg_danceability'], 2)
 
         # If context not provided or the previous query on upvotes for context did return any votes,
         # determine attributes from the attributes for the user and emotion
