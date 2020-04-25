@@ -57,8 +57,8 @@ def update_user_emotion_record_attributes(self, vote_id):
         }
     )
 
-    old_energy = user_emotion.energy,
-    old_valence = user_emotion.valence,
+    old_energy = user_emotion.energy
+    old_valence = user_emotion.valence
     old_danceability = user_emotion.danceability
 
     logger.info('Updating UserEmotion attributes for user {} for emotion {}'.format(
