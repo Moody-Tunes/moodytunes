@@ -55,9 +55,28 @@ def update_user_emotion_record_attributes(self, vote_id):
         }
     )
 
+    old_energy = user_emotion.energy,
+    old_valence = user_emotion.valence,
+    old_danceability = user_emotion.danceability
+
     logger.info('Updating UserEmotion attributes for user {} for emotion {}'.format(
         vote.user.username,
         vote.emotion.full_name
     ))
 
     user_emotion.update_attributes()
+    user_emotion.refresh_from_db()
+
+    logger.info('Updated UserEmotion attributes for user {} for emotion {}'.format(
+            vote.user.username,
+            vote.emotion.full_name
+        ),
+        extra={
+            'old_energy': old_energy,
+            'old_valence': old_valence,
+            'old_danceability': old_danceability,
+            'new_energy': user_emotion.energy,
+            'new_valence': user_emotion.valence,
+            'new_danceability': user_emotion.danceability
+        }
+    )
