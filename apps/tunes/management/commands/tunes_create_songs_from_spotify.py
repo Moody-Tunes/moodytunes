@@ -160,3 +160,5 @@ class Command(MoodyBaseCommand):
         self.write_to_log_and_output('Failed to process {} songs'.format(failed))
 
         self.stdout.write('Done!')
+
+        return 'Created Songs: {}'.format(succeeded)
