@@ -269,35 +269,27 @@ LOGGING = {
         },
         'app_file': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/application.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'error_file': {
             'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/error.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'gunicorn': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/gunicorn.log'.format(LOGGING_DIR),
             'formatter': 'gunicorn',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'celery': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '{}/celery.log'.format(LOGGING_DIR),
             'formatter': 'json',
-            'backupCount': 5,
-            'maxBytes': 10000000  # 10MB
         },
         'database': {
             'level': 'DEBUG',
