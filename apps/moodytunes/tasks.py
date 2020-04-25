@@ -58,7 +58,8 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
     :param songs: (list) Collection of Spotify track URIs to add to playlist
 
     """
-    spotify = SpotifyClient()
+    spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(spotify_user_id))
+    fingerprint_base = 'tunes.tasks.create_spotify_playlist_from_songs.{msg}'
     playlist_id = None
 
     try:
@@ -73,6 +74,7 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
                 break
     except SpotifyException:
         logger.exception('Error getting playlist for user {}'.format(spotify_user_id), extra={
+            'fingerprint': fingerprint_base.format(msg='failed_getting_user_playlists'),
             'spotify_user_id': spotify_user_id,
             'playlist_name': playlist_name,
             'songs': songs
@@ -85,6 +87,7 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
             logger.info('Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name))
         except SpotifyException:
             logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
+                'fingerprint': fingerprint_base.format(msg='failed_creating_playlist'),
                 'spotify_user_id': spotify_user_id,
                 'playlist_name': playlist_name,
                 'songs': songs
@@ -96,10 +99,11 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
         spotify.add_songs_to_playlist(auth_code, playlist_id, songs)
         logger.info(
             'Added songs to playlist {} successfully'.format(playlist_id),
-            extra={'fingerprint': 'created_playlist_success'}
+            extra={'fingerprint': fingerprint_base.format(msg='created_spotify_playlist')}
         )
     except SpotifyException:
         logger.exception('Error adding songs to playlist {} for user {}'.format(playlist_id, spotify_user_id), extra={
+            'fingerprint': fingerprint_base.format(msg='failed_adding_songs_to_playlist'),
             'spotify_user_id': spotify_user_id,
             'playlist_name': playlist_name,
             'songs': songs
