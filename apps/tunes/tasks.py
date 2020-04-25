@@ -19,7 +19,7 @@ def create_songs_from_spotify_task(self):
     # Everything that we write to stdout gets logged anyway
     try:
         with open(os.devnull, 'w') as dev_null:
-            call_command('tunes_create_songs_from_spotify', stdout=dev_null, stderr=dev_null)
+            return call_command('tunes_create_songs_from_spotify', stdout=dev_null, stderr=dev_null)
 
     except Exception as exc:
         logger.warning('Exception raised when creating songs from Spotify: {}'.format(exc))
