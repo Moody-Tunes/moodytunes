@@ -88,6 +88,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'fingerprint': 'tunes.views.BrowseView.get.generate_playlist',
                 'user_id': self.request.user.pk,
                 'emotion': self.cleaned_data['emotion'],
+                'genre': self.cleaned_data.get('genre'),
+                'context': self.cleaned_data.get('context'),
                 'strategy': strategy,
                 'energy': energy,
                 'valence': valence,
