@@ -101,6 +101,10 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
         # Break up the total list of songs into batches of 100
         batched_songs = spotify.batch_tracks(songs)
 
+        # First, remove songs from playlist to clear out already existing songs
+        for batch in batched_songs:
+            spotify.delete_songs_from_playlist(auth_code, playlist_id, batch)
+
         for batch in batched_songs:
             spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
 

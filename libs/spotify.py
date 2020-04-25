@@ -499,3 +499,27 @@ class SpotifyClient(object):
         resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
 
         return resp
+
+    def delete_songs_from_playlist(self, auth_code, playlist_id, songs):
+        """
+        Remove songs from a specified playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify playlist ID to remove songs from
+        :param songs: (list) Collection of Spotify track URIs to remove from playlist
+        """
+        url = '{api_url}/playlists/{playlist_id}/tracks'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            playlist_id=playlist_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {'uris': songs}
+
+        resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
+
+        return resp
