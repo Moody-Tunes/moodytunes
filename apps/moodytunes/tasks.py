@@ -73,7 +73,7 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
                 playlist_id = playlist['id']
                 break
     except SpotifyException:
-        logger.exception('Error getting playlist for user {}'.format(spotify_user_id), extra={
+        logger.warning('Error getting playlists for user {}'.format(spotify_user_id), extra={
             'fingerprint': fingerprint_base.format(msg='failed_getting_user_playlists'),
             'spotify_user_id': spotify_user_id,
             'playlist_name': playlist_name,
