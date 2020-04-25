@@ -542,8 +542,20 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(retrieved_response, mock_response)
         mock_request.assert_called_once_with(
-            'PUT',
+            'POST',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
             headers=expected_headers,
             data=json.dumps(expected_data)
         )
+
+    def test_batch_tracks_batches_list(self):
+        items = [i for i in range(200)]
+        batched_items = self.spotify_client.batch_tracks(items)
+
+        self.assertEqual(len(batched_items), 2)
+
+    def test_batch_tracks_works_on_lists_with_less_than_batch_size(self):
+        items = [i for i in range(20)]
+        batched_items = self.spotify_client.batch_tracks(items)
+
+        self.assertEqual(len(batched_items), 1)

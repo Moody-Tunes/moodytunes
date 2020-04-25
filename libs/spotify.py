@@ -159,6 +159,18 @@ class SpotifyClient(object):
 
         return resp.get('access_token')
 
+    def batch_tracks(self, tracks):
+        """
+        Some Spotify endpoints have a limit of 100 tracks for one request. This method will
+        take a list of tracks and create a list of batches for including in Spotify requests
+
+        :param tracks: (list) List of tracks
+
+        :return: (list[list])
+        """
+        batch_size = 100
+        return [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
+
     def get_playlists_for_category(self, category, num_playlists):
         """
         Get a number of playlists from Spotify for a given category
@@ -484,6 +496,6 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('PUT', url, headers=headers, data=json.dumps(data))
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
 
         return resp

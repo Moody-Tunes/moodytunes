@@ -96,7 +96,14 @@ def create_spotify_playlist_from_songs(self, auth_code, spotify_user_id, playlis
 
     try:
         logger.info('Adding songs to playlist {}'.format(playlist_id))
-        spotify.add_songs_to_playlist(auth_code, playlist_id, songs)
+
+        # Spotify has a limit of 100 songs per request to add songs to a playlist
+        # Break up the total list of songs into batches of 100
+        batched_songs = spotify.batch_tracks(songs)
+
+        for batch in batched_songs:
+            spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
+
         logger.info(
             'Added songs to playlist {} successfully'.format(playlist_id),
             extra={'fingerprint': fingerprint_base.format(msg='created_spotify_playlist')}
