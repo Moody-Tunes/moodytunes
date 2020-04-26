@@ -16,8 +16,8 @@ class MoodyPeriodicTask(MoodyBaseTask, PeriodicTask):
     run_every = None
 
 
-class ClearExpiredSessions(MoodyPeriodicTask):
-    name = 'base.tasks.ClearExpiredSessions'
+class ClearExpiredSessionsTask(MoodyPeriodicTask):
+    name = 'base.tasks.ClearExpiredSessionsTask'
     run_every = crontab(minute=0, hour=2, day_of_week=0)
 
     """Task to clean expired sessions from session storage"""
@@ -27,4 +27,4 @@ class ClearExpiredSessions(MoodyPeriodicTask):
         call_command('clearsessions')
 
 
-current_app.tasks.register(ClearExpiredSessions())
+current_app.tasks.register(ClearExpiredSessionsTask())
