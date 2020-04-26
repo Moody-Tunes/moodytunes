@@ -17,7 +17,7 @@ class CreateSongsFromSpotifyTask(MoodyPeriodicTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
-    def run(self):
+    def run(self, *args, **kwargs):
         """Periodic task to create songs from Spotify"""
         logger.info('Calling command to create songs from Spotify')
 
