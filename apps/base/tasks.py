@@ -24,4 +24,3 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
         logger.info('Calling django management command to clear expired sessions')
 
         call_command('clearsessions')
-
