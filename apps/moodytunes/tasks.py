@@ -73,18 +73,19 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
-    def run(self, auth_code, spotify_user_id, playlist_name, songs, *args, **kwargs):
+    fingerprint_base = 'tunes.tasks.CreateSpotifyPlaylistFromSongsTask.{msg}'
+
+    def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify):
         """
-        Create a playlist on a user's Spotify account from a list of tracks in our system.
+        Get the Spotify playlist by name for the user, creating it if it does not exist
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param spotify_user_id: (str) Spotify username for the given user
         :param playlist_name: (str) Name of the playlist to be created
-        :param songs: (list) Collection of Spotify track URIs to add to playlist
+        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
 
+        :return: (str)
         """
-        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(spotify_user_id))
-        fingerprint_base = 'tunes.tasks.CreateSpotifyPlaylistFromSongsTask.{msg}'
         playlist_id = None
 
         try:
@@ -94,18 +95,14 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
             for playlist in playlists:
                 if playlist['name'] == playlist_name:
-                    logger.info('Found existing playlist with name {} for user {}'.format(
-                        playlist_name,
-                        spotify_user_id
-                    ))
                     playlist_id = playlist['id']
                     break
+
         except SpotifyException:
             logger.warning('Error getting playlists for user {}'.format(spotify_user_id), extra={
-                'fingerprint': fingerprint_base.format(msg='failed_getting_user_playlists'),
+                'fingerprint': self.fingerprint_base.format(msg='failed_getting_user_playlists'),
                 'spotify_user_id': spotify_user_id,
                 'playlist_name': playlist_name,
-                'songs': songs
             })
 
         if playlist_id is None:
@@ -114,17 +111,29 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                 playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
                 logger.info(
                     'Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name),
-                    extra={'fingerprint': fingerprint_base.format(msg='created_spotify_playlist')}
+                    extra={'fingerprint': self.fingerprint_base.format(msg='created_spotify_playlist')}
                 )
+
             except SpotifyException:
                 logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
-                    'fingerprint': fingerprint_base.format(msg='failed_creating_playlist'),
+                    'fingerprint': self.fingerprint_base.format(msg='failed_creating_playlist'),
                     'spotify_user_id': spotify_user_id,
                     'playlist_name': playlist_name,
-                    'songs': songs
                 })
                 self.retry()
 
+        return playlist_id
+
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify):
+        """
+        Call Spotify API to add songs to a playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify ID of the playlist to be created
+        :param songs: (list) Collection of Spotify track URIs to add to playlist
+        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
+
+        """
         try:
             logger.info('Adding songs to playlist {}'.format(playlist_id))
 
@@ -141,16 +150,19 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
             logger.info(
                 'Added songs to playlist {} successfully'.format(playlist_id),
-                extra={'fingerprint': fingerprint_base.format(msg='success_adding_songs_to_spotify_playlist')}
+                extra={'fingerprint': self.fingerprint_base.format(msg='success_adding_songs_to_spotify_playlist')}
             )
         except SpotifyException:
             logger.exception(
-                'Error adding songs to playlist {} for user {}'.format(playlist_id, spotify_user_id), extra={
-                    'fingerprint': fingerprint_base.format(msg='failed_adding_songs_to_playlist'),
-                    'spotify_user_id': spotify_user_id,
-                    'playlist_name': playlist_name,
+                'Error adding songs to playlist {}'.format(playlist_id), extra={
+                    'fingerprint': self.fingerprint_base.format(msg='failed_adding_songs_to_playlist'),
                     'songs': songs
                 }
             )
             self.retry()
 
+    def run(self, auth_code, spotify_user_id, playlist_name, songs, *args, **kwargs):
+        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(spotify_user_id))
+
+        playlist_id = self.get_or_create_playlist(auth_code, spotify_user_id, playlist_name, spotify)
+        self.add_songs_to_playlist(auth_code, playlist_id, songs, spotify)
