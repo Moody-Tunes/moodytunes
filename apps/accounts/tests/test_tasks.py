@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from accounts.models import MoodyUser, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
-from accounts.tasks import create_user_emotion_records_for_user, update_user_emotion_record_attributes
+from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
 from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from utils import average
@@ -18,7 +18,7 @@ class TestCreateUserEmotionTask(TestCase):
             cls.user = MoodyUtil.create_user(username='test_user')
 
     def test_happy_path(self):
-        create_user_emotion_records_for_user.run(self.user.pk)
+        CreateUserEmotionRecordsForUserTask().run(self.user.pk)
 
         self.user.refresh_from_db()
 
@@ -35,7 +35,7 @@ class TestCreateUserEmotionTask(TestCase):
         invalid_user_pk = 10000
 
         with self.assertRaises(MoodyUser.DoesNotExist):
-            create_user_emotion_records_for_user.run(invalid_user_pk)
+            CreateUserEmotionRecordsForUserTask().run(invalid_user_pk)
 
 
 class TestUpdateUserEmotionTask(TestCase):
@@ -52,8 +52,8 @@ class TestUpdateUserEmotionTask(TestCase):
             vote1 = MoodyUtil.create_user_song_vote(self.user, self.song1, self.emotion, True)
             vote2 = MoodyUtil.create_user_song_vote(self.user, self.song2, self.emotion, True)
 
-        update_user_emotion_record_attributes.run(vote1.pk)
-        update_user_emotion_record_attributes.run(vote2.pk)
+        UpdateUserEmotionRecordAttributeTask().run(vote1.pk)
+        UpdateUserEmotionRecordAttributeTask().run(vote2.pk)
 
         user_emotion = self.user.get_user_emotion_record(self.emotion.name)
         user_votes = self.user.usersongvote_set.all()
@@ -68,4 +68,4 @@ class TestUpdateUserEmotionTask(TestCase):
         invalid_vote_pk = 10000
 
         with self.assertRaises(UserSongVote.DoesNotExist):
-            update_user_emotion_record_attributes.run(invalid_vote_pk)
+            UpdateUserEmotionRecordAttributeTask().run(invalid_vote_pk)

@@ -542,8 +542,46 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(retrieved_response, mock_response)
         mock_request.assert_called_once_with(
-            'PUT',
+            'POST',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
             headers=expected_headers,
             data=json.dumps(expected_data)
         )
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_delete_songs_from_playlist(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        playlist_id = 'spotify:playlist:id'
+        songs = ['spotify:track:1', 'spotify:track:2']
+        mock_response = {'resp': 'OK'}
+
+        mock_request.return_value = mock_response
+
+        expected_headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        expected_data = {'uris': songs}
+
+        retrieved_response = self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
+
+        self.assertEqual(retrieved_response, mock_response)
+        mock_request.assert_called_once_with(
+            'DELETE',
+            'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
+            headers=expected_headers,
+            data=json.dumps(expected_data)
+        )
+
+    def test_batch_tracks_batches_list(self):
+        items = [i for i in range(200)]
+        batched_items = self.spotify_client.batch_tracks(items)
+
+        self.assertEqual(len(batched_items), 2)
+
+    def test_batch_tracks_works_on_lists_with_less_than_batch_size(self):
+        items = [i for i in range(20)]
+        batched_items = self.spotify_client.batch_tracks(items)
+
+        self.assertEqual(len(batched_items), 1)

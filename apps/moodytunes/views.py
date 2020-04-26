@@ -14,7 +14,7 @@ from ratelimit.mixins import RatelimitMixin
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, ExportPlaylistForm
-from moodytunes.tasks import create_spotify_playlist_from_songs, fetch_song_from_spotify
+from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
@@ -76,7 +76,7 @@ class SuggestSongView(RatelimitMixin, FormView):
 
         if form.is_valid():
             code = form.cleaned_data['code']
-            fetch_song_from_spotify.delay(code, username=request.user.username)
+            FetchSongFromSpotifyTask().delay(code, username=request.user.username)
 
             logger.info(
                 'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
@@ -224,7 +224,7 @@ class ExportPlayListView(FormView):
                 logger.info('Refreshing access token for {} to export playlist'.format(auth.user.username))
                 auth.refresh_access_token()
 
-            create_spotify_playlist_from_songs.delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
+            CreateSpotifyPlaylistFromSongsTask().delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
