@@ -1,6 +1,6 @@
 from logging import getLogger
 import os
-from celery import current_app
+
 from celery.schedules import crontab
 
 from django.core.management import call_command
@@ -30,6 +30,3 @@ class CreateSongsFromSpotifyTask(MoodyPeriodicTask):
         except Exception as exc:
             logger.warning('Exception raised when creating songs from Spotify: {}'.format(exc))
             self.retry(exc=exc)
-
-
-current_app.tasks.register(CreateSongsFromSpotifyTask())

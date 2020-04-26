@@ -1,7 +1,5 @@
 from logging import getLogger
 
-from celery import current_app
-
 from accounts.models import MoodyUser, UserEmotion, UserSongVote
 from base.tasks import MoodyBaseTask
 from tunes.models import Emotion
@@ -87,7 +85,3 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'new_danceability': user_emotion.danceability
             }
         )
-
-
-current_app.tasks.register(CreateUserEmotionRecordsForUserTask())
-current_app.tasks.register(UpdateUserEmotionRecordAttributeTask())

@@ -1,7 +1,5 @@
 import logging
 
-from celery import current_app
-
 from base.tasks import MoodyBaseTask
 from tunes.models import Song
 from libs.spotify import SpotifyClient, SpotifyException
@@ -156,6 +154,3 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             )
             self.retry()
 
-
-current_app.tasks.register(FetchSongFromSpotifyTask())
-current_app.tasks.register(CreateSpotifyPlaylistFromSongsTask())

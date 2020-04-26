@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from celery import current_app
 from celery.schedules import crontab
 from celery.task import Task, PeriodicTask
 from django.core.management import call_command
@@ -26,5 +25,3 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
 
         call_command('clearsessions')
 
-
-current_app.tasks.register(ClearExpiredSessionsTask())
