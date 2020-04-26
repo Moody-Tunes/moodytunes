@@ -12,6 +12,7 @@ class MoodyBaseTask(Task):
 
 
 class MoodyPeriodicTask(MoodyBaseTask, PeriodicTask):
+    abstract = True
     run_every = None
 
 
