@@ -5,7 +5,7 @@ from django.contrib.sessions.models import Session
 from django.test import TestCase
 from django.utils import timezone
 
-from base.tasks import ClearExpiredSessions
+from base.tasks import ClearExpiredSessionsTask
 
 
 class TestClearExpiredSessionsTask(TestCase):
@@ -17,5 +17,5 @@ class TestClearExpiredSessionsTask(TestCase):
             expire_date=expired_session_date
         )
 
-        ClearExpiredSessions().run()
+        ClearExpiredSessionsTask().run()
         self.assertEqual(Session.objects.count(), 0)
