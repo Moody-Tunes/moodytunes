@@ -159,6 +159,18 @@ class SpotifyClient(object):
 
         return resp.get('access_token')
 
+    def batch_tracks(self, tracks):
+        """
+        Some Spotify endpoints have a limit of 100 tracks for one request. This method will
+        take a list of tracks and create a list of batches for including in Spotify requests
+
+        :param tracks: (list) List of tracks
+
+        :return: (list[list])
+        """
+        batch_size = 100
+        return [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
+
     def get_playlists_for_category(self, category, num_playlists):
         """
         Get a number of playlists from Spotify for a given category
@@ -269,11 +281,8 @@ class SpotifyClient(object):
 
         :return: (list[dict]) Song mappings + (energy, valence)
         """
-        batch_size = 100
-
-        # Create a list of lists of tracks, each one being at most batch_size length
-        # Spotify allows up to 100 songs to be processed at once
-        batched_tracks = [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
+        # Need to batch tracks as Spotify limits the number of tracks sent in one request
+        batched_tracks = self.batch_tracks(tracks)
 
         for batch in batched_tracks:
             url = '{api_url}/audio-features'.format(
@@ -484,6 +493,30 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('PUT', url, headers=headers, data=json.dumps(data))
+        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+
+        return resp
+
+    def delete_songs_from_playlist(self, auth_code, playlist_id, songs):
+        """
+        Remove songs from a specified playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify playlist ID to remove songs from
+        :param songs: (list) Collection of Spotify track URIs to remove from playlist
+        """
+        url = '{api_url}/playlists/{playlist_id}/tracks'.format(
+            api_url=settings.SPOTIFY['api_url'],
+            playlist_id=playlist_id
+        )
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+            'Content-Type': 'application/json'
+        }
+
+        data = {'uris': songs}
+
+        resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
         return resp

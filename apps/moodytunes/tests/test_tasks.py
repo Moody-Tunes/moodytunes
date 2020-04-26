@@ -61,10 +61,17 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         cls.playlist_name = 'new_playlist'
         cls.songs = ['spotify:track:1']
 
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
-    def test_happy_path(self, mock_get_user_playlists, mock_create_playlist, mock_add_songs_to_playlist):
+    def test_happy_path(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+    ):
         mock_get_user_playlists.return_value = {'items': []}
 
         playlist_id = 'spotify:playlist:id'
@@ -75,32 +82,39 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_create_playlist.assert_called_once_with(self.auth_code, self.spotify_user_id, self.playlist_name)
         mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
 
+    @mock.patch('moodytunes.tasks.create_spotify_playlist_from_songs.retry')
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
-    def test_create_playlist_exception_raises_exception(
+    def test_error_creating_playlist_retries(
             self,
             mock_get_user_playlists,
             mock_create_playlist,
-            mock_add_songs_to_playlist
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_retry
     ):
         mock_get_user_playlists.return_value = {'items': []}
 
         mock_create_playlist.side_effect = SpotifyException
 
-        with self.assertRaises(SpotifyException):
-            create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+        create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
 
-        mock_add_songs_to_playlist.assert_not_called()
+        mock_retry.assert_called_once()
 
+    @mock.patch('moodytunes.tasks.create_spotify_playlist_from_songs.retry')
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
-    def test_add_songs_to_playlist_raises_exception(
+    def test_error_adding_songs_to_playlist_retries(
             self,
             mock_get_user_playlists,
             mock_create_playlist,
-            mock_add_songs_to_playlist
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_retry
     ):
         mock_get_user_playlists.return_value = {'items': []}
 
@@ -109,9 +123,11 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_add_songs_to_playlist.side_effect = SpotifyException
 
-        with self.assertRaises(SpotifyException):
-            create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
+        create_spotify_playlist_from_songs.run(self.auth_code, self.spotify_user_id, self.playlist_name, self.songs)
 
+        mock_retry.assert_called_once()
+
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
@@ -119,7 +135,8 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
             self,
             mock_get_user_playlists,
             mock_create_playlist,
-            mock_add_songs_to_playlist
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
     ):
         playlist_id = 'spotify:playlist:id'
         mock_get_user_playlists.return_value = {'items': [{'name': self.playlist_name, 'id': playlist_id}]}
@@ -130,6 +147,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_create_playlist.assert_not_called()
         mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
 
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
@@ -137,7 +155,8 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
             self,
             mock_get_user_playlists,
             mock_create_playlist,
-            mock_add_songs_to_playlist
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
     ):
         playlist_id = 'spotify:playlist:id'
         mock_get_user_playlists.return_value = {'items': [{'name': 'some_other_playlist', 'id': '12345'}]}
@@ -150,6 +169,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_create_playlist.assert_called_once_with(self.auth_code, self.spotify_user_id, self.playlist_name)
         mock_add_songs_to_playlist.assert_called_once_with(self.auth_code, playlist_id, self.songs)
 
+    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
     @mock.patch('libs.spotify.SpotifyClient.create_playlist')
     @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
@@ -157,7 +177,8 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
             self,
             mock_get_user_playlists,
             mock_create_playlist,
-            mock_add_songs_to_playlist
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
     ):
         mock_get_user_playlists.side_effect = SpotifyException
 
