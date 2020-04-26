@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from celery.schedules import crontab
 from envparse import env
 
 
@@ -14,16 +13,4 @@ CELERY_RESULT_EXPIRES = timedelta(days=90)  # Delete result records after 90 day
 
 DJANGO_CELERY_RESULTS = {
     'ALLOW_EDITS': False  # Disable editing results in admin interface
-}
-
-# Define periodic tasks here as key:value pairs
-# Key should be a string identifying the task to be run
-# Value should be a dictionary containing configurations for the periodic task
-#   - task: dotted.path.to.task
-#   - schedule: Scheduler to use for calling task (crontab, seconds value, etc.)
-CELERY_BEAT_SCHEDULE = {
-    'create-songs-from-spotify': {
-        'task': 'tunes.tasks.create_songs_from_spotify_task',
-        'schedule': crontab(minute=0, hour=1, day_of_week=0)
-    },
 }
