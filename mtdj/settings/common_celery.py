@@ -22,10 +22,6 @@ DJANGO_CELERY_RESULTS = {
 #   - task: dotted.path.to.task
 #   - schedule: Scheduler to use for calling task (crontab, seconds value, etc.)
 CELERY_BEAT_SCHEDULE = {
-    'clear-expired-sessions': {
-        'task': 'base.tasks.clear_expired_sessions',
-        'schedule': crontab(minute=0, hour=2, day_of_week=0)
-    },
     'create-songs-from-spotify': {
         'task': 'tunes.tasks.create_songs_from_spotify_task',
         'schedule': crontab(minute=0, hour=1, day_of_week=0)

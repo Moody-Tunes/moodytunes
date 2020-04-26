@@ -1,14 +1,31 @@
 from logging import getLogger
 
-from celery.task import task
+from celery import current_app
+from celery.schedules import crontab
+from celery.task import Task, PeriodicTask
 from django.core.management import call_command
 
 logger = getLogger(__name__)
 
 
-@task()
-def clear_expired_sessions():
-    """Task to clean expired sessions from session storage"""
-    logger.info('Calling django management command to clear expired sessions')
+class MoodyBaseTask(Task):
+    abstract = True
 
-    call_command('clearsessions')
+
+class MoodyPeriodicTask(MoodyBaseTask, PeriodicTask):
+    abstract = True
+    run_every = None
+
+
+class ClearExpiredSessions(MoodyPeriodicTask):
+    name = 'base.tasks.ClearExpiredSessions'
+    run_every = crontab()
+
+    """Task to clean expired sessions from session storage"""
+    def run(self, *args, **kwargs):
+        logger.info('Calling django management command to clear expired sessions')
+
+        call_command('clearsessions')
+
+
+current_app.tasks.register(ClearExpiredSessions())
