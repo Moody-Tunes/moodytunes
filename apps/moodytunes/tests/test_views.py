@@ -42,14 +42,14 @@ class TestSuggestSongView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-    @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay')
+    @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay')
     def test_happy_path(self, mock_task):
         data = {'code': 'spotify:track:2E0Y5LQdiqrPDJJoEyfSqC'}
         self.client.post(self.url, data)
 
         mock_task.assert_called_once_with('spotify:track:2E0Y5LQdiqrPDJJoEyfSqC', username=self.user.username)
 
-    @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay')
+    @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay')
     def test_task_not_called_for_duplicate_song(self, mock_task):
         song = MoodyUtil.create_song()
         data = {'code': song.code}
@@ -57,7 +57,7 @@ class TestSuggestSongView(TestCase):
 
         mock_task.assert_not_called()
 
-    @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay')
+    @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay')
     def test_task_not_called_for_invalid_code(self, mock_task):
         data = {'code': 'foo'}
         self.client.post(self.url, data)
@@ -71,7 +71,7 @@ class TestSuggestSongView(TestCase):
             'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir())
         }
     })
-    @mock.patch('moodytunes.tasks.fetch_song_from_spotify.delay', mock.Mock())
+    @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay', mock.Mock())
     def test_requests_are_rate_limited_after_max_requests_processed(self):
         for _ in range(3):
             data = {'code': MoodyUtil._generate_song_code()}
