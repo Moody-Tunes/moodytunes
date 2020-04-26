@@ -281,11 +281,8 @@ class SpotifyClient(object):
 
         :return: (list[dict]) Song mappings + (energy, valence)
         """
-        batch_size = 100
-
-        # Create a list of lists of tracks, each one being at most batch_size length
-        # Spotify allows up to 100 songs to be processed at once
-        batched_tracks = [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
+        # Need to batch tracks as Spotify limits the number of tracks sent in one request
+        batched_tracks = self.batch_tracks(tracks)
 
         for batch in batched_tracks:
             url = '{api_url}/audio-features'.format(
