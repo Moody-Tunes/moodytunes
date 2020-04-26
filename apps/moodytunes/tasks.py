@@ -23,7 +23,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         :param spotify_code: (str) Spotify URI for the song to be created
         :param username: (str) [Optional] Username for the user that requested this song
         """
-        signature = 'FetchSongFromSpotifyTask-{}-{}'.format(username, spotify_code)
+        signature = 'tunes.tasks.FetchSongFromSpotifyTask-{}-{}'.format(username, spotify_code)
 
         # Early exit: if song already exists in our system don't do the work to fetch it
         if Song.objects.filter(code=spotify_code).exists():
