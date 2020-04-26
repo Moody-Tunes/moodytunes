@@ -23,22 +23,32 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         :param spotify_code: (str) Spotify URI for the song to be created
         :param username: (str) [Optional] Username for the user that requested this song
         """
-        signature = 'fetch_song_from_spotify-{}-{}'.format(username, spotify_code)
+        signature = 'FetchSongFromSpotifyTask-{}-{}'.format(username, spotify_code)
 
         # Early exit: if song already exists in our system don't do the work to fetch it
         if Song.objects.filter(code=spotify_code).exists():
-            logger.info('{} - Song with code {} already exists in database'.format(signature, spotify_code))
+            logger.info(
+                'Song with code {} already exists in database'.format(spotify_code),
+                extra={'fingerprint': signature}
+            )
             return
 
         client = SpotifyClient(identifier=signature)
         song_data = None
 
         try:
-            logger.info('{} - Making request to Spotify for song data for {}'.format(signature, spotify_code))
+            logger.info(
+                'Making request to Spotify for song data for {}'.format(spotify_code),
+                extra={'fingerprint': signature}
+            )
             track_data = client.get_attributes_for_track(spotify_code)
             song_data = client.get_audio_features_for_tracks([track_data])[0]
         except SpotifyException:
-            logger.warning('{} - Failed to fetch song data from Spotify. Retrying'.format(signature), exc_info=True)
+            logger.warning(
+                'Failed to fetch song data from Spotify. Retrying',
+                extra={'fingerprint': signature},
+                exc_info=True
+            )
             self.retry()
 
         if song_data:
@@ -48,12 +58,15 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             _, created = Song.objects.get_or_create(code=song_data['code'], defaults=song_data)
 
             if created:
-                logger.info('{} - Created song {} in database'.format(signature, spotify_code))
+                logger.info(
+                    'Created song {} in database'.format(spotify_code),
+                    extra={'fingerprint': signature}
+                )
             else:
-                logger.info('{} - Did not create song {} in database, song already exists'.format(
-                    signature,
-                    spotify_code
-                ))
+                logger.info(
+                    'Did not create song {} in database, song already exists'.format(spotify_code),
+                    extra={'fingerprint': signature}
+                )
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
@@ -73,7 +86,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         """
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(spotify_user_id))
-        fingerprint_base = 'tunes.tasks.create_spotify_playlist_from_songs.{msg}'
+        fingerprint_base = 'tunes.tasks.CreateSpotifyPlaylistFromSongsTask.{msg}'
         playlist_id = None
 
         try:
