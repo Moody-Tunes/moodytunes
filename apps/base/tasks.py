@@ -14,6 +14,7 @@ class MoodyBaseTask(Task):
 class MoodyPeriodicTask(MoodyBaseTask, PeriodicTask):
     abstract = True
     run_every = None
+    ignore_result = None
 
 
 class ClearExpiredSessionsTask(MoodyPeriodicTask):
