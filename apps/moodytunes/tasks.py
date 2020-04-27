@@ -9,8 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class FetchSongFromSpotifyTask(MoodyBaseTask):
-    name = 'moodytunes.tasks.FetchSongFromSpotifyTask'
-
     max_retries = 3
     default_retry_delay = 60 * 15
 
@@ -68,8 +66,6 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
-    name = 'moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask'
-
     max_retries = 3
     default_retry_delay = 60 * 15
 

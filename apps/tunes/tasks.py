@@ -11,7 +11,6 @@ logger = getLogger(__name__)
 
 
 class CreateSongsFromSpotifyTask(MoodyPeriodicTask):
-    name = 'tunes.tasks.CreateSongsFromSpotifyTask'
     run_every = crontab(minute=0, hour=1, day_of_week=0)
 
     max_retries = 3
