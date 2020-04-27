@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.test import TestCase
 
-from accounts.models import SpotifyUserAuth
 from moodytunes.tasks import FetchSongFromSpotifyTask, CreateSpotifyPlaylistFromSongsTask
 from tunes.models import Song
 from libs.spotify import SpotifyException
