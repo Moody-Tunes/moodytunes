@@ -3,7 +3,7 @@ import string
 
 from django.contrib.messages import get_messages
 
-from accounts.models import MoodyUser, UserSongVote
+from accounts.models import MoodyUser, UserSongVote, SpotifyUserAuth
 from tunes.models import Song, Emotion
 
 
@@ -143,3 +143,17 @@ class MoodyUtil(object):
         )
 
         return vote
+
+    @staticmethod
+    def create_spotify_user_auth(user):
+        auth, _ = SpotifyUserAuth.objects.get_or_create(
+            user=user,
+            defaults={
+                'user': user,
+                'spotify_user_id': 'spotify_user',
+                'access_token': 'access_token',
+                'refresh_token': 'refresh_token'
+            }
+        )
+
+        return auth
