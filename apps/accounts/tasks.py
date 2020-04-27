@@ -8,7 +8,6 @@ logger = getLogger(__name__)
 
 
 class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
-    name = 'accounts.tasks.CreateUserEmotionRecordsForUser'
 
     def run(self, user_id, *args, **kwargs):
         """
@@ -34,7 +33,6 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
 
 class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
-    name = 'accounts.tasks.UpdateUserEmotionRecordAttributeTask'
 
     def run(self, vote_id, *args, **kwargs):
         """
