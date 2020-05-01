@@ -17,3 +17,4 @@ install:
 script:
   - pytest
   - flake8
+  - pre-commit install && pre-commit
