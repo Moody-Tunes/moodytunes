@@ -7,6 +7,24 @@ We use Vagrant and ansible to manage building and provisioning virtual machines.
 new hosts for our producion environment, as well as develop in a similar environment to the one we'll deploy mtdj. See
 our [cradle](https://github.com/Moody-Tunes/cradle#cradle) repository for how to get an instance of mtdj setup and running.
 
+We also use [pre-commit](https://pre-commit.com/) for running hooks during git commits. This will help immensely with
+developer workflow by running linters, checkers, and other tools when you make commits. To install pre-commit, create a
+virtual environment and install pre-commit:
+
+```shell script
+virtualenv -p $(which python3) venv
+source venv/bin/activate
+(venv) pip install pre-commit
+```
+
+Next, install the pre-commit packages we use in our project:
+
+```shell script
+(venv) pre-commit install
+```
+
+This should run the pre-commit hooks when you make a commit to the moodytunes repository.
+
 ## Handy Tips/Tricks
 
 ### Django Commands
