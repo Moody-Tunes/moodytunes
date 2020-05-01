@@ -7,6 +7,7 @@ repos:
     - id: trailing-whitespace
     - id: no-commit-to-branch
     - id: name-tests-test
+      name: Check test filename name is valid
       args: ['--django']
     - id: debug-statements
     - id: check-merge-conflict
