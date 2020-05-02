@@ -1,11 +1,11 @@
-from logging import getLogger
 import os
+from logging import getLogger
 
 from celery.schedules import crontab
-
 from django.core.management import call_command
 
 from base.tasks import MoodyPeriodicTask
+
 
 logger = getLogger(__name__)
 

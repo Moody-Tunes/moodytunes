@@ -4,15 +4,15 @@ from unittest import mock
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.utils import timezone
 from django.test import TestCase
+from django.utils import timezone
+from spotify import SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
-from spotify import SpotifyException
-from tunes.models import Emotion
-from libs.tests.helpers import SignalDisconnect, MoodyUtil
+from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
+from tunes.models import Emotion
 
 
 class TestUserEmotion(TestCase):

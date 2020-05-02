@@ -1,8 +1,8 @@
-from django.test import TestCase
+import urllib.request
 
 import requests
+from django.test import TestCase
 from pytest_blockage import MockHttpCall
-import urllib.request
 
 
 class TestBlockage(TestCase):

@@ -1,8 +1,9 @@
 from logging import getLogger
 
 from celery.schedules import crontab
-from celery.task import Task, PeriodicTask
+from celery.task import PeriodicTask, Task
 from django.core.management import call_command
+
 
 logger = getLogger(__name__)
 

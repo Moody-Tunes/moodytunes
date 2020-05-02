@@ -3,24 +3,30 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView, \
-    LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordChangeView,
+    PasswordResetConfirmView,
+    PasswordResetView,
+)
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve, Resolver404, reverse_lazy
+from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser, UserSongVote
-from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
+from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
-from tunes.models import Emotion
 from libs.utils import average
+from tunes.models import Emotion
+
 
 logger = logging.getLogger(__name__)
 

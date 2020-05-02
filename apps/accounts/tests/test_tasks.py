@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.test import TestCase
+from utils import average
 
 from accounts.models import MoodyUser, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
-from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
-from utils import average
+from tunes.models import Emotion
 
 
 class TestCreateUserEmotionTask(TestCase):

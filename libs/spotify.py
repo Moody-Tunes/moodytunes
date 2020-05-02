@@ -1,13 +1,13 @@
-from base64 import b64encode
 import json
 import logging
 import random
+from base64 import b64encode
 from urllib.parse import urlencode
 
+import requests
 from django.conf import settings
 from django.core.cache import cache
 
-import requests
 
 logger = logging.getLogger(__name__)
 

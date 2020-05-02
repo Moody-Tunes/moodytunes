@@ -1,6 +1,7 @@
 # API Keys/Credentials get stored here
 from envparse import env
 
+
 # Spotify Definitions
 SPOTIFY = {
     'api_url': env.str('MTDJ_SPOTIFY_API_URL', default='https://api.spotify.com/v1'),

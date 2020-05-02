@@ -1,10 +1,12 @@
-from envparse import env
 import os
 import tempfile
+
+from envparse import env
 
 from . import BASE_DIR
 from .common_api import *
 from .common_celery import *
+
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='')
 

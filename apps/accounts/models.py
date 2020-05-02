@@ -12,6 +12,7 @@ from base.validators import validate_decimal_value
 from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
 
+
 logger = getLogger(__name__)
 
 
