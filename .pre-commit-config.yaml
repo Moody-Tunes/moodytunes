@@ -12,3 +12,9 @@ repos:
     - id: debug-statements
     - id: check-merge-conflict
     - id: check-json
+
+- repo: https://github.com/miki725/importanize/
+  rev: 'master'
+  hooks:
+  - id: importanize
+    args: [--verbose]
