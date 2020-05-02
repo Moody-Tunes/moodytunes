@@ -27,8 +27,8 @@ class TestUpdateUserAttributesSignal(TestCase):
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
     @mock.patch('accounts.models.UserEmotion.update_attributes')
-    def test_upvoting_song_updates_attributes(self, mock_update):
-        vote = UserSongVote.objects.create(
+    def test_upvoting_song_calls_updates_attributes(self, mock_update):
+        UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
             song=self.song,
@@ -37,12 +37,8 @@ class TestUpdateUserAttributesSignal(TestCase):
 
         mock_update.assert_called_once()
 
-        # If we save the vote again, we shouldn't trigger another update
-        vote.save()
-        self.assertEqual(mock_update.call_count, 1)
-
     @mock.patch('accounts.models.UserEmotion.update_attributes')
-    def test_downvoting_song_does_not_update_attributes(self, mock_update):
+    def test_downvoting_song_does_not_call_update_attributes(self, mock_update):
         UserSongVote.objects.create(
             user=self.user,
             emotion=self.emotion,
@@ -51,3 +47,18 @@ class TestUpdateUserAttributesSignal(TestCase):
         )
 
         mock_update.assert_not_called()
+
+    @mock.patch('accounts.models.UserEmotion.update_attributes')
+    def test_deleting_vote_calls_update_attributes(self, mock_update):
+        vote = UserSongVote.objects.create(
+            user=self.user,
+            emotion=self.emotion,
+            song=self.song,
+            vote=True
+        )
+
+        mock_update.reset_mock()
+
+        vote.delete()
+
+        mock_update.assert_called_once()
