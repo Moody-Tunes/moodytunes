@@ -1,0 +1,15 @@
+{
+  "formatter": "grouped",
+  "length": 120,
+  "exclude": [
+    "*.tox/*",
+    "*venv/*",
+    "*migrations*"
+  ],
+  "groups": [
+    {"type": "stdlib"},
+    {"type": "sitepackages"},
+    {"type": "remainder"},
+    {"type": "local"}
+  ]
+}
