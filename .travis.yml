@@ -3,7 +3,7 @@ language: python
 cache:
   pip: true
   directories:
-    - .git/hooks/pre-commit
+    - $HOME/.cache/pre-commit
 
 python:
   - "3.6"
