@@ -4,7 +4,6 @@ from logging import getLogger
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Avg, Count
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
 
@@ -180,33 +179,6 @@ class UserSongVote(BaseModel):
 
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
-
-    @classmethod
-    def get_attributes_for_emotion_and_context(cls, user_id, emotion_name, context):
-        """
-        Return the average of  upvoted Song attributes for a given User, Emotion, and Context values.
-        This is needed because of the way we cross the attribute values for a user and emotion with the
-        attribute values for a user, emotion, and context.
-
-        TODO: Maybe move this to the UserEmotion model?
-
-        :param user_id: (int) Primary key for the MoodyUser
-        :param emotion_name: (str) Code for Emotion record to fetch
-        :param context: (str) Choice for context field for a UserSongVote
-
-        :return: (dict) Payload of upvoted song attributes for the given user, emotion, and context
-        """
-        return cls.objects.filter(
-            user__id=user_id,
-            emotion__name=emotion_name,
-            context=context,
-            vote=True
-        ).aggregate(
-            avg_energy=Avg('song__energy'),
-            avg_valence=Avg('song__valence'),
-            avg_danceability=Avg('song__danceability'),
-            count=Count('vote')
-        )
 
     def delete(self, *args, **kwargs):
         # We don't actually want to delete these records, so just set the vote value to false

@@ -28,7 +28,7 @@ from tunes.serializers import (
     LastPlaylistSerializer
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
-
+from libs.utils import average
 
 logger = logging.getLogger(__name__)
 
@@ -63,16 +63,17 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
         # Try to use upvotes for this emotion and context to generate attributes for songs to return
         if self.cleaned_data.get('context'):
-            context_vote_data = UserSongVote.get_attributes_for_emotion_and_context(
-                self.request.user.id,
-                self.cleaned_data['emotion'],
-                self.cleaned_data['context']
+            votes = self.request.user.usersongvote_set.filter(
+                emotion__name=self.cleaned_data['emotion'],
+                context=self.cleaned_data['context'],
+                vote=True
             )
 
-            if context_vote_data['count']:
-                energy = round(context_vote_data['avg_energy'], 2)
-                valence = round(context_vote_data['avg_valence'], 2)
-                danceability = round(context_vote_data['avg_danceability'], 2)
+            if votes.exists():
+                attributes_for_votes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+                valence = attributes_for_votes['song__valence__avg']
+                energy = attributes_for_votes['song__energy__avg']
+                danceability = attributes_for_votes['song__danceability__avg']
 
         # If context not provided or the previous query on upvotes for context did return any votes,
         # determine attributes from the attributes for the user and emotion
