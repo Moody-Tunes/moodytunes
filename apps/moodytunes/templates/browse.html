@@ -19,6 +19,7 @@
 {% endblock %}
 
 {% block content %}
+<div id="config" data-csrf-token="{{ csrf_token }}"></div>
 <h1>Browse Songs</h1>
 <div id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
