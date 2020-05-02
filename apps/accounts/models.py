@@ -183,7 +183,3 @@ class UserSongVote(BaseModel):
         # We don't actually want to delete these records, so just set the vote value to false
         self.vote = False
         self.save()
-
-        # Update attributes for the emotion for user after deleting vote
-        user_emot = self.user.get_user_emotion_record(self.emotion.name)
-        user_emot.update_attributes()
