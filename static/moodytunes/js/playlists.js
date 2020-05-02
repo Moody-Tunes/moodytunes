@@ -52,15 +52,31 @@
     }
 
     function createDeleteButton(song) {
-        let buttonContainer = document.createElement('div');
-        buttonContainer.className = 'vote-button-container';
-
         let button = document.createElement('button');
         button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
         button.addEventListener('click', confirmDeleteVote);
-        buttonContainer.appendChild(button);
+
+        return button;
+    }
+
+    function createContextButton(song) {
+        let button = document.createElement('button');
+        button.className = 'vote-button vote-button-context';
+        button.appendChild(document.createTextNode('Context'));
+        button.dataset.song = song;
+        //button.addEventListener('click', confirmDeleteVote);
+
+        return button;
+    }
+
+    function createButtons(song) {
+        let buttonContainer = document.createElement('div');
+        buttonContainer.className = 'vote-button-container';
+
+        buttonContainer.appendChild(createDeleteButton(song));
+        buttonContainer.appendChild(createContextButton(song));
 
         return buttonContainer
     }
@@ -136,7 +152,7 @@
             descriptionContainer.className = 'song-description-container';
             descriptionContainer.innerText = vote.description;
             songContainer.appendChild(descriptionContainer);
-            songContainer.appendChild(createDeleteButton(song.code));
+            songContainer.appendChild(createButtons(song.code));
 
             playlistContainer.appendChild(songContainer);
         });
