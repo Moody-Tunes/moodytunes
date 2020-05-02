@@ -23,11 +23,14 @@ class TestAverage(TestCase):
         self.assertEqual(calculated_attrs['energy__avg'], expected_energy)
         self.assertEqual(calculated_attrs['danceability__avg'], expected_danceability)
 
-    def test_empty_queryset_returns_null(self):
+    def test_empty_queryset_returns_null_values(self):
         collection = Song.objects.none()
 
         calculated_attrs = average(collection, 'valence', 'energy', 'danceability')
-        self.assertIsNone(calculated_attrs)
+
+        self.assertIsNone(calculated_attrs['valence__avg'])
+        self.assertIsNone(calculated_attrs['energy__avg'])
+        self.assertIsNone(calculated_attrs['danceability__avg'])
 
     def test_invalid_attribute_raises_exception(self):
         collection = Song.objects.all()

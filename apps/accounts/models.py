@@ -11,7 +11,7 @@ from encrypted_model_fields.fields import EncryptedCharField
 from base.models import BaseModel
 from base.validators import validate_decimal_value
 from libs.spotify import SpotifyClient, SpotifyException
-
+from libs.utils import average
 
 logger = getLogger(__name__)
 
@@ -142,19 +142,11 @@ class UserEmotion(BaseModel):
         """
         votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
 
-        vote_data = votes.aggregate(
-            Avg('song__energy'),
-            Avg('song__valence'),
-            Avg('song__danceability'),
-        )
+        vote_data = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        self.valence = vote_data['song__valence__avg']
+        self.energy = vote_data['song__energy__avg']
+        self.danceability = vote_data['song__danceability__avg']
 
-        valence = vote_data['song__valence__avg']
-        energy = vote_data['song__energy__avg']
-        danceability = vote_data['song__danceability__avg']
-
-        self.valence = valence and round(valence, 2)
-        self.energy = energy and round(energy, 2)
-        self.danceability = danceability and round(danceability, 2)
         self.save()
 
 

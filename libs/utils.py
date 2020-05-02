@@ -17,7 +17,7 @@ def average(collection, *criteria, precision=2):
         ret = collection.aggregate(*fields)
 
         if not all(ret.values()):
-            return None
+            return dict([(key, None) for key in ret.keys()])
 
         for key, value in ret.items():
             ret[key] = round(value, precision)
