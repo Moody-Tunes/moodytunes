@@ -58,11 +58,14 @@ class TestUpdateUserEmotionTask(TestCase):
         user_emotion = self.user.get_user_emotion_record(self.emotion.name)
         user_votes = self.user.usersongvote_set.all()
 
-        expected_valence = average(user_votes, 'song__valence')
-        expected_energy = average(user_votes, 'song__energy')
+        expected_attributes = average(user_votes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = expected_attributes['song__valence__avg']
+        expected_energy = expected_attributes['song__energy__avg']
+        expected_danceability = expected_attributes['song__danceability__avg']
 
         self.assertEqual(user_emotion.valence, expected_valence)
         self.assertEqual(user_emotion.energy, expected_energy)
+        self.assertEqual(user_emotion.danceability, expected_danceability)
 
     def test_raises_exception_if_user_not_found(self):
         invalid_vote_pk = 10000

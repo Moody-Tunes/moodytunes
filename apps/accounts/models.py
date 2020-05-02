@@ -12,7 +12,6 @@ from base.validators import validate_decimal_value
 from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
 
-
 logger = getLogger(__name__)
 
 
@@ -142,9 +141,11 @@ class UserEmotion(BaseModel):
         """
         votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
 
-        self.valence = average(votes, 'song__valence')
-        self.energy = average(votes, 'song__energy')
-        self.danceability = average(votes, 'song__danceability')
+        vote_data = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        self.valence = vote_data['song__valence__avg']
+        self.energy = vote_data['song__energy__avg']
+        self.danceability = vote_data['song__danceability__avg']
+
         self.save()
 
 

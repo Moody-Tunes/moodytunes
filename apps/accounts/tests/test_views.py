@@ -211,14 +211,18 @@ class TestAnalyticsView(TestCase):
 
         working_songs = [upvoted_song_1, upvoted_song_2]
         votes = UserSongVote.objects.filter(user=self.user, vote=True)
+        expected_attributes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = expected_attributes['song__valence__avg']
+        expected_energy = expected_attributes['song__energy__avg']
+        expected_danceability = expected_attributes['song__danceability__avg']
 
         expected_response = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': None,
-            'energy': average(votes, 'song__energy'),
-            'valence': average(votes, 'song__valence'),
-            'danceability': average(votes, 'song__danceability'),
+            'energy': expected_energy,
+            'valence': expected_valence,
+            'danceability': expected_danceability,
             'total_songs': len(working_songs)
         }
 

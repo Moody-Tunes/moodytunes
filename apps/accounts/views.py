@@ -171,17 +171,18 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
-            energy = average(votes_for_emotion, 'song__energy')
-            valence = average(votes_for_emotion, 'song__valence')
-            danceability = average(votes_for_emotion, 'song__danceability')
+            votes_for_emotion_data = average(votes_for_emotion, 'song__valence', 'song__energy', 'song__danceability')
+            valence = votes_for_emotion_data['song__valence__avg']
+            energy = votes_for_emotion_data['song__energy__avg']
+            danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': genre,
-            'energy': energy,
-            'valence': valence,
-            'danceability': danceability,
+            'energy': energy and round(energy, 2),
+            'valence': valence and round(valence, 2),
+            'danceability': danceability and round(danceability, 2),
             'total_songs': votes_for_emotion.count()
         }
 
