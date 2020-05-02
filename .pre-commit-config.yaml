@@ -17,4 +17,4 @@ repos:
   rev: 'master'
   hooks:
   - id: importanize
-    args: [--verbose]
+    args: [--verbose -c .importanize.json]
