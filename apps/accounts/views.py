@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView, \
     LogoutView
 from django.core.exceptions import SuspiciousOperation
+from django.db.models import Avg
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, resolve, Resolver404, reverse_lazy
@@ -20,7 +21,7 @@ from accounts.serializers import AnalyticsSerializer, AnalyticsRequestSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
 from tunes.models import Emotion
-from libs.utils import average
+
 
 logger = logging.getLogger(__name__)
 
@@ -171,17 +172,23 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
-            energy = average(votes_for_emotion, 'song__energy')
-            valence = average(votes_for_emotion, 'song__valence')
-            danceability = average(votes_for_emotion, 'song__danceability')
+            votes_for_emotion_data = votes_for_emotion.aggregate(
+                Avg('song__energy'),
+                Avg('song__valence'),
+                Avg('song__danceability'),
+            )
+
+            valence = votes_for_emotion_data['song__valence__avg']
+            energy = votes_for_emotion_data['song__energy__avg']
+            danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': genre,
-            'energy': energy,
-            'valence': valence,
-            'danceability': danceability,
+            'energy': energy and round(energy, 2),
+            'valence': valence and round(valence, 2),
+            'danceability': danceability and round(danceability, 2),
             'total_songs': votes_for_emotion.count()
         }
 

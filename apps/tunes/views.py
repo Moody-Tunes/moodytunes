@@ -28,7 +28,7 @@ from tunes.serializers import (
     LastPlaylistSerializer
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
-from libs.utils import average
+
 
 logger = logging.getLogger(__name__)
 
