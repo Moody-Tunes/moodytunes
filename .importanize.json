@@ -10,6 +10,16 @@
     {"type": "stdlib"},
     {"type": "sitepackages"},
     {"type": "remainder"},
+    {
+      "type": "packages",
+      "packages": [
+        "accounts",
+        "base",
+        "moodytunes",
+        "tunes",
+        "libs"
+      ]
+    },
     {"type": "local"}
   ]
 }
