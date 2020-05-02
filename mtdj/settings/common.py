@@ -91,6 +91,7 @@ SESSION_COOKIE_SECURE = True  # Add `secure` flag when setting session cookie
 SESSION_COOKIE_HTTPONLY = True  # Add `HttpOnly` flag when setting session cookie
 
 CSRF_COOKIE_SECURE = True  # Add `secure` flag when setting CSRF cookie
+CSRF_COOKIE_HTTPONLY = True  # Add `HttpOnly` flag when setting CSRF cookie
 
 ROOT_URLCONF = 'mtdj.urls'
 ROOT_HOSTCONF = 'mtdj.hosts'
