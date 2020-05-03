@@ -13,6 +13,7 @@ from ratelimit.mixins import RatelimitMixin
 
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
@@ -62,12 +63,16 @@ class SuggestSongView(RatelimitMixin, FormView):
     ratelimit_rate = '3/m'
     ratelimit_method = 'POST'
 
+    @update_logging_data
     def post(self, request, *args, **kwargs):
         # Check if request is rate limited,
         if getattr(request, 'limited', False):
             logger.warning(
                 'User {} has been rate limited from suggesting songs'.format(request.user.username),
-                extra={'fingerprint': 'rate_limited_suggested_song'}
+                extra={
+                    'fingerprint': auto_fingerprint('rate_limit_suggest_song', **kwargs),
+                    'user_id': request.user.id
+                }
             )
             messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
             return HttpResponseRedirect(reverse('moodytunes:suggest'))
@@ -80,7 +85,7 @@ class SuggestSongView(RatelimitMixin, FormView):
 
             logger.info(
                 'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
-                extra={'fingerprint': 'added_suggested_song'}
+                extra={'fingerprint': auto_fingerprint('added_suggested_song', **kwargs)}
             )
             messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
 
@@ -92,7 +97,7 @@ class SuggestSongView(RatelimitMixin, FormView):
                     request.POST.get('code'),
                     form.errors['code'][0]
                 ),
-                extra={'fingerprint': 'invalid_suggested_song'}
+                extra={'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs)}
             )
             return render(request, self.template_name, context={'form': form})
 
@@ -116,6 +121,7 @@ class SpotifyAuthenticationView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationCallbackView(View):
 
+    @update_logging_data
     def get(self, request, *args, **kwargs):
         if 'code' in request.GET:
             code = request.GET['code']
@@ -143,14 +149,20 @@ class SpotifyAuthenticationCallbackView(View):
                     spotify_user_id=profile_data['id']
                 )
 
-                logger.info('Created SpotifyAuthUser record for user {}'.format(user.username))
+                logger.info(
+                    'Created SpotifyAuthUser record for user {}'.format(user.username),
+                    extra={'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs)}
+                )
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
             except IntegrityError:
-                logger.exception('Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
-                    user.username,
-                    profile_data['id']
-                ))
+                logger.exception(
+                    'Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                        user.username,
+                        profile_data['id']
+                    ),
+                    extra={'fingerprint': auto_fingerprint('failed_to_create_spotify_auth_user', **kwargs)}
+                )
 
                 messages.error(request, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
                     profile_data['id']
@@ -161,7 +173,10 @@ class SpotifyAuthenticationCallbackView(View):
         else:
             logger.warning(
                 'User {} failed Spotify Oauth confirmation'.format(request.user.username),
-                extra={'error': request.GET['error']}
+                extra={
+                    'fingerprint': auto_fingerprint('user_rejected_oauth_confirmation', **kwargs),
+                    'error': request.GET['error']
+                }
             )
 
             # Map error code to human-friendly display

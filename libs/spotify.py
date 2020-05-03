@@ -23,6 +23,22 @@ class SpotifyClient(object):
         self.fingerprint = identifier
         self.seen_songs = []
 
+    def _log(self, level, msg, extra=None, exc_info=False):
+        """
+        Log a message to the logger
+
+        :param level: (int) Logging level to log at. Should be a constant from the `logging` library
+        :param msg: (str) Log message to write to write
+        :param extra: (dict) Optional payload of extra logging information
+        :param exc_info: (bool) Include traceback information with log message
+        """
+        if extra is None:
+            extra = {}
+
+        extra.update({'fingerprint': self.fingerprint})
+
+        logger.log(level, msg, extra=extra, exc_info=exc_info)
+
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
         Make a request to the Spotify API and return the JSON response
@@ -37,22 +53,23 @@ class SpotifyClient(object):
         """
         response = None
 
-        logger.info(
-            '{id} - Making {method} request to Spotify URL: {url}'.format(
-                id=self.fingerprint,
+        if not headers:  # pragma: no cover
+            # Retrieve the header we need to make an auth request
+            auth_token = self._get_auth_access_token()
+            headers = {'Authorization': 'Bearer {}'.format(auth_token)}
+
+        self._log(
+            logging.INFO,
+            'Making {method} request to Spotify URL: {url}'.format(
                 method=method,
                 url=url,
             ),
             extra={
                 'params': params,
-                'data': data
+                'data': data,
+                'headers': headers
             }
         )
-
-        if not headers:  # pragma: no cover
-            # Retrieve the header we need to make an auth request
-            auth_token = self._get_auth_access_token()
-            headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 
         try:
             response = requests.request(
@@ -65,11 +82,8 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
-            logger.info('{} - Successful request made to {}.'.format(self.fingerprint, url))
-            logger.debug(
-                '{} - Successful request made to {}.'.format(self.fingerprint, url),
-                extra={'response_data': response}
-            )
+            self._log(logging.INFO, 'Successful request made to {}.'.format(url))
+            self._log(logging.DEBUG, 'Successful request made to {}.'.format(url), extra={'response_data': response})
 
         except requests.exceptions.HTTPError:
             response_data = None
@@ -80,24 +94,27 @@ class SpotifyClient(object):
             except Exception:
                 pass
 
-            logger.exception(
-                '{} - Received HTTPError requesting {}'.format(self.fingerprint, url),
+            self._log(
+                logging.ERROR,
+                'Received HTTPError requesting {}'.format(url),
                 extra={
                     'request_method': method,
                     'data': data,
                     'params': params,
+                    'headers': headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
                     'response_data': response_data,
-                }
+                },
+                exc_info=True
             )
 
-            raise SpotifyException('{} - Received HTTP Error requesting {}'.format(self.fingerprint, url))
+            raise SpotifyException('Received HTTP Error requesting {}'.format(url))
 
         except Exception:
-            logger.exception('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
+            self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
-            raise SpotifyException('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
+            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
 
         return response
 
@@ -113,15 +130,15 @@ class SpotifyClient(object):
         access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
         if not access_token:
-            logger.info('{} - Cache miss for auth access token'.format(self.fingerprint))
+            self._log(logging.INFO, 'Cache miss for auth access token')
             access_token = self._make_auth_access_token_request()
 
             if access_token:
                 cache.set(settings.SPOTIFY['auth_cache_key'], access_token, settings.SPOTIFY['auth_cache_key_timeout'])
             else:
-                logger.warning('{} - Unable to retrieve access token from Spotify'.format(self.fingerprint))
+                self._log(logging.ERROR, 'Unable to retrieve access token from Spotify')
 
-                raise SpotifyException('{} - Unable to retrieve Spotify access token'.format(self.fingerprint))
+                raise SpotifyException('Unable to retrieve Spotify access token')
 
         return access_token
 

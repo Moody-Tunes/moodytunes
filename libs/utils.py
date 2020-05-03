@@ -7,8 +7,8 @@ def average(collection, *criteria, precision=2):
     Given a QuerySey of records, calculate the average for given attributes of the set to `precision` decimal places
 
     :param collection: (QuerySet) Queryset of records
-    :param criteria: (*args[str]) Desired fields for calculated average
     :param precision: (int) Precision to round values to. Default is 2
+    :param criteria: (*args[str]) Desired fields for calculated average
 
     :return: (dict)
     """
@@ -25,4 +25,8 @@ def average(collection, *criteria, precision=2):
         return ret
 
     except FieldError:
-        raise ValueError('{} does not have an attribute {}'.format(collection.model, criteria))
+        raise ValueError('{}.{} does not have all the attributes {}'.format(
+            collection.model.__module__,
+            collection.model.__name__,
+            criteria
+        ))

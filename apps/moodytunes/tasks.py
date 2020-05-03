@@ -2,6 +2,7 @@ import logging
 
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
@@ -13,6 +14,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
+    @update_logging_data
     def run(self, spotify_code, username='anonymous', *args, **kwargs):
         """
         Use Spotify API to fetch song data for a given song and save the song to the database
@@ -26,7 +28,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         if Song.objects.filter(code=spotify_code).exists():
             logger.info(
                 'Song with code {} already exists in database'.format(spotify_code),
-                extra={'fingerprint': signature}
+                extra={'fingerprint': auto_fingerprint('song_already_exists', **kwargs)}
             )
             return
 
@@ -34,16 +36,12 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         song_data = None
 
         try:
-            logger.info(
-                'Making request to Spotify for song data for {}'.format(spotify_code),
-                extra={'fingerprint': signature}
-            )
             track_data = client.get_attributes_for_track(spotify_code)
             song_data = client.get_audio_features_for_tracks([track_data])[0]
         except SpotifyException:
             logger.warning(
                 'Failed to fetch song data from Spotify. Retrying',
-                extra={'fingerprint': signature},
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_song', **kwargs)},
                 exc_info=True
             )
             self.retry()
@@ -57,12 +55,12 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             if created:
                 logger.info(
                     'Created song {} in database'.format(spotify_code),
-                    extra={'fingerprint': signature}
+                    extra={'fingerprint': auto_fingerprint('created_song', **kwargs)},
                 )
             else:
                 logger.info(
                     'Did not create song {} in database, song already exists'.format(spotify_code),
-                    extra={'fingerprint': signature}
+                    extra={'fingerprint': auto_fingerprint('song_already_exists', **kwargs)},
                 )
 
 
@@ -70,9 +68,8 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
-    fingerprint_base = 'tunes.tasks.CreateSpotifyPlaylistFromSongsTask.{msg}'
-
-    def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify):
+    @update_logging_data
+    def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify, **kwargs):
         """
         Get the Spotify playlist by name for the user, creating it if it does not exist
 
@@ -86,7 +83,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         playlist_id = None
 
         try:
-            logger.info('Checking if user {} has playlist with name {}'.format(spotify_user_id, playlist_name))
             resp = spotify.get_user_playlists(auth_code, spotify_user_id)
             playlists = resp['items']
 
@@ -97,23 +93,22 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         except SpotifyException:
             logger.warning('Error getting playlists for user {}'.format(spotify_user_id), extra={
-                'fingerprint': self.fingerprint_base.format(msg='failed_getting_user_playlists'),
+                'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
                 'spotify_user_id': spotify_user_id,
                 'playlist_name': playlist_name,
             })
 
         if playlist_id is None:
             try:
-                logger.info('Creating playlist for user {} with name {}'.format(spotify_user_id, playlist_name))
                 playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
                 logger.info(
                     'Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name),
-                    extra={'fingerprint': self.fingerprint_base.format(msg='created_spotify_playlist')}
+                    extra={'fingerprint': auto_fingerprint('created_spotify_playlist', **kwargs)}
                 )
 
             except SpotifyException:
                 logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
-                    'fingerprint': self.fingerprint_base.format(msg='failed_creating_playlist'),
+                    'fingerprint': auto_fingerprint('failed_creating_playlist', **kwargs),
                     'spotify_user_id': spotify_user_id,
                     'playlist_name': playlist_name,
                 })
@@ -121,7 +116,8 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         return playlist_id
 
-    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify):
+    @update_logging_data
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify, **kwargs):
         """
         Call Spotify API to add songs to a playlist
 
@@ -132,8 +128,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         """
         try:
-            logger.info('Adding songs to playlist {}'.format(playlist_id))
-
             # Spotify has a limit of 100 songs per request to add songs to a playlist
             # Break up the total list of songs into batches of 100
             batched_songs = spotify.batch_tracks(songs)
@@ -147,18 +141,19 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
             logger.info(
                 'Added songs to playlist {} successfully'.format(playlist_id),
-                extra={'fingerprint': self.fingerprint_base.format(msg='success_adding_songs_to_spotify_playlist')}
+                extra={'fingerprint': auto_fingerprint('added_songs_to_playlist', **kwargs)},
             )
         except SpotifyException:
             logger.exception(
                 'Error adding songs to playlist {}'.format(playlist_id), extra={
-                    'fingerprint': self.fingerprint_base.format(msg='failed_adding_songs_to_playlist'),
+                    'fingerprint': auto_fingerprint('failed_adding_songs_to_playlist', **kwargs),
                     'songs': songs
                 }
             )
             self.retry()
 
-    def get_and_refresh_spotify_user_auth_record(self, auth_id):
+    @update_logging_data
+    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
         """
         Fetch the SpotifyUserAuth record for the given primary key, and refresh if
         the access token is expired
@@ -172,7 +167,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
             logger.error(
                 'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': self.fingerprint_base.format(msg='fail_fetch_spotify_auth_user')}
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
             )
 
             raise
@@ -183,9 +178,8 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             except SpotifyException:
                 logger.warning(
                     'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': self.fingerprint_base.format(msg='failed_update_access_token')}
+                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
                 )
-
                 self.retry()
 
         return auth
