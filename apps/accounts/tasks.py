@@ -11,6 +11,7 @@ logger = getLogger(__name__)
 
 class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
+    @update_logging_data
     def run(self, user_id, *args, **kwargs):
         """
         Create UserEmotion records for a user for each emotion we have in our system
@@ -20,10 +21,11 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
         try:
             user = MoodyUser.objects.get(pk=user_id)
         except (MoodyUser.DoesNotExist, MoodyUser.MultipleObjectsReturned):
-            logger.exception('Unable to fetch MoodyUser with pk={}'.format(user_id))
+            logger.exception(
+                'Unable to fetch MoodyUser with pk={}'.format(user_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs)}
+            )
             raise
-
-        logger.info('Creating UserEmotion records for user {}'.format(user.username))
 
         for emotion in Emotion.objects.all().iterator():
             UserEmotion.objects.create(
@@ -31,7 +33,10 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
                 emotion=emotion
             )
 
-        logger.info('Created UserEmotion records for user {}'.format(user.username))
+        logger.info(
+            'Created UserEmotion records for user {}'.format(user.username),
+            extra={'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs)}
+        )
 
 
 class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
