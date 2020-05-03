@@ -180,9 +180,9 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             'emotion': emotion.name,
             'emotion_name': emotion.full_name,
             'genre': genre,
-            'energy': energy and round(energy, 2),
-            'valence': valence and round(valence, 2),
-            'danceability': danceability and round(danceability, 2),
+            'energy': energy,
+            'valence': valence,
+            'danceability': danceability,
             'total_songs': votes_for_emotion.count()
         }
 
