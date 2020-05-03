@@ -445,7 +445,25 @@ class TestSpotifyClient(TestCase):
         self.assertEqual(access_token, resp_data['access_token'])
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_attributes_for_track_no_genre(self, mock_request):
+    def test_get_user_profile(self, mock_request):
+        access_token = 'spotify:access:token'
+
+        mock_profile_data = {'id': 'spotify-user-id'}
+        mock_request.return_value = mock_profile_data
+        expected_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+
+        profile_data = self.spotify_client.get_user_profile(access_token)
+
+        mock_request.assert_called_once_with(
+            'GET',
+            'https://api.spotify.com/v1/me',
+            headers=expected_headers,
+        )
+
+        self.assertDictEqual(profile_data, mock_profile_data)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_attributes_for_track(self, mock_request):
         mock_song_code = 'spotify:track:1234567'
         mock_track_data = {
             'name': 'Sickfit',
@@ -461,10 +479,7 @@ class TestSpotifyClient(TestCase):
             'code': mock_song_code
         }
 
-        mock_request.side_effect = [
-            mock_track_data,
-            {}
-        ]
+        mock_request.return_value = mock_track_data
 
         song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
 

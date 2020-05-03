@@ -333,7 +333,8 @@ class SpotifyClient(object):
 
         return tracks
 
-    def build_spotify_oauth_confirm_link(self, state, scopes):
+    @staticmethod
+    def build_spotify_oauth_confirm_link(state, scopes):
         """
         First step in the Spotify user authorization flow. This builds the request to authorize the application with
         Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
