@@ -42,8 +42,8 @@ class TestUserEmotion(TestCase):
 
     def test_update_attributes_sets_values_to_average_of_upvoted_songs(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(energy=.50, valence=.75)
-        song2 = MoodyUtil.create_song(energy=.60, valence=.85)
+        song = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.45)
+        song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
         user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
@@ -65,17 +65,20 @@ class TestUserEmotion(TestCase):
 
         votes = UserSongVote.objects.filter(user=self.user)
 
-        expected_new_energy = average(votes, 'song__energy')
-        expected_new_valence = average(votes, 'song__valence')
+        expected_attributes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = expected_attributes['song__valence__avg']
+        expected_energy = expected_attributes['song__energy__avg']
+        expected_danceability = expected_attributes['song__danceability__avg']
 
         user_emot.update_attributes()
-        self.assertEqual(user_emot.energy, expected_new_energy)
-        self.assertEqual(user_emot.valence, expected_new_valence)
+        self.assertEqual(user_emot.energy, expected_energy)
+        self.assertEqual(user_emot.valence, expected_valence)
+        self.assertEqual(user_emot.danceability, expected_danceability)
 
     def test_update_attributes_sets_values_to_default_if_no_songs_upvoted(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(energy=.50, valence=.75)
-        song2 = MoodyUtil.create_song(energy=.60, valence=.85)
+        song = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.45)
+        song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
         user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
 
         UserSongVote.objects.create(
@@ -93,12 +96,14 @@ class TestUserEmotion(TestCase):
         )
 
         self.user.usersongvote_set.filter(emotion=emotion).update(vote=False)
-        expected_new_energy = emotion.energy
-        expected_new_valence = emotion.valence
+        default_emotion_energy = emotion.energy
+        default_emotion_valence = emotion.valence
+        default_emotion_danceability = emotion.danceability
 
         user_emot.update_attributes()
-        self.assertEqual(user_emot.energy, expected_new_energy)
-        self.assertEqual(user_emot.valence, expected_new_valence)
+        self.assertEqual(user_emot.energy, default_emotion_energy)
+        self.assertEqual(user_emot.valence, default_emotion_valence)
+        self.assertEqual(user_emot.danceability, default_emotion_danceability)
 
 
 class TestMoodyUser(TestCase):
@@ -225,14 +230,17 @@ class TestUserSongVote(TestCase):
 
         vote_to_delete.delete()
 
-        upvoted_votes = UserSongVote.objects.filter(user=self.user, vote=True)
-        expected_new_energy = average(upvoted_votes, 'song__energy')
-        expected_new_valence = average(upvoted_votes, 'song__valence')
+        upvotes = UserSongVote.objects.filter(user=self.user, vote=True)
+        expected_attributes = average(upvotes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = expected_attributes['song__valence__avg']
+        expected_energy = expected_attributes['song__energy__avg']
+        expected_danceability = expected_attributes['song__danceability__avg']
 
         user_emot.refresh_from_db()
 
-        self.assertEqual(user_emot.energy, expected_new_energy)
-        self.assertEqual(user_emot.valence, expected_new_valence)
+        self.assertEqual(user_emot.energy, expected_energy)
+        self.assertEqual(user_emot.valence, expected_valence)
+        self.assertEqual(user_emot.danceability, expected_danceability)
 
     def test_deleting_all_votes_updates_attributes_to_defaults(self):
         user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)

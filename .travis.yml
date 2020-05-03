@@ -1,5 +1,10 @@
 language: python
 
+cache:
+  pip: true
+  directories:
+    - $HOME/.cache/pre-commit
+
 python:
   - "3.6"
 
@@ -17,3 +22,4 @@ install:
 script:
   - pytest
   - flake8
+  - pre-commit install && pre-commit

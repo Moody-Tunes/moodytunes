@@ -3,9 +3,11 @@ from unittest import mock
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from rest_framework import status
 
 from accounts.models import SpotifyUserAuth
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
+from tunes.models import Emotion
 
 
 class TestBrowsePlaylistsView(TestCase):
@@ -186,12 +188,7 @@ class TestExportView(TestCase):
         cls.user_with_no_auth = MoodyUtil.create_user(username='no-auth')
         cls.url = reverse('moodytunes:export')
 
-        cls.spotify_auth = SpotifyUserAuth.objects.create(
-            user=cls.user,
-            access_token='test-access-token',
-            refresh_token='test-refresh-token',
-            spotify_user_id='test-user-id'
-        )
+        cls.spotify_auth = MoodyUtil.create_spotify_user_auth(cls.user)
 
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -202,3 +199,73 @@ class TestExportView(TestCase):
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+
+    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.delay')
+    def test_post_request_happy_path(self, mock_task_call):
+        # Set up playlist for creation
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name
+        }
+
+        self.client.post(self.url, data)
+
+        mock_task_call.assert_called_once()
+
+    def test_post_request_with_no_user_auth_returns_not_found(self):
+        self.client.logout()
+        self.client.login(username=self.user_with_no_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        # Set up playlist for creation
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user_with_no_auth, song, emotion, True)
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name
+        }
+
+        resp = self.client.post(self.url, data)
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_post_empty_playlist_displays_error(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name
+        }
+
+        resp = self.client.post(self.url, data)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+            emotion.full_name.lower()
+        )
+
+        self.assertEqual(last_message, msg)
+
+    def test_post_bad_request_displays_error(self):
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': 'bad-value'
+        }
+
+        resp = self.client.post(self.url, data)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Please submit a valid request'
+
+        self.assertEqual(last_message, msg)

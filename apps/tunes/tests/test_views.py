@@ -361,12 +361,15 @@ class TestVoteView(TestCase):
         self.api_client.post(self.url, data=data, format='json')
 
         votes = UserSongVote.objects.filter(user=self.user, vote=True)
-        expected_energy = average(votes, 'song__energy')
-        expected_valence = average(votes, 'song__valence')
+        expected_attributes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = expected_attributes['song__valence__avg']
+        expected_energy = expected_attributes['song__energy__avg']
+        expected_danceability = expected_attributes['song__danceability__avg']
 
         user_emotion.refresh_from_db()
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
+        self.assertEqual(user_emotion.danceability, expected_danceability)
 
     def test_submitting_duplicate_vote_not_allowed(self):
         data = {

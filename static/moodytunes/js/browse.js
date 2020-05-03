@@ -69,6 +69,20 @@
         });
     }
 
+    function allSongsVotedOn() {
+        // Check if all the songs from the browse playlist have been voted on
+        let allSongsVotedOn = true;
+        const songContainers = document.getElementsByClassName('song-container');
+
+        for (const songContainer of songContainers) {
+            if (!songContainer.dataset.votedOn) {
+                allSongsVotedOn = false;
+            }
+        }
+
+        return allSongsVotedOn;
+    }
+
     function voteOnSong() {
         var context = sessionStorage.context;
         var description = sessionStorage.description;
@@ -87,6 +101,11 @@
                 if (button.dataset.vote === vote) {
                     button.className += ' vote-button-' + vote + '-chosen';
                 }
+            }
+
+            songContainer.dataset.votedOn = 'true';
+            if (allSongsVotedOn()) {
+                getBrowsePlaylist();
             }
         })
     }

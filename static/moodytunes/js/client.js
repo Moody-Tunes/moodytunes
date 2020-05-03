@@ -15,11 +15,11 @@
         the data in the context of the page (like appending Spotify play buttons to a section or writing the data to an
         element on the page).
         */
-        checkTruthyObject: function(obj) {
+        checkTruthyObject: function (obj) {
             // Return whether or not `obj` is a Javascript Object and is empty
             return Boolean(obj && obj.constructor === Object && Object.entries(obj).length !== 0);
         },
-        buildRequestURL: function(endpoint, params) {
+        buildRequestURL: function (endpoint, params) {
             // Build a URL for making a request to the backend API
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to append to request url
@@ -36,7 +36,7 @@
 
             return requestUrl;
         },
-        stripNullParams: function(params) {
+        stripNullParams: function (params) {
             // Strips null values from params to ensure that URL doesn't include undefined parameters
             // @params (object): Query params to include in request
             // :return (object): Same params passed in, minus any keys that have undefined values
@@ -50,25 +50,18 @@
 
             return params;
         },
-        getCookie: function(name) {
-            // Retrieve a cookie value by name from the session cookie
-            // Lifted from Django documentation https://docs.djangoproject.com/en/2.1/ref/csrf/
-            // @param name (str): Name of cookie to retrieve
-            // :return (str, undefined): Cookie value if present in session cookie or undefined if not found
-            var cookieValue = null;
+        getCSRFToken: function () {
+            // Retrieve the CSRF cookie value to use in making unsafe requests
 
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i=0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
+            // Simple path: fetch the CSRF token from the page config
+            // Include a div with id="config" that includes the CSRF token as a dataset attribute
+            let csrfToken = document.getElementById('config').dataset.csrfToken;
+
+            if (csrfToken !== undefined && csrfToken !== null ) {
+                return csrfToken;
             }
 
-            return cookieValue;
+            // TODO: How else can we find the CSRF token for the request?
         },
         request: function(method, endpoint, params, data, callback) {
             // Wrapper for making request to MoodyTunes API
@@ -89,7 +82,7 @@
 
             if (method !== 'GET') {
                 options.body = JSON.stringify(data);
-                options.headers['X-CSRFToken'] = this.getCookie('csrftoken');
+                options.headers['X-CSRFToken'] = this.getCSRFToken();
             }
 
             fetch(url, options)

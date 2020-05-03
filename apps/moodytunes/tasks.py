@@ -1,5 +1,6 @@
 import logging
 
+from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
 from tunes.models import Song
 from libs.spotify import SpotifyClient, SpotifyException
@@ -157,8 +158,41 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             )
             self.retry()
 
-    def run(self, auth_code, spotify_user_id, playlist_name, songs, *args, **kwargs):
-        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(spotify_user_id))
+    def get_and_refresh_spotify_user_auth_record(self, auth_id):
+        """
+        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
+        the access token is expired
 
-        playlist_id = self.get_or_create_playlist(auth_code, spotify_user_id, playlist_name, spotify)
-        self.add_songs_to_playlist(auth_code, playlist_id, songs, spotify)
+        :param auth_id: (int) Primary key for SpotifyUserAuth record
+
+        :return: (SpotifyUserAuth)
+        """
+        try:
+            auth = SpotifyUserAuth.objects.get(pk=auth_id)
+        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
+            logger.error(
+                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
+                extra={'fingerprint': self.fingerprint_base.format(msg='fail_fetch_spotify_auth_user')}
+            )
+
+            raise
+
+        if auth.should_update_access_token:
+            try:
+                auth.refresh_access_token()
+            except SpotifyException:
+                logger.warning(
+                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
+                    extra={'fingerprint': self.fingerprint_base.format(msg='failed_update_access_token')}
+                )
+
+                self.retry()
+
+        return auth
+
+    def run(self, auth_id, playlist_name, songs, *args, **kwargs):
+        auth = self.get_and_refresh_spotify_user_auth_record(auth_id)
+        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
+
+        playlist_id = self.get_or_create_playlist(auth.access_token, auth.spotify_user_id, playlist_name, spotify)
+        self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)

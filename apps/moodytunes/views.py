@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -219,12 +219,9 @@ class ExportPlayListView(FormView):
 
                 return HttpResponseRedirect(reverse('moodytunes:export'))
 
-            auth = SpotifyUserAuth.objects.get(user=request.user)
-            if auth.should_update_access_token:
-                logger.info('Refreshing access token for {} to export playlist'.format(auth.user.username))
-                auth.refresh_access_token()
+            auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
-            CreateSpotifyPlaylistFromSongsTask().delay(auth.access_token, auth.spotify_user_id, playlist_name, songs)
+            CreateSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 

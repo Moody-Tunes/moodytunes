@@ -1,0 +1,14 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.4.0
+  hooks:
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: no-commit-to-branch
+    - id: name-tests-test
+      name: Check test filename name is valid
+      args: ['--django']
+    - id: debug-statements
+    - id: check-merge-conflict
+    - id: check-json
