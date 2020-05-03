@@ -1,14 +1,14 @@
 import copy
 from unittest import mock
 
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
+from libs.spotify import SpotifyException
+from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from tunes.management.commands.tunes_clear_duplicate_songs_from_database import Command as ClearDupesCommand
 from tunes.management.commands.tunes_create_songs_from_spotify import Command as SpotifyCommand
 from tunes.models import Emotion, Song
-from libs.spotify import SpotifyException
-from libs.tests.helpers import generate_random_unicode_string, MoodyUtil
 
 
 @mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)

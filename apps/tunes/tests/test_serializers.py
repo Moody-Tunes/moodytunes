@@ -1,14 +1,14 @@
 from django.test import TestCase
 
+from libs.tests.helpers import MoodyUtil
 from tunes.models import Emotion
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
+    LastPlaylistSerializer,
     PlaylistSongsRequestSerializer,
     VoteSongsRequestSerializer,
-    LastPlaylistSerializer
 )
-from libs.tests.helpers import MoodyUtil
 
 
 class TestBrowseSongsRequestSerializer(TestCase):

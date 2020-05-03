@@ -11,9 +11,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import MoodyUser, UserSongVote
-from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from libs.utils import average
+from tunes.models import Emotion
 
 
 class TestLoginView(TestCase):

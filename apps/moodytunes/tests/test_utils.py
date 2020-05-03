@@ -1,8 +1,8 @@
 from django.test import TestCase
 
+from libs.tests.helpers import MoodyUtil
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
-from libs.tests.helpers import MoodyUtil
 
 
 class TestExportPlaylistHelper(TestCase):

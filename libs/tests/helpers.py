@@ -3,8 +3,8 @@ import string
 
 from django.contrib.messages import get_messages
 
-from accounts.models import MoodyUser, UserSongVote, SpotifyUserAuth
-from tunes.models import Song, Emotion
+from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
+from tunes.models import Emotion, Song
 
 
 def generate_random_unicode_string(length):

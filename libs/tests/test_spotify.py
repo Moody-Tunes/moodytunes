@@ -4,7 +4,6 @@ from unittest import mock
 from urllib import parse
 
 from django.test import TestCase
-
 from requests.exceptions import HTTPError
 
 from libs.spotify import SpotifyClient, SpotifyException

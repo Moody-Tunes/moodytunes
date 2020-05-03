@@ -4,6 +4,7 @@ from accounts.models import MoodyUser, UserEmotion, UserSongVote
 from base.tasks import MoodyBaseTask
 from tunes.models import Emotion
 
+
 logger = getLogger(__name__)
 
 

@@ -10,25 +10,22 @@ from rest_framework.response import Response
 
 from accounts.models import UserSongVote
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
-from base.mixins import (
-    GetRequestValidatorMixin,
-    PostRequestValidatorMixin,
-    DeleteRequestValidatorMixin
-)
-from tunes.models import Song, Emotion
+from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
+from libs.utils import average
+from tunes.models import Emotion, Song
 from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
-    OptionsSerializer,
-    SongSerializer,
-    VoteSerializer,
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
+    LastPlaylistSerializer,
+    OptionsSerializer,
     PlaylistSongsRequestSerializer,
+    SongSerializer,
+    VoteSerializer,
     VoteSongsRequestSerializer,
-    LastPlaylistSerializer
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
-from libs.utils import average
+
 
 logger = logging.getLogger(__name__)
 

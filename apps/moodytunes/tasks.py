@@ -2,8 +2,8 @@ import logging
 
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
-from tunes.models import Song
 from libs.spotify import SpotifyClient, SpotifyException
+from tunes.models import Song
 
 
 logger = logging.getLogger(__name__)
