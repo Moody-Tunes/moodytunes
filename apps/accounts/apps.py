@@ -7,4 +7,3 @@ class AccountsConfig(AppConfig):
     def ready(self):
         # Register signals
         import accounts.signals  # noqa: F401
-        import pdb; pdb.set_trace()
