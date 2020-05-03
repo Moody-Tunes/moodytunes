@@ -24,3 +24,4 @@ script:
   - pytest
   - flake8
   - pre-commit
+  - importanize --config=.importanize.json
