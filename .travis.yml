@@ -23,5 +23,5 @@ install:
 script:
   - pytest
   - flake8
-  - pre-commit
+  - pre-commit run --from-ref origin.HEAD --to-ref HEAD
   - importanize --config=.importanize.json --ci
