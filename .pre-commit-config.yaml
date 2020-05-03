@@ -8,7 +8,7 @@ repos:
     - id: no-commit-to-branch
     - id: name-tests-test
       exclude: libs/tests/helpers.py
-      name: Check test filename name is valid
+      name: Check test filename is valid
       args: ['--django']
     - id: debug-statements
     - id: check-merge-conflict
