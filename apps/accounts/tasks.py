@@ -2,6 +2,7 @@ from logging import getLogger
 
 from accounts.models import MoodyUser, UserEmotion, UserSongVote
 from base.tasks import MoodyBaseTask
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from tunes.models import Emotion
 
 
@@ -35,6 +36,7 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
 class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
+    @update_logging_data
     def run(self, vote_id, *args, **kwargs):
         """
         Update UserEmotion attributes for an upvoted song
@@ -45,7 +47,10 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
         try:
             vote = UserSongVote.objects.get(pk=vote_id)
         except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
-            logger.exception('Unable to fetch UserSongVote with pk={}'.format(vote_id))
+            logger.exception(
+                'Unable to fetch UserSongVote with pk={}'.format(vote_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_vote', **kwargs)}
+            )
             raise
 
         # We should always call get_or_create to ensure that if we add new emotions, we'll auto
@@ -63,19 +68,17 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
         old_valence = user_emotion.valence
         old_danceability = user_emotion.danceability
 
-        logger.info('Updating UserEmotion attributes for user {} for emotion {}'.format(
-            vote.user.username,
-            vote.emotion.full_name
-        ))
-
         user_emotion.update_attributes()
-        user_emotion.refresh_from_db()
 
-        logger.info('Updated UserEmotion attributes for user {} for emotion {}'.format(
+        logger.info(
+            'Updated UserEmotion attributes for user {} for emotion {}'.format(
                 vote.user.username,
                 vote.emotion.full_name
             ),
             extra={
+                'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
+                'user_id': vote.user.id,
+                'emotion_id': vote.emotion.id,
                 'old_energy': old_energy,
                 'old_valence': old_valence,
                 'old_danceability': old_danceability,
