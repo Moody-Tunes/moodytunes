@@ -290,13 +290,13 @@ class SpotifyClient(object):
 
     def get_audio_features_for_tracks(self, tracks):
         """
-        Get audio features for a number of tracks. Currently returns sentiment and valence data for the track from
-        Spotify. Will update the track in place, each track in the list is a dictionary of values needed to create a
-        Song object. This track returns the list with the dictionaries updated with the `valence` and `energy` values.
+        Get audio features (attributes we use for determining song emotion) for a number of tracks. Will update the
+        tracks in place, each track in the list is a dictionary of values needed to create a Song object. This method
+        returns the list of tracks updated with the tracks emotion attribute values.
 
         :param tracks: (list[dict]) Song mappings
 
-        :return: (list[dict]) Song mappings + (energy, valence)
+        :return: (list[dict]) Song mappings + (energy, valence, danceability)
         """
         # Need to batch tracks as Spotify limits the number of tracks sent in one request
         batched_tracks = self.batch_tracks(tracks)
