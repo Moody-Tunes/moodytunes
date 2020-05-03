@@ -178,6 +178,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
+    @update_logging_data
     def create(self, request, *args, **kwargs):
         try:
             song = Song.objects.get(code=self.cleaned_data['song_code'])
@@ -229,6 +230,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
+    @update_logging_data
     def destroy(self, request, *args, **kwargs):
         votes = UserSongVote.objects.filter(
             user_id=self.request.user.id,
