@@ -17,9 +17,10 @@ before_script:
   - psql -c 'ALTER USER mtdj CREATEDB;' -U postgres
 
 install:
-  pip install -r requirements/common.txt
+  - pip install -r requirements/common.txt
+  - pre-commit install
 
 script:
   - pytest
   - flake8
-  - pre-commit install && pre-commit
+  - pre-commit
