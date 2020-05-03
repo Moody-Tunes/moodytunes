@@ -4,15 +4,15 @@
     // Global variables for API requests to backend
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
-    var emotion;
-    var generatePlaylistButton = document.getElementById('generate-playlist');
-    var confirmDeleteModal = document.getElementById('delete-confirm-modal');
-    var closeModal = document.getElementById('close-modal');
-    var cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
-    var confirmDeleteVoteButton = document.getElementById('delete-vote');
+    let emotion;
+    let generatePlaylistButton = document.getElementById('generate-playlist');
+    let confirmDeleteModal = document.getElementById('delete-confirm-modal');
+    let closeModal = document.getElementById('close-modal');
+    let cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
+    let confirmDeleteVoteButton = document.getElementById('delete-vote');
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
-    var lastGenre,
+    let lastGenre,
         lastContext;
 
     function hideConfirmDeleteModal() {
@@ -24,7 +24,7 @@
     }
 
     function deleteVote(evt) {
-        var song = confirmDeleteVoteButton.dataset.song;
+        let song = confirmDeleteVoteButton.dataset.song;
         confirmDeleteVoteButton.disabled = true;
         cancelDeleteVoteButton.disabled = true;
         document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
@@ -48,10 +48,10 @@
     }
 
     function createDeleteButton(song) {
-        var buttonContainer = document.createElement('div');
+        let buttonContainer = document.createElement('div');
         buttonContainer.className = 'vote-button-container';
 
-        var button = document.createElement('button');
+        let button = document.createElement('button');
         button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
@@ -62,8 +62,8 @@
     }
 
     function createPaginationButton(link, type) {
-        var name = type.charAt(0).toUpperCase() + type.slice(1);
-        var button = document.createElement('button');
+        let name = type.charAt(0).toUpperCase() + type.slice(1);
+        let button = document.createElement('button');
         button.appendChild(document.createTextNode(name));
         button.className = type + '-button';
         button.dataset.url = link;
@@ -84,8 +84,8 @@
     }
 
     function getPaginatedEmotionPlaylist() {
-        var url = this.dataset.url;
-        var options = {
+        let url = this.dataset.url;
+        let options = {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -102,13 +102,13 @@
     }
 
     function displayEmotionPlaylist(data) {
-        var playlistContainer = document.getElementById('playlist-display-container');
-        var buttonContainer = document.getElementById('playlist-pagination-button-container');
-        var noResultsFoundAlert = document.getElementById('alert-no-results');
+        let playlistContainer = document.getElementById('playlist-display-container');
+        let buttonContainer = document.getElementById('playlist-pagination-button-container');
+        let noResultsFoundAlert = document.getElementById('alert-no-results');
 
-        var votes = data.results;
-        var nextLink = data.next;
-        var previousLink = data.previous;
+        let votes = data.results;
+        let nextLink = data.next;
+        let previousLink = data.previous;
 
         document.PlaylistCurator.clearChildren(playlistContainer);
         document.PlaylistCurator.clearChildren(buttonContainer);
@@ -121,15 +121,15 @@
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
             votes.forEach(function (vote) {
-                var song = vote.song;
+                let song = vote.song;
 
-                var songContainer = document.createElement('div');
+                let songContainer = document.createElement('div');
                 songContainer.id = 'song-' + song.code;
                 songContainer.className = 'song-container';
 
                 songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
 
-                var descriptionContainer = document.createElement('p');
+                let descriptionContainer = document.createElement('p');
                 descriptionContainer.className = 'song-description-container';
                 descriptionContainer.innerText = vote.description;
                 songContainer.appendChild(descriptionContainer);
@@ -147,7 +147,7 @@
     }
 
     function getEmotionPlaylist(evt) {
-        var genre,
+        let genre,
             context;
 
         if (evt.target === generatePlaylistButton) {
