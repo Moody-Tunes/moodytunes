@@ -94,12 +94,11 @@
             let songContainer = document.getElementById('song-' + song);
             let voteButtons = songContainer.querySelectorAll('button');
 
-            for (let i=0; i<voteButtons.length; i++) {
-                let button = voteButtons[i];
-                button.disabled = true;
+            for (const voteButton of voteButtons) {
+                voteButton.disabled = true;
 
-                if (button.dataset.vote === vote) {
-                    button.className += ' vote-button-' + vote + '-chosen';
+                if (voteButton.dataset.vote === vote) {
+                    voteButton.className += ' vote-button-' + vote + '-chosen';
                 }
             }
 
