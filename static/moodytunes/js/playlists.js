@@ -27,7 +27,7 @@
         let song = confirmDeleteVoteButton.dataset.song;
         confirmDeleteVoteButton.disabled = true;
         cancelDeleteVoteButton.disabled = true;
-        document.MoodyTunesClient.deleteVote(song, emotion, lastContext, function(data) {
+        document.MoodyTunesClient.deleteVote(song, emotion, lastContext, data => {
             getEmotionPlaylist(evt);
             hideConfirmDeleteModal();
         });
@@ -120,7 +120,7 @@
         } else {
             noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
 
-            votes.forEach(function (vote) {
+            votes.forEach(vote => {
                 let song = vote.song;
 
                 let songContainer = document.createElement('div');
