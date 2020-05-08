@@ -166,7 +166,7 @@
     }
 
     function getBrowsePlaylist() {
-        let limit = undefined; // We don't want people to set the limit themselves, keep it at the default
+        let limit; // We don't want people to set the limit themselves, keep it at the default
 
         let context = sessionStorage.context;
         let description = sessionStorage.description;
