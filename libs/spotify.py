@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import random
@@ -19,9 +20,26 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
+    REDACT_VALUE = '**********'
+    REDACT_DATA_KEYS = ['Authorization', ]
+
     def __init__(self, identifier='SpotifyClient'):
         self.fingerprint = identifier
         self.seen_songs = []
+
+    def _sanitize_log_data(self, data):
+        """
+        Redact sensitive data (auth headers, access token, etc.) from logging data
+
+        :param data: (dict) Request data to log
+
+        :return: (dict)
+        """
+        for name in data:
+            if name in self.REDACT_DATA_KEYS:
+                data[name] = self.REDACT_VALUE
+
+        return data
 
     def _log(self, level, msg, extra=None, exc_info=False):
         """
@@ -36,6 +54,11 @@ class SpotifyClient(object):
             extra = {}
 
         extra.update({'fingerprint': self.fingerprint})
+
+        # Redact sensitive data from logging data
+        for key, data in extra.items():
+            if isinstance(data, dict):
+                extra[key] = self._sanitize_log_data(data)
 
         logger.log(level, msg, extra=extra, exc_info=exc_info)
 
@@ -58,6 +81,10 @@ class SpotifyClient(object):
             auth_token = self._get_auth_access_token()
             headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 
+        logging_params = copy.deepcopy(params)
+        logging_data = copy.deepcopy(data)
+        logging_headers = copy.deepcopy(headers)
+
         self._log(
             logging.INFO,
             'Making {method} request to Spotify URL: {url}'.format(
@@ -65,9 +92,9 @@ class SpotifyClient(object):
                 url=url,
             ),
             extra={
-                'params': params,
-                'data': data,
-                'headers': headers
+                'params': logging_params,
+                'data': logging_data,
+                'headers': logging_headers
             }
         )
 
@@ -99,9 +126,9 @@ class SpotifyClient(object):
                 'Received HTTPError requesting {}'.format(url),
                 extra={
                     'request_method': method,
-                    'data': data,
-                    'params': params,
-                    'headers': headers,
+                    'data': logging_data,
+                    'params': logging_params,
+                    'headers': logging_headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
                     'response_data': response_data,
