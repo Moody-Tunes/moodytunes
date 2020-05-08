@@ -118,7 +118,10 @@
         if (data.errors) {
             document.PlaylistCurator.displayRequestErrors(data.errors);
         } else {
-            noResultsFoundAlert.hidden = data.count >= 1;  // Show alert if we don't get any data back
+            if (document.PlaylistCurator.isEmptyResult(data.count)) {
+                noResultsFoundAlert.hidden = false;
+                return;
+            }
 
             votes.forEach(vote => {
                 let song = vote.song;

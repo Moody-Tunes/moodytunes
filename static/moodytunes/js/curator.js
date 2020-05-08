@@ -39,6 +39,9 @@
             playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
 
             return playButton
+        },
+        isEmptyResult: function(results) {
+            return !Boolean(results);
         }
     }
 })();

@@ -154,7 +154,10 @@
         if (data.errors) {
             document.PlaylistCurator.displayRequestErrors(data.errors);
         } else {
-            noResultsFoundAlert.hidden = data.length >= 1;  // Show alert if we don't get any data back
+            if (document.PlaylistCurator.isEmptyResult(data.length)) {
+                noResultsFoundAlert.hidden = false;
+                return;
+            }
 
             // Build playlist from returned data
             for (let i = 0; i < data.length; i++) {
