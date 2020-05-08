@@ -160,7 +160,6 @@
 
             // Build playlist from returned data
             for (const song of data) {
-                console.log('Adding song to container: ' + song.name);
                 playlistContainer.appendChild(createSongContainer(song));
             }
         }
