@@ -432,10 +432,9 @@ class TestSpotifyClient(TestCase):
             'refresh_token': 'some:refresh:token'
         }
 
-        response = mock.Mock()
-        response.json.return_value = resp_data
-
-        mock_request.return_value = response
+        mock_response = mock.Mock()
+        mock_response.json.return_value = resp_data
+        mock_request.return_value = mock_response
 
         user_tokens = self.spotify_client.get_access_and_refresh_tokens(**request_data)
 
