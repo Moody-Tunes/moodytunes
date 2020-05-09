@@ -21,7 +21,7 @@ class SpotifyException(Exception):
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
     REDACT_VALUE = '**********'
-    REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token']
+    REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token', 'access_token']
 
     def __init__(self, identifier='SpotifyClient'):
         self.fingerprint = identifier
@@ -115,7 +115,11 @@ class SpotifyClient(object):
             response = response.json()
 
             self._log(logging.INFO, 'Successful request made to {}.'.format(url))
-            self._log(logging.DEBUG, 'Successful request made to {}.'.format(url), extra={'response_data': response})
+            self._log(
+                logging.DEBUG,
+                'Successful request made to {}.'.format(url),
+                extra={'response_data': copy.deepcopy(response)}
+            )
 
             return response
 
