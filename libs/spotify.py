@@ -80,7 +80,6 @@ class SpotifyClient(object):
 
         :return (dict) Response content
         """
-        response = None
 
         if not headers:
             # Retrieve the header we need to make an auth request
@@ -118,14 +117,10 @@ class SpotifyClient(object):
             self._log(logging.INFO, 'Successful request made to {}.'.format(url))
             self._log(logging.DEBUG, 'Successful request made to {}.'.format(url), extra={'response_data': response})
 
-        except requests.exceptions.HTTPError:
-            response_data = None
+            return response
 
-            # Try to parse error message from response
-            try:
-                response_data = response.json()
-            except Exception:
-                pass
+        except requests.exceptions.HTTPError:
+            response_data = response.json()
 
             self._log(
                 logging.ERROR,
@@ -148,8 +143,6 @@ class SpotifyClient(object):
             self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
             raise SpotifyException('Received unhandled exception requesting {}'.format(url))
-
-        return response
 
     def _get_auth_access_token(self):
         """
