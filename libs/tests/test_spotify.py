@@ -20,9 +20,11 @@ class TestSpotifyClient(TestCase):
         # Clear seen songs cache from SpotifyClient instance
         self.spotify_client.seen_songs = []
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_make_auth_access_token_request_happy_path(self, mock_request):
-        mock_request.return_value = {'access_token': self.auth_code}
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {'access_token': self.auth_code}
+        mock_request.return_value = mock_response
 
         # Calculate encoded auth header expected by Spotify
         auth_val = '{client_id}:{secret_key}'.format(
@@ -42,13 +44,16 @@ class TestSpotifyClient(TestCase):
             'POST',
             'https://accounts.spotify.com/api/token',
             data=expected_request_data,
-            headers=expected_headers
+            headers=expected_headers,
+            params=None
         )
         self.assertEqual(auth, self.auth_code)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_make_auth_access_token_request_auth_code_not_found(self, mock_request):
-        mock_request.return_value = {}
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {}
+        mock_request.return_value = mock_response
 
         auth = self.spotify_client._make_auth_access_token_request()
 
@@ -168,9 +173,13 @@ class TestSpotifyClient(TestCase):
         with self.assertRaises(SpotifyException):
             self.spotify_client._make_spotify_request('GET', '/dummy_endpoint')
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_playlists_for_category_happy_path(self, mock_request):
-        mock_request.return_value = {
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_playlists_for_category_happy_path(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
+
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'playlists': {
                 'items': [{
                     'name': 'Super Dope',
@@ -181,6 +190,7 @@ class TestSpotifyClient(TestCase):
                 }],
             },
         }
+        mock_request.return_value = mock_response
 
         expected_resp = [{
             'name': 'Super Dope'.encode('ascii', 'ignore'),
@@ -199,15 +209,21 @@ class TestSpotifyClient(TestCase):
             params={
                 'country': 'US',
                 'limit': 1
-            }
+            },
+            data=None,
+            headers={'Authorization': 'Bearer {}'.format(self.auth_code)}
         )
         self.assertEqual(resp, expected_resp)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_songs_from_playlist_happy_path(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_songs_from_playlist_happy_path(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
+
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [{
                     'track': {
@@ -221,6 +237,7 @@ class TestSpotifyClient(TestCase):
                 }]
             }
         }
+        mock_request.return_value = mock_response
 
         expected_return = {
             'name': 'Glazed'.encode('utf-8'),
@@ -231,13 +248,17 @@ class TestSpotifyClient(TestCase):
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertDictEqual(expected_return, actual_return[0])
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_songs_from_playlist_with_unicode_data(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_songs_from_playlist_with_unicode_data(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
+
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
         song_name = generate_random_unicode_string(10)
         song_artist = generate_random_unicode_string(10)
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [{
                     'track': {
@@ -251,6 +272,7 @@ class TestSpotifyClient(TestCase):
                 }]
             }
         }
+        mock_request.return_value = mock_response
 
         expected_return = {
             'name': song_name.encode('utf-8'),
@@ -261,12 +283,16 @@ class TestSpotifyClient(TestCase):
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertDictEqual(expected_return, actual_return[0])
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_songs_from_playlist_excludes_song_already_seen(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_songs_from_playlist_excludes_song_already_seen(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
+
         self.spotify_client.seen_songs = ['already-seen-code']
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [{
                     'track': {
@@ -276,15 +302,19 @@ class TestSpotifyClient(TestCase):
                 }]
             }
         }
+        mock_request.return_value = mock_response
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_songs_from_playlist_excludes_song_is_explicit(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_songs_from_playlist_excludes_song_is_explicit(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [{
                     'track': {
@@ -294,30 +324,38 @@ class TestSpotifyClient(TestCase):
                 }]
             }
         }
+        mock_request.return_value = mock_response
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_songs_from_playlist_handles_empty_tracks(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_songs_from_playlist_handles_empty_tracks(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [{
                     'track': None
                 }]
             }
         }
+        mock_request.return_value = mock_response
 
         actual_return = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertFalse(actual_return)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_song_from_playlist_respects_limit(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_song_from_playlist_respects_limit(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         mock_playlist = {'user': 'two-tone-killer', 'uri': 'beats-pub'}
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'tracks': {
                 'items': [
                     {
@@ -343,22 +381,28 @@ class TestSpotifyClient(TestCase):
                 ]
             }
         }
+        mock_request.return_value = mock_response
 
         resp = self.spotify_client.get_songs_from_playlist(mock_playlist, 1)
         self.assertEqual(len(resp), 1)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_audio_features_for_tracks_happy_path(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_audio_features_for_tracks_happy_path(self, mock_request, mock_get_auth_token):
         track = {'code': 'spotify:song:code'}
         tracks = [track]
 
-        mock_request.return_value = {
+        mock_get_auth_token.return_value = self.auth_code
+
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'audio_features': [{
                 'valence': .5,
                 'energy': .5,
                 'danceability': .5
             }]
         }
+        mock_request.return_value = mock_response
 
         resp = self.spotify_client.get_audio_features_for_tracks(tracks)
         new_track = resp[0]
@@ -367,14 +411,16 @@ class TestSpotifyClient(TestCase):
         self.assertEqual(new_track['valence'], .5)
         self.assertEqual(new_track['danceability'], .5)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_audio_features_handles_missing_track_data(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_audio_features_handles_missing_track_data(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         track = {'code': 'spotify:song:code'}
         tracks = [track]
 
-        mock_request.return_value = {
-            'audio_features': [{}]
-        }
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {'audio_features': [{}]}
+        mock_request.return_value = mock_response
 
         resp = self.spotify_client.get_audio_features_for_tracks(tracks)
         new_track = resp[0]
@@ -383,16 +429,20 @@ class TestSpotifyClient(TestCase):
         self.assertIsNone(new_track.get('valence'))
         self.assertIsNone(new_track.get('danceability'))
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         track = {'code': 'spotify:song:code'}
         tracks = [track]
 
-        mock_request.return_value = {
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {
             'audio_features': [{
                 'valence': .5,
             }]
         }
+        mock_request.return_value = mock_response
 
         resp = self.spotify_client.get_audio_features_for_tracks(tracks)
         new_track = resp[0]
@@ -484,12 +534,16 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(access_token, expected_response_data['access_token'])
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_get_user_profile(self, mock_request):
         access_token = 'spotify:access:token'
 
         mock_profile_data = {'id': 'spotify-user-id'}
-        mock_request.return_value = mock_profile_data
+
+        mock_response = mock.Mock()
+        mock_response.json.return_value = mock_profile_data
+        mock_request.return_value = mock_response
+
         expected_headers = {'Authorization': 'Bearer {}'.format(access_token)}
 
         profile_data = self.spotify_client.get_user_profile(access_token)
@@ -498,12 +552,16 @@ class TestSpotifyClient(TestCase):
             'GET',
             'https://api.spotify.com/v1/me',
             headers=expected_headers,
+            params=None,
+            data=None
         )
 
         self.assertDictEqual(profile_data, mock_profile_data)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_attributes_for_track(self, mock_request):
+    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
+    @mock.patch('requests.request')
+    def test_get_attributes_for_track(self, mock_request, mock_get_auth_token):
+        mock_get_auth_token.return_value = self.auth_code
         mock_song_code = 'spotify:track:1234567'
         mock_track_data = {
             'name': 'Sickfit',
@@ -519,19 +577,23 @@ class TestSpotifyClient(TestCase):
             'code': mock_song_code
         }
 
-        mock_request.return_value = mock_track_data
+        mock_response = mock.Mock()
+        mock_response.json.return_value = mock_track_data
+        mock_request.return_value = mock_response
 
         song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
 
         self.assertDictEqual(song_data, expected_song_data)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_get_users_playlist(self, mock_request):
         auth_code = 'spotify-auth-id'
         spotify_user_id = 'spotify:user:id'
+        response_data = {'items': [{'name': 'test-playlist', 'id': '12345'}]}
 
-        mock_resp = {'items': [{'name': 'test-playlist', 'id': '12345'}]}
-        mock_request.return_value = mock_resp
+        mock_response = mock.Mock()
+        mock_response.json.return_value = response_data
+        mock_request.return_value = mock_response
 
         expected_headers = {
             'Authorization': 'Bearer {}'.format(auth_code),
@@ -540,21 +602,25 @@ class TestSpotifyClient(TestCase):
 
         resp = self.spotify_client.get_user_playlists(auth_code, spotify_user_id)
 
-        self.assertEqual(resp, mock_resp)
+        self.assertEqual(resp, response_data)
         mock_request.assert_called_once_with(
             'GET',
             'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
+            params=None,
             headers=expected_headers,
+            data=None
         )
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_create_playlist(self, mock_request):
         auth_code = 'spotify-auth-id'
         spotify_user_id = 'spotify:user:id'
         playlist_name = 'My Cool Playlist'
         playlist_id = 'spotify:playlist:id'
 
-        mock_request.return_value = {'id': playlist_id}
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {'id': playlist_id}
+        mock_request.return_value = mock_response
 
         expected_headers = {
             'Authorization': 'Bearer {}'.format(auth_code),
@@ -572,17 +638,20 @@ class TestSpotifyClient(TestCase):
         mock_request.assert_called_once_with(
             'POST',
             'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
+            params=None,
             headers=expected_headers,
             data=json.dumps(expected_data)
         )
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_add_songs_to_playlist(self, mock_request):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        mock_response = {'resp': 'OK'}
+        response_data = {'resp': 'OK'}
 
+        mock_response = mock.Mock()
+        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -594,21 +663,24 @@ class TestSpotifyClient(TestCase):
 
         retrieved_response = self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, mock_response)
+        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'POST',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
+            params=None,
             headers=expected_headers,
             data=json.dumps(expected_data)
         )
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_delete_songs_from_playlist(self, mock_request):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        mock_response = {'resp': 'OK'}
+        response_data = {'resp': 'OK'}
 
+        mock_response = mock.Mock()
+        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -620,10 +692,11 @@ class TestSpotifyClient(TestCase):
 
         retrieved_response = self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, mock_response)
+        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'DELETE',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
+            params=None,
             headers=expected_headers,
             data=json.dumps(expected_data)
         )
