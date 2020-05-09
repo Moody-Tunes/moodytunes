@@ -79,4 +79,4 @@ class UpdateUserForm(BaseUserForm):
 class UpdateUserEmotionAttributesForm(forms.ModelForm):
     class Meta:
         model = UserEmotion
-        fields = ('energy', 'valence')
+        fields = ('energy', 'valence', 'danceability')
