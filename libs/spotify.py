@@ -29,9 +29,10 @@ class SpotifyClient(object):
 
     def _sanitize_log_data(self, data):
         """
-        Redact sensitive data (auth headers, access token, etc.) from logging data
+        Redact sensitive data (auth headers, access tokens, etc.) from logging data and
+        replace with a sanitized value.
 
-        :param data: (dict) Request data to log
+        :param data: (dict) Request data to log that may contain sensitive information
 
         :return: (dict)
         """
@@ -43,7 +44,12 @@ class SpotifyClient(object):
 
     def _log(self, level, msg, extra=None, exc_info=False):
         """
-        Log a message to the logger
+        Log a message to the logger at a given level with optional extra info or traceback info.
+
+        NOTE: Any data passed as `extra` should be a copy of the real data used in the code. This
+        is because we do transformations on the data passed to sanitize sensitive values, so if we
+        operate on the "real data" we could inadvertently update the actual data being used in the
+        code.
 
         :param level: (int) Logging level to log at. Should be a constant from the `logging` library
         :param msg: (str) Log message to write to write
@@ -55,7 +61,7 @@ class SpotifyClient(object):
 
         extra.update({'fingerprint': self.fingerprint})
 
-        # Redact sensitive data from logging data
+        # Redact sensitive information from logging data extra
         for key, data in extra.items():
             if isinstance(data, dict):
                 extra[key] = self._sanitize_log_data(data)
