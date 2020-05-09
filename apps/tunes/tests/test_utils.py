@@ -106,6 +106,28 @@ class TestGenerateBrowsePlaylist(TestCase):
         with self.assertRaises(ValueError):
             generate_browse_playlist(energy, valence, danceability, strategy=strategy, jitter=jitter, songs=songs_mock)
 
+    def test_artist_passed_only_returns_songs_from_artist(self):
+        artist = 'TTK'
+        song_params = {
+            'energy': .5,
+            'valence': .75,
+            'danceability': .65,
+        }
+
+        song_from_artist = MoodyUtil.create_song(artist=artist, **song_params)
+        song_from_other_artist = MoodyUtil.create_song(artist='Bum', **song_params)
+
+        playlist = generate_browse_playlist(
+            song_params['energy'],
+            song_params['valence'],
+            song_params['danceability'],
+            jitter=0,
+            artist=artist
+        )
+
+        self.assertIn(song_from_artist, playlist)
+        self.assertNotIn(song_from_other_artist, playlist)
+
 
 class TestCachedPlaylistManager(TestCase):
     @classmethod
