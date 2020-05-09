@@ -34,7 +34,7 @@ def get_genre_choices(user=None):
             genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
             cache.set(settings.GENRE_CHOICES_CACHE_KEY, genres, settings.GENRE_CHOICES_CACHE_TIMEOUT)
 
-    return default_option + [(genre, genre) for genre in genres if genre]
+    return default_option + [(genre, genre.split('_')[0].capitalize()) for genre in genres if genre]
 
 
 class BrowseForm(forms.Form):
