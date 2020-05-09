@@ -26,3 +26,13 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
         logger.info('Calling django management command to clear expired sessions')
 
         call_command('clearsessions')
+
+
+class BackupDatabaseTask(MoodyPeriodicTask):
+    run_every = crontab(minute=0, hour=1, day_of_week=0)
+
+    """Task to make backups of application database"""
+    def run(self, *args, **kwargs):
+        logger.info('Calling django management command to backup database')
+
+        call_command('dbbackup')
