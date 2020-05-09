@@ -167,12 +167,13 @@
 
     function getBrowsePlaylist() {
         let limit; // We don't want people to set the limit themselves, keep it at the default
+        let artistInput = document.getElementById('id_artist');
 
         let context = sessionStorage.context;
         let description = sessionStorage.description;
         emotion = document.getElementById('id_emotion').value;
         let jitter = document.getElementById('id_jitter').value;
-        let artist = document.getElementById('id_artist').value;
+        let artist = artistInput && artistInput.value || undefined;
         let genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
