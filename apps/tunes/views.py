@@ -50,6 +50,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         cached_playlist_manager = CachedPlaylistManager()
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
+        artist = self.cleaned_data.get('artist')
 
         energy = None
         valence = None
@@ -93,7 +94,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'strategy': strategy,
                 'energy': energy,
                 'valence': valence,
-                'danceability': danceability
+                'danceability': danceability,
+                'artist': artist
             }
         )
 
@@ -104,6 +106,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             strategy=strategy,
             limit=limit,
             jitter=jitter,
+            artist=artist,
             songs=queryset
         )
 

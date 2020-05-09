@@ -106,7 +106,7 @@
             };
             this.request('GET', '/accounts/analytics/', params, {}, callback);
         },
-        getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, callback) {
+        getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, artist, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
             // their desired emotion
             let params = {
@@ -115,7 +115,8 @@
                 limit: limit,
                 genre: genre,
                 context: context,
-                description: description
+                description: description,
+                artist: artist
             };
 
             this.request('GET', '/tunes/browse/', params, {}, callback);

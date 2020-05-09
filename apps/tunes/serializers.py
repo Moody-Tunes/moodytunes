@@ -50,6 +50,7 @@ class BrowseSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/browse/"""
 
     emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
+    artist = serializers.CharField(max_length=50, required=False)
     genre = serializers.CharField(max_length=15, required=False)
     jitter = serializers.FloatField(min_value=0, max_value=1, required=False)
     limit = serializers.IntegerField(max_value=25, required=False)
