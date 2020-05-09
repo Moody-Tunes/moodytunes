@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import random
@@ -19,13 +20,36 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
+    REDACT_VALUE = '**********'
+    REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token']
+
     def __init__(self, identifier='SpotifyClient'):
         self.fingerprint = identifier
         self.seen_songs = []
 
+    def _sanitize_log_data(self, data):
+        """
+        Redact sensitive data (auth headers, access tokens, etc.) from logging data and
+        replace with a sanitized value.
+
+        :param data: (dict) Request data to log that may contain sensitive information
+
+        :return: (dict)
+        """
+        for name in data:
+            if name in self.REDACT_DATA_KEYS:
+                data[name] = self.REDACT_VALUE
+
+        return data
+
     def _log(self, level, msg, extra=None, exc_info=False):
         """
-        Log a message to the logger
+        Log a message to the logger at a given level with optional extra info or traceback info.
+
+        NOTE: Any data passed as `extra` should be a copy of the real data used in the code. This
+        is because we do transformations on the data passed to sanitize sensitive values, so if we
+        operate on the "real data" we could inadvertently update the actual data being used in the
+        code.
 
         :param level: (int) Logging level to log at. Should be a constant from the `logging` library
         :param msg: (str) Log message to write to write
@@ -36,6 +60,11 @@ class SpotifyClient(object):
             extra = {}
 
         extra.update({'fingerprint': self.fingerprint})
+
+        # Redact sensitive information from logging data extra
+        for key, data in extra.items():
+            if isinstance(data, dict):
+                extra[key] = self._sanitize_log_data(data)
 
         logger.log(level, msg, extra=extra, exc_info=exc_info)
 
@@ -51,12 +80,15 @@ class SpotifyClient(object):
 
         :return (dict) Response content
         """
-        response = None
 
-        if not headers:  # pragma: no cover
+        if not headers:
             # Retrieve the header we need to make an auth request
             auth_token = self._get_auth_access_token()
             headers = {'Authorization': 'Bearer {}'.format(auth_token)}
+
+        logging_params = copy.deepcopy(params)
+        logging_data = copy.deepcopy(data)
+        logging_headers = copy.deepcopy(headers)
 
         self._log(
             logging.INFO,
@@ -65,9 +97,9 @@ class SpotifyClient(object):
                 url=url,
             ),
             extra={
-                'params': params,
-                'data': data,
-                'headers': headers
+                'params': logging_params,
+                'data': logging_data,
+                'headers': logging_headers
             }
         )
 
@@ -85,23 +117,19 @@ class SpotifyClient(object):
             self._log(logging.INFO, 'Successful request made to {}.'.format(url))
             self._log(logging.DEBUG, 'Successful request made to {}.'.format(url), extra={'response_data': response})
 
-        except requests.exceptions.HTTPError:
-            response_data = None
+            return response
 
-            # Try to parse error message from response
-            try:
-                response_data = response.json()
-            except Exception:
-                pass
+        except requests.exceptions.HTTPError:
+            response_data = response.json()
 
             self._log(
                 logging.ERROR,
                 'Received HTTPError requesting {}'.format(url),
                 extra={
                     'request_method': method,
-                    'data': data,
-                    'params': params,
-                    'headers': headers,
+                    'data': logging_data,
+                    'params': logging_params,
+                    'headers': logging_headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
                     'response_data': response_data,
@@ -115,8 +143,6 @@ class SpotifyClient(object):
             self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
             raise SpotifyException('Received unhandled exception requesting {}'.format(url))
-
-        return response
 
     def _get_auth_access_token(self):
         """
