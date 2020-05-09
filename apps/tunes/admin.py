@@ -40,7 +40,7 @@ class EmotionAdmin(admin.ModelAdmin):
 
 class SongAdmin(admin.ModelAdmin):
     list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy', 'danceability')
-    readonly_fields = ('code', 'artist', 'name', 'valence', 'energy')
+    readonly_fields = ('code', 'artist', 'name', 'valence', 'energy', 'danceability')
     list_filter = (NullGenreFilter, 'genre')
     form = GenreFormField
 

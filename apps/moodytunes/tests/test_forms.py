@@ -18,8 +18,8 @@ class TestGetGenreChoices(TestCase):
 
         expected_choices = [
             self.default_choice,
-            (hiphop_song.genre, hiphop_song.genre),
-            (rock_song.genre, rock_song.genre)
+            (hiphop_song.genre, hiphop_song.genre.capitalize()),
+            (rock_song.genre, rock_song.genre.capitalize())
         ]
 
         choices = get_genre_choices()
@@ -37,7 +37,7 @@ class TestGetGenreChoices(TestCase):
 
         expected_choices = [
             self.default_choice,
-            (upvoted_song.genre, upvoted_song.genre),
+            (upvoted_song.genre, upvoted_song.genre.capitalize()),
         ]
 
         choices = get_genre_choices(user=user)
@@ -50,7 +50,7 @@ class TestGetGenreChoices(TestCase):
 
         expected_choices = [
             self.default_choice,
-            (song_with_genre.genre, song_with_genre.genre),
+            (song_with_genre.genre, song_with_genre.genre.capitalize()),
         ]
 
         choices = get_genre_choices()
@@ -63,7 +63,7 @@ class TestGetGenreChoices(TestCase):
         genres = ['foo']
         mock_cache.return_value = genres
 
-        expected_genres = [('', '-----------'), ('foo', 'foo')]
+        expected_genres = [('', '-----------'), ('foo', 'Foo')]
         returned_genres = get_genre_choices()
 
         self.assertEqual(returned_genres, expected_genres)
