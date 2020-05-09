@@ -116,6 +116,35 @@ class TestSpotifyClient(TestCase):
         self.assertDictEqual(resp, dummy_response)
 
     @mock.patch('requests.request')
+    def test_make_spotify_request_uses_headers_if_passed(self, mock_request):
+        dummy_response = {'status': 200, 'content': 'OK'}
+        dummy_headers = {'Foo': 'bar'}
+        dummy_params = {'query': 'param'}
+        dummy_data = {'key': 'value'}
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = None
+        mock_response.json.return_value = dummy_response
+        mock_request.return_value = mock_response
+
+        resp = self.spotify_client._make_spotify_request(
+            'GET',
+            '/dummy_endpoint',
+            data=dummy_data,
+            params=dummy_params,
+            headers=dummy_headers
+        )
+
+        mock_request.assert_called_with(
+            'GET',
+            '/dummy_endpoint',
+            params=dummy_params,
+            data=dummy_data,
+            headers=dummy_headers
+        )
+        self.assertDictEqual(resp, dummy_response)
+
+    @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
     def test_make_spotify_request_raises_spotify_exception_on_http_error(self, mock_auth, mock_request):
         mock_response = mock.Mock()
