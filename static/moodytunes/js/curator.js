@@ -36,7 +36,7 @@
             let playButton = document.createElement('iframe');
             playButton.setAttribute('allow', 'encrypted-media https://open.spotify.com;');
             playButton.className = 'play-button';
-            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+            playButton.src = 'https://open.spotify.com/embed/track/' + song.code.split(':')[2];
 
             return playButton
         },
