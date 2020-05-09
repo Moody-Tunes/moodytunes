@@ -80,8 +80,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         if energy is None or valence is None or valence is None:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
 
-            # If the user doesn't have a UserEmotion record for the user, fall back to the
-            # attributes for the emotion
+            # If the user doesn't have a UserEmotion record for the emotion, fall back to the
+            # default attributes for the emotion
             if not user_emotion:
                 emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
                 energy = emotion.energy
