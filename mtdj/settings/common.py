@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'django_celery_beat',
     'django_celery_results',
+    'dbbackup',
     'django_hosts',
     'easy_timezones',
     'encrypted_model_fields',
@@ -127,6 +128,13 @@ DATABASES = {
         'PORT': env.str('MTDJ_DATABASE_PORT', default='5432')
     }
 }
+
+# django-dbbackup options
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {
+    'location': env.str('MTDJ_DATABASE_BACKUPS_PATH', default='/tmp')
+}
+
 
 CACHES = {
     'default': {
