@@ -79,9 +79,18 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         # determine attributes from the attributes for the user and emotion
         if energy is None or valence is None or valence is None:
             user_emotion = self.request.user.get_user_emotion_record(self.cleaned_data['emotion'])
-            energy = user_emotion.energy
-            valence = user_emotion.valence
-            danceability = user_emotion.danceability
+
+            # If the user doesn't have a UserEmotion record for the emotion, fall back to the
+            # default attributes for the emotion
+            if not user_emotion:
+                emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
+                energy = emotion.energy
+                valence = emotion.valence
+                danceability = emotion.danceability
+            else:
+                energy = user_emotion.energy
+                valence = user_emotion.valence
+                danceability = user_emotion.danceability
 
         logger.info(
             'Generating browse playlist for user {}'.format(self.request.user.username),

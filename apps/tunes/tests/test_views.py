@@ -98,6 +98,27 @@ class TestBrowseView(TestCase):
 
         self.assertEqual(called_jitter, BrowseView.default_jitter)
 
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_browse_for_missing_user_emotion_uses_emotion_attributes(self, mock_generate_playlist):
+        user_emotion = self.user.get_user_emotion_record(Emotion.HAPPY)
+        emotion = user_emotion.emotion
+        emotion_energy = emotion.energy
+        emotion_valence = emotion.valence
+        emotion_danceability = emotion.danceability
+        user_emotion.delete()
+
+        params = {'emotion': Emotion.HAPPY}
+        self.api_client.get(self.url, data=params)
+
+        call_args = mock_generate_playlist.mock_calls[0][1]
+        called_energy = call_args[0]
+        called_valence = call_args[1]
+        called_danceability = call_args[2]
+
+        self.assertEqual(called_energy, emotion_energy)
+        self.assertEqual(called_valence, emotion_valence)
+        self.assertEqual(called_danceability, emotion_danceability)
+
     def test_playlist_excludes_previously_voted_songs(self):
         voted_song = MoodyUtil.create_song()
         not_voted_song = MoodyUtil.create_song()
