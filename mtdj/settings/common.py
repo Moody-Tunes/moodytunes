@@ -1,10 +1,12 @@
-from envparse import env
 import os
 import tempfile
+
+from envparse import env
 
 from . import BASE_DIR
 from .common_api import *
 from .common_celery import *
+
 
 SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='')
 
@@ -45,7 +47,6 @@ THIRD_PARTY_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_hosts',
-    'django_user_agents',
     'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
@@ -73,7 +74,6 @@ MIDDLEWARE = [
     'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
-    'django_user_agents.middleware.UserAgentMiddleware'
 ]
 
 # Security middleware definitions
@@ -332,6 +332,3 @@ GEOIP2_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.mmdb')
 
 # Strategies for generating browse playlist
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
-
-# User-Agent families that are like Chrome
-CHROME_USER_AGENT_FAMILIES = ['Chrome', 'Chromium']

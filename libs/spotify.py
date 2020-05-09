@@ -1,13 +1,14 @@
-from base64 import b64encode
+import copy
 import json
 import logging
 import random
+from base64 import b64encode
 from urllib.parse import urlencode
 
+import requests
 from django.conf import settings
 from django.core.cache import cache
 
-import requests
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +20,53 @@ class SpotifyException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
+    REDACT_VALUE = '**********'
+    REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token']
+
     def __init__(self, identifier='SpotifyClient'):
         self.fingerprint = identifier
         self.seen_songs = []
+
+    def _sanitize_log_data(self, data):
+        """
+        Redact sensitive data (auth headers, access tokens, etc.) from logging data and
+        replace with a sanitized value.
+
+        :param data: (dict) Request data to log that may contain sensitive information
+
+        :return: (dict)
+        """
+        for name in data:
+            if name in self.REDACT_DATA_KEYS:
+                data[name] = self.REDACT_VALUE
+
+        return data
+
+    def _log(self, level, msg, extra=None, exc_info=False):
+        """
+        Log a message to the logger at a given level with optional extra info or traceback info.
+
+        NOTE: Any data passed as `extra` should be a copy of the real data used in the code. This
+        is because we do transformations on the data passed to sanitize sensitive values, so if we
+        operate on the "real data" we could inadvertently update the actual data being used in the
+        code.
+
+        :param level: (int) Logging level to log at. Should be a constant from the `logging` library
+        :param msg: (str) Log message to write to write
+        :param extra: (dict) Optional payload of extra logging information
+        :param exc_info: (bool) Include traceback information with log message
+        """
+        if extra is None:
+            extra = {}
+
+        extra.update({'fingerprint': self.fingerprint})
+
+        # Redact sensitive information from logging data extra
+        for key, data in extra.items():
+            if isinstance(data, dict):
+                extra[key] = self._sanitize_log_data(data)
+
+        logger.log(level, msg, extra=extra, exc_info=exc_info)
 
     def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
         """
@@ -35,24 +80,28 @@ class SpotifyClient(object):
 
         :return (dict) Response content
         """
-        response = None
 
-        logger.info(
-            '{id} - Making {method} request to Spotify URL: {url}'.format(
-                id=self.fingerprint,
+        if not headers:
+            # Retrieve the header we need to make an auth request
+            auth_token = self._get_auth_access_token()
+            headers = {'Authorization': 'Bearer {}'.format(auth_token)}
+
+        logging_params = copy.deepcopy(params)
+        logging_data = copy.deepcopy(data)
+        logging_headers = copy.deepcopy(headers)
+
+        self._log(
+            logging.INFO,
+            'Making {method} request to Spotify URL: {url}'.format(
                 method=method,
                 url=url,
             ),
             extra={
-                'params': params,
-                'data': data
+                'params': logging_params,
+                'data': logging_data,
+                'headers': logging_headers
             }
         )
-
-        if not headers:  # pragma: no cover
-            # Retrieve the header we need to make an auth request
-            auth_token = self._get_auth_access_token()
-            headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 
         try:
             response = requests.request(
@@ -65,41 +114,35 @@ class SpotifyClient(object):
             response.raise_for_status()
             response = response.json()
 
-            logger.info('{} - Successful request made to {}.'.format(self.fingerprint, url))
-            logger.debug(
-                '{} - Successful request made to {}.'.format(self.fingerprint, url),
-                extra={'response_data': response}
-            )
+            self._log(logging.INFO, 'Successful request made to {}.'.format(url))
+            self._log(logging.DEBUG, 'Successful request made to {}.'.format(url), extra={'response_data': response})
+
+            return response
 
         except requests.exceptions.HTTPError:
-            response_data = None
+            response_data = response.json()
 
-            # Try to parse error message from response
-            try:
-                response_data = response.json()
-            except Exception:
-                pass
-
-            logger.exception(
-                '{} - Received HTTPError requesting {}'.format(self.fingerprint, url),
+            self._log(
+                logging.ERROR,
+                'Received HTTPError requesting {}'.format(url),
                 extra={
                     'request_method': method,
-                    'data': data,
-                    'params': params,
+                    'data': logging_data,
+                    'params': logging_params,
+                    'headers': logging_headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
                     'response_data': response_data,
-                }
+                },
+                exc_info=True
             )
 
-            raise SpotifyException('{} - Received HTTP Error requesting {}'.format(self.fingerprint, url))
+            raise SpotifyException('Received HTTP Error requesting {}'.format(url))
 
         except Exception:
-            logger.exception('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
+            self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
-            raise SpotifyException('{} - Received unhandled exception requesting {}'.format(self.fingerprint, url))
-
-        return response
+            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
 
     def _get_auth_access_token(self):
         """
@@ -113,15 +156,15 @@ class SpotifyClient(object):
         access_token = cache.get(settings.SPOTIFY['auth_cache_key'])
 
         if not access_token:
-            logger.info('{} - Cache miss for auth access token'.format(self.fingerprint))
+            self._log(logging.INFO, 'Cache miss for auth access token')
             access_token = self._make_auth_access_token_request()
 
             if access_token:
                 cache.set(settings.SPOTIFY['auth_cache_key'], access_token, settings.SPOTIFY['auth_cache_key_timeout'])
             else:
-                logger.warning('{} - Unable to retrieve access token from Spotify'.format(self.fingerprint))
+                self._log(logging.ERROR, 'Unable to retrieve access token from Spotify')
 
-                raise SpotifyException('{} - Unable to retrieve Spotify access token'.format(self.fingerprint))
+                raise SpotifyException('Unable to retrieve Spotify access token')
 
         return access_token
 
@@ -273,13 +316,13 @@ class SpotifyClient(object):
 
     def get_audio_features_for_tracks(self, tracks):
         """
-        Get audio features for a number of tracks. Currently returns sentiment and valence data for the track from
-        Spotify. Will update the track in place, each track in the list is a dictionary of values needed to create a
-        Song object. This track returns the list with the dictionaries updated with the `valence` and `energy` values.
+        Get audio features (attributes we use for determining song emotion) for a number of tracks. Will update the
+        tracks in place, each track in the list is a dictionary of values needed to create a Song object. This method
+        returns the list of tracks updated with the tracks emotion attribute values.
 
         :param tracks: (list[dict]) Song mappings
 
-        :return: (list[dict]) Song mappings + (energy, valence)
+        :return: (list[dict]) Song mappings + (energy, valence, danceability)
         """
         # Need to batch tracks as Spotify limits the number of tracks sent in one request
         batched_tracks = self.batch_tracks(tracks)
@@ -316,7 +359,8 @@ class SpotifyClient(object):
 
         return tracks
 
-    def build_spotify_oauth_confirm_link(self, state, scopes):
+    @staticmethod
+    def build_spotify_oauth_confirm_link(state, scopes):
         """
         First step in the Spotify user authorization flow. This builds the request to authorize the application with
         Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the

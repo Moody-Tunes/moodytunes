@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 from django.core.management import CommandError
 
 from base.management.commands import MoodyBaseCommand
-from tunes.models import Song
 from libs.spotify import SpotifyClient, SpotifyException
+from tunes.models import Song
 
 
 class Command(MoodyBaseCommand):

@@ -10,25 +10,23 @@ from rest_framework.response import Response
 
 from accounts.models import UserSongVote
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
-from base.mixins import (
-    GetRequestValidatorMixin,
-    PostRequestValidatorMixin,
-    DeleteRequestValidatorMixin
-)
-from tunes.models import Song, Emotion
+from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
+from libs.moody_logging import auto_fingerprint, update_logging_data
+from libs.utils import average
+from tunes.models import Emotion, Song
 from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
-    OptionsSerializer,
-    SongSerializer,
-    VoteSerializer,
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
+    LastPlaylistSerializer,
+    OptionsSerializer,
     PlaylistSongsRequestSerializer,
+    SongSerializer,
+    VoteSerializer,
     VoteSongsRequestSerializer,
-    LastPlaylistSerializer
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
-from libs.utils import average
+
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = BrowseSongsRequestSerializer
 
-    def filter_queryset(self, queryset):
+    @update_logging_data
+    def filter_queryset(self, queryset, **kwargs):
         cached_playlist_manager = CachedPlaylistManager()
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
@@ -86,7 +85,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         logger.info(
             'Generating browse playlist for user {}'.format(self.request.user.username),
             extra={
-                'fingerprint': 'tunes.views.BrowseView.get.generate_playlist',
+                'fingerprint': auto_fingerprint('generate_playlist', **kwargs),
                 'user_id': self.request.user.pk,
                 'emotion': self.cleaned_data['emotion'],
                 'genre': self.cleaned_data.get('genre'),
@@ -179,6 +178,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
+    @update_logging_data
     def create(self, request, *args, **kwargs):
         try:
             song = Song.objects.get(code=self.cleaned_data['song_code'])
@@ -186,7 +186,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             logger.warning(
                 'Unable to retrieve song with code {}'.format(self.cleaned_data['song_code']),
                 extra={
-                    'fingerprint': 'tunes.VoteView.create.song_not_found'
+                    'fingerprint': auto_fingerprint('song_not_found', **kwargs),
                 }
             )
 
@@ -213,7 +213,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 ),
                 extra={
                     'vote_data': vote_data,
-                    'fingerprint': 'tunes.VoteView.create.created_new_vote'
+                    'fingerprint': auto_fingerprint('created_new_vote', **kwargs),
                 }
             )
 
@@ -224,12 +224,13 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 'Bad data supplied to VoteView.create from {}'.format(self.request.user.username),
                 extra={
                     'vote_data': vote_data,
-                    'fingerprint': 'tunes.VoteView.create.bad_vote_data'
+                    'fingerprint': auto_fingerprint('bad_vote_data', **kwargs),
                 }
             )
 
             raise ValidationError('Bad data supplied to {}'.format(self.__class__.__name__))
 
+    @update_logging_data
     def destroy(self, request, *args, **kwargs):
         votes = UserSongVote.objects.filter(
             user_id=self.request.user.id,
@@ -246,7 +247,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 'Unable to find UserSongVote to delete',
                 extra={
                     'request_data': self.cleaned_data,
-                    'fingerprint': 'tunes.VoteView.destroy.unvote_fail_missing_vote'
+                    'fingerprint': auto_fingerprint('unvote_fail_missing_vote', **kwargs),
                 }
             )
             raise Http404()
@@ -261,7 +262,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                     self.cleaned_data['emotion'],
                 ),
                 extra={
-                    'fingerprint': 'tunes.VoteView.destroy.unvote_success',
+                    'fingerprint': auto_fingerprint('unvote_success', **kwargs),
                     'data': self.cleaned_data
                 }
             )

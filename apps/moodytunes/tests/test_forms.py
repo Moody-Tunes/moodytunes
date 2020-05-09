@@ -2,9 +2,9 @@ from unittest import mock
 
 from django.test import TestCase
 
-from moodytunes.forms import get_genre_choices, BrowseForm, PlaylistForm, SuggestSongForm
-from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, get_genre_choices
+from tunes.models import Emotion
 
 
 class TestGetGenreChoices(TestCase):

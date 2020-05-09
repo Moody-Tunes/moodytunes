@@ -3,8 +3,8 @@ from unittest import mock
 from django.test import TestCase
 
 from accounts.models import UserSongVote
-from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
+from tunes.models import Emotion
 
 
 class TestCreateUserEmotionRecordsSignal(TestCase):

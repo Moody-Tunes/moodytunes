@@ -13,18 +13,18 @@
         },
         displayRequestErrors: function(errors) {
             // Display validation in an error container
-            var errorContainer = document.getElementById('playlist-error-container');
+            let errorContainer = document.getElementById('playlist-error-container');
 
             // Clean out older errors
             while (errorContainer.hasChildNodes()) {
                 this.clearChildren(errorContainer);
             }
 
-            var errorList = document.createElement('ul');
+            let errorList = document.createElement('ul');
 
-            for (var key in errors) {
+            for (let key in errors) {
                 if (errors.hasOwnProperty(key)) {
-                    var error = document.createElement('li');
+                    let error = document.createElement('li');
                     error.innerText = key + ': ' + errors[key];
                     errorList.appendChild(error);
                 }
@@ -33,12 +33,15 @@
             errorContainer.appendChild(errorList);
         },
         createPlayButton: function(song) {
-            var playButton = document.createElement('iframe');
-            playButton.setAttribute('allow', 'encrypted-media');
+            let playButton = document.createElement('iframe');
+            playButton.setAttribute('allow', 'encrypted-media https://open.spotify.com;');
             playButton.className = 'play-button';
-            playButton.src = 'https://embed.spotify.com/?uri=' + song.code;
+            playButton.src = 'https://open.spotify.com/embed/track/' + song.code.split(':')[2];
 
             return playButton
+        },
+        isEmptyResult: function(results) {
+            return !Boolean(results);
         }
     }
 })();

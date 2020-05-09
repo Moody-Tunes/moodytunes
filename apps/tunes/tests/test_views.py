@@ -2,15 +2,14 @@ from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import UserSongVote
-from tunes.models import Emotion, Song
-from tunes.views import BrowseView
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
+from tunes.models import Emotion, Song
+from tunes.views import BrowseView
 
 
 class TestBrowseView(TestCase):

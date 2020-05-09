@@ -3,9 +3,9 @@ from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 
+from libs.tests.helpers import MoodyUtil
 from tunes.models import Song
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
-from libs.tests.helpers import MoodyUtil
 
 
 class TestGenerateBrowsePlaylist(TestCase):

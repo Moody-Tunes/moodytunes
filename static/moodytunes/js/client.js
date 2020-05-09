@@ -24,10 +24,10 @@
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to append to request url
             // :return (str): Full url for API request
-            var requestUrl = new URL(window.location.origin + endpoint);
+            let requestUrl = new URL(window.location.origin + endpoint);
 
             if (this.checkTruthyObject(params)) {
-                for (var key in params) {
+                for (let key in params) {
                     if (params.hasOwnProperty(key)) {
                         requestUrl.searchParams.append(key, params[key]);
                     }
@@ -41,7 +41,7 @@
             // @params (object): Query params to include in request
             // :return (object): Same params passed in, minus any keys that have undefined values
             if (this.checkTruthyObject(params)) {
-                for (var key in params) {
+                for (let key in params) {
                     if (params.hasOwnProperty(key) && params[key] === undefined) {
                         delete params[key];
                     }
@@ -71,8 +71,8 @@
             // @data (object): Request data to send (used for POST and DELETE methods)
             // @callback (function): Callback function to pass retrieved data onto
             //      -> This is what will consume the data retrieved from the request
-            var url = this.buildRequestURL(endpoint, this.stripNullParams(params));
-            var options = {
+            let url = this.buildRequestURL(endpoint, this.stripNullParams(params));
+            let options = {
                 method: method,
                 credentials: 'include',
                 headers: {
@@ -99,7 +99,7 @@
         },
         getUserAnalytics: function(emotion, genre, context, callback) {
             // Retrieve analytics for users based on what songs they've listened to
-            var params = {
+            let params = {
                 emotion: emotion,
                 genre: genre,
                 context: context,
@@ -109,7 +109,7 @@
         getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
             // their desired emotion
-            var params = {
+            let params = {
                 emotion: emotion,
                 jitter: jitter,
                 limit: limit,
@@ -126,7 +126,7 @@
         },
         getEmotionPlaylist: function(emotion, genre, context, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
-            var params = {
+            let params = {
                 emotion: emotion,
                 genre: genre,
                 context: context,
@@ -137,7 +137,7 @@
         postVote: function(songCode, emotion, context, description, vote, callback) {
             // Register a vote for a song in our system based on whether or not the song makes the user feel
             // the desired emotion
-            var data = {
+            let data = {
                 song_code: songCode,
                 emotion: emotion,
                 context: context,
@@ -148,7 +148,7 @@
         },
         deleteVote: function(songCode, emotion, context, callback) {
             // "Unvote" a song the user has previously reported as making them feel the desired emotion
-            var data = {
+            let data = {
                 song_code: songCode,
                 emotion: emotion,
                 context: context,

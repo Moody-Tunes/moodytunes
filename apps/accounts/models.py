@@ -9,8 +9,10 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
+
 
 logger = getLogger(__name__)
 
@@ -79,28 +81,34 @@ class SpotifyUserAuth(BaseModel):
         spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
         return self.last_refreshed < spotify_auth_timeout
 
-    def refresh_access_token(self):
+    @update_logging_data
+    def refresh_access_token(self, **kwargs):
         """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
         spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
 
         try:
-            logger.info(
-                'Refreshing access token for {}'.format(self.user.username),
-                extra={
-                    'fingerprint': 'accounts.SpotifyUserAuth.refresh_access_token',
-                    'moodytunes_username': self.user.username,
-                    'spotify_username': self.spotify_user_id
-                }
-            )
-
             access_token = spotify_client.refresh_access_token(self.refresh_token)
 
             self.access_token = access_token
             self.last_refreshed = timezone.now()
 
             self.save()
+
+            logger.info(
+                'Refreshed access token for {}'.format(self.user.username),
+                extra={
+                    'fingerprint': auto_fingerprint('success_refresh_access_token', **kwargs),
+                    'moodytunes_username': self.user.username,
+                    'spotify_username': self.spotify_user_id
+                }
+            )
+
         except SpotifyException:
-            logger.warning('Unable to refresh access token for {}'.format(self.user.username), exc_info=True)
+            logger.warning(
+                'Unable to refresh access token for {}'.format(self.user.username),
+                extra={'fingerprint': auto_fingerprint('failed_refresh_access_token', **kwargs)},
+                exc_info=True
+            )
 
             raise
 

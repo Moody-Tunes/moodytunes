@@ -10,8 +10,6 @@
 #
 from .common import *
 
-import tempfile
-
 
 # We want to make it easy to create test users, so we'll remove the password
 # validators locally

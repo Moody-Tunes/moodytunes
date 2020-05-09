@@ -2,6 +2,7 @@ from django.urls import path
 
 from accounts import views
 
+
 urlpatterns = [
     # Authentication views
     path('login/', views.MoodyLoginView.as_view(), name='login'),

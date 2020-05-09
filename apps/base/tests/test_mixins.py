@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
 
 from base.mixins import ValidateRequestDataMixin
 from libs.tests.helpers import MoodyUtil

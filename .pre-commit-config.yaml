@@ -7,8 +7,20 @@ repos:
     - id: trailing-whitespace
     - id: no-commit-to-branch
     - id: name-tests-test
-      name: Check test filename name is valid
+      exclude: libs/tests/helpers.py
+      name: Check test filename is valid
       args: ['--django']
     - id: debug-statements
     - id: check-merge-conflict
     - id: check-json
+
+- repo: https://github.com/miki725/importanize/
+  rev: 'master'
+  hooks:
+  - id: importanize
+    args: [--verbose, --config=.importanize.json]
+
+- repo: https://github.com/pre-commit/mirrors-fixmyjs
+  rev: 'master'
+  hooks:
+  - id: fixmyjs

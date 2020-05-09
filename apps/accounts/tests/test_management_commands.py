@@ -4,12 +4,11 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 from django.urls import reverse
 
 from accounts.management.commands.accounts_recover_user_account import Command as RecoverCommand
-from tunes.models import Emotion
 from libs.tests.helpers import MoodyUtil
 
 
@@ -75,34 +74,3 @@ class TestRecoverUserAccount(TestCase):
             log_level=logging.ERROR,
             extra={'exc': exc}
         )
-
-
-class TestUpdateUserEmotionDanceability(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = MoodyUtil.create_user()
-        cls.emotion = Emotion.objects.get(name=Emotion.EXCITED)
-
-    def test_command_set_empty_value_to_emotion_default(self):
-        user_emotion = self.user.get_user_emotion_record(Emotion.EXCITED)
-        user_emotion.danceability = 0
-        user_emotion.save()
-
-        call_command('accounts_update_user_emotion_danceability')
-
-        user_emotion.refresh_from_db()
-        self.assertEqual(user_emotion.danceability, self.emotion.danceability)
-
-    def test_command_does_not_override_previous_danceability_value(self):
-        song1 = MoodyUtil.create_song(danceability=.75)
-        song2 = MoodyUtil.create_song(danceability=.95)
-        MoodyUtil.create_user_song_vote(self.user, song1, self.emotion, True)
-        MoodyUtil.create_user_song_vote(self.user, song2, self.emotion, True)
-
-        user_emotion = self.user.get_user_emotion_record(Emotion.EXCITED)
-        old_user_emotion_danceability = user_emotion.danceability
-
-        call_command('accounts_update_user_emotion_danceability')
-
-        user_emotion.refresh_from_db()
-        self.assertEqual(user_emotion.danceability, old_user_emotion_danceability)

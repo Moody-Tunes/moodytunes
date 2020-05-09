@@ -4,7 +4,6 @@ from unittest import mock
 from urllib import parse
 
 from django.test import TestCase
-
 from requests.exceptions import HTTPError
 
 from libs.spotify import SpotifyClient, SpotifyException
@@ -113,6 +112,35 @@ class TestSpotifyClient(TestCase):
             params=dummy_params,
             data=dummy_data,
             headers={'Authorization': 'Bearer {}'.format(self.auth_code)}
+        )
+        self.assertDictEqual(resp, dummy_response)
+
+    @mock.patch('requests.request')
+    def test_make_spotify_request_uses_headers_if_passed(self, mock_request):
+        dummy_response = {'status': 200, 'content': 'OK'}
+        dummy_headers = {'Foo': 'bar'}
+        dummy_params = {'query': 'param'}
+        dummy_data = {'key': 'value'}
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = None
+        mock_response.json.return_value = dummy_response
+        mock_request.return_value = mock_response
+
+        resp = self.spotify_client._make_spotify_request(
+            'GET',
+            '/dummy_endpoint',
+            data=dummy_data,
+            params=dummy_params,
+            headers=dummy_headers
+        )
+
+        mock_request.assert_called_with(
+            'GET',
+            '/dummy_endpoint',
+            params=dummy_params,
+            data=dummy_data,
+            headers=dummy_headers
         )
         self.assertDictEqual(resp, dummy_response)
 
@@ -446,7 +474,25 @@ class TestSpotifyClient(TestCase):
         self.assertEqual(access_token, resp_data['access_token'])
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
-    def test_get_attributes_for_track_no_genre(self, mock_request):
+    def test_get_user_profile(self, mock_request):
+        access_token = 'spotify:access:token'
+
+        mock_profile_data = {'id': 'spotify-user-id'}
+        mock_request.return_value = mock_profile_data
+        expected_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+
+        profile_data = self.spotify_client.get_user_profile(access_token)
+
+        mock_request.assert_called_once_with(
+            'GET',
+            'https://api.spotify.com/v1/me',
+            headers=expected_headers,
+        )
+
+        self.assertDictEqual(profile_data, mock_profile_data)
+
+    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    def test_get_attributes_for_track(self, mock_request):
         mock_song_code = 'spotify:track:1234567'
         mock_track_data = {
             'name': 'Sickfit',
@@ -462,10 +508,7 @@ class TestSpotifyClient(TestCase):
             'code': mock_song_code
         }
 
-        mock_request.side_effect = [
-            mock_track_data,
-            {}
-        ]
+        mock_request.return_value = mock_track_data
 
         song_data = self.spotify_client.get_attributes_for_track(mock_song_code)
 
@@ -585,3 +628,18 @@ class TestSpotifyClient(TestCase):
         batched_items = self.spotify_client.batch_tracks(items)
 
         self.assertEqual(len(batched_items), 1)
+
+    def test_sanitize_log_data(self):
+        data = {
+            'code': 'super-secret-code',
+            'foo': 'bar'
+        }
+
+        expected_sanitized_data = {
+            'code': self.spotify_client.REDACT_VALUE,
+            'foo': 'bar'
+        }
+
+        sanitized_data = self.spotify_client._sanitize_log_data(data)
+
+        self.assertDictEqual(sanitized_data, expected_sanitized_data)

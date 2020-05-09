@@ -5,10 +5,10 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import SpotifyUserAuth
-from moodytunes.tasks import FetchSongFromSpotifyTask, CreateSpotifyPlaylistFromSongsTask
-from tunes.models import Song
 from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil
+from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from tunes.models import Song
 
 
 class TestFetchSongFromSpotify(TestCase):

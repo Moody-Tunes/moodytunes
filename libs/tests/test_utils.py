@@ -1,8 +1,8 @@
 from django.test import TestCase
 
-from tunes.models import Song
-from libs.utils import average
 from libs.tests.helpers import MoodyUtil
+from libs.utils import average
+from tunes.models import Song
 
 
 class TestAverage(TestCase):
