@@ -599,3 +599,18 @@ class TestSpotifyClient(TestCase):
         batched_items = self.spotify_client.batch_tracks(items)
 
         self.assertEqual(len(batched_items), 1)
+
+    def test_sanitize_log_data(self):
+        data = {
+            'code': 'super-secret-code',
+            'foo': 'bar'
+        }
+
+        expected_sanitized_data = {
+            'code': self.spotify_client.REDACT_VALUE,
+            'foo': 'bar'
+        }
+
+        sanitized_data = self.spotify_client._sanitize_log_data(data)
+
+        self.assertDictEqual(sanitized_data, expected_sanitized_data)
