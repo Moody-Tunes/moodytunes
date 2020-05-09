@@ -6,16 +6,33 @@ from django.core.cache import cache
 from tunes.models import Song
 
 
-def generate_browse_playlist(energy, valence, danceability, strategy=None, limit=None, jitter=None, songs=None):
+def generate_browse_playlist(
+        energy,
+        valence,
+        danceability,
+        strategy=None,
+        limit=None,
+        jitter=None,
+        artist=None,
+        songs=None
+):
     """
-    Return a `QuerySet` of `Song` records whose energy and valence are within the specified range. Used to build a
-    playlist of songs for given song attributes.
+    Build a browse playlist of songs for the given criteria.
+
+    Given the attributes to search for, will return a list of songs based on the criteria.
+
+    To have more control over the variability of songs returned, specify a `strategy`
+    to use in looking up songs. This will force the query to only  use the `strategy`
+    attribute specified when filtering songs.
+        Example: specifying `energy` as the strategy will only filter
+        songs by the given energy, plus and minus the jitter.
 
     :param energy: (float) Energy estimate of `Song` records returned
     :param valence: (float) Valence estimate of `Song` records returned
     :param danceability: (float) Danceability estimate of `Song` records returned
     :param strategy: (str) Attribute to use in filtering playlist
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
+    :param artist: (str) Optional artist of songs to return
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
     :param songs: (QuerySet) Optional queryset of songs to filter
 
@@ -59,6 +76,10 @@ def generate_browse_playlist(energy, valence, danceability, strategy=None, limit
         params = {key: params[key] for key in params if key.startswith(strategy)}
 
     playlist = songs.filter(**params)
+
+    # Filter by artist if provided
+    if artist:
+        playlist = songs.filter(artist=artist)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)

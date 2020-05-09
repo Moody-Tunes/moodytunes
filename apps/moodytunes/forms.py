@@ -39,6 +39,7 @@ def get_genre_choices(user=None):
 
 class BrowseForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
+    artist = forms.CharField(max_length=50, required=False)
     genre = forms.ChoiceField(choices=get_genre_choices, required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     description = forms.CharField(required=False)
