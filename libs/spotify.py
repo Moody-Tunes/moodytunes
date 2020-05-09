@@ -21,7 +21,7 @@ class SpotifyException(Exception):
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
     REDACT_VALUE = '**********'
-    REDACT_DATA_KEYS = ['Authorization', 'code']
+    REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token']
 
     def __init__(self, identifier='SpotifyClient'):
         self.fingerprint = identifier
