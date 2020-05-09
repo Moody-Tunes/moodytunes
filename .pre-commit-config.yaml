@@ -24,4 +24,3 @@ repos:
   rev: 'master'
   hooks:
   - id: fixmyjs
-    args: ['-l']
