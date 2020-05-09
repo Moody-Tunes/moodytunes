@@ -460,13 +460,16 @@ class TestSpotifyClient(TestCase):
         )
         self.assertDictEqual(user_tokens, expected_response_data)
 
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('requests.request')
     def test_refresh_access_token(self, mock_request):
         request_data = {'refresh_token': 'some:refresh:token'}
-        resp_data = {'access_token': 'some:access:token'}
-        mock_request.return_value = resp_data
+
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {'access_token': 'some:access:token'}
+        mock_request.return_value = mock_response
 
         expected_headers = self.spotify_client._make_authorization_header()
+        expected_response_data = {'access_token': 'some:access:token'}
 
         access_token = self.spotify_client.refresh_access_token(**request_data)
 
@@ -475,11 +478,12 @@ class TestSpotifyClient(TestCase):
         mock_request.assert_called_once_with(
             'POST',
             'https://accounts.spotify.com/api/token',
+            params=None,
             headers=expected_headers,
             data=request_data
         )
 
-        self.assertEqual(access_token, resp_data['access_token'])
+        self.assertEqual(access_token, expected_response_data['access_token'])
 
     @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
     def test_get_user_profile(self, mock_request):
