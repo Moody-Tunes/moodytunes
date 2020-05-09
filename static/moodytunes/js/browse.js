@@ -172,10 +172,11 @@
         let description = sessionStorage.description;
         emotion = document.getElementById('id_emotion').value;
         let jitter = document.getElementById('id_jitter').value;
+        let artist = document.getElementById('id_artist').value;
         let genre = document.getElementById('id_genre').value || undefined;
 
         document.MoodyTunesClient.getBrowsePlaylist(
-            emotion, jitter, limit, genre, context, description, displayBrowsePlaylist
+            emotion, jitter, limit, genre, context, description, artist, displayBrowsePlaylist
         );
     }
 
