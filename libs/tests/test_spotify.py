@@ -476,6 +476,7 @@ class TestSpotifyClient(TestCase):
             data=expected_request_data,
             headers=expected_headers
         )
+
         self.assertDictEqual(user_tokens, expected_response_data)
 
     @mock.patch('requests.request')
@@ -571,7 +572,6 @@ class TestSpotifyClient(TestCase):
 
         resp = self.spotify_client.get_user_playlists(auth_code, spotify_user_id)
 
-        self.assertEqual(resp, response_data)
         mock_request.assert_called_once_with(
             'GET',
             'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
@@ -579,6 +579,8 @@ class TestSpotifyClient(TestCase):
             headers=expected_headers,
             data=None
         )
+
+        self.assertDictEqual(resp, response_data)
 
     @mock.patch('requests.request')
     def test_create_playlist(self, mock_request):
