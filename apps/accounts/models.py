@@ -23,7 +23,8 @@ class MoodyUser(BaseModel, AbstractUser):
     logic needed in course of site flow.
     """
 
-    def get_user_emotion_record(self, emotion_name):
+    @update_logging_data
+    def get_user_emotion_record(self, emotion_name, **kwargs):
         """
         Return the UserEmotion record for a given Emotion name.
 
@@ -34,7 +35,10 @@ class MoodyUser(BaseModel, AbstractUser):
         try:
             return self.useremotion_set.get(emotion__name=emotion_name)
         except UserEmotion.DoesNotExist:
-            logger.error('User {} has no UserEmotion record for {}'.format(self.username, emotion_name))
+            logger.warning(
+                'User {} has no UserEmotion record for {}'.format(self.username, emotion_name),
+                extra={'fingerprint': auto_fingerprint('user_emotion_not_found', **kwargs)}
+            )
             return None
 
     def update_information(self, data):

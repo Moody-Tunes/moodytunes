@@ -351,8 +351,8 @@ class SpotifyClient(object):
                     energy = track_data.get('energy')
                     danceability = track_data.get('danceability')
 
-                    # Skip tracks that don't have both attributes we're looking for
-                    if not all([valence, energy, danceability]):
+                    # Skip tracks that are missing any of the attributes we're looking for
+                    if not any([valence, energy, danceability]):
                         continue
 
                     track.update({
@@ -364,21 +364,20 @@ class SpotifyClient(object):
         return tracks
 
     @staticmethod
-    def build_spotify_oauth_confirm_link(state, scopes):
+    def build_spotify_oauth_confirm_link(state):
         """
         First step in the Spotify user authorization flow. This builds the request to authorize the application with
         Spotify. Note that this function simply builds the URL for the user to visit, the actual behavior for the
         authorization need to be made client-side.
 
         :param state: (str) State to pass in request. Used for validating redirect URI against request
-        :param scopes: (list) List of scopes to specify when authorizing the application
 
         :return: (str) URL for Spotify OAuth confirmation
         """
         params = {
             'client_id': settings.SPOTIFY['client_id'],
             'response_type': 'code',
-            'scope': ' '.join(scopes),
+            'scope': ' '.join(settings.SPOTIFY['auth_user_scopes']),
             'redirect_uri': settings.SPOTIFY['auth_redirect_uri'],
             'state': state
         }
