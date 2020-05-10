@@ -27,11 +27,19 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
             )
             raise
 
+        user_emotions = []
         for emotion in Emotion.objects.all().iterator():
-            UserEmotion.objects.create(
-                user=user,
-                emotion=emotion
+            user_emotions.append(
+                UserEmotion(
+                    user=user,
+                    emotion=emotion,
+                    energy=emotion.energy,
+                    valence=emotion.valence,
+                    danceability=emotion.danceability,
+                )
             )
+
+        UserEmotion.objects.bulk_create(user_emotions)
 
         logger.info(
             'Created UserEmotion records for user {}'.format(user.username),
