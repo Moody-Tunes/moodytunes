@@ -200,19 +200,6 @@ class TestSpotifyClient(TestCase):
 
         resp = self.spotify_client.get_playlists_for_category('category', 1)
 
-        mock_request.assert_called_with(
-            'GET',
-            '{api_url}/browse/categories/{category_id}/playlists'.format(
-                api_url='https://api.spotify.com/v1',
-                category_id='category'
-            ),
-            params={
-                'country': 'US',
-                'limit': 1
-            },
-            data=None,
-            headers={'Authorization': 'Bearer {}'.format(self.auth_code)}
-        )
         self.assertEqual(resp, expected_resp)
 
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
