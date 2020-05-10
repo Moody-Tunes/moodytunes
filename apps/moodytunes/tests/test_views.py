@@ -145,6 +145,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         session = self.client.session
         session['state'] = self.state
         session.save()
+
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
@@ -155,6 +156,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         session = self.client.session
         session['state'] = self.state
         session.save()
+
         resp = self.client.get(self.url, data=query_params)
 
         self.assertRedirects(resp, self.failure_url)
@@ -183,6 +185,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         session = self.client.session
         session['state'] = self.state
         session.save()
+
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
@@ -211,6 +214,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         session = self.client.session
         session['state'] = self.state
         session.save()
+
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         messages = get_messages_from_response(resp)
@@ -220,6 +224,16 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         self.assertEqual(last_message, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
             'test-user-id'
         ))
+
+    def test_invalid_state_para_raises_error(self):
+        query_params = {'code': 'test-spotify-code', 'state': 'bad-state-value'}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestExportView(TestCase):
