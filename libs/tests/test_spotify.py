@@ -421,10 +421,7 @@ class TestSpotifyClient(TestCase):
         self.assertIsNone(new_track.get('danceability'))
 
     def test_build_spotify_oauth_confirm_link(self):
-        params = {
-            'state': 'user_id=1',
-            'scopes': ['view-playlist', 'edit-playlist']
-        }
+        params = {'state': 'user_id=1'}
 
         url = self.spotify_client.build_spotify_oauth_confirm_link(**params)
 
@@ -434,7 +431,7 @@ class TestSpotifyClient(TestCase):
             'response_type': ['code'],
             'redirect_uri': ['https://moodytunes.vm/moodytunes/spotify/callback/'],
             'state': ['user_id=1'],
-            'scope': ['view-playlist edit-playlist']
+            'scope': ['playlist-modify-public']
         }
         request = parse.urlparse(url)
         request_url = '{}://{}{}'.format(request.scheme, request.netloc, request.path)
