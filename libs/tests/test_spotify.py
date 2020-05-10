@@ -400,24 +400,6 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
     @mock.patch('requests.request')
-    def test_get_audio_features_handles_missing_track_data(self, mock_request, mock_get_auth_token):
-        mock_get_auth_token.return_value = self.auth_code
-        track = {'code': 'spotify:song:code'}
-        tracks = [track]
-
-        mock_response = mock.Mock()
-        mock_response.json.return_value = {'audio_features': [{}]}
-        mock_request.return_value = mock_response
-
-        resp = self.spotify_client.get_audio_features_for_tracks(tracks)
-        new_track = resp[0]
-
-        self.assertIsNone(new_track.get('energy'))
-        self.assertIsNone(new_track.get('valence'))
-        self.assertIsNone(new_track.get('danceability'))
-
-    @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    @mock.patch('requests.request')
     def test_get_audio_features_for_tracks_skips_tracks_missing_features(self, mock_request, mock_get_auth_token):
         mock_get_auth_token.return_value = self.auth_code
         track = {'code': 'spotify:song:code'}
