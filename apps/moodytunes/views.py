@@ -2,10 +2,12 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import RedirectView, TemplateView
@@ -108,10 +110,11 @@ class SpotifyAuthenticationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
+        state = get_random_string(length=48)
 
-        context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(
-            state='user:{}'.format(self.request.user.id),
-        )
+        context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(state)
+
+        self.request.session['state'] = state
 
         return context
 
@@ -121,6 +124,20 @@ class SpotifyAuthenticationCallbackView(View):
 
     @update_logging_data
     def get(self, request, *args, **kwargs):
+        # Check to make sure that the user who initiated the request is the one making the request
+        # state value for session is set in initial authentication request
+        if request.GET.get('state') != request.session['state']:
+            logger.error(
+                'User {} has an invalid state parameter for OAuth callback'.format(request.user.username),
+                extra={
+                    'session_state': request.session.get('state'),
+                    'request_state': request.GET.get('state'),
+                    'fingerprint': auto_fingerprint('invalid_oauth_state', **kwargs)
+                }
+            )
+
+            raise SuspiciousOperation('Invalid state parameter')
+
         if 'code' in request.GET:
             code = request.GET['code']
             user = request.user
