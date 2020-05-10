@@ -1,6 +1,7 @@
 import tempfile
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
@@ -86,6 +87,29 @@ class TestSuggestSongView(TestCase):
         last_message = messages[-1]
 
         self.assertEqual(last_message, 'You have submitted too many suggestions! Try again in a minute')
+
+
+class TestSpotifyAuthenticationView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.url = reverse('moodytunes:spotify-auth')
+
+    def setUp(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_spotify_oauth_url_is_built_properly(self):
+        expected_auth_url = 'https://accounts.spotify.com/authorize?client_id={client_id}\
+        &response_type=code&scope=playlist-modify-public\
+        &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state=user%3A{user_id}\
+        '.format(
+            client_id=settings.SPOTIFY['client_id'],
+            user_id=self.user.pk
+        )
+
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.context['spotify_auth_url'], expected_auth_url.replace(' ', ''))
 
 
 class TestSpotifyAuthenticationCallbackView(TestCase):

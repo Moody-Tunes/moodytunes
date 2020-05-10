@@ -111,7 +111,6 @@ class SpotifyAuthenticationView(TemplateView):
 
         context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(
             state='user:{}'.format(self.request.user.id),
-            scopes=['playlist-modify-public']
         )
 
         return context
