@@ -104,7 +104,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'energy': energy,
                 'valence': valence,
                 'danceability': danceability,
-                'artist': artist
+                'artist': artist,
+                'jitter': jitter,
             }
         )
 
