@@ -79,7 +79,7 @@ def generate_browse_playlist(
 
     # Filter by artist if provided
     if artist:
-        playlist = playlist.filter(artist=artist)
+        playlist = playlist.filter(artist__icontains=artist)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
