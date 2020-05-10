@@ -98,13 +98,17 @@ class TestSpotifyAuthenticationView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-    def test_spotify_oauth_url_is_built_properly(self):
+    @mock.patch('moodytunes.views.get_random_string')
+    def test_spotify_oauth_url_is_built_properly(self, mock_random_string):
+        random_string = 'foo'
+        mock_random_string.return_value = random_string
+
         expected_auth_url = 'https://accounts.spotify.com/authorize?client_id={client_id}\
         &response_type=code&scope=playlist-modify-public\
-        &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state=user%3A{user_id}\
+        &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state={state}\
         '.format(
             client_id=settings.SPOTIFY['client_id'],
-            user_id=self.user.pk
+            state=random_string
         )
 
         resp = self.client.get(self.url)
@@ -120,6 +124,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         cls.url = reverse('moodytunes:spotify-auth-callback')
         cls.success_url = reverse('moodytunes:export')
         cls.failure_url = reverse('moodytunes:spotify-auth-failure')
+        cls.state = 'state-key'
 
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -136,14 +141,20 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         mock_spotify.return_value = spotify_client
 
-        query_params = {'code': 'test-spotify-code'}
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
         self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
 
     def test_error_in_callback_returns_error_page(self):
-        query_params = {'error': 'access_denied'}
+        query_params = {'error': 'access_denied', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
         resp = self.client.get(self.url, data=query_params)
 
         self.assertRedirects(resp, self.failure_url)
@@ -168,7 +179,10 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         mock_spotify.return_value = spotify_client
 
-        query_params = {'code': 'test-spotify-code'}
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertRedirects(resp, self.success_url)
@@ -193,7 +207,10 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         mock_spotify.return_value = spotify_client
 
-        query_params = {'code': 'test-spotify-code'}
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         messages = get_messages_from_response(resp)
