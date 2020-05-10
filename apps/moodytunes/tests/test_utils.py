@@ -46,3 +46,11 @@ class TestExportPlaylistHelper(TestCase):
 
         self.assertIn(other_song.code, songs)
         self.assertNotIn(self.song.code, songs)
+
+    def test_duplicate_votes_for_song_returns_one_record_for_song(self):
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, context='WORK')
+
+        songs = ExportPlaylistHelper.get_export_playlist_for_user(self.user, self.emotion.name)
+
+        self.assertEqual(len(songs), 1)
