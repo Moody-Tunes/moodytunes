@@ -217,7 +217,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         }
 
         try:
-            UserSongVote.objects.create(**vote_data)
+            vote = UserSongVote.objects.create(**vote_data)
             logger.info(
                 'Saved vote for user {} voting on song {} for emotion {}'.format(
                     self.request.user.username,
@@ -226,6 +226,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 ),
                 extra={
                     'vote_data': vote_data,
+                    'vote_id': vote.pk,
                     'fingerprint': auto_fingerprint('created_new_vote', **kwargs),
                 }
             )
@@ -276,6 +277,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 ),
                 extra={
                     'fingerprint': auto_fingerprint('unvote_success', **kwargs),
+                    'vote_id': vote.pk,
                     'data': self.cleaned_data
                 }
             )
