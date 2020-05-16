@@ -14,15 +14,12 @@ from django.views.generic import RedirectView, TemplateView
 from ratelimit.mixins import RatelimitMixin
 
 from accounts.models import SpotifyUserAuth
+from accounts.tasks import CreateSpotifyAuthUserSavedTracksTask
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import (
-    CreateSpotifyAuthUserSavedTracksTask,
-    CreateSpotifyPlaylistFromSongsTask,
-    FetchSongFromSpotifyTask,
-)
+from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager

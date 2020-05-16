@@ -1,49 +1,14 @@
 import logging
 
-from celery.schedules import crontab
-
 from accounts.models import SpotifyUserAuth
-from base.tasks import MoodyBaseTask, MoodyPeriodicTask
+from accounts.tasks import SpotifyAuthUserMixin
+from base.tasks import MoodyBaseTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
 
 logger = logging.getLogger(__name__)
-
-
-class SpotifyAuthUserTask(object):
-    @update_logging_data
-    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
-        """
-        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
-        the access token is expired
-
-        :param auth_id: (int) Primary key for SpotifyUserAuth record
-
-        :return: (SpotifyUserAuth)
-        """
-        try:
-            auth = SpotifyUserAuth.objects.get(pk=auth_id)
-        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
-            logger.error(
-                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
-            )
-
-            raise
-
-        if auth.should_update_access_token:
-            try:
-                auth.refresh_access_token()
-            except SpotifyException:
-                logger.warning(
-                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
-                )
-                self.retry()
-
-        return auth
 
 
 class FetchSongFromSpotifyTask(MoodyBaseTask):
@@ -100,7 +65,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
                 )
 
 
-class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserTask):
+class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserMixin):
     max_retries = 3
     default_retry_delay = 60 * 15
 
@@ -185,38 +150,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserTask):
             self.retry()
 
     @update_logging_data
-    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
-        """
-        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
-        the access token is expired
-
-        :param auth_id: (int) Primary key for SpotifyUserAuth record
-
-        :return: (SpotifyUserAuth)
-        """
-        try:
-            auth = SpotifyUserAuth.objects.get(pk=auth_id)
-        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
-            logger.error(
-                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
-            )
-
-            raise
-
-        if auth.should_update_access_token:
-            try:
-                auth.refresh_access_token()
-            except SpotifyException:
-                logger.warning(
-                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
-                )
-                self.retry()
-
-        return auth
-
-    @update_logging_data
     def run(self, auth_id, playlist_name, songs, *args, **kwargs):
         auth = self.get_and_refresh_spotify_user_auth_record(auth_id)
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
@@ -241,58 +174,3 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserTask):
                 'auth_id': auth.pk
             }
         )
-
-
-class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask, SpotifyAuthUserTask):
-    max_retries = 3
-    default_retry_delay = 60 * 15
-
-    @update_logging_data
-    def run(self, user_auth_id, *args, **kwargs):
-        """
-        Fetch the songs the user has saved in their Spotify account and save to their
-        record for use in generating their browse playlist.
-
-        :param user_auth_id: (int) Primary key of SpotifyAuthUser record to fetch
-        """
-        auth = self.get_and_refresh_spotify_user_auth_record(user_auth_id)
-        client = SpotifyClient(identifier='create_spotify_saved_tracks:{}'.format(auth.spotify_user_id))
-
-        try:
-            spotify_track_ids = client.get_user_saved_tracks(auth.access_token)
-            auth.saved_songs = spotify_track_ids
-            auth.save()
-            logger.info(
-                'Successfully updated Spotify saved songs for user {}'.format(auth.spotify_user_id),
-                extra={
-                    'fingerprint': auto_fingerprint('success_get_saved_songs_from_spotify', **kwargs),
-                    'spotify_user_id': auth.spotify_user_id,
-                    'spotify_user_auth_id': auth.pk
-                }
-            )
-        except SpotifyException:
-            logger.warning(
-                'Error fetching user saved songs from Spotify for user {}'.format(auth.spotify_user_id),
-                extra={
-                    'fingerprint': auto_fingerprint('failed_get_saved_songs_from_spotify', **kwargs),
-                    'spotify_user_id': auth.spotify_user_id,
-                    'spotify_user_auth_id': auth.pk
-                }
-            )
-
-            self.retry()
-
-
-class UpdateSpotifyAuthUserSavedTracksTask(MoodyPeriodicTask):
-    run_every = crontab(minute=0, hour=2, day_of_week=0)
-
-    @update_logging_data
-    def run(self, *args, **kwargs):
-        """
-        Periodically update the saved_songs for each of the SpotifyUserAuth records we have stored.
-        This will ensure we keep our concept of user saved tracks on Spotify fresh.
-        """
-        auths = SpotifyUserAuth.objects.all()
-
-        for auth in auths:
-            UpdateSpotifyAuthUserSavedTracksTask().delay(auth.pk)

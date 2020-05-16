@@ -1,10 +1,19 @@
+from datetime import timedelta
+from unittest import mock
+
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.test import TestCase
+from django.utils import timezone
+from spotify import SpotifyException
 
-from accounts.models import MoodyUser, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
-from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
+from accounts.tasks import (
+    CreateUserEmotionRecordsForUserTask,
+    SpotifyAuthUserMixin,
+    UpdateUserEmotionRecordAttributeTask,
+)
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
 from tunes.models import Emotion
@@ -72,3 +81,39 @@ class TestUpdateUserEmotionTask(TestCase):
 
         with self.assertRaises(UserSongVote.DoesNotExist):
             UpdateUserEmotionRecordAttributeTask().run(invalid_vote_pk)
+
+
+class TestSpotifyAuthUserMixin(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+
+    def test_get_auth_record_does_not_exists_raises_error(self):
+        invalid_auth_id = 99999
+
+        with self.assertRaises(SpotifyUserAuth.DoesNotExist):
+            SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(invalid_auth_id)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_get_auth_record_with_expired_access_token_calls_refresh_method(self, mock_refresh_access_token):
+        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
+        self.auth.save()
+
+        mock_refresh_access_token.return_value = 'spotify_access_token'
+
+        SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
+
+        mock_refresh_access_token.assert_called_once()
+
+    @mock.patch('accounts.tasks.SpotifyAuthUserMixin.retry')
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
+        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
+        self.auth.save()
+
+        mock_refresh_access_token.side_effect = SpotifyException
+
+        SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
+
+        mock_retry.assert_called_once()
