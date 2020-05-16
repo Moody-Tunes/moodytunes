@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 
+from base.admin import MoodyBaseAdmin
 from moodytunes.forms import get_genre_choices
 from tunes.models import Emotion, Song
 
@@ -30,7 +31,7 @@ class GenreFormField(forms.ModelForm):
         fields = ('genre',)
 
 
-class EmotionAdmin(admin.ModelAdmin):
+class EmotionAdmin(MoodyBaseAdmin):
     list_display = ('full_name', 'energy', 'valence', 'danceability')
     readonly_fields = ('name',)
 
@@ -38,7 +39,7 @@ class EmotionAdmin(admin.ModelAdmin):
         return False
 
 
-class SongAdmin(admin.ModelAdmin):
+class SongAdmin(MoodyBaseAdmin):
     list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy', 'danceability')
     readonly_fields = ('code', 'artist', 'name', 'valence', 'energy', 'danceability')
     list_filter = (NullGenreFilter, 'genre')
