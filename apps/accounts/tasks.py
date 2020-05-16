@@ -1,11 +1,11 @@
 from logging import getLogger
 
 from celery.schedules import crontab
-from spotify import SpotifyClient, SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
+from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Emotion
 
 
