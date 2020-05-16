@@ -577,8 +577,8 @@ class SpotifyClient(object):
         Query a user's saved track list to check if any of the tracks specified are in it.
         Will return a list of track_ids that were found in the user's saved tracks.
 
-        TODO: This endpoint only takes 50 track_ids at a time to lookup. Need to batch
-        requests in bunches of 50 track_ids.
+        NOTE: This endpoint limits requests to max 50 items in one request. Need to
+        use the batch_tracks method to batch items to send in the request.
 
         :param auth_code: (str) SpotifyAuthUser access_token for use in making request
         :param track_ids: (list[str]) Spotify track ids to check for in user saved tracks
