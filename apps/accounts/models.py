@@ -3,6 +3,7 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
@@ -71,6 +72,7 @@ class SpotifyUserAuth(BaseModel):
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
+    saved_songs = ArrayField(models.CharField(max_length=36), default=[])
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
