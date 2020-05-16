@@ -72,7 +72,7 @@ class SpotifyUserAuth(BaseModel):
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
-    saved_songs = ArrayField(models.CharField(max_length=36), default=[])
+    saved_songs = ArrayField(models.CharField(max_length=36), default=list)
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)

@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='spotifyuserauth',
             name='saved_songs',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=36), default=[], size=None),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=36), default=list, size=None),
         ),
     ]
