@@ -1,7 +1,6 @@
 import logging
 
-from accounts.models import SpotifyUserAuth
-from accounts.tasks import SpotifyAuthUserMixin
+from accounts.tasks import SpotifyAuthUserTaskMixin
 from base.tasks import MoodyBaseTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
@@ -65,7 +64,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
                 )
 
 
-class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserMixin):
+class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserTaskMixin):
     max_retries = 3
     default_retry_delay = 60 * 15
 

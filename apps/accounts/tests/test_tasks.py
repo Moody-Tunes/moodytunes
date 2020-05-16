@@ -11,7 +11,7 @@ from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
     CreateUserEmotionRecordsForUserTask,
-    SpotifyAuthUserMixin,
+    SpotifyAuthUserTaskMixin,
     UpdateUserEmotionRecordAttributeTask,
 )
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
@@ -93,7 +93,7 @@ class TestSpotifyAuthUserMixin(TestCase):
         invalid_auth_id = 99999
 
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
-            SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(invalid_auth_id)
+            SpotifyAuthUserTaskMixin().get_and_refresh_spotify_user_auth_record(invalid_auth_id)
 
     @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
     def test_get_auth_record_with_expired_access_token_calls_refresh_method(self, mock_refresh_access_token):
@@ -102,11 +102,11 @@ class TestSpotifyAuthUserMixin(TestCase):
 
         mock_refresh_access_token.return_value = 'spotify_access_token'
 
-        SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
+        SpotifyAuthUserTaskMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
 
         mock_refresh_access_token.assert_called_once()
 
-    @mock.patch('accounts.tasks.SpotifyAuthUserMixin.retry')
+    @mock.patch('accounts.tasks.SpotifyAuthUserTaskMixin.retry')
     @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
         self.auth.last_refreshed = timezone.now() - timedelta(days=1)
@@ -114,6 +114,6 @@ class TestSpotifyAuthUserMixin(TestCase):
 
         mock_refresh_access_token.side_effect = SpotifyException
 
-        SpotifyAuthUserMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
+        SpotifyAuthUserTaskMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
 
         mock_retry.assert_called_once()

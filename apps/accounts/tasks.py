@@ -109,11 +109,11 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
         )
 
 
-class SpotifyAuthUserMixin(object):
+class SpotifyAuthUserTaskMixin(object):
 
     def retry(self):
         """Dummy method for calling celery retry for task. Needed for testing purposes."""
-        return super(SpotifyAuthUserMixin, self).retry()
+        return super(SpotifyAuthUserTaskMixin, self).retry()
 
     @update_logging_data
     def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
@@ -148,7 +148,7 @@ class SpotifyAuthUserMixin(object):
         return auth
 
 
-class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask, SpotifyAuthUserMixin):
+class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask, SpotifyAuthUserTaskMixin):
     max_retries = 3
     default_retry_delay = 60 * 15
 
