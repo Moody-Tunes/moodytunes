@@ -601,3 +601,29 @@ class SpotifyClient(object):
                 saved_tracks.append(track_id)
 
         return saved_tracks
+
+    def get_user_saved_tracks(self, auth_code):
+        """
+        Get the track IDs for the songs the user have saved to their Spotify account.
+        This is used to populate the SpotifyUserAuth.saved_songs attribute
+
+        :param auth_code: (str) SpotifyAuthUser access_token for use in making request
+
+        :return: (list[str])
+        """
+        song_ids = []
+        url = '{api_url}/me/tracks'.format(api_url=settings.SPOTIFY['api_url'])
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+
+        resp = self._make_spotify_request('GET', url, headers=headers)
+
+        for track in resp['items']:
+            song_ids.append(track['track']['uri'])
+
+        while resp.get('next'):
+            resp = self._make_spotify_request('GET', resp['next'], headers=headers)
+
+            for track in resp['items']:
+                song_ids.append(track['track']['uri'])
+
+        return song_ids
