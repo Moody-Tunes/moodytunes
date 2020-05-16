@@ -112,6 +112,12 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             }
         )
 
+        # Include Spotify user in request to generate browse playlist
+        # if available
+        user_auth = None
+        if self.request.user.spotifyuserauth:
+            user_auth = self.request.user.spotifyuserauth
+
         playlist = generate_browse_playlist(
             energy,
             valence,
@@ -120,7 +126,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             limit=limit,
             jitter=jitter,
             artist=artist,
-            songs=queryset
+            songs=queryset,
+            user_auth=user_auth,
         )
 
         cached_playlist_manager.cache_browse_playlist(

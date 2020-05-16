@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from django.core.cache import cache
 
+from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
 
@@ -14,7 +15,8 @@ def generate_browse_playlist(
         limit=None,
         jitter=None,
         artist=None,
-        songs=None
+        songs=None,
+        user_auth=None,
 ):
     """
     Build a browse playlist of songs for the given criteria.
@@ -35,6 +37,7 @@ def generate_browse_playlist(
     :param artist: (str) Optional artist of songs to return
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
     :param songs: (QuerySet) Optional queryset of songs to filter
+    :param user_auth: (SpotifyUserAuth) Optional auth instance for checking Spotify for user saved tracks
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
     """
@@ -80,6 +83,25 @@ def generate_browse_playlist(
     # Filter by artist if provided
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
+
+    # Check Spotify to see if any songs in the candidate list are saved
+    # in the user's Spotify library. If any are, return the songs from
+    # the user's saved songs on Spotify
+    if user_auth:
+        client = SpotifyClient('generate_browse_playlist:{}'.format(user_auth.spotify_user_id))
+        track_ids = list(playlist.values_list('code', flat=True))
+        batched_track_ids = client.batch_tracks(track_ids, batch_size=50)  # TODO: Move this to settings variable?
+        tracks_in_user_saved_library = []
+
+        try:
+            for track_ids in batched_track_ids:
+                tracks_in_user_saved_library.extend(client.check_user_saved_tracks(user_auth.access_token, track_ids))
+        except SpotifyException:
+            # TODO Add error handling and logging
+            pass
+
+        if tracks_in_user_saved_library:
+            playlist = playlist.filter(code__in=tracks_in_user_saved_library)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
