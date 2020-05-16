@@ -12,6 +12,40 @@ from tunes.models import Song
 logger = logging.getLogger(__name__)
 
 
+class SpotifyAuthUserTask(object):
+    @update_logging_data
+    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
+        """
+        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
+        the access token is expired
+
+        :param auth_id: (int) Primary key for SpotifyUserAuth record
+
+        :return: (SpotifyUserAuth)
+        """
+        try:
+            auth = SpotifyUserAuth.objects.get(pk=auth_id)
+        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
+            logger.error(
+                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
+            )
+
+            raise
+
+        if auth.should_update_access_token:
+            try:
+                auth.refresh_access_token()
+            except SpotifyException:
+                logger.warning(
+                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
+                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
+                )
+                self.retry()
+
+        return auth
+
+
 class FetchSongFromSpotifyTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
@@ -66,7 +100,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
                 )
 
 
-class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
+class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask, SpotifyAuthUserTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
@@ -209,42 +243,9 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         )
 
 
-class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
+class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask, SpotifyAuthUserTask):
     max_retries = 3
     default_retry_delay = 60 * 15
-
-    @update_logging_data
-    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
-        """
-        TODO: Move this to a shared library (used by CreateSpotifyPlaylistFromSongsTask as well)
-        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
-        the access token is expired
-
-        :param auth_id: (int) Primary key for SpotifyUserAuth record
-
-        :return: (SpotifyUserAuth)
-        """
-        try:
-            auth = SpotifyUserAuth.objects.get(pk=auth_id)
-        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
-            logger.error(
-                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
-            )
-
-            raise
-
-        if auth.should_update_access_token:
-            try:
-                auth.refresh_access_token()
-            except SpotifyException:
-                logger.warning(
-                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
-                )
-                self.retry()
-
-        return auth
 
     @update_logging_data
     def run(self, user_auth_id, *args, **kwargs):
