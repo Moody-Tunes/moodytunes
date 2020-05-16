@@ -1,7 +1,9 @@
 import logging
 
+from celery.schedules import crontab
+
 from accounts.models import SpotifyUserAuth
-from base.tasks import MoodyBaseTask
+from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
@@ -207,7 +209,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         )
 
 
-class UpdateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
+class CreateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
@@ -253,7 +255,7 @@ class UpdateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
         :param user_auth_id: (int) Primary key of SpotifyAuthUser record to fetch
         """
         auth = self.get_and_refresh_spotify_user_auth_record(user_auth_id)
-        client = SpotifyClient(identifier='update_spotify_saved_tracks:{}'.format(auth.spotify_user_id))
+        client = SpotifyClient(identifier='create_spotify_saved_tracks:{}'.format(auth.spotify_user_id))
 
         try:
             spotify_track_ids = client.get_user_saved_tracks(auth.access_token)
@@ -278,3 +280,18 @@ class UpdateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
             )
 
             self.retry()
+
+
+class UpdateSpotifyAuthUserSavedTracksTask(MoodyPeriodicTask):
+    run_every = crontab(minute=0, hour=2, day_of_week=0)
+
+    @update_logging_data
+    def run(self, *args, **kwargs):
+        """
+        Periodically update the saved_songs for each of the SpotifyUserAuth records we have stored.
+        This will ensure we keep our concept of user saved tracks on Spotify fresh.
+        """
+        auths = SpotifyUserAuth.objects.all()
+
+        for auth in auths:
+            UpdateSpotifyAuthUserSavedTracksTask().delay(auth.pk)
