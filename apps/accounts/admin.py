@@ -6,7 +6,7 @@ from base.admin import MoodyBaseAdmin
 
 
 class MoodyUserAdmin(MoodyBaseAdmin):
-    list_display = ('username',)
+    list_display = ('username', 'last_login')
     exclude = ('password',)
     readonly_fields = ('last_login', 'date_joined', 'first_name', 'last_name', 'username',)
 
