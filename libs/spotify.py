@@ -567,3 +567,33 @@ class SpotifyClient(object):
         resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
         return resp
+
+    def check_user_saved_tracks(self, auth_code, track_ids):
+        """
+        Query a user's saved track list to check if any of the tracks specified are in it.
+        Will return a list of track_ids that were found in the user's saved tracks.
+
+        TODO: This endpoint only takes 50 track_ids at a time to lookup. Need to batch
+        requests in bunches of 50 track_ids.
+
+        :param auth_code: (str) SpotifyAuthUser access_token for use in making request
+        :param track_ids: (list[str]) Spotify track ids to check for in user saved tracks
+
+        :return: (list[str])
+        """
+        saved_tracks = []
+        spotify_track_ids = [track_id.split(':')[2] for track_id in track_ids]  # Spotify only needs the ID portion
+
+        url = '{api_url}/me/tracks/contains'.format(api_url=settings.SPOTIFY['api_url'])
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+        params = {'ids': ','.join(spotify_track_ids)}
+
+        resp = self._make_spotify_request('GET', url, headers=headers, params=params)
+
+        # Response is returned in the order requested (req:[1,2,3] -> res:[1,2,3])
+        # If an object is not found, a null value is returned in the appropriate position
+        for track_id, is_found in zip(track_ids, resp):
+            if is_found:
+                saved_tracks.append(track_id)
+
+        return saved_tracks
