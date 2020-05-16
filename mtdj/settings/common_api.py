@@ -17,5 +17,5 @@ SPOTIFY = {
     'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/moodytunes/spotify/callback/'),
     'auth_cache_key_timeout': 60 * 60,  # Authorization token is good for one hour
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
-    'auth_user_scopes': ['playlist-modify-public'],
+    'auth_user_scopes': ['playlist-modify-public', 'user-library-read'],
 }
