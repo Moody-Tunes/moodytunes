@@ -18,7 +18,11 @@ from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from moodytunes.tasks import (
+    CreateSpotifyPlaylistFromSongsTask,
+    FetchSongFromSpotifyTask,
+    UpdateSpotifyAuthUserSavedTracksTask,
+)
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
@@ -176,7 +180,7 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Create SpotifyAuth record from data
             try:
-                SpotifyUserAuth.objects.get_or_create(
+                auth = SpotifyUserAuth.objects.create(
                     user=user,
                     access_token=tokens['access_token'],
                     refresh_token=tokens['refresh_token'],
@@ -187,6 +191,8 @@ class SpotifyAuthenticationCallbackView(View):
                     'Created SpotifyAuthUser record for user {}'.format(user.username),
                     extra={'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs)}
                 )
+
+                UpdateSpotifyAuthUserSavedTracksTask().delay(auth.pk)
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
             except IntegrityError:

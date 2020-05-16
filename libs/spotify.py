@@ -614,8 +614,9 @@ class SpotifyClient(object):
         song_ids = []
         url = '{api_url}/me/tracks'.format(api_url=settings.SPOTIFY['api_url'])
         headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+        params = {'limit': 50}  # TODO: Move this to settings
 
-        resp = self._make_spotify_request('GET', url, headers=headers)
+        resp = self._make_spotify_request('GET', url, headers=headers, params=params)
 
         for track in resp['items']:
             song_ids.append(track['track']['uri'])

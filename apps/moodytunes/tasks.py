@@ -205,3 +205,76 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                 'auth_id': auth.pk
             }
         )
+
+
+class UpdateSpotifyAuthUserSavedTracksTask(MoodyBaseTask):
+    max_retries = 3
+    default_retry_delay = 60 * 15
+
+    @update_logging_data
+    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
+        """
+        TODO: Move this to a shared library (used by CreateSpotifyPlaylistFromSongsTask as well)
+        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
+        the access token is expired
+
+        :param auth_id: (int) Primary key for SpotifyUserAuth record
+
+        :return: (SpotifyUserAuth)
+        """
+        try:
+            auth = SpotifyUserAuth.objects.get(pk=auth_id)
+        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
+            logger.error(
+                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
+            )
+
+            raise
+
+        if auth.should_update_access_token:
+            try:
+                auth.refresh_access_token()
+            except SpotifyException:
+                logger.warning(
+                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
+                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
+                )
+                self.retry()
+
+        return auth
+
+    @update_logging_data
+    def run(self, user_auth_id, *args, **kwargs):
+        """
+        Fetch the songs the user has saved in their Spotify account and save to their
+        record for use in generating their browse playlist.
+
+        :param user_auth_id: (int) Primary key of SpotifyAuthUser record to fetch
+        """
+        auth = self.get_and_refresh_spotify_user_auth_record(user_auth_id)
+        client = SpotifyClient(identifier='update_spotify_saved_tracks:{}'.format(auth.spotify_user_id))
+
+        try:
+            spotify_track_ids = client.get_user_saved_tracks(auth.access_token)
+            auth.saved_songs = spotify_track_ids
+            auth.save()
+            logger.info(
+                'Successfully updated Spotify saved songs for user {}'.format(auth.spotify_user_id),
+                extra={
+                    'fingerprint': auto_fingerprint('success_get_saved_songs_from_spotify', **kwargs),
+                    'spotify_user_id': auth.spotify_user_id,
+                    'spotify_user_auth_id': auth.pk
+                }
+            )
+        except SpotifyException:
+            logger.warning(
+                'Error fetching user saved songs from Spotify for user {}'.format(auth.spotify_user_id),
+                extra={
+                    'fingerprint': auto_fingerprint('failed_get_saved_songs_from_spotify', **kwargs),
+                    'spotify_user_id': auth.spotify_user_id,
+                    'spotify_user_auth_id': auth.pk
+                }
+            )
+
+            self.retry()
