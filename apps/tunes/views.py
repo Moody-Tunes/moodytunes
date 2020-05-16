@@ -8,7 +8,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from accounts.models import UserSongVote
+from accounts.models import SpotifyUserAuth, UserSongVote
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
 from libs.moody_logging import auto_fingerprint, update_logging_data
@@ -113,9 +113,9 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
         # Include Spotify user in request to generate browse playlist
-        # if available
+        # if user has authenticated with Spotify
         user_auth = None
-        if self.request.user.spotifyuserauth:
+        if SpotifyUserAuth.objects.filter(user=self.request.user).exists():
             user_auth = self.request.user.spotifyuserauth
 
         playlist = generate_browse_playlist(
