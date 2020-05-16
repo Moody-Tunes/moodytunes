@@ -180,7 +180,7 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Create SpotifyAuth record from data
             try:
-                auth = SpotifyUserAuth.objects.create(
+                auth, _ = SpotifyUserAuth.objects.get_or_create(
                     user=user,
                     access_token=tokens['access_token'],
                     refresh_token=tokens['refresh_token'],
