@@ -200,4 +200,11 @@ class UpdateSpotifyAuthUserSavedTracksTask(MoodyPeriodicTask):
         auths = SpotifyUserAuth.objects.all()
 
         for auth in auths:
-            UpdateSpotifyAuthUserSavedTracksTask().delay(auth.pk)
+            logger.info(
+                'Updating user saved tracks from Spotify',
+                extra={
+                    'fingerprint': auto_fingerprint('update_saved_tracks_from_spotify', **kwargs),
+                    'auth_id': auth.pk
+                }
+            )
+            CreateSpotifyAuthUserSavedTracksTask().delay(auth.pk)
