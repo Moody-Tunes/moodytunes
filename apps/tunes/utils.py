@@ -3,7 +3,6 @@ import random
 from django.conf import settings
 from django.core.cache import cache
 
-from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
 
@@ -41,6 +40,16 @@ def generate_browse_playlist(
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
     """
+
+    # Check if user has any songs from Spotify saved to their record
+    # If they do, return that first; we want the songs the user has
+    # saved to Spotify to appear first
+    if user_auth and user_auth.saved_songs:
+        user_playlist = songs.filter(code__in=user_auth.saved_songs)
+
+        if user_playlist.exists():
+            return user_playlist
+
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
     danceability_lower_limit = danceability_upper_limit = danceability
@@ -83,25 +92,6 @@ def generate_browse_playlist(
     # Filter by artist if provided
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
-
-    # Check Spotify to see if any songs in the candidate list are saved
-    # in the user's Spotify library. If any are, return the songs from
-    # the user's saved songs on Spotify
-    if user_auth:
-        client = SpotifyClient('generate_browse_playlist:{}'.format(user_auth.spotify_user_id))
-        track_ids = list(playlist.values_list('code', flat=True))
-        batched_track_ids = client.batch_tracks(track_ids, batch_size=50)  # TODO: Move this to settings variable?
-        tracks_in_user_saved_library = []
-
-        try:
-            for track_ids in batched_track_ids:
-                tracks_in_user_saved_library.extend(client.check_user_saved_tracks(user_auth.access_token, track_ids))
-        except SpotifyException:
-            # TODO Add error handling and logging
-            pass
-
-        if tracks_in_user_saved_library:
-            playlist = playlist.filter(code__in=tracks_in_user_saved_library)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
