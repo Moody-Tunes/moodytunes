@@ -37,7 +37,7 @@ class BackupDatabaseTask(MoodyPeriodicTask):
 
     def delete_old_backups(self):
         for backup_file in os.listdir(settings.DATABASE_BACKUPS_PATH):
-            backup_filename = '{}/{}'.format(settings.DATABASE_BACKUPS_PATH, backup_file)
+            backup_filename = os.path.join(settings.DATABASE_BACKUPS_PATH, backup_file)
             logger.info('Deleting old backup {}'.format(backup_filename))
             os.unlink(backup_filename)
 
