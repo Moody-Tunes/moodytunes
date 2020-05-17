@@ -17,6 +17,10 @@ class TestCreateUserEmotionRecordsSignal(TestCase):
         for emotion in existing_emotions:
             self.assertTrue(user.useremotion_set.filter(emotion__name=emotion.name).exists())
 
+    def test_post_save_admin_does_not_create_user_emotion_records(self):
+        user = MoodyUtil.create_user(username='test_signal_admin', is_superuser=True)
+        self.assertFalse(user.useremotion_set.all())
+
 
 class TestUpdateUserAttributesSignal(TestCase):
     @classmethod

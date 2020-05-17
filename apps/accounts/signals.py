@@ -7,7 +7,7 @@ from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotio
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
     # Post save signal to create UserEmotion records for a user on creation
-    if created:
+    if created and not instance.is_superuser:
         CreateUserEmotionRecordsForUserTask().delay(instance.pk)
 
 
