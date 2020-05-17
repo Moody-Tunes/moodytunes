@@ -27,6 +27,14 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
             )
             raise
 
+        if user.is_superuser:
+            logger.info(
+                'Skipping creating UserEmotion records for user {} because user is admin'.format(user.username),
+                extra={'fingerprint': auto_fingerprint('skip_creating_useremotion_records_for_admin', **kwargs)}
+            )
+
+            return
+
         user_emotions = []
         for emotion in Emotion.objects.all().iterator():
             user_emotions.append(
