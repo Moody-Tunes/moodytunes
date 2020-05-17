@@ -128,7 +128,7 @@ DATABASES = {
     }
 }
 
-DATABASE_BACKUPS_PATH = env.str('MTDJ_DATABASE_BACKUPS_PATH', default='/tmp')
+DATABASE_BACKUPS_PATH = env.str('MTDJ_DATABASE_BACKUPS_PATH', default=tempfile.gettempdir())
 DATABASE_BACKUP_TARGETS = [
     'accounts.MoodyUser',
     'accounts.UserEmotion',
