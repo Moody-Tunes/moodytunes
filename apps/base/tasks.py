@@ -1,8 +1,12 @@
+import os
 from logging import getLogger
 
 from celery.schedules import crontab
 from celery.task import PeriodicTask, Task
+from django.conf import settings
 from django.core.management import call_command
+
+from libs.moody_logging import auto_fingerprint, update_logging_data
 
 
 logger = getLogger(__name__)
@@ -26,3 +30,39 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
         logger.info('Calling django management command to clear expired sessions')
 
         call_command('clearsessions')
+
+
+class BackupDatabaseTask(MoodyPeriodicTask):
+    run_every = crontab(minute=0, hour=3, day_of_week=0)
+
+    def delete_old_backups(self):
+        for backup_file in os.listdir(settings.DATABASE_BACKUPS_PATH):
+            if any([backup_file.startswith(model) for model in settings.DATABASE_BACKUP_TARGETS]):
+                backup_filename = os.path.join(settings.DATABASE_BACKUPS_PATH, backup_file)
+                logger.info('Deleting old backup {}'.format(backup_filename))
+                os.unlink(backup_filename)
+
+    """Task to backup mission critical database tables"""
+    @update_logging_data
+    def run(self, *args, **kwargs):
+        logger.info(
+            'Starting run to backup mission critical database tables',
+            extra={'fingerprint': auto_fingerprint('start_database_backup', **kwargs)}
+        )
+
+        self.delete_old_backups()
+
+        for model in settings.DATABASE_BACKUP_TARGETS:
+            backup_filename = '{backup_directory}/{model_name}.json'.format(
+                backup_directory=settings.DATABASE_BACKUPS_PATH,
+                model_name=model
+            )
+
+            logger.info('Writing backup of {} to file {}'.format(model, backup_filename))
+
+            call_command('dumpdata', model, output=backup_filename)
+
+        logger.info(
+            'Finished run to backup mission critical database tables',
+            extra={'fingerprint': auto_fingerprint('finished_database_backup', **kwargs)}
+        )
