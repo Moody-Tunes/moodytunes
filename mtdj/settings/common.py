@@ -128,12 +128,7 @@ DATABASES = {
     }
 }
 
-# django-dbbackup options
-DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {
-    'location': env.str('MTDJ_DATABASE_BACKUPS_PATH', default='/tmp')
-}
-
+DATABASE_BACKUPS_PATH = env.str('MTDJ_DATABASE_BACKUPS_PATH', default='/tmp')
 
 CACHES = {
     'default': {
