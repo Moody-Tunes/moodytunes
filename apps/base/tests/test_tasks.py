@@ -31,9 +31,10 @@ class TestBackupDatabaseTask(TestCase):
             self.assertTrue(os.path.exists(backup_filename))
 
     def test_delete_old_backups_clears_files(self):
-        with open(os.path.join(settings.DATABASE_BACKUPS_PATH, 'test'), 'w') as test_file:
+        backup_filename = '{}.json'.format(settings.DATABASE_BACKUP_TARGETS[0])
+        with open(os.path.join(settings.DATABASE_BACKUPS_PATH, backup_filename), 'w') as test_file:
             test_file.write('Hello World!')
 
         BackupDatabaseTask().delete_old_backups()
 
-        self.assertFalse(os.listdir(settings.DATABASE_BACKUPS_PATH))
+        self.assertNotIn(backup_filename, os.listdir(settings.DATABASE_BACKUPS_PATH))
