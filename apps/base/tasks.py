@@ -1,3 +1,4 @@
+import os
 from logging import getLogger
 
 from celery.schedules import crontab
@@ -34,6 +35,12 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
 class BackupDatabaseTask(MoodyPeriodicTask):
     run_every = crontab(minute=0, hour=3, day_of_week=0)
 
+    def delete_old_backups(self):
+        for backup_file in os.listdir(settings.DATABASE_BACKUPS_PATH):
+            backup_filename = os.path.join(settings.DATABASE_BACKUPS_PATH, backup_file)
+            logger.info('Deleting old backup {}'.format(backup_filename))
+            os.unlink(backup_filename)
+
     """Task to backup mission critical database tables"""
     @update_logging_data
     def run(self, *args, **kwargs):
@@ -41,6 +48,8 @@ class BackupDatabaseTask(MoodyPeriodicTask):
             'Starting run to backup mission critical database tables',
             extra={'fingerprint': auto_fingerprint('start_database_backup', **kwargs)}
         )
+
+        self.delete_old_backups()
 
         for model in settings.DATABASE_BACKUP_TARGETS:
             backup_filename = '{backup_directory}/{model_name}.json'.format(
