@@ -129,6 +129,14 @@ DATABASES = {
 }
 
 DATABASE_BACKUPS_PATH = env.str('MTDJ_DATABASE_BACKUPS_PATH', default='/tmp')
+DATABASE_BACKUP_TARGETS = [
+    'accounts.MoodyUser',
+    'accounts.UserEmotion',
+    'accounts.UserSongVote',
+    'accounts.SpotifyUserAuth',
+    'tunes.Emotion',
+    'tunes.Song',
+]
 
 CACHES = {
     'default': {
