@@ -13,10 +13,16 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    import debug_toolbar
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
 
-    urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+        urlpatterns = [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns
 
-    urlpatterns += [path(r'silk/', include('silk.urls'))]
+    if 'silk' in settings.INSTALLED_APPS:
+        import silk.urls
+
+        urlpatterns = [
+            path('silk/', include(silk.urls))
+        ] + urlpatterns
