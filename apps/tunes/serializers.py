@@ -7,17 +7,6 @@ from base.fields import CleanedChoiceField
 from tunes.models import Emotion, Song
 
 
-class EmotionSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Emotion
-        fields = ('name', 'full_name')
-
-    def get_full_name(self, obj):
-        return obj.full_name
-
-
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
