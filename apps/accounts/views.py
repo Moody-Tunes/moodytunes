@@ -183,9 +183,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': genre,
             'energy': energy,
             'valence': valence,
             'danceability': danceability,

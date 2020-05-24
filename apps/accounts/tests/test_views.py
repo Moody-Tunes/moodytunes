@@ -199,6 +199,18 @@ class TestAnalyticsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_invalid_context_returns_bad_request(self):
+        data = {'emotion': Emotion.HAPPY, 'context': 'invalid-context'}
+        resp = self.api_client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_genre_returns_bad_request(self):
+        data = {'emotion': Emotion.HAPPY, 'genre': 'this-genre-value-is-way-too-long-for-our-site-usage'}
+        resp = self.api_client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         upvoted_song_1 = MoodyUtil.create_song(valence=.75, energy=.65)
@@ -217,9 +229,7 @@ class TestAnalyticsView(TestCase):
         expected_danceability = expected_attributes['song__danceability__avg']
 
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': expected_energy,
             'valence': expected_valence,
             'danceability': expected_danceability,
@@ -255,9 +265,7 @@ class TestAnalyticsView(TestCase):
         # We should only see the average energy and valence
         # for the songs in the genre
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -275,9 +283,7 @@ class TestAnalyticsView(TestCase):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': None,
             'valence': None,
             'danceability': None,
@@ -314,9 +320,7 @@ class TestAnalyticsView(TestCase):
         # We should only see the song once in the response
         user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': user_emotion.energy,
             'valence': user_emotion.valence,
             'danceability': user_emotion.danceability,
@@ -353,9 +357,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the song for this context in the response
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -412,9 +414,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the expected song for this context and genre in the response
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,

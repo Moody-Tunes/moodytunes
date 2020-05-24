@@ -20,9 +20,9 @@ from tunes.serializers import (
     DeleteVoteRequestSerializer,
     LastPlaylistSerializer,
     OptionsSerializer,
+    PlaylistSerializer,
     PlaylistSongsRequestSerializer,
     SongSerializer,
-    VoteSerializer,
     VoteSongsRequestSerializer,
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
@@ -290,7 +290,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
     on the songs as making them feel the given emotion.
     """
-    serializer_class = VoteSerializer
+    serializer_class = PlaylistSerializer
     queryset = UserSongVote.objects.prefetch_related('emotion', 'song').all()
     pagination_class = PlaylistPaginator
 
