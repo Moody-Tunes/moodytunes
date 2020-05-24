@@ -33,11 +33,10 @@ class LastPlaylistSerializer(serializers.Serializer):
 
 class PlaylistSerializer(serializers.ModelSerializer):
     song = SongSerializer()
-    emotion = EmotionSerializer()
 
     class Meta:
         model = UserSongVote
-        fields = ('emotion', 'song', 'context', 'description')
+        fields = ('song', 'context', 'description')
 
 
 class OptionsSerializer(serializers.Serializer):
