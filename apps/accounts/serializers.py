@@ -5,9 +5,7 @@ from tunes.models import Emotion
 
 
 class AnalyticsSerializer(serializers.Serializer):
-    emotion = serializers.CharField(min_length=3, max_length=3)
     emotion_name = serializers.CharField(max_length=20)
-    genre = serializers.CharField(max_length=15, required=False)
     energy = serializers.FloatField(min_value=0, max_value=1)
     valence = serializers.FloatField(min_value=0, max_value=1)
     danceability = serializers.FloatField(min_value=0, max_value=1)

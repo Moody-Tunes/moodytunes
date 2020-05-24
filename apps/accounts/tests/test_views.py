@@ -217,9 +217,7 @@ class TestAnalyticsView(TestCase):
         expected_danceability = expected_attributes['song__danceability__avg']
 
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': expected_energy,
             'valence': expected_valence,
             'danceability': expected_danceability,
@@ -255,9 +253,7 @@ class TestAnalyticsView(TestCase):
         # We should only see the average energy and valence
         # for the songs in the genre
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -275,9 +271,7 @@ class TestAnalyticsView(TestCase):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': None,
             'valence': None,
             'danceability': None,
@@ -314,9 +308,7 @@ class TestAnalyticsView(TestCase):
         # We should only see the song once in the response
         user_emotion = self.user.get_user_emotion_record(emotion.name)
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': user_emotion.energy,
             'valence': user_emotion.valence,
             'danceability': user_emotion.danceability,
@@ -353,9 +345,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the song for this context in the response
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': None,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -412,9 +402,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the expected song for this context and genre in the response
         expected_response = {
-            'emotion': emotion.name,
             'emotion_name': emotion.full_name,
-            'genre': expected_song.genre,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
