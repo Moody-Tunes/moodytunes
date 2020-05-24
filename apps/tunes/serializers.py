@@ -21,7 +21,7 @@ class EmotionSerializer(serializers.ModelSerializer):
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = ('artist', 'name', 'genre', 'code')
+        fields = ('code',)
 
 
 class LastPlaylistSerializer(serializers.Serializer):
