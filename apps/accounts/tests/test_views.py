@@ -199,6 +199,18 @@ class TestAnalyticsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_invalid_context_returns_bad_request(self):
+        data = {'emotion': Emotion.HAPPY, 'context': 'invalid-context'}
+        resp = self.api_client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_genre_returns_bad_request(self):
+        data = {'emotion': Emotion.HAPPY, 'genre': 'this-genre-value-is-way-too-long-for-our-site-usage'}
+        resp = self.api_client.get(self.url, data=data)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         upvoted_song_1 = MoodyUtil.create_song(valence=.75, energy=.65)
