@@ -58,7 +58,7 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
         """
         try:
-            vote = UserSongVote.objects.select_related('user', 'emotion').get(pk=vote_id)
+            vote = UserSongVote.objects.select_related('user', 'emotion', 'song').get(pk=vote_id)
         except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
             logger.exception(
                 'Unable to fetch UserSongVote with pk={}'.format(vote_id),
