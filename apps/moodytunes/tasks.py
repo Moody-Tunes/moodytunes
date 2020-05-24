@@ -139,10 +139,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             for batch in batched_songs:
                 spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
 
-            logger.info(
-                'Added songs to playlist {} successfully'.format(playlist_id),
-                extra={'fingerprint': auto_fingerprint('added_songs_to_playlist', **kwargs)},
-            )
         except SpotifyException:
             logger.exception(
                 'Error adding songs to playlist {}'.format(playlist_id), extra={
@@ -184,9 +180,28 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         return auth
 
+    @update_logging_data
     def run(self, auth_id, playlist_name, songs, *args, **kwargs):
         auth = self.get_and_refresh_spotify_user_auth_record(auth_id)
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
 
+        logger.info(
+            'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.user.username),
+            extra={
+                'fingerprint': auto_fingerprint('start_export_playlist', **kwargs),
+                'songs': songs,
+                'auth_id': auth.pk
+            }
+        )
+
         playlist_id = self.get_or_create_playlist(auth.access_token, auth.spotify_user_id, playlist_name, spotify)
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
+
+        logger.info(
+            'Exported songs to playlist {} successfully'.format(playlist_name),
+            extra={
+                'fingerprint': auto_fingerprint('success_export_playlist', **kwargs),
+                'songs': songs,
+                'auth_id': auth.pk
+            }
+        )
