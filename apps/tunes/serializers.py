@@ -31,7 +31,7 @@ class LastPlaylistSerializer(serializers.Serializer):
     playlist = SongSerializer(many=True, read_only=True)
 
 
-class VoteSerializer(serializers.ModelSerializer):
+class PlaylistSerializer(serializers.ModelSerializer):
     song = SongSerializer()
     emotion = EmotionSerializer()
 
