@@ -97,6 +97,9 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'old_danceability': old_danceability,
                 'new_energy': user_emotion.energy,
                 'new_valence': user_emotion.valence,
-                'new_danceability': user_emotion.danceability
+                'new_danceability': user_emotion.danceability,
+                'song_energy': vote.song.energy,
+                'song_valence': vote.song.valence,
+                'song_danceability': vote.song.danceability,
             }
         )
