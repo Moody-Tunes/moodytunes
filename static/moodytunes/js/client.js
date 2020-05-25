@@ -87,10 +87,15 @@
 
             fetch(url, options)
                 .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Error with request!');
+                    }
                     return response.json();
                 }).then((json) => {
                     callback(json);
-                });
+                }).catch(error => {
+                    alert(error);
+            });
         },
         getOptions: function(callback) {
             // Retrieve options for site interaction (emotions and genres in our system)
