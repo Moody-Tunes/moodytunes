@@ -78,6 +78,7 @@
             // @data (object): Request data to send (used for POST and DELETE methods)
             // @callback (function): Callback function to pass retrieved data onto
             //      -> This is what will consume the data retrieved from the request
+            document.PlaylistCurator.clearErrorModal();
             let url = this.buildRequestURL(endpoint, this.stripNullParams(params));
             let options = {
                 method: method,

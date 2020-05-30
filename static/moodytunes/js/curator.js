@@ -11,16 +11,20 @@
                 container.removeChild(container.firstChild);
             }
         },
-        displayAPIErrors: function(error) {
-            // Display API error message in modal
+        clearErrorModal: function() {
             let container = document.getElementById('container');
-
-            // Delete old error modal if present
             let oldErrorModal = document.getElementById('error-modal');
 
             if (oldErrorModal) {
                 container.removeChild(oldErrorModal);
             }
+        },
+        displayAPIErrors: function(error) {
+            // Delete old error modal if present
+            this.clearErrorModal();
+
+            // Display API error message in modal
+            let container = document.getElementById('container');
 
             // Create parent modal
             let errorModal = document.createElement('div');
