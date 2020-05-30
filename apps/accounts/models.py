@@ -129,6 +129,7 @@ class UserEmotion(BaseModel):
     energy = models.FloatField(validators=[validate_decimal_value])
     valence = models.FloatField(validators=[validate_decimal_value])
     danceability = models.FloatField(validators=[validate_decimal_value], default=0)
+    vote_count = models.IntegerField(default=0)
 
     class Meta:
         unique_together = ('user', 'emotion')
@@ -137,6 +138,7 @@ class UserEmotion(BaseModel):
         return '{} - {}'.format(self.user, self.emotion)
 
     def save(self, *args, **kwargs):
+        self.vote_count = UserSongVote.objects.filter(user=self.user, emotion=self.emotion).count()
         self.energy = self.energy or self.emotion.energy
         self.valence = self.valence or self.emotion.valence
         self.danceability = self.danceability or self.emotion.danceability
