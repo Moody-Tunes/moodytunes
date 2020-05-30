@@ -93,7 +93,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 danceability = user_emotion.danceability
 
         logger.info(
-            'Generating browse playlist for user {}'.format(self.request.user.username),
+            'Generating {} browse playlist for user {}'.format(
+                self.cleaned_data['emotion'],
+                self.request.user.username,
+            ),
             extra={
                 'fingerprint': auto_fingerprint('generate_playlist', **kwargs),
                 'user_id': self.request.user.pk,
