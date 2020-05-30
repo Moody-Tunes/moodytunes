@@ -16,7 +16,7 @@ from ratelimit.mixins import RatelimitMixin
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.spotify import SpotifyClient
+from libs.spotify import SpotifyClient, SpotifyException
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
@@ -150,10 +150,29 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Get access and refresh tokens for user
             spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
-            tokens = spotify_client.get_access_and_refresh_tokens(code)
+
+            try:
+                tokens = spotify_client.get_access_and_refresh_tokens(code)
+            except SpotifyException:
+                logger.error(
+                    'Unable to get Spotify tokens for user {}'.format(user.username),
+                    extra={'fingerprint': auto_fingerprint('failed_get_spotify_tokens', **kwargs)}
+                )
+
+                messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
 
             # Get Spotify username from profile data
-            profile_data = spotify_client.get_user_profile(tokens['access_token'])
+            try:
+                profile_data = spotify_client.get_user_profile(tokens['access_token'])
+            except SpotifyException:
+                logger.error(
+                    'Unable to get Spotify profile for user {}'.format(user.username),
+                    extra={'fingerprint': auto_fingerprint('failed_get_spotify_profile', **kwargs)}
+                )
+
+                messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
 
             # Create SpotifyAuth record from data
             try:
@@ -179,7 +198,7 @@ class SpotifyAuthenticationCallbackView(View):
                     extra={'fingerprint': auto_fingerprint('failed_to_create_spotify_auth_user', **kwargs)}
                 )
 
-                messages.error(request, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
+                messages.error(request, 'Spotify user {} has already authorized MoodyTunes.'.format(
                     profile_data['id']
                 ))
 
