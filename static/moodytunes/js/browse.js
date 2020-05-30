@@ -149,7 +149,6 @@
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         document.PlaylistCurator.clearChildren(playlistContainer);
-        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
 
         if (document.PlaylistCurator.isEmptyResult(data.length)) {
             noResultsFoundAlert.hidden = false;

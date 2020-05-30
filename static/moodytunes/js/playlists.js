@@ -115,7 +115,6 @@
 
         document.PlaylistCurator.clearChildren(playlistContainer);
         document.PlaylistCurator.clearChildren(buttonContainer);
-        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         if (document.PlaylistCurator.isEmptyResult(data.count)) {
