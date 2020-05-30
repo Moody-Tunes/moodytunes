@@ -3,6 +3,7 @@
 (function IIFE() {
     let HttpStatusErrorMap = {
         '400': 'Invalid request parameters',
+        '403': 'Request forbidden',
         '404': 'Resource not found',
         '500': 'Server returned an error',
         '502': 'Could not connect to API'
