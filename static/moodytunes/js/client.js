@@ -106,7 +106,7 @@
                 }).then((json) => {
                     callback(json);
                 }).catch(error => {
-                    alert(error);
+                    document.PlaylistCurator.displayAPIErrors(error);
             });
         },
         getOptions: function(callback) {
