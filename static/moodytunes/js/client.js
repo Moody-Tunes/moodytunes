@@ -98,6 +98,8 @@
                             throw new Error('Could not find song to vote on!');
                         } else if (response.status === HttpStatusCodes.badGateway ) {
                             throw new Error('Could not connect to API!');
+                        } else if (response.status === HttpStatusCodes.serverError ) {
+                            throw new Error('Server returned an error!');
                         }
 
                         throw new Error('Error!');
