@@ -1,10 +1,10 @@
 'use strict';
 
 (function IIFE() {
-    let HttpStatusCodes = {
-        notFound: 404,
-        serverError: 500,
-        badGateway: 502
+    let HttpStatusErrorMap = {
+        '404': 'Could not find song to vote on!',
+        '500': 'Server returned an error!',
+        '502': 'Could not connect to API!'
     };
 
     document.MoodyTunesClient = {
@@ -94,12 +94,8 @@
             fetch(url, options)
                 .then((response) => {
                     if (!response.ok) {
-                        if (response.status === HttpStatusCodes.notFound) {
-                            throw new Error('Could not find song to vote on!');
-                        } else if (response.status === HttpStatusCodes.badGateway ) {
-                            throw new Error('Could not connect to API!');
-                        } else if (response.status === HttpStatusCodes.serverError ) {
-                            throw new Error('Server returned an error!');
+                        if (Object.keys(HttpStatusErrorMap).includes(String(response.status))) {
+                            throw new Error(HttpStatusErrorMap[response.status]);
                         }
 
                         throw new Error('Error!');
