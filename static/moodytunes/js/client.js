@@ -1,6 +1,12 @@
 'use strict';
 
 (function IIFE() {
+    let HttpStatusCodes = {
+        notFound: 404,
+        serverError: 500,
+        badGateway: 502
+    };
+
     document.MoodyTunesClient = {
         /*
         Client for interacting with the MoodyTunes backend API. Exposes a set of functions that are meant to retrieve
@@ -88,8 +94,15 @@
             fetch(url, options)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error('Error with request!');
+                        if (response.status === HttpStatusCodes.notFound) {
+                            throw new Error('Could not find song to vote on!');
+                        } else if (response.status === HttpStatusCodes.badGateway ) {
+                            throw new Error('Could not connect to API!');
+                        }
+
+                        throw new Error('Error!');
                     }
+
                     return response.json();
                 }).then((json) => {
                     callback(json);
