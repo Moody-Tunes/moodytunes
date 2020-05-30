@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from accounts.management.commands.accounts_recover_user_account import Command as RecoverCommand
 from libs.tests.helpers import MoodyUtil
+from tunes.models import Emotion
 
 
 @mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
@@ -74,3 +75,37 @@ class TestRecoverUserAccount(TestCase):
             log_level=logging.ERROR,
             extra={'exc': exc}
         )
+
+
+@mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
+class TestBackfillUserEmotionVoteCount(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.user_with_votes = MoodyUtil.create_user(username='user_with_votes')
+        cls.user_without_votes = MoodyUtil.create_user(username='user_without_votes')
+
+        song1 = MoodyUtil.create_song()
+        song2 = MoodyUtil.create_song()
+        MoodyUtil.create_user_song_vote(cls.user_with_votes, song1, cls.emotion, True)
+        MoodyUtil.create_user_song_vote(cls.user_with_votes, song2, cls.emotion, False)
+
+    def test_happy_path(self):
+        user_emotion = self.user_with_votes.get_user_emotion_record(self.emotion.name)
+        user_emotion.vote_count = 0
+        user_emotion.save()
+
+        call_command('accounts_backfill_user_emotion_vote_count')
+        user_emotion.refresh_from_db()
+
+        self.assertEqual(user_emotion.vote_count, 2)
+
+    def test_user_with_no_votes_keeps_vote_count_at_zero(self):
+        user_emotion = self.user_without_votes.get_user_emotion_record(self.emotion.name)
+        user_emotion.vote_count = 0
+        user_emotion.save()
+
+        call_command('accounts_backfill_user_emotion_vote_count')
+        user_emotion.refresh_from_db()
+
+        self.assertEqual(user_emotion.vote_count, 0)
