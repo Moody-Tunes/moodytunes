@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from accounts.models import SpotifyUserAuth
+from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from tunes.models import Emotion
 
@@ -234,6 +235,50 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_spotify_error_fetching_tokens_redirects_to_error_page(self, mock_spotify):
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.side_effect = SpotifyException
+
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.failure_url)
+        self.assertEqual(last_message, 'We were unable to retrieve your Spotify profile. Please try again.')
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_spotify_error_fetching_profile_redirects_to_error_page(self, mock_spotify):
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.return_value = {
+            'access_token': 'test-access-token',
+            'refresh_token': 'test-refresh-token'
+        }
+
+        spotify_client.get_user_profile.side_effect = SpotifyException
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.failure_url)
+        self.assertEqual(last_message, 'We were unable to retrieve your Spotify profile. Please try again.')
 
 
 class TestExportView(TestCase):
