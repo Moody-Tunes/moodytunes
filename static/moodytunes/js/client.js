@@ -2,9 +2,10 @@
 
 (function IIFE() {
     let HttpStatusErrorMap = {
-        '404': 'Could not find song to vote on!',
-        '500': 'Server returned an error!',
-        '502': 'Could not connect to API!'
+        '400': 'Invalid request parameters',
+        '404': 'Resource not found',
+        '500': 'Server returned an error',
+        '502': 'Could not connect to API'
     };
 
     document.MoodyTunesClient = {
