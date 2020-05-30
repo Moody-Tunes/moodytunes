@@ -130,6 +130,10 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
+
     @mock.patch('moodytunes.views.SpotifyClient')
     def test_happy_path(self, mock_spotify):
         spotify_client = mock.Mock()
@@ -143,9 +147,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -154,9 +155,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params)
 
@@ -183,9 +181,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -212,9 +207,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -228,9 +220,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
     def test_invalid_state_para_raises_error(self):
         query_params = {'code': 'test-spotify-code', 'state': 'bad-state-value'}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -244,9 +233,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -268,9 +254,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
