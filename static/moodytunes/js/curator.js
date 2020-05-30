@@ -34,8 +34,11 @@
 
             // Add ability to close modal on click outside of modal
             window.onclick = function (evt) {
-                if (evt.target === errorModal) {
-                    errorModal.style.display = 'none';
+                let modals = document.getElementsByClassName('modal');
+                for (const modal of modals) {
+                    if (evt.target === modal) {
+                        modal.style.display = 'none';
+                    }
                 }
             };
 
