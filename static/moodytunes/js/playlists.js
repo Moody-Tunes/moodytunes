@@ -33,6 +33,11 @@
 
     function init() {
         closeModal.addEventListener('click', hideConfirmDeleteModal);
+        window.onclick = function (evt) {
+            if (evt.target === confirmDeleteModal) {
+                hideConfirmDeleteModal();
+            }
+        };
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
