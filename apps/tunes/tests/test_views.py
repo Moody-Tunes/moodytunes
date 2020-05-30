@@ -276,20 +276,19 @@ class TestLastPlaylistView(TestCase):
         mock_cache.get.return_value = None
         expected_error = 'Could not find cached playlist'
 
-        params = {'return_last': True}
-        resp = self.api_client.get(self.url, params)
+        resp = self.api_client.get(self.url)
         resp_json = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(resp_json['errors'], expected_error)
 
     @mock.patch('tunes.utils.cache')
-    def test_cached_playlist_filters_songs_user_voted_on(self, mock_cache):
+    def test_cached_playlist_filters_songs_user_voted_on_for_emotion(self, mock_cache):
         voted_song = MoodyUtil.create_song()
         cached_data = {
             'emotion': Emotion.HAPPY,
             'context': 'WORK',
-            'playlist': Song.objects.all()
+            'playlist': Song.objects.filter(code__in=[voted_song.code])
         }
         mock_cache.get.return_value = cached_data
 
@@ -300,11 +299,32 @@ class TestLastPlaylistView(TestCase):
             True
         )
 
-        params = {'return_last': True}
-        resp = self.api_client.get(self.url, params)
+        resp = self.api_client.get(self.url)
         resp_json = resp.json()
 
-        self.assertNotIn(voted_song, resp_json['playlist'])
+        self.assertFalse(resp_json['playlist'])
+
+    @mock.patch('tunes.utils.cache')
+    def test_cached_playlist_includes_songs_user_voted_on_for_different_emotion(self, mock_cache):
+        voted_song = MoodyUtil.create_song()
+        cached_data = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK',
+            'playlist': Song.objects.filter(code__in=[voted_song.code])
+        }
+        mock_cache.get.return_value = cached_data
+
+        MoodyUtil.create_user_song_vote(
+            self.user,
+            voted_song,
+            Emotion.objects.get(name=Emotion.MELANCHOLY),
+            True
+        )
+
+        resp = self.api_client.get(self.url)
+        resp_json = resp.json()
+
+        self.assertEqual(voted_song.code, resp_json['playlist'][0]['code'])
 
 
 class TestVoteView(TestCase):
