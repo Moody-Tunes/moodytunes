@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Not Found{% endblock %}
+
+{% block content %}
+<h1>Not Found</h1>
+    <p>We couldn't find {{ request_path }} on our site.</p>
+    <p>Try going back to the <a href="{% url 'homepage' %}">homepage</a> and searching there.</p>
+{% endblock %}
