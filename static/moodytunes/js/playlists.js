@@ -118,37 +118,33 @@
         document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
-        if (data.errors) {
-            document.PlaylistCurator.displayRequestErrors(data.errors);
-        } else {
-            if (document.PlaylistCurator.isEmptyResult(data.count)) {
-                noResultsFoundAlert.hidden = false;
-                return;
-            }
+        if (document.PlaylistCurator.isEmptyResult(data.count)) {
+            noResultsFoundAlert.hidden = false;
+            return;
+        }
 
-            votes.forEach(vote => {
-                let song = vote.song;
+        votes.forEach(vote => {
+            let song = vote.song;
 
-                let songContainer = document.createElement('div');
-                songContainer.id = 'song-' + song.code;
-                songContainer.className = 'song-container';
+            let songContainer = document.createElement('div');
+            songContainer.id = 'song-' + song.code;
+            songContainer.className = 'song-container';
 
-                songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
+            songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
 
-                let descriptionContainer = document.createElement('p');
-                descriptionContainer.className = 'song-description-container';
-                descriptionContainer.innerText = vote.description;
-                songContainer.appendChild(descriptionContainer);
-                songContainer.appendChild(createDeleteButton(song.code));
+            let descriptionContainer = document.createElement('p');
+            descriptionContainer.className = 'song-description-container';
+            descriptionContainer.innerText = vote.description;
+            songContainer.appendChild(descriptionContainer);
+            songContainer.appendChild(createDeleteButton(song.code));
 
-                playlistContainer.appendChild(songContainer);
-            });
+            playlistContainer.appendChild(songContainer);
+        });
 
-            // Add buttons to retrieve paginated responses
-            if (nextLink || previousLink) {
-                buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
-                buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
-            }
+        // Add buttons to retrieve paginated responses
+        if (nextLink || previousLink) {
+            buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
+            buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
         }
     }
 

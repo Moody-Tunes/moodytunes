@@ -151,18 +151,14 @@
         document.PlaylistCurator.clearChildren(playlistContainer);
         document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
 
-        if (data.errors) {
-            document.PlaylistCurator.displayRequestErrors(data.errors);
-        } else {
-            if (document.PlaylistCurator.isEmptyResult(data.length)) {
-                noResultsFoundAlert.hidden = false;
-                return;
-            }
+        if (document.PlaylistCurator.isEmptyResult(data.length)) {
+            noResultsFoundAlert.hidden = false;
+            return;
+        }
 
-            // Build playlist from returned data
-            for (const song of data) {
-                playlistContainer.appendChild(createSongContainer(song));
-            }
+        // Build playlist from returned data
+        for (const song of data) {
+            playlistContainer.appendChild(createSongContainer(song));
         }
     }
 

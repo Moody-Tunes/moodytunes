@@ -11,27 +11,6 @@
                 container.removeChild(container.firstChild);
             }
         },
-        displayRequestErrors: function(errors) {
-            // Display validation in an error container
-            let errorContainer = document.getElementById('playlist-error-container');
-
-            // Clean out older errors
-            while (errorContainer.hasChildNodes()) {
-                this.clearChildren(errorContainer);
-            }
-
-            let errorList = document.createElement('ul');
-
-            for (let key in errors) {
-                if (errors.hasOwnProperty(key)) {
-                    let error = document.createElement('li');
-                    error.innerText = key + ': ' + errors[key];
-                    errorList.appendChild(error);
-                }
-            }
-
-            errorContainer.appendChild(errorList);
-        },
         displayAPIErrors: function(error) {
             // Display API error message in modal
             let container = document.getElementById('container');
