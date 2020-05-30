@@ -214,9 +214,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         last_message = messages[-1]
 
         self.assertRedirects(resp, self.failure_url)
-        self.assertEqual(last_message, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
-            'test-user-id'
-        ))
+        self.assertEqual(last_message, 'Spotify user test-user-id has already authorized MoodyTunes.')
 
     def test_invalid_state_para_raises_error(self):
         query_params = {'code': 'test-spotify-code', 'state': 'bad-state-value'}

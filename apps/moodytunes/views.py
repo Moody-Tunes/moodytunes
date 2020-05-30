@@ -198,7 +198,7 @@ class SpotifyAuthenticationCallbackView(View):
                     extra={'fingerprint': auto_fingerprint('failed_to_create_spotify_auth_user', **kwargs)}
                 )
 
-                messages.error(request, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
+                messages.error(request, 'Spotify user {} has already authorized MoodyTunes.'.format(
                     profile_data['id']
                 ))
 
