@@ -56,6 +56,7 @@
 
             // Create div for displaying error message
             let errorContent = document.createElement('p');
+            errorContent.className = 'error-modal-text';
             errorContent.innerText = error;
 
             // Build up error modal
