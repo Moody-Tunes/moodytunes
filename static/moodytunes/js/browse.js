@@ -177,7 +177,7 @@
         let artist = artistInput && artistInput.value || undefined;
         let genre = document.getElementById('id_genre').value || undefined;
 
-        if (evt.target === generatePlaylistButton) {
+        if (evt && evt.target === generatePlaylistButton) {
             emotion = document.getElementById('id_emotion').value;
         }
 
