@@ -95,10 +95,11 @@
                 .then((response) => {
                     if (!response.ok) {
                         if (Object.keys(HttpStatusErrorMap).includes(String(response.status))) {
-                            throw new Error(HttpStatusErrorMap[response.status]);
+                            throw HttpStatusErrorMap[response.status];
                         }
 
-                        throw new Error('Error!');
+                        // Default error message
+                        throw 'Error!';
                     }
 
                     return response.json();
