@@ -25,11 +25,9 @@
 
     function deleteVote(evt) {
         let song = confirmDeleteVoteButton.dataset.song;
-        confirmDeleteVoteButton.disabled = true;
-        cancelDeleteVoteButton.disabled = true;
+        hideConfirmDeleteModal();
         document.MoodyTunesClient.deleteVote(song, emotion, lastContext, data => {
             getEmotionPlaylist(evt);
-            hideConfirmDeleteModal();
         });
     }
 
@@ -161,7 +159,7 @@
 
             lastGenre = genre;
             lastContext = context;
-        } else{
+        } else {
             // Used cached parameters for persistent queries (on delete vote requests)
             genre = lastGenre;
             context = lastContext;
