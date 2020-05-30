@@ -11,26 +11,61 @@
                 container.removeChild(container.firstChild);
             }
         },
-        displayRequestErrors: function(errors) {
-            // Display validation in an error container
-            let errorContainer = document.getElementById('playlist-error-container');
+        clearErrorModal: function() {
+            let container = document.getElementById('container');
+            let oldErrorModal = document.getElementById('error-modal');
 
-            // Clean out older errors
-            while (errorContainer.hasChildNodes()) {
-                this.clearChildren(errorContainer);
+            if (oldErrorModal) {
+                container.removeChild(oldErrorModal);
             }
+        },
+        displayAPIErrors: function(error) {
+            // Delete old error modal if present
+            this.clearErrorModal();
 
-            let errorList = document.createElement('ul');
+            // Display API error message in modal
+            let container = document.getElementById('container');
 
-            for (let key in errors) {
-                if (errors.hasOwnProperty(key)) {
-                    let error = document.createElement('li');
-                    error.innerText = key + ': ' + errors[key];
-                    errorList.appendChild(error);
+            // Create parent modal
+            let errorModal = document.createElement('div');
+            errorModal.style.display =  'block';
+            errorModal.id = 'error-modal';
+            errorModal.className = 'modal';
+
+            // Add ability to close modal on click outside of modal
+            window.onclick = function (evt) {
+                let modals = document.getElementsByClassName('modal');
+                for (const modal of modals) {
+                    if (evt.target === modal) {
+                        modal.style.display = 'none';
+                    }
                 }
-            }
+            };
 
-            errorContainer.appendChild(errorList);
+            // Add close button to modal
+            let closeErrorModal = document.createElement('span');
+            closeErrorModal.innerHTML = '&times;';
+            closeErrorModal.className = 'close';
+            closeErrorModal.onclick = function () {
+                errorModal.style.display = 'none';
+            };
+
+            // Create div for modal content
+            let errorModalContent = document.createElement('div');
+            errorModalContent.className = 'modal-content';
+
+            // Create div for displaying error message
+            let errorContent = document.createElement('p');
+            errorContent.className = 'error-modal-text';
+            errorContent.innerText = error;
+
+            // Build up error modal
+            errorModalContent.appendChild(closeErrorModal);
+            errorModalContent.appendChild(errorContent);
+            errorModal.appendChild(errorModalContent);
+
+            // Display error modal
+            container.appendChild(errorModal);
         },
         createPlayButton: function(song) {
             let playButton = document.createElement('iframe');

@@ -25,16 +25,19 @@
 
     function deleteVote(evt) {
         let song = confirmDeleteVoteButton.dataset.song;
-        confirmDeleteVoteButton.disabled = true;
-        cancelDeleteVoteButton.disabled = true;
+        hideConfirmDeleteModal();
         document.MoodyTunesClient.deleteVote(song, emotion, lastContext, data => {
             getEmotionPlaylist(evt);
-            hideConfirmDeleteModal();
         });
     }
 
     function init() {
         closeModal.addEventListener('click', hideConfirmDeleteModal);
+        window.onclick = function (evt) {
+            if (evt.target === confirmDeleteModal) {
+                hideConfirmDeleteModal();
+            }
+        };
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
@@ -112,40 +115,35 @@
 
         document.PlaylistCurator.clearChildren(playlistContainer);
         document.PlaylistCurator.clearChildren(buttonContainer);
-        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
-        if (data.errors) {
-            document.PlaylistCurator.displayRequestErrors(data.errors);
-        } else {
-            if (document.PlaylistCurator.isEmptyResult(data.count)) {
-                noResultsFoundAlert.hidden = false;
-                return;
-            }
+        if (document.PlaylistCurator.isEmptyResult(data.count)) {
+            noResultsFoundAlert.hidden = false;
+            return;
+        }
 
-            votes.forEach(vote => {
-                let song = vote.song;
+        votes.forEach(vote => {
+            let song = vote.song;
 
-                let songContainer = document.createElement('div');
-                songContainer.id = 'song-' + song.code;
-                songContainer.className = 'song-container';
+            let songContainer = document.createElement('div');
+            songContainer.id = 'song-' + song.code;
+            songContainer.className = 'song-container';
 
-                songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
+            songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
 
-                let descriptionContainer = document.createElement('p');
-                descriptionContainer.className = 'song-description-container';
-                descriptionContainer.innerText = vote.description;
-                songContainer.appendChild(descriptionContainer);
-                songContainer.appendChild(createDeleteButton(song.code));
+            let descriptionContainer = document.createElement('p');
+            descriptionContainer.className = 'song-description-container';
+            descriptionContainer.innerText = vote.description;
+            songContainer.appendChild(descriptionContainer);
+            songContainer.appendChild(createDeleteButton(song.code));
 
-                playlistContainer.appendChild(songContainer);
-            });
+            playlistContainer.appendChild(songContainer);
+        });
 
-            // Add buttons to retrieve paginated responses
-            if (nextLink || previousLink) {
-                buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
-                buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
-            }
+        // Add buttons to retrieve paginated responses
+        if (nextLink || previousLink) {
+            buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
+            buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
         }
     }
 
@@ -161,7 +159,7 @@
 
             lastGenre = genre;
             lastContext = context;
-        } else{
+        } else {
             // Used cached parameters for persistent queries (on delete vote requests)
             genre = lastGenre;
             context = lastContext;

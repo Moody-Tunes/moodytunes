@@ -92,6 +92,7 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
                 'user_id': vote.user.id,
                 'emotion_id': vote.emotion.id,
+                'song_id': vote.song.id,
                 'old_energy': old_energy,
                 'old_valence': old_valence,
                 'old_danceability': old_danceability,
