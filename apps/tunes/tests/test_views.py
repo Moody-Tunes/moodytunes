@@ -1,3 +1,5 @@
+import random
+import string
 from unittest import mock
 
 from django.test import TestCase
@@ -37,6 +39,30 @@ class TestBrowseView(TestCase):
 
     def test_unknown_emotion_passed_returns_bad_request(self):
         params = {'emotion': 'unknown'}
+        resp = self.api_client.get(self.url, data=params)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_jitter_passed_returns_bad_request(self):
+        params = {'emotion': Emotion.HAPPY, 'jitter': 5}
+        resp = self.api_client.get(self.url, data=params)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_limit_passed_returns_bad_request(self):
+        params = {'emotion': Emotion.HAPPY, 'limit': 50}
+        resp = self.api_client.get(self.url, data=params)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_context_passed_returns_bad_request(self):
+        params = {'emotion': Emotion.HAPPY, 'context': 'invalid-context'}
+        resp = self.api_client.get(self.url, data=params)
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_genre_passed_returns_bad_request(self):
+        params = {'emotion': Emotion.HAPPY, 'genre': 'this-genre-value-is-way-too-long-for-our-site-usage'}
         resp = self.api_client.get(self.url, data=params)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -250,20 +276,19 @@ class TestLastPlaylistView(TestCase):
         mock_cache.get.return_value = None
         expected_error = 'Could not find cached playlist'
 
-        params = {'return_last': True}
-        resp = self.api_client.get(self.url, params)
+        resp = self.api_client.get(self.url)
         resp_json = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(resp_json['errors'], expected_error)
 
     @mock.patch('tunes.utils.cache')
-    def test_cached_playlist_filters_songs_user_voted_on(self, mock_cache):
+    def test_cached_playlist_filters_songs_user_voted_on_for_emotion(self, mock_cache):
         voted_song = MoodyUtil.create_song()
         cached_data = {
             'emotion': Emotion.HAPPY,
             'context': 'WORK',
-            'playlist': Song.objects.all()
+            'playlist': Song.objects.filter(code__in=[voted_song.code])
         }
         mock_cache.get.return_value = cached_data
 
@@ -274,11 +299,32 @@ class TestLastPlaylistView(TestCase):
             True
         )
 
-        params = {'return_last': True}
-        resp = self.api_client.get(self.url, params)
+        resp = self.api_client.get(self.url)
         resp_json = resp.json()
 
-        self.assertNotIn(voted_song, resp_json['playlist'])
+        self.assertFalse(resp_json['playlist'])
+
+    @mock.patch('tunes.utils.cache')
+    def test_cached_playlist_includes_songs_user_voted_on_for_different_emotion(self, mock_cache):
+        voted_song = MoodyUtil.create_song()
+        cached_data = {
+            'emotion': Emotion.HAPPY,
+            'context': 'WORK',
+            'playlist': Song.objects.filter(code__in=[voted_song.code])
+        }
+        mock_cache.get.return_value = cached_data
+
+        MoodyUtil.create_user_song_vote(
+            self.user,
+            voted_song,
+            Emotion.objects.get(name=Emotion.MELANCHOLY),
+            True
+        )
+
+        resp = self.api_client.get(self.url)
+        resp_json = resp.json()
+
+        self.assertEqual(voted_song.code, resp_json['playlist'][0]['code'])
 
 
 class TestVoteView(TestCase):
@@ -525,6 +571,18 @@ class TestVoteView(TestCase):
         resp = self.api_client.post(self.url, data=data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_vote_with_invalid_description_is_invalid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'WORK',
+            'description': ''.join([random.choice(string.ascii_lowercase) for _ in range(150)]),
+            'vote': True
+        }
+
+        resp = self.api_client.post(self.url, data=data, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_delete_happy_path(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
@@ -564,7 +622,7 @@ class TestVoteView(TestCase):
         resp = self.api_client.delete(self.url, data=data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_bad_request_data(self):
+    def test_delete_invalid_emotion_returns_bad_request(self):
         data = {
             'emotion': 'foobarbaz',
             'song_code': self.song.code
@@ -574,7 +632,18 @@ class TestVoteView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_delete_vote_not_found(self):
+    def test_delete_invalid_context_returns_bad_request(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'song_code': self.song.code,
+            'context': 'invalid-context'
+        }
+
+        resp = self.api_client.delete(self.url, data=data, format='json')
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_vote_not_found_returns_not_found(self):
         data = {
             'emotion': Emotion.HAPPY,
             'song_code': self.song.code

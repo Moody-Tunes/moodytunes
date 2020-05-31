@@ -3,6 +3,7 @@
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
     let emotion;
+    let jitter;
 
     function init() {
         setUpContextModal();
@@ -148,33 +149,36 @@
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         document.PlaylistCurator.clearChildren(playlistContainer);
-        document.PlaylistCurator.clearChildren(document.getElementById('playlist-error-container'));
 
-        if (data.errors) {
-            document.PlaylistCurator.displayRequestErrors(data.errors);
-        } else {
-            if (document.PlaylistCurator.isEmptyResult(data.length)) {
-                noResultsFoundAlert.hidden = false;
-                return;
-            }
+        if (document.PlaylistCurator.isEmptyResult(data.length)) {
+            noResultsFoundAlert.hidden = false;
+            return;
+        }
 
-            // Build playlist from returned data
-            for (const song of data) {
-                playlistContainer.appendChild(createSongContainer(song));
-            }
+        // Build playlist from returned data
+        for (const song of data) {
+            playlistContainer.appendChild(createSongContainer(song));
         }
     }
 
-    function getBrowsePlaylist() {
-        let limit; // We don't want people to set the limit themselves, keep it at the default
+    function getBrowsePlaylist(evt) {
+        let generatePlaylistButton = document.getElementById('generate-playlist');
         let artistInput = document.getElementById('id_artist');
+
+        let limit; // We don't want people to set the limit themselves, keep it at the default
 
         let context = sessionStorage.context;
         let description = sessionStorage.description;
-        emotion = document.getElementById('id_emotion').value;
-        let jitter = document.getElementById('id_jitter').value;
         let artist = artistInput && artistInput.value || undefined;
         let genre = document.getElementById('id_genre').value || undefined;
+
+        // Only gather values from input if request for browse playlist is made
+        // This will ensure we persist values across refresh requests when the
+        // user votes on all the songs for their browse playlist
+        if (evt && evt.target === generatePlaylistButton) {
+            emotion = document.getElementById('id_emotion').value;
+            jitter = document.getElementById('id_jitter').value;
+        }
 
         document.MoodyTunesClient.getBrowsePlaylist(
             emotion, jitter, limit, genre, context, description, artist, displayBrowsePlaylist

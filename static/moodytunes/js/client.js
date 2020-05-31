@@ -1,6 +1,14 @@
 'use strict';
 
 (function IIFE() {
+    let HttpStatusErrorMap = {
+        '400': 'Invalid request parameters',
+        '403': 'Request forbidden',
+        '404': 'Resource not found',
+        '500': 'Server returned an error',
+        '502': 'Could not connect to API'
+    };
+
     document.MoodyTunesClient = {
         /*
         Client for interacting with the MoodyTunes backend API. Exposes a set of functions that are meant to retrieve
@@ -71,6 +79,7 @@
             // @data (object): Request data to send (used for POST and DELETE methods)
             // @callback (function): Callback function to pass retrieved data onto
             //      -> This is what will consume the data retrieved from the request
+            document.PlaylistCurator.clearErrorModal();
             let url = this.buildRequestURL(endpoint, this.stripNullParams(params));
             let options = {
                 method: method,
@@ -87,10 +96,21 @@
 
             fetch(url, options)
                 .then((response) => {
+                    if (!response.ok) {
+                        if (Object.keys(HttpStatusErrorMap).includes(String(response.status))) {
+                            throw HttpStatusErrorMap[response.status];
+                        }
+
+                        // Default error message
+                        throw 'Error!';
+                    }
+
                     return response.json();
                 }).then((json) => {
                     callback(json);
-                });
+                }).catch(error => {
+                    document.PlaylistCurator.displayAPIErrors(error);
+            });
         },
         getOptions: function(callback) {
             // Retrieve options for site interaction (emotions and genres in our system)

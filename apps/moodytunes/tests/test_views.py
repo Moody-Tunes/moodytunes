@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from accounts.models import SpotifyUserAuth
+from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from tunes.models import Emotion
 
@@ -129,6 +130,10 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
+        session = self.client.session
+        session['state'] = self.state
+        session.save()
+
     @mock.patch('moodytunes.views.SpotifyClient')
     def test_happy_path(self, mock_spotify):
         spotify_client = mock.Mock()
@@ -142,9 +147,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -153,9 +155,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params)
 
@@ -182,9 +181,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -211,9 +207,6 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         mock_spotify.return_value = spotify_client
 
         query_params = {'code': 'test-spotify-code', 'state': self.state}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
@@ -221,19 +214,52 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         last_message = messages[-1]
 
         self.assertRedirects(resp, self.failure_url)
-        self.assertEqual(last_message, 'Spotify user {} has already authorized MoodyTunes. Please try again'.format(
-            'test-user-id'
-        ))
+        self.assertEqual(last_message, 'Spotify user test-user-id has already authorized MoodyTunes.')
 
     def test_invalid_state_para_raises_error(self):
         query_params = {'code': 'test-spotify-code', 'state': 'bad-state-value'}
-        session = self.client.session
-        session['state'] = self.state
-        session.save()
 
         resp = self.client.get(self.url, data=query_params, follow=True)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_spotify_error_fetching_tokens_redirects_to_error_page(self, mock_spotify):
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.side_effect = SpotifyException
+
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.failure_url)
+        self.assertEqual(last_message, 'We were unable to retrieve your Spotify profile. Please try again.')
+
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_spotify_error_fetching_profile_redirects_to_error_page(self, mock_spotify):
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.return_value = {
+            'access_token': 'test-access-token',
+            'refresh_token': 'test-refresh-token'
+        }
+
+        spotify_client.get_user_profile.side_effect = SpotifyException
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.failure_url)
+        self.assertEqual(last_message, 'We were unable to retrieve your Spotify profile. Please try again.')
 
 
 class TestExportView(TestCase):

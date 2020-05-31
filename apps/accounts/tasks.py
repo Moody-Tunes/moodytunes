@@ -58,7 +58,7 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
         """
         try:
-            vote = UserSongVote.objects.get(pk=vote_id)
+            vote = UserSongVote.objects.select_related('user', 'emotion', 'song').get(pk=vote_id)
         except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
             logger.exception(
                 'Unable to fetch UserSongVote with pk={}'.format(vote_id),
@@ -92,11 +92,15 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
                 'user_id': vote.user.id,
                 'emotion_id': vote.emotion.id,
+                'song_id': vote.song.id,
                 'old_energy': old_energy,
                 'old_valence': old_valence,
                 'old_danceability': old_danceability,
                 'new_energy': user_emotion.energy,
                 'new_valence': user_emotion.valence,
-                'new_danceability': user_emotion.danceability
+                'new_danceability': user_emotion.danceability,
+                'song_energy': vote.song.energy,
+                'song_valence': vote.song.valence,
+                'song_danceability': vote.song.danceability,
             }
         )

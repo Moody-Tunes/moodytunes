@@ -20,9 +20,9 @@ from tunes.serializers import (
     DeleteVoteRequestSerializer,
     LastPlaylistSerializer,
     OptionsSerializer,
+    PlaylistSerializer,
     PlaylistSongsRequestSerializer,
     SongSerializer,
-    VoteSerializer,
     VoteSongsRequestSerializer,
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
@@ -93,7 +93,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 danceability = user_emotion.danceability
 
         logger.info(
-            'Generating browse playlist for user {}'.format(self.request.user.username),
+            'Generating {} browse playlist for user {}'.format(
+                self.cleaned_data['emotion'],
+                self.request.user.username,
+            ),
             extra={
                 'fingerprint': auto_fingerprint('generate_playlist', **kwargs),
                 'user_id': self.request.user.pk,
@@ -167,8 +170,13 @@ class LastPlaylistView(generics.RetrieveAPIView):
             description = cached_playlist.get('description')
 
             # Filter out songs user has already voted on from the playlist
-            # to prevent double votes on songs
-            user_voted_songs = self.request.user.usersongvote_set.all().values_list('song__code', flat=True)
+            # for the emotion to prevent double votes on songs
+            user_voted_songs = self.request.user.usersongvote_set.filter(
+                    emotion__name=emotion
+                ).values_list(
+                    'song__code', flat=True
+            )
+
             playlist = [song for song in playlist if song.code not in user_voted_songs]
             return {
                 'emotion': emotion,
@@ -290,7 +298,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
     on the songs as making them feel the given emotion.
     """
-    serializer_class = VoteSerializer
+    serializer_class = PlaylistSerializer
     queryset = UserSongVote.objects.prefetch_related('emotion', 'song').all()
     pagination_class = PlaylistPaginator
 
