@@ -77,15 +77,6 @@ class UpdateUserForm(BaseUserForm):
 
 
 class UpdateUserEmotionAttributesForm(forms.ModelForm):
-    vote_count = forms.IntegerField()
-
-    def __init__(self, *args, **kwargs):
-        super(UpdateUserEmotionAttributesForm, self).__init__(**kwargs)
-        self.fields['vote_count'].initial = self.instance.user.usersongvote_set.filter(
-            emotion=self.instance.emotion
-        ).count()
-        self.fields['vote_count'].disabled = True
-
     class Meta:
         model = UserEmotion
         fields = ('energy', 'valence', 'danceability')
