@@ -13,16 +13,12 @@ class MoodyUserAdmin(MoodyBaseAdmin):
 
 class UserEmotionAdmin(MoodyBaseAdmin):
     form = UpdateUserEmotionAttributesForm
-    list_display = ('user', 'emotion', 'energy', 'valence', 'danceability', 'vote_count_for_emotion')
+    list_display = ('user', 'emotion', 'energy', 'valence', 'danceability')
     readonly_fields = ('user', 'emotion')
     list_filter = ('emotion',)
 
     def has_add_permission(self, request):
         return False
-
-    def vote_count_for_emotion(self, obj):
-        return obj.user.usersongvote_set.filter(emotion=obj.emotion).count()
-    vote_count_for_emotion.short_description = 'Votes'
 
 
 class UserSongVoteAdmin(MoodyBaseAdmin):
