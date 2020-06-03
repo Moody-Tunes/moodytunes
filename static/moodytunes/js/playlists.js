@@ -75,15 +75,23 @@
     }
 
     function confirmAddContextToVote(songCode, contexts) {
+        let contextChoices = {
+            'PARTY': 'Listening to music at a party',
+            'RELAX': 'Listening to music to relax',
+            'WORK': 'Listening to music while working on a task',
+            'OTHER': 'Doing something else'
+        };
+
         let confirmAddContextButton = document.getElementById('add-context-to-vote-button');
         confirmAddContextButton.dataset.songCode = songCode;
         confirmAddContextButton.addEventListener('click', addContextToVote);
 
         let confirmAddContextInput = document.getElementById('add-context-input');
+        document.PlaylistCurator.clearChildren(confirmAddContextInput);
 
         contexts.forEach( context => {
             let newOption = document.createElement('option');
-            newOption.appendChild(document.createTextNode(context));
+            newOption.appendChild(document.createTextNode(contextChoices[context]));
             newOption.value = context;
             confirmAddContextInput.appendChild(newOption);
         });
