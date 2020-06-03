@@ -2,6 +2,7 @@
 
 {% load compress %}
 {% load static %}
+{% load waffle_tags %}
 
 {% block title %}View Playlists{% endblock %}
 
@@ -46,7 +47,12 @@
 </div>
 <div id= id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
-    {{ form.as_p }}
+    <p>Emotion: {{ form.emotion }}</p>
+    <p>Genre: {{ form.genre }}</p>
+    <p>Context: {{ form.context }}</p>
+    {% flag 'filter_browse_playlist_by_artist' %}
+        <p>Artist: {{ form.artist }}</p>
+    {% endflag %}
     <button id="generate-playlist" class="call-to-action-button">Generate</button>
     <p id="alert-no-results" class="warning" hidden>No songs you have previously voted on fit the criteria specified</p>
 </div>

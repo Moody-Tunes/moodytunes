@@ -13,7 +13,8 @@
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
     let lastGenre,
-        lastContext;
+        lastContext,
+        lastArtist;
 
     function hideConfirmDeleteModal() {
         confirmDeleteModal.style.display = 'none';
@@ -149,23 +150,27 @@
 
     function getEmotionPlaylist(evt) {
         let genre,
-            context;
+            context,
+            artist;
 
         if (evt.target === generatePlaylistButton) {
             // Pull request parameters from form options
             emotion = document.getElementById('id_emotion').value;
             genre = document.getElementById('id_genre').value || undefined;
             context = document.getElementById('id_context').value || undefined;
+            artist = document.getElementById('id_artist').value || undefined;
 
             lastGenre = genre;
             lastContext = context;
+            lastArtist = artist;
         } else {
             // Used cached parameters for persistent queries (on delete vote requests)
             genre = lastGenre;
             context = lastContext;
+            artist = lastArtist;
         }
 
-        document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, displayEmotionPlaylist);
+        document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, artist, displayEmotionPlaylist);
         document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
     }
 
