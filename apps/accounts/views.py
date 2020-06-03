@@ -57,7 +57,7 @@ class MoodyLoginView(LoginView):
 class MoodyLogoutView(LogoutView):
     def get_next_page(self):
         if self.request.host.name == 'www':
-            self.next_page = '/accounts/login'
+            self.next_page = settings.LOGIN_URL
         elif self.request.host.name == 'admin':
             self.next_page = '/'
 
