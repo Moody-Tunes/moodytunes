@@ -160,6 +160,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         danceability = None
         context = self.cleaned_data.get('context')
         genre = self.cleaned_data.get('genre')
+        artist = self.cleaned_data.get('artist')
 
         emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.select_related('song').filter(
@@ -174,6 +175,9 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
             if genre:
                 votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
+
+            if artist:
+                votes_for_emotion = votes_for_emotion.filter(song__artist=artist)
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 

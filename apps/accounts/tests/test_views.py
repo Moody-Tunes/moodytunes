@@ -279,6 +279,30 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
+    def test_artist_filter_only_returns_songs_for_artist(self):
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        expected_song = MoodyUtil.create_song(artist='Cool Artist')
+        other_song = MoodyUtil.create_song(artist='Other Artist', energy=.3, valence=.25)
+
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=emotion, song=expected_song, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=emotion, song=other_song, vote=True)
+
+        # We should only see the average attributes for the song by the selected artist
+        expected_response = {
+            'emotion_name': emotion.full_name,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'danceability': expected_song.danceability,
+            'total_songs': 1,
+        }
+
+        params = {'emotion': Emotion.HAPPY, 'artist': expected_song.artist}
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
     def test_user_with_no_votes_returns_no_analytics(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
