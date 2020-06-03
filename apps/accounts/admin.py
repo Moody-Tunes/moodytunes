@@ -35,19 +35,19 @@ class UserEmotionAdmin(MoodyBaseAdmin):
         queryset = queryset.annotate(
             melancholy_vote_count=Count(
                 'user__usersongvote',
-                filter=Q(user__usersongvote__emotion__name=Emotion.MELANCHOLY)
+                filter=Q(user__usersongvote__emotion__name=Emotion.MELANCHOLY, user__usersongvote__vote=True)
             ),
             calm_vote_count=Count(
                 'user__usersongvote',
-                filter=Q(user__usersongvote__emotion__name=Emotion.CALM)
+                filter=Q(user__usersongvote__emotion__name=Emotion.CALM, user__usersongvote__vote=True)
             ),
             happy_vote_count=Count(
                 'user__usersongvote',
-                filter=Q(user__usersongvote__emotion__name=Emotion.HAPPY)
+                filter=Q(user__usersongvote__emotion__name=Emotion.HAPPY, user__usersongvote__vote=True)
             ),
             excited_vote_count=Count(
                 'user__usersongvote',
-                filter=Q(user__usersongvote__emotion__name=Emotion.EXCITED)
+                filter=Q(user__usersongvote__emotion__name=Emotion.EXCITED, user__usersongvote__vote=True)
             ),
         )
 
