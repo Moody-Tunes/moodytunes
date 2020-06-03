@@ -51,6 +51,10 @@
         showConfirmDeleteModal();
     }
 
+    function addContextToVote() {
+        alert('Hello World!');
+    }
+
     function createDeleteButton(song) {
         let button = document.createElement('button');
         button.className = 'vote-button vote-button-delete';
@@ -64,9 +68,9 @@
     function createContextButton(song) {
         let button = document.createElement('button');
         button.className = 'vote-button vote-button-context';
-        button.appendChild(document.createTextNode('Context'));
+        button.appendChild(document.createTextNode('Add Context'));
         button.dataset.song = song;
-        //button.addEventListener('click', confirmDeleteVote);
+        button.addEventListener('click', addContextToVote);
 
         return button;
     }
