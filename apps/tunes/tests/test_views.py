@@ -808,6 +808,24 @@ class TestPlaylistView(TestCase):
         self.assertEqual(len(resp_data['results']), 1)
         self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
 
+    def test_filter_by_artist(self):
+        expected_song = MoodyUtil.create_song(artist='Cool Artist')
+
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, expected_song, self.emotion, True)
+
+        data = {
+            'emotion': self.emotion.name,
+            'artist': expected_song.artist
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data['results']), 1)
+        self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
+
     def test_multiple_votes_for_a_song_does_not_return_duplicate_songs(self):
         # Create two upvotes in different contexts
         UserSongVote.objects.create(
