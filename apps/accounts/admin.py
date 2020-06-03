@@ -26,6 +26,7 @@ class UserEmotionAdmin(MoodyBaseAdmin):
     list_display = ('user', 'emotion', 'energy', 'valence', 'danceability', 'votes_for_emotion')
     readonly_fields = ('user', 'emotion')
     list_filter = ('emotion',)
+    search_fields = ('user__username',)
 
     def get_queryset(self, request):
         queryset = super(UserEmotionAdmin, self).get_queryset(request).select_related('user', 'emotion')
