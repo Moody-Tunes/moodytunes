@@ -133,7 +133,6 @@ DATABASE_BACKUP_TARGETS = [
     'accounts.MoodyUser',
     'accounts.UserEmotion',
     'accounts.UserSongVote',
-    'accounts.SpotifyUserAuth',
     'tunes.Emotion',
     'tunes.Song',
 ]
