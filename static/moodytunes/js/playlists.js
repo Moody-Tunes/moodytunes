@@ -171,7 +171,7 @@
         }
 
         document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, artist, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, displayAnalytics);
+        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, artist, displayAnalytics);
     }
 
     init();
