@@ -23,6 +23,8 @@ from tunes.serializers import (
     PlaylistSerializer,
     PlaylistSongsRequestSerializer,
     SongSerializer,
+    VoteInfoRequestSerializer,
+    VoteInfoSerializer,
     VoteSongsRequestSerializer,
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
@@ -391,3 +393,26 @@ class OptionView(generics.GenericAPIView):
         serializer = self.serializer_class(data=data)
 
         return Response(data=serializer.initial_data)
+
+
+class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
+    """
+    Returns a JSON response of info on votes for a given user, emotion, and song. Currently used to
+    find the different contexts for a song that a user has voted on.
+    """
+
+    serializer_class = VoteInfoSerializer
+
+    get_request_serializer = VoteInfoRequestSerializer
+
+    def get_object(self):
+        contexts = UserSongVote.objects.filter(
+            user=self.request.user,
+            emotion__name=self.cleaned_data['emotion'],
+            song__code=self.cleaned_data['song_code'],
+        ).values_list(
+            'context',
+            flat=True,
+        )
+
+        return {'contexts': contexts}
