@@ -134,8 +134,9 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         session['state'] = self.state
         session.save()
 
+    @mock.patch('accounts.tasks.CreateSpotifyAuthUserSavedTracksTask.delay')
     @mock.patch('moodytunes.views.SpotifyClient')
-    def test_happy_path(self, mock_spotify):
+    def test_happy_path(self, mock_spotify, mock_update_saved_tracks_task):
         spotify_client = mock.Mock()
         spotify_client.get_access_and_refresh_tokens.return_value = {
             'access_token': 'test-access-token',
@@ -152,6 +153,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         self.assertRedirects(resp, self.success_url)
         self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
+        mock_update_saved_tracks_task.assert_called_once()
 
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
