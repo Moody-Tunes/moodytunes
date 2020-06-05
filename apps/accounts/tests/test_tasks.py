@@ -9,6 +9,7 @@ from django.utils import timezone
 from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
+    CreateSpotifyAuthUserSavedTracksTask,
     CreateUserEmotionRecordsForUserTask,
     SpotifyAuthUserTaskMixin,
     UpdateUserEmotionRecordAttributeTask,
@@ -115,5 +116,30 @@ class TestSpotifyAuthUserMixin(TestCase):
         mock_refresh_access_token.side_effect = SpotifyException
 
         SpotifyAuthUserTaskMixin().get_and_refresh_spotify_user_auth_record(self.auth.id)
+
+        mock_retry.assert_called_once()
+
+
+class TestCreateSpotifyAuthUserSavedTracksTask(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+
+    @mock.patch('libs.spotify.SpotifyClient.get_user_saved_tracks')
+    def test_happy_path(self, mock_get_saved_tracks):
+        mock_get_saved_tracks.return_value = ['spotify:code:123']
+
+        CreateSpotifyAuthUserSavedTracksTask().run(self.auth.pk)
+
+        self.auth.refresh_from_db()
+        self.assertEqual(self.auth.saved_songs, ['spotify:code:123'])
+
+    @mock.patch('accounts.tasks.CreateSpotifyAuthUserSavedTracksTask.retry')
+    @mock.patch('libs.spotify.SpotifyClient.get_user_saved_tracks')
+    def test_spotify_error_causes_task_to_retry(self, mock_get_saved_tracks, mock_retry):
+        mock_get_saved_tracks.side_effect = SpotifyException
+
+        CreateSpotifyAuthUserSavedTracksTask().run(self.auth.pk)
 
         mock_retry.assert_called_once()
