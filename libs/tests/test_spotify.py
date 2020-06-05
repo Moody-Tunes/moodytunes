@@ -691,6 +691,46 @@ class TestSpotifyClient(TestCase):
             data=json.dumps(expected_data)
         )
 
+    @mock.patch('requests.request')
+    def test_get_user_saved_tracks(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        response_data = [
+            {'next': 'https://example.com/?page=2', 'items': [{'track': {'uri': 'spotify:code:123'}}]},
+            {'next': '', 'items': [{'track': {'uri': 'spotify:code:456'}}]},
+        ]
+
+        mock_response = mock.Mock()
+        mock_response.json.side_effect = response_data
+        mock_request.return_value = mock_response
+
+        expected_headers = {
+            'Authorization': 'Bearer {}'.format(auth_code),
+        }
+
+        expected_data = ['spotify:code:123', 'spotify:code:456']
+
+        retrieved_response = self.spotify_client.get_user_saved_tracks(auth_code)
+
+        self.assertEqual(retrieved_response, expected_data)
+
+        # Check the first call
+        mock_request.assert_any_call(
+            'GET',
+            'https://api.spotify.com/v1/me/tracks',
+            headers=expected_headers,
+            params={'limit': 50},
+            data=None
+        )
+
+        # Then check second call with `next` parameter
+        mock_request.assert_any_call(
+            'GET',
+            'https://example.com/?page=2',
+            headers=expected_headers,
+            params=None,
+            data=None
+        )
+
     def test_batch_tracks_batches_list(self):
         items = [i for i in range(200)]
         batched_items = self.spotify_client.batch_tracks(items)
