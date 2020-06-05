@@ -7,8 +7,7 @@
     let emotion;
     let generatePlaylistButton = document.getElementById('generate-playlist');
 
-    let closeModal = document.getElementById('close-modal');
-
+    let closeDeleteModal = document.getElementById('close-delete-modal');
     let confirmDeleteModal = document.getElementById('delete-confirm-modal');
     let cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
     let confirmDeleteVoteButton = document.getElementById('delete-vote');
@@ -58,7 +57,7 @@
     }
 
     function init() {
-        closeModal.addEventListener('click', hideConfirmDeleteModal);
+        closeDeleteModal.addEventListener('click', hideConfirmDeleteModal);
         closeAddContextModal.addEventListener('click', hideConfirmAddContextModal);
 
         window.onclick = function (evt) {
