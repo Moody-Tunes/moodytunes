@@ -312,7 +312,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             queryset = queryset.filter(context=self.cleaned_data['context'])
 
         if self.cleaned_data.get('artist'):
-            queryset = queryset.filter(song__artist=self.cleaned_data['artist'])
+            queryset = queryset.filter(song__artist__icontains=self.cleaned_data['artist'])
 
         return filter_duplicate_votes_on_song_from_playlist(queryset)
 
