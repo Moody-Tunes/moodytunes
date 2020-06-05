@@ -177,7 +177,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
                 votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
 
             if artist:
-                votes_for_emotion = votes_for_emotion.filter(song__artist=artist)
+                votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
 
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
