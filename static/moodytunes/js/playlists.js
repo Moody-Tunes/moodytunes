@@ -127,15 +127,14 @@
     }
 
     function showContextsToAddForVote() {
-        let playlistContext = lastContext;
+        let song = this.dataset.song;
         let availableContexts = ['PARTY', 'RELAX', 'WORK', 'OTHER'];
 
-        // If the song is in an emotion playlist for a context, eliminate it from choices
-        if (availableContexts.includes(playlistContext)) {
-            availableContexts = availableContexts.filter(item => item !== playlistContext);
-        }
-
-        confirmAddContextToVote(this.dataset.song, availableContexts);
+        document.MoodyTunesClient.getInfoForVote(song, emotion, function (data) {
+            let contexts = data.contexts;
+            let optionContexts = availableContexts.filter(x => !contexts.includes(x));
+            confirmAddContextToVote(song, optionContexts);
+        });
     }
 
     function createDeleteButton(song) {

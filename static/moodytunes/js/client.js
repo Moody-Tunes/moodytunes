@@ -177,6 +177,13 @@
                 context: context,
             };
             this.request('DELETE', '/tunes/vote/', {}, data, callback);
+        },
+        getInfoForVote: function (songCode, emotion, callback) {
+            let params = {
+                song_code: songCode,
+                emotion: emotion
+            };
+            this.request('GET', '/tunes/vote/info/', params, {}, callback)
         }
     };
 })();
