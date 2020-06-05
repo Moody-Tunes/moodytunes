@@ -329,6 +329,8 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
                 'emotion': self.cleaned_data['emotion'],
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
+                'artist': self.cleaned_data.get('artist'),
+                'page': self.request.GET.get('page')
             }
         )
 
