@@ -50,7 +50,7 @@
     <p>Emotion: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
     <p>Context: {{ form.context }}</p>
-    {% flag 'filter_browse_playlist_by_artist' %}
+    {% flag 'filter_emotion_playlist_by_artist' %}
         <p>Artist: {{ form.artist }}</p>
     {% endflag %}
     <button id="generate-playlist" class="call-to-action-button">Generate</button>
