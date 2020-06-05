@@ -13,6 +13,8 @@
     let cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
     let confirmDeleteVoteButton = document.getElementById('delete-vote');
 
+    let closeAddContextModal = document.getElementById('close-add-context-modal');
+    let cancelAddContextModal = document.getElementById('cancel-add-context-to-vote-button');
     let confirmAddContextModal = document.getElementById('add-context-confirm-modal');
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
@@ -57,11 +59,17 @@
 
     function init() {
         closeModal.addEventListener('click', hideConfirmDeleteModal);
+        closeAddContextModal.addEventListener('click', hideConfirmAddContextModal);
+
         window.onclick = function (evt) {
             if (evt.target === confirmDeleteModal) {
                 hideConfirmDeleteModal();
+            } else if (evt.target === confirmAddContextModal) {
+                hideConfirmAddContextModal();
             }
         };
+
+        cancelAddContextModal.addEventListener('click', hideConfirmAddContextModal);
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
