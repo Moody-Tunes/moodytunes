@@ -16,6 +16,9 @@
     let cancelAddContextModal = document.getElementById('cancel-add-context-to-vote-button');
     let confirmAddContextModal = document.getElementById('add-context-confirm-modal');
 
+    let closeSuccessAddContextModal = document.getElementById('close-add-context-success-modal');
+    let successAddContextModal = document.getElementById('add-context-success-modal');
+
     // Cache options for previous request, used for refreshing playlist on delete of vote
     let lastGenre,
         lastContext,
@@ -37,6 +40,14 @@
         confirmAddContextModal.style.display = 'block';
     }
 
+    function hideSuccessAddContextModal() {
+        successAddContextModal.style.display = 'none';
+    }
+
+    function showSuccessAddContextModal() {
+        successAddContextModal.style.display = 'block';
+    }
+
     function deleteVote(evt) {
         let song = confirmDeleteVoteButton.dataset.song;
         hideConfirmDeleteModal();
@@ -52,19 +63,22 @@
         let context = document.getElementById('add-context-input').value;
 
         document.MoodyTunesClient.postVote(song, emotion, context, '', true, data => {
-            getEmotionPlaylist(evt);
+            successAddContextToVote(context);
         });
     }
 
     function init() {
         closeDeleteModal.addEventListener('click', hideConfirmDeleteModal);
         closeAddContextModal.addEventListener('click', hideConfirmAddContextModal);
+        closeSuccessAddContextModal.addEventListener('click', hideSuccessAddContextModal);
 
         window.onclick = function (evt) {
             if (evt.target === confirmDeleteModal) {
                 hideConfirmDeleteModal();
             } else if (evt.target === confirmAddContextModal) {
                 hideConfirmAddContextModal();
+            } else if (evt.target === successAddContextModal) {
+                hideSuccessAddContextModal();
             }
         };
 
@@ -72,6 +86,12 @@
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
+    }
+
+    function successAddContextToVote(context) {
+        let messageContainer = document.getElementById('add-context-success-content');
+        messageContainer.innerText = 'Successfully added ' + context + ' to your song!';
+        showSuccessAddContextModal();
     }
 
     function confirmDeleteVote() {
