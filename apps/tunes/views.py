@@ -98,7 +98,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 self.request.user.username,
             ),
             extra={
-                'fingerprint': auto_fingerprint('generate_playlist', **kwargs),
+                'fingerprint': auto_fingerprint('generate_browse playlist', **kwargs),
                 'user_id': self.request.user.pk,
                 'emotion': self.cleaned_data['emotion'],
                 'genre': self.cleaned_data.get('genre'),
@@ -316,7 +316,22 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
         return filter_duplicate_votes_on_song_from_playlist(queryset)
 
-    def get_queryset(self):
+    @update_logging_data
+    def get_queryset(self, **kwargs):
+        logger.info(
+            'Generating {} emotion playlist for user {}'.format(
+                self.cleaned_data['emotion'],
+                self.request.user.username,
+            ),
+            extra={
+                'fingerprint': auto_fingerprint('generate_emotion_playlist', **kwargs),
+                'user_id': self.request.user.pk,
+                'emotion': self.cleaned_data['emotion'],
+                'genre': self.cleaned_data.get('genre'),
+                'context': self.cleaned_data.get('context'),
+            }
+        )
+
         queryset = super(PlaylistView, self).get_queryset()
 
         return queryset.filter(
