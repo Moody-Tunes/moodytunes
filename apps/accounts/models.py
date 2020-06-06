@@ -83,6 +83,14 @@ class SpotifyUserData(BaseModel):
     top_artists = ArrayField(models.CharField(max_length=200), default=list)
 
 
+class UserProfile(BaseModel):
+    """
+    Stores information about a given user in our system
+    """
+    user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
+    has_completed_onboarding = models.BooleanField(default=False)
+
+
 class SpotifyUserAuth(BaseModel):
     """
     Represent a mapping of a user in our system to a Spotify account.
