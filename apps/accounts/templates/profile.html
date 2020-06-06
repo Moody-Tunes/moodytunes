@@ -7,10 +7,12 @@
     {% compress css %}
         <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/profile.less' %}">
     {% endcompress %}
+
     {% compress js %}
         <script src="{% static 'moodytunes/js/client.js' %}" defer></script>
         <script src="{% static 'moodytunes/js/curator.js' %}" defer></script>
         <script src="{% static 'accounts/js/spotify_auth_prompt.js' %}" defer></script>
+        <script src="{% static 'accounts/js/onboarding.js' %}" defer></script>
     {% endcompress %}
 {% endblock %}
 
@@ -32,6 +34,7 @@
     <li><a class="profile-link" href="{% url 'moodytunes:suggest' %}">Suggest A New Song</a></li>
     <li><a class="profile-link" href="{% url 'moodytunes:export' %}">Export Emotion Playlist To Spotify</a></li>
 </ul>
+<<<<<<< HEAD
 <div id="spotify-auth-modal" class="modal" hidden>
     <div class="modal-content">
         <span id="close-spotify-auth-modal" class="close">&times;</span>
@@ -41,4 +44,16 @@
         <button id="decline-spotify-auth">No</button>
     </div>
 </div>
+=======
+    {% if show_onboarding %}
+<div id="onboarding-start-modal" class="modal">
+    <div class="modal-content">
+        <span id="close-onboarding-modal" class="close">&times;</span>
+        <p>Welcome to Moodytunes! Would you like to take a tour of the site?</p>
+        <button id="reject-onboarding-button">No</button>
+        <button id="accept-onboarding-button" class="call-to-action-button">Yes</button>
+    </div>
+</div>
+    {% endif %}
+>>>>>>> WIP on start of onboarding workflow
 {% endblock %}

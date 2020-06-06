@@ -103,6 +103,15 @@ class MoodyPasswordResetDone(RedirectView):
 class ProfileView(TemplateView):
     template_name = 'profile.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ProfileView, self).get_context_data(**kwargs)
+        context['show_onboarding'] = False
+
+        if hasattr(self.request.user, 'userprofile') and not self.request.user.userprofile.has_completed_onboarding:
+            context['show_onboarding'] = True
+
+        return context
+
 
 @method_decorator(login_required, name='dispatch')
 class MoodyPasswordChangeView(PasswordChangeView):
