@@ -47,10 +47,16 @@ def generate_browse_playlist(
     # If they do, return that first; we want the songs the user has
     # saved to Spotify to appear first
     if user_auth and user_auth.saved_songs:
-        user_playlist = songs.filter(code__in=user_auth.saved_songs)
+        song_codes = songs.values_list('code', flat=True)
+        user_playlist = [song_code for song_code in user_auth.saved_songs if song_code in song_codes]
 
-        if user_playlist.exists():
-            return user_playlist
+        if user_playlist:
+            songs = Song.objects.filter(code__in=user_playlist)
+
+            if limit:
+                songs = songs[:limit]
+
+            return songs
 
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
