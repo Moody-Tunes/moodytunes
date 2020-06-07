@@ -128,6 +128,43 @@ class TestGenerateBrowsePlaylist(TestCase):
         self.assertIn(song_from_artist, playlist)
         self.assertNotIn(song_from_other_artist, playlist)
 
+    def test_generate_browse_playlist_returns_user_saved_songs_if_passed(self):
+        other_song = MoodyUtil.create_song()
+        saved_song = MoodyUtil.create_song()
+
+        user = MoodyUtil.create_user()
+        auth = MoodyUtil.create_spotify_user_auth(user)
+        auth.saved_songs = [saved_song.code]
+        auth.save()
+
+        playlist = generate_browse_playlist(
+            saved_song.energy,
+            saved_song.valence,
+            saved_song.danceability,
+            user_auth=auth
+        )
+
+        self.assertIn(saved_song, playlist)
+        self.assertNotIn(other_song, playlist)
+
+    def test_generate_browse_playlist_returns_lookup_if_no_saved_songs_found(self):
+        song = MoodyUtil.create_song(energy=.75, valence=.50, danceability=.65)
+
+        user = MoodyUtil.create_user()
+        auth = MoodyUtil.create_spotify_user_auth(user)
+        auth.saved_songs = ['spotify:track:123']
+        auth.save()
+
+        playlist = generate_browse_playlist(
+            song.energy,
+            song.valence,
+            song.danceability,
+            jitter=None,
+            user_auth=auth
+        )
+
+        self.assertIn(song, playlist)
+
 
 class TestCachedPlaylistManager(TestCase):
     @classmethod
