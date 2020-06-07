@@ -40,6 +40,8 @@ def generate_browse_playlist(
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
     """
+    if songs is None:
+        songs = Song.objects.all()
 
     # Check if user has any songs from Spotify saved to their record
     # If they do, return that first; we want the songs the user has
@@ -53,9 +55,6 @@ def generate_browse_playlist(
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
     danceability_lower_limit = danceability_upper_limit = danceability
-
-    if songs is None:
-        songs = Song.objects.all()
 
     if jitter:
         energy_lower_limit -= jitter
