@@ -1,0 +1,50 @@
+name: Test
+on:
+  pull_request:
+    branches:
+      - master
+      - production
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Cache installed dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/common.txt') }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/common.txt
+      - name: Test with pytest
+        run: pytest
+        env:
+          DJANGO_SETTINGS_MODULE: mtdj.settings.test
+          MTDJ_ENV_FILE: test
+          DJANGO_SECRET_KEY: ${{ secrets.TEST_DJANGO_SECRET_KEY }}
+          MTDJ_DATABASE_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+          MTDJ_DATABASE_USER: postgres
