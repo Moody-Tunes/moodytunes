@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: Run linters
+    name: Run python linter
     runs-on: ubuntu-latest
 
     steps:
@@ -16,13 +16,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
-      - name: Install linter packages
+      - name: Install flake8
         run: |
           python -m pip install --upgrade pip
           grep flake8 requirements/common.txt | xargs pip install
-          grep importanize requirements/common.txt | xargs pip install
       - name: Run flake8
         run: flake8
+
+  pre-commit:
+    name: Run pre-commit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
       - name: Get changed files from PR
         uses: futuratrepadeira/changed-files@v3.0.0
         id: changed-files
@@ -35,5 +41,20 @@ jobs:
         with:
           extra_args: --files ${{ env.FILES }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  importanize:
+    name: Run importanize
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install importanize
+        run: |
+          python -m pip install --upgrade pip
+          grep importanize requirements/common.txt | xargs pip install
       - name: Run importanize
         run: importanize --config=.importanize.json --ci
