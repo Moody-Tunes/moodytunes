@@ -1,8 +1,9 @@
 name: Test
 on:
   pull_request:
-    - master
-    - production
+    branches:
+      - master
+      - production
 
 jobs:
   test:
