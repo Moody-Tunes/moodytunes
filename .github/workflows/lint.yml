@@ -16,9 +16,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
-      - name: Install flake8
+      - name: Install linter packages
         run: |
           python -m pip install --upgrade pip
           grep flake8 requirements/common.txt | xargs pip install
+          grep pre-commit requirements/common.txt | xargs pip install
       - name: Run flake8
         run: flake8
+      - name: Install pre-commit
+        run: pre-commit install
+      - name: Run pre-commit
+        run: pre-commit run --from-ref origin/HEAD --to-ref HEAD
