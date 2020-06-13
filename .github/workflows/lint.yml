@@ -20,6 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           grep flake8 requirements/common.txt | xargs pip install
+          grep importanize requirements/common.txt | xargs pip install
       - name: Run flake8
         run: flake8
       - name: Get changed files from PR
@@ -34,3 +35,5 @@ jobs:
         with:
           extra_args: --files ${{ env.FILES }}
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run importanize
+        run: importanize --config=.importanize.json --ci
