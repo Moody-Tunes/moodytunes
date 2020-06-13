@@ -25,11 +25,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Postgres database
-        run: |
-          psql -c 'CREATE DATABASE mtdj_local;' -U postgres
-          psql -c 'CREATE USER mtdj;' -U postgres
-          psql -c 'ALTER USER mtdj CREATEDB;' -U postgres
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
@@ -45,3 +40,4 @@ jobs:
           MTDJ_ENV_FILE: test
           DJANGO_SECRET_KEY: ${{ secrets.TEST_DJANGO_SECRET_KEY }}
           MTDJ_DATABASE_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+          MTDJ_DATABASE_USER: postgres
