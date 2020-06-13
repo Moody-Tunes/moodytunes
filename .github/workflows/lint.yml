@@ -1,0 +1,24 @@
+name: Lint
+on:
+  pull_request:
+    branches:
+      - master
+      - production
+
+jobs:
+  test:
+    name: Run linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install flake8
+        run: |
+          python -m pip install --upgrade pip
+          grep flake8 requirements/common.txt | xargs pip install
+      - name: Run flake8
+        run: flake8
