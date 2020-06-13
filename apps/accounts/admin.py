@@ -69,6 +69,7 @@ class UserSongVoteAdmin(MoodyBaseAdmin):
     search_fields = ('user__username',)
 
     def has_add_permission(self, request):
+        import pdb; pdb.set_trace()
         return False
 
 
