@@ -50,7 +50,6 @@ jobs:
       - uses: pre-commit/action@v1.1.1
         with:
           extra_args: --files ${{ env.FILES }}
-          token: ${{ secrets.GITHUB_TOKEN }}
 
   importanize:
     name: Run importanize
