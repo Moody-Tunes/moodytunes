@@ -71,6 +71,7 @@ class UserSongVoteAdmin(MoodyBaseAdmin):
     def has_add_permission(self, request):
         return False
 
+
 class SpotifyUserAuthAdmin(MoodyBaseAdmin):
     list_display = ('user', 'spotify_user_id', 'last_refreshed')
     readonly_fields = ('user', 'spotify_user_id')
