@@ -41,6 +41,12 @@ jobs:
       - name: Set changed files environment variable
         run: |
           echo "::set-env name=FILES::${{ steps.changed-files.outputs.files_created }} ${{ steps.changed-files.outputs.files_updated }}"
+      - name: set PY
+        run: echo "::set-env name=PY::$(python -VV | sha256sum | cut -d' ' -f1)"
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v1.1.1
         with:
           extra_args: --files ${{ env.FILES }}
