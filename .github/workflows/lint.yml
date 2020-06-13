@@ -22,10 +22,4 @@ jobs:
           grep flake8 requirements/common.txt | xargs pip install
       - name: Run flake8
         run: flake8
-      - name: set PY
-        run: echo "::set-env name=PY::$(python -c 'import hashlib, sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v1.1.0
