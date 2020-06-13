@@ -6,7 +6,7 @@ on:
       - production
 
 jobs:
-  test:
+  lint:
     name: Run linter
     runs-on: ubuntu-latest
 
