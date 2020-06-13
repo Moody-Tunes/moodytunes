@@ -30,7 +30,7 @@ jobs:
       - name: Set changed files environment variable
         run: |
           echo "::set-env name=FILES::${{ steps.changed-files.outputs.files_created }} ${{ steps.changed-files.outputs.files_updated }}"
-      - uses: pre-commit/action@v1.1.0
+      - uses: pre-commit/action@v1.1.1
         with:
           extra_args: --files ${{ env.FILES }}
           token: ${{ secrets.GITHUB_TOKEN }}
