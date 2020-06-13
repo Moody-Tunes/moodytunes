@@ -3,8 +3,8 @@ from django.db.models import Q, Count
 
 from accounts.forms import UpdateUserEmotionAttributesForm
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
-from tunes.models import Emotion
 from base.admin import MoodyBaseAdmin
+from tunes.models import Emotion
 
 
 emotion_vote_count_map = {
