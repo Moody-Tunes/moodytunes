@@ -16,7 +16,7 @@ class TestExportPlaylistHelper(TestCase):
         MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
         songs = ExportPlaylistHelper.get_export_playlist_for_user(self.user, self.emotion.name)
 
-        self.assertNotIn(self.song.code, songs)
+        self.assertIn(self.song.code, songs)
 
     def test_exclude_downvoted_songs(self):
         MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False)
