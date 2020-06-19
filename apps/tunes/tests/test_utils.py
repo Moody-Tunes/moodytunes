@@ -167,6 +167,7 @@ class TestGenerateBrowsePlaylist(TestCase):
 
     def test_generate_browse_playlist_with_user_saved_songs_respects_limit(self):
         limit = 9
+        song = MoodyUtil.create_song()
 
         for _ in range(20):
             MoodyUtil.create_song()
@@ -177,11 +178,12 @@ class TestGenerateBrowsePlaylist(TestCase):
         auth.save()
 
         playlist = generate_browse_playlist(
-            .5,
-            .5,
-            .5,
+            song.energy,
+            song.valence,
+            song.danceability,
             limit=limit,
-            user_auth=auth
+            user_auth=auth,
+            jitter=0,
         )
 
         self.assertEqual(len(playlist), limit)

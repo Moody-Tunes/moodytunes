@@ -43,21 +43,6 @@ def generate_browse_playlist(
     if songs is None:
         songs = Song.objects.all()
 
-    # Check if user has any songs from Spotify saved to their record
-    # If they do, return that first; we want the songs the user has
-    # saved to Spotify to appear first
-    if user_auth and user_auth.saved_songs:
-        song_codes = songs.values_list('code', flat=True)
-        user_playlist = [song_code for song_code in user_auth.saved_songs if song_code in song_codes]
-
-        if user_playlist:
-            songs = Song.objects.filter(code__in=user_playlist)
-
-            if limit:
-                songs = songs[:limit]
-
-            return songs
-
     energy_lower_limit = energy_upper_limit = energy
     valence_lower_limit = valence_upper_limit = valence
     danceability_lower_limit = danceability_upper_limit = danceability
@@ -97,6 +82,16 @@ def generate_browse_playlist(
     # Filter by artist if provided
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
+
+    # Check if user has any songs from Spotify saved to their record
+    # If they do, return those; we want the songs the user has saved
+    # in Spotify to appear in their browse playlist
+    if user_auth and user_auth.saved_songs:
+        song_codes = playlist.values_list('code', flat=True)
+        user_saved_songs = [song_code for song_code in user_auth.saved_songs if song_code in song_codes]
+
+        if user_saved_songs:
+            playlist = Song.objects.filter(code__in=user_saved_songs)
 
     # Shuffle playlist to ensure freshness
     playlist = list(playlist)
