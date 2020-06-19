@@ -98,7 +98,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 self.request.user.username,
             ),
             extra={
-                'fingerprint': auto_fingerprint('generate_playlist', **kwargs),
+                'fingerprint': auto_fingerprint('generate_browse playlist', **kwargs),
                 'user_id': self.request.user.pk,
                 'emotion': self.cleaned_data['emotion'],
                 'genre': self.cleaned_data.get('genre'),
@@ -305,27 +305,42 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     get_request_serializer = PlaylistSongsRequestSerializer
 
     def filter_queryset(self, queryset):
-        # Find the songs the user has previously voted as making them feel the desired emotion
-        emotion = self.cleaned_data['emotion']
-
-        user_votes = queryset.filter(
-            user=self.request.user,
-            emotion__name=emotion,
-            vote=True
-        )
-
-        return filter_duplicate_votes_on_song_from_playlist(user_votes)
-
-    def get_queryset(self):
-        queryset = super(PlaylistView, self).get_queryset()
-
         if self.cleaned_data.get('genre'):
             queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
 
         if self.cleaned_data.get('context'):
             queryset = queryset.filter(context=self.cleaned_data['context'])
 
-        return queryset
+        if self.cleaned_data.get('artist'):
+            queryset = queryset.filter(song__artist__icontains=self.cleaned_data['artist'])
+
+        return filter_duplicate_votes_on_song_from_playlist(queryset)
+
+    @update_logging_data
+    def get_queryset(self, **kwargs):
+        logger.info(
+            'Generating {} emotion playlist for user {}'.format(
+                self.cleaned_data['emotion'],
+                self.request.user.username,
+            ),
+            extra={
+                'fingerprint': auto_fingerprint('generate_emotion_playlist', **kwargs),
+                'user_id': self.request.user.pk,
+                'emotion': self.cleaned_data['emotion'],
+                'genre': self.cleaned_data.get('genre'),
+                'context': self.cleaned_data.get('context'),
+                'artist': self.cleaned_data.get('artist'),
+                'page': self.request.GET.get('page')
+            }
+        )
+
+        queryset = super(PlaylistView, self).get_queryset()
+
+        return queryset.filter(
+            user=self.request.user,
+            emotion__name=self.cleaned_data['emotion'],
+            vote=True
+        )
 
 
 class OptionView(generics.GenericAPIView):

@@ -16,3 +16,4 @@ class AnalyticsRequestSerializer(serializers.Serializer):
     genre = serializers.CharField(max_length=15, required=False)
     emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
+    artist = serializers.CharField(max_length=50, required=False)

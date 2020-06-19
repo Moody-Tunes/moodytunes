@@ -175,6 +175,8 @@ class TestAnalyticsView(TestCase):
         cls.url = reverse('accounts:analytics')
         cls.user = MoodyUtil.create_user()
         cls.api_client = APIClient()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.song = MoodyUtil.create_song()
 
     def setUp(self):
         self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -182,13 +184,13 @@ class TestAnalyticsView(TestCase):
     def test_unauthenticated_request_is_forbidden(self):
         self.api_client.logout()
 
-        params = {'emotion': Emotion.HAPPY}
-        resp = self.api_client.get(self.url, data=params)
+        data = {'emotion': self.emotion.name}
+        resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unsupported_method_is_rejected(self):
-        data = {'emotion': Emotion.HAPPY}
+        data = {'emotion': self.emotion.name}
         resp = self.api_client.post(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -200,26 +202,25 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_context_returns_bad_request(self):
-        data = {'emotion': Emotion.HAPPY, 'context': 'invalid-context'}
+        data = {'emotion': self.emotion.name, 'context': 'invalid-context'}
         resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_genre_returns_bad_request(self):
-        data = {'emotion': Emotion.HAPPY, 'genre': 'this-genre-value-is-way-too-long-for-our-site-usage'}
+        data = {'emotion': self.emotion.name, 'genre': 'this-genre-value-is-way-too-long-for-our-site-usage'}
         resp = self.api_client.get(self.url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
         upvoted_song_1 = MoodyUtil.create_song(valence=.75, energy=.65)
         upvoted_song_2 = MoodyUtil.create_song(valence=.65, energy=.7)
         downvoted_song = MoodyUtil.create_song(valence=.5, energy=.45)
 
-        UserSongVote.objects.create(user=self.user, emotion=emotion, song=upvoted_song_1, vote=True)
-        UserSongVote.objects.create(user=self.user, emotion=emotion, song=upvoted_song_2, vote=True)
-        UserSongVote.objects.create(user=self.user, emotion=emotion, song=downvoted_song, vote=False)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=upvoted_song_1, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=upvoted_song_2, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=downvoted_song, vote=False)
 
         working_songs = [upvoted_song_1, upvoted_song_2]
         votes = UserSongVote.objects.filter(user=self.user, vote=True)
@@ -229,14 +230,14 @@ class TestAnalyticsView(TestCase):
         expected_danceability = expected_attributes['song__danceability__avg']
 
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
             'energy': expected_energy,
             'valence': expected_valence,
             'danceability': expected_danceability,
             'total_songs': len(working_songs)
         }
 
-        params = {'emotion': Emotion.HAPPY}
+        params = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
@@ -244,28 +245,15 @@ class TestAnalyticsView(TestCase):
         self.assertDictEqual(resp_data, expected_response)
 
     def test_genre_filter_only_returns_songs_for_genre(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song(genre='hiphop')
         other_song = MoodyUtil.create_song(genre='something-else', energy=.3, valence=.25)
 
-        UserSongVote.objects.create(
-            user=self.user,
-            emotion=emotion,
-            song=expected_song,
-            vote=True
-        )
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=expected_song, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=other_song, vote=True)
 
-        UserSongVote.objects.create(
-            user=self.user,
-            emotion=emotion,
-            song=other_song,
-            vote=True
-        )
-
-        # We should only see the average energy and valence
-        # for the songs in the genre
+        # We should only see the average attributes for the songs in the selected genre
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -279,18 +267,39 @@ class TestAnalyticsView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp_data, expected_response)
 
-    def test_user_with_no_votes_returns_no_analytics(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+    def test_artist_filter_only_returns_songs_for_artist(self):
+        expected_song = MoodyUtil.create_song(artist='Cool Artist')
+        other_song = MoodyUtil.create_song(artist='Other Artist', energy=.3, valence=.25)
 
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=expected_song, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=other_song, vote=True)
+
+        # We should only see the average attributes for the song by the selected artist
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
+            'energy': expected_song.energy,
+            'valence': expected_song.valence,
+            'danceability': expected_song.danceability,
+            'total_songs': 1,
+        }
+
+        params = {'emotion': self.emotion.name, 'artist': expected_song.artist}
+        resp = self.api_client.get(self.url, data=params)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp_data, expected_response)
+
+    def test_user_with_no_votes_returns_no_analytics(self):
+        expected_response = {
+            'emotion_name': self.emotion.full_name,
             'energy': None,
             'valence': None,
             'danceability': None,
             'total_songs': 0
         }
 
-        params = {'emotion': Emotion.HAPPY}
+        params = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=params)
         resp_data = resp.json()
 
@@ -298,29 +307,21 @@ class TestAnalyticsView(TestCase):
         self.assertDictEqual(resp_data, expected_response)
 
     def test_multiple_votes_for_same_song_only_returns_one_count(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        expected_song = MoodyUtil.create_song()
 
         # Make one vote without a context and one with a context
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(user=self.user, emotion=self.emotion, song=self.song, vote=True)
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
-            song=expected_song,
-            vote=True,
-        )
-
-        UserSongVote.objects.create(
-            user=self.user,
-            emotion=emotion,
-            song=expected_song,
+            emotion=self.emotion,
+            song=self.song,
             vote=True,
             context='WORK'
         )
 
         # We should only see the song once in the response
-        user_emotion = self.user.get_user_emotion_record(emotion.name)
+        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
             'energy': user_emotion.energy,
             'valence': user_emotion.valence,
             'danceability': user_emotion.danceability,
@@ -335,21 +336,20 @@ class TestAnalyticsView(TestCase):
         self.assertDictEqual(resp_data, expected_response)
 
     def test_endpoint_return_analytics_for_context_if_provided(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song()
         other_song = MoodyUtil.create_song(energy=.75, valence=.65)
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=expected_song,
             vote=True,
             context='WORK'
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=other_song,
             vote=True,
             context='PARTY'
@@ -357,7 +357,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the song for this context in the response
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -365,7 +365,7 @@ class TestAnalyticsView(TestCase):
         }
 
         params = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'context': 'WORK'
         }
         resp = self.api_client.get(self.url, data=params)
@@ -375,38 +375,37 @@ class TestAnalyticsView(TestCase):
         self.assertDictEqual(resp_data, expected_response)
 
     def test_endpoint_handles_context_and_genre_filters(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
         expected_song = MoodyUtil.create_song(genre='first-genre')
         other_song = MoodyUtil.create_song(genre='second-genre', energy=.75, valence=.65)
 
         # Create matrix of expected song and context
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=expected_song,
             vote=True,
             context='WORK'
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=other_song,
             vote=True,
             context='WORK'
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=expected_song,
             vote=True,
             context='PARTY'
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=other_song,
             vote=True,
             context='PARTY'
@@ -414,7 +413,7 @@ class TestAnalyticsView(TestCase):
 
         # We should only see the expected song for this context and genre in the response
         expected_response = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': self.emotion.full_name,
             'energy': expected_song.energy,
             'valence': expected_song.valence,
             'danceability': expected_song.danceability,
@@ -422,7 +421,7 @@ class TestAnalyticsView(TestCase):
         }
 
         params = {
-            'emotion': Emotion.HAPPY,
+            'emotion': self.emotion.name,
             'genre': expected_song.genre,
             'context': 'WORK'
         }

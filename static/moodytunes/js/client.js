@@ -117,12 +117,13 @@
             // Used to build options for users to choose from when generating playlists to listen to
             this.request('GET', '/tunes/options/', {}, {}, callback);
         },
-        getUserAnalytics: function(emotion, genre, context, callback) {
+        getUserAnalytics: function(emotion, genre, context, artist, callback) {
             // Retrieve analytics for users based on what songs they've listened to
             let params = {
                 emotion: emotion,
                 genre: genre,
                 context: context,
+                artist: artist
             };
             this.request('GET', '/accounts/analytics/', params, {}, callback);
         },
@@ -145,12 +146,13 @@
             // Retrieve the last viewed browse playlist for the user
             this.request('GET', '/tunes/browse/last/', {}, {}, callback);
         },
-        getEmotionPlaylist: function(emotion, genre, context, callback) {
+        getEmotionPlaylist: function(emotion, genre, context, artist, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
             let params = {
                 emotion: emotion,
                 genre: genre,
                 context: context,
+                artist: artist,
             };
 
             this.request('GET', '/tunes/playlist/', params, {}, callback);

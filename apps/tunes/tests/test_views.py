@@ -723,12 +723,7 @@ class TestPlaylistView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_happy_path(self):
-        UserSongVote.objects.create(
-            user=self.user,
-            song=self.song,
-            emotion=self.emotion,
-            vote=True
-        )
+        MoodyUtil.create_user_song_vote(user=self.user, song=self.song, emotion=self.emotion, vote=True)
 
         data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
@@ -738,12 +733,7 @@ class TestPlaylistView(TestCase):
         self.assertEqual(resp_data['results'][0]['song']['code'], self.song.code)
 
     def test_downvoted_songs_are_not_returned(self):
-        UserSongVote.objects.create(
-            user=self.user,
-            song=self.song,
-            emotion=self.emotion,
-            vote=False
-        )
+        MoodyUtil.create_user_song_vote(user=self.user, song=self.song, emotion=self.emotion, vote=False)
 
         data = {'emotion': self.emotion.name}
         resp = self.api_client.get(self.url, data=data)
@@ -754,23 +744,14 @@ class TestPlaylistView(TestCase):
 
     def test_filter_playlist_by_genre(self):
         new_song = MoodyUtil.create_song(genre='super-dope')
-        UserSongVote.objects.create(
-            user=self.user,
-            song=self.song,
-            emotion=self.emotion,
-            vote=True
-        )
-        UserSongVote.objects.create(
-            user=self.user,
-            song=new_song,
-            emotion=self.emotion,
-            vote=True
-        )
+        MoodyUtil.create_user_song_vote(user=self.user, song=self.song, emotion=self.emotion, vote=True)
+        MoodyUtil.create_user_song_vote(user=self.user, song=new_song, emotion=self.emotion, vote=True)
 
         data = {
             'emotion': self.emotion.name,
             'genre': new_song.genre
         }
+
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -782,7 +763,7 @@ class TestPlaylistView(TestCase):
         expected_song = MoodyUtil.create_song(name='song-with-context')
         context = 'WORK'
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
             song=expected_song,
             emotion=self.emotion,
@@ -790,7 +771,7 @@ class TestPlaylistView(TestCase):
             context=context
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
             song=self.song,
             emotion=self.emotion,
@@ -801,6 +782,25 @@ class TestPlaylistView(TestCase):
             'emotion': self.emotion.name,
             'context': context
         }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp_data['results']), 1)
+        self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
+
+    def test_filter_by_artist(self):
+        expected_song = MoodyUtil.create_song(artist='Cool Artist')
+
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, expected_song, self.emotion, True)
+
+        data = {
+            'emotion': self.emotion.name,
+            'artist': expected_song.artist
+        }
+
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
@@ -810,7 +810,7 @@ class TestPlaylistView(TestCase):
 
     def test_multiple_votes_for_a_song_does_not_return_duplicate_songs(self):
         # Create two upvotes in different contexts
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
             song=self.song,
             emotion=self.emotion,
@@ -818,7 +818,7 @@ class TestPlaylistView(TestCase):
             context='WORK'
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
             song=self.song,
             emotion=self.emotion,
