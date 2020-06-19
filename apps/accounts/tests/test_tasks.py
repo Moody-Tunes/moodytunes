@@ -12,6 +12,7 @@ from accounts.tasks import (
     CreateSpotifyAuthUserSavedTracksTask,
     CreateUserEmotionRecordsForUserTask,
     SpotifyAuthUserTaskMixin,
+    UpdateSpotifyAuthUserSavedTracksTask,
     UpdateUserEmotionRecordAttributeTask,
 )
 from libs.spotify import SpotifyException
@@ -143,3 +144,15 @@ class TestCreateSpotifyAuthUserSavedTracksTask(TestCase):
         CreateSpotifyAuthUserSavedTracksTask().run(self.auth.pk)
 
         mock_retry.assert_called_once()
+
+
+class TestUpdateSpotifyAuthUserSavedTracksTask(TestCase):
+    @mock.patch('accounts.tasks.CreateSpotifyAuthUserSavedTracksTask.delay')
+    def test_happy_path(self, mock_create_saved_tracks):
+        for i in range(2):
+            user = MoodyUtil.create_user(username='test_update_saved_tracks_{}'.format(i))
+            MoodyUtil.create_spotify_user_auth(user, spotify_user_id=user.username)
+
+        UpdateSpotifyAuthUserSavedTracksTask().run()
+
+        self.assertEqual(mock_create_saved_tracks.call_count, 2)

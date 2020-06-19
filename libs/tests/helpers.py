@@ -145,12 +145,12 @@ class MoodyUtil(object):
         return vote
 
     @staticmethod
-    def create_spotify_user_auth(user):
+    def create_spotify_user_auth(user, spotify_user_id='spotify_user'):
         auth, _ = SpotifyUserAuth.objects.get_or_create(
             user=user,
             defaults={
                 'user': user,
-                'spotify_user_id': 'spotify_user',
+                'spotify_user_id': spotify_user_id,
                 'access_token': 'access_token',
                 'refresh_token': 'refresh_token'
             }
