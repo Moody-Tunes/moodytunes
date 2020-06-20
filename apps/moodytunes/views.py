@@ -246,6 +246,7 @@ class ExportPlayListView(FormView):
 
         return super(ExportPlayListView, self).get(request, *args, **kwargs)
 
+    @update_logging_data
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
 
@@ -269,6 +270,18 @@ class ExportPlayListView(FormView):
                 return HttpResponseRedirect(reverse('moodytunes:export'))
 
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
+
+            logger.info(
+                'Exporting {} playlist for user {} to Spotify'.format(emotion_name, request.user.username),
+                extra={
+                    'emotion': Emotion.get_full_name_from_keyword(emotion_name),
+                    'genre': genre,
+                    'context': context,
+                    'user_id': request.user.pk,
+                    'auth_id': auth.pk,
+                    'fingerprint': auto_fingerprint('export_playlist_to_spotify', **kwargs)
+                }
+            )
 
             CreateSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
 
