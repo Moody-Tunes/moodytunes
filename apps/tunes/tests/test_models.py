@@ -8,7 +8,7 @@ class TestEmotion(TestCase):
     @classmethod
     def setUpTestData(cls):
         # First we need to delete all Emotions, so we can create our own for
-        # testing purposes. Hard to create new Emotions with the uniquness and
+        # testing purposes. Hard to create new Emotions with the uniqueness and
         # choice lock on the model
         Emotion.objects.all().delete()
 
