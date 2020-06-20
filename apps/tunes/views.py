@@ -244,6 +244,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 ),
                 extra={
                     'vote_data': vote_data,
+                    'emotion': emotion.full_name,
                     'vote_id': vote.pk,
                     'fingerprint': auto_fingerprint('created_new_vote', **kwargs),
                 }
