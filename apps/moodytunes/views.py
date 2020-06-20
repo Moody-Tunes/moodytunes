@@ -154,7 +154,7 @@ class SpotifyAuthenticationCallbackView(View):
             try:
                 tokens = spotify_client.get_access_and_refresh_tokens(code)
             except SpotifyException:
-                logger.error(
+                logger.exception(
                     'Unable to get Spotify tokens for user {}'.format(user.username),
                     extra={'fingerprint': auto_fingerprint('failed_get_spotify_tokens', **kwargs)}
                 )
@@ -166,7 +166,7 @@ class SpotifyAuthenticationCallbackView(View):
             try:
                 profile_data = spotify_client.get_user_profile(tokens['access_token'])
             except SpotifyException:
-                logger.error(
+                logger.exception(
                     'Unable to get Spotify profile for user {}'.format(user.username),
                     extra={'fingerprint': auto_fingerprint('failed_get_spotify_profile', **kwargs)}
                 )
