@@ -108,7 +108,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             extra={
                 'fingerprint': auto_fingerprint('generate_browse playlist', **kwargs),
                 'user_id': self.request.user.pk,
-                'emotion': self.cleaned_data['emotion'],
+                'emotion': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
                 'strategy': strategy,
@@ -337,7 +337,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             extra={
                 'fingerprint': auto_fingerprint('generate_emotion_playlist', **kwargs),
                 'user_id': self.request.user.pk,
-                'emotion': self.cleaned_data['emotion'],
+                'emotion': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
                 'artist': self.cleaned_data.get('artist'),
