@@ -61,7 +61,7 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         request_data = {
             'params': request.GET,
-            'data': request.data if request.data else request.body,
+            'data': request.data,
             'user_id': request.user.id,
             'headers': cleaned_headers,
             'method': request.method,
