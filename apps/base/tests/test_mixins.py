@@ -76,7 +76,8 @@ class TestValidateRequestDataMixin(TestCase):
                 'HTTP_COOKIE': '********'
             },
             'method': request.method,
-            'errors': mock_serializer.errors
+            'errors': mock_serializer.errors,
+            'fingerprint': 'base.mixins.ValidateRequestDataMixin._log_bad_request.bad_request',
         }
 
         self.mixin._log_bad_request(request, mock_serializer)
