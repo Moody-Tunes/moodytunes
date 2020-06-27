@@ -152,8 +152,11 @@ class TestSpotifyClient(TestCase):
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
     def test_make_spotify_request_raises_spotify_exception_on_http_error(self, mock_auth, mock_request):
+        mock_http_error = HTTPError()
+        mock_http_error.response = mock.Mock()
+
         mock_response = mock.Mock()
-        mock_response.raise_for_status.side_effect = HTTPError
+        mock_response.raise_for_status.side_effect = mock_http_error
 
         mock_auth.return_value = self.auth_code
         mock_request.return_value = mock_response
