@@ -40,7 +40,7 @@ class ValidateRequestDataMixin(MoodyMixin):
         :param headers: (dict) Request headers to be stripped.
         :return: (dict) Headers with sensitive information from it
         """
-        sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE']
+        sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE', 'HTTP_X_CSRFTOKEN']
         stripped_value = '********'
 
         for name in headers:
