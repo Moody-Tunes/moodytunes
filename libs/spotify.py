@@ -97,6 +97,7 @@ class SpotifyClient(object):
                 url=url,
             ),
             extra={
+                'request_method': method,
                 'params': logging_params,
                 'data': logging_data,
                 'headers': logging_headers
