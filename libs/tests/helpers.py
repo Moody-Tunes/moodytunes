@@ -147,7 +147,12 @@ class MoodyUtil(object):
         return vote
 
     @staticmethod
-    def create_spotify_user_auth(user, spotify_user_id='spotify_user', access_token='access_token', refresh_token='refresh_token'):
+    def create_spotify_user_auth(
+            user,
+            spotify_user_id='spotify_user',
+            access_token='access_token',
+            refresh_token='refresh_token'
+    ):
         dispatch_uid = 'spotify_user_auth_post_save_update_top_artist'
         with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
             auth, _ = SpotifyUserAuth.objects.get_or_create(
