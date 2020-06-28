@@ -10,7 +10,7 @@ from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
     CreateUserEmotionRecordsForUserTask,
-    UpdateTopArtistsFromSpotify,
+    UpdateTopArtistsFromSpotifyTask,
     UpdateUserEmotionRecordAttributeTask,
 )
 from libs.spotify import SpotifyException
@@ -83,7 +83,7 @@ class TestUpdateUserEmotionTask(TestCase):
             UpdateUserEmotionRecordAttributeTask().run(invalid_vote_pk)
 
 
-class TestUpdateTopArtistsFromSpotify(TestCase):
+class TestUpdateTopArtistsFromSpotifyTask(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
@@ -94,17 +94,17 @@ class TestUpdateTopArtistsFromSpotify(TestCase):
         top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
         mock_get_top_artists.return_value = top_artists
 
-        UpdateTopArtistsFromSpotify().run(self.auth.id)
+        UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
         self.auth.refresh_from_db()
         self.assertListEqual(self.auth.top_artists, top_artists)
 
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.retry')
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
     @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
     def test_spotify_error_on_get_top_artists_causes_task_to_retry(self, mock_get_top_artists, mock_retry):
         mock_get_top_artists.side_effect = SpotifyException
 
-        UpdateTopArtistsFromSpotify().run(self.auth.id)
+        UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
         mock_retry.assert_called_once_with()
 
@@ -112,9 +112,9 @@ class TestUpdateTopArtistsFromSpotify(TestCase):
         invalid_auth_id = 99999
 
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
-            UpdateTopArtistsFromSpotify().run(invalid_auth_id)
+            UpdateTopArtistsFromSpotifyTask().run(invalid_auth_id)
 
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.retry')
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
     @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
         self.auth.last_refreshed = timezone.now() - timedelta(days=1)
@@ -122,6 +122,6 @@ class TestUpdateTopArtistsFromSpotify(TestCase):
 
         mock_refresh_access_token.side_effect = SpotifyException
 
-        UpdateTopArtistsFromSpotify().run(self.auth.id)
+        UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
         mock_retry.assert_called_once()

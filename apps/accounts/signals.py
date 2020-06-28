@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from accounts.models import SpotifyUserAuth, UserSongVote
 from accounts.tasks import (
     CreateUserEmotionRecordsForUserTask,
-    UpdateTopArtistsFromSpotify,
+    UpdateTopArtistsFromSpotifyTask,
     UpdateUserEmotionRecordAttributeTask,
 )
 
@@ -38,7 +38,7 @@ post_save.connect(
 
 def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
     if created:
-        UpdateTopArtistsFromSpotify().delay(instance.pk)
+        UpdateTopArtistsFromSpotifyTask().delay(instance.pk)
 
 
 post_save.connect(

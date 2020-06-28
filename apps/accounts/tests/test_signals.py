@@ -69,7 +69,7 @@ class TestUpdateUserAttributesSignal(TestCase):
 
 
 class TestUpdateSpotifyTopArtistsSignal(TestCase):
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.delay')
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay')
     def test_task_is_only_called_on_create(self, mock_task):
         user = MoodyUtil.create_user()
         data = {

@@ -117,7 +117,7 @@ class TestSpotifyAuthenticationView(TestCase):
         self.assertEqual(resp.context['spotify_auth_url'], expected_auth_url.replace(' ', ''))
 
 
-@mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.delay', mock.MagicMock)
+@mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay', mock.MagicMock)
 class TestSpotifyAuthenticationCallbackView(TestCase):
     @classmethod
     def setUpTestData(cls):
