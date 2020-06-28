@@ -10,6 +10,7 @@ from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
     CreateUserEmotionRecordsForUserTask,
+    RefreshTopArtistsFromSpotifyTask,
     UpdateTopArtistsFromSpotifyTask,
     UpdateUserEmotionRecordAttributeTask,
 )
@@ -125,3 +126,16 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
         mock_retry.assert_called_once()
+
+
+class TestRefreshTopArtistsFromSpotifyTask(TestCase):
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
+    def test_happy_path(self, mock_update_top_artist_task):
+        user_1 = MoodyUtil.create_user(username='test1')
+        user_2 = MoodyUtil.create_user(username='test2')
+        MoodyUtil.create_spotify_user_auth(user_1, spotify_user_id='test_user_1')
+        MoodyUtil.create_spotify_user_auth(user_2, spotify_user_id='test_user_2')
+
+        RefreshTopArtistsFromSpotifyTask().run()
+
+        self.assertEqual(mock_update_top_artist_task.call_count, 2)

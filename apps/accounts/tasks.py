@@ -1,7 +1,9 @@
 from logging import getLogger
 
+from celery.schedules import crontab
+
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
-from base.tasks import MoodyBaseTask
+from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Emotion
@@ -145,3 +147,19 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
             )
 
             self.retry()
+
+
+class RefreshTopArtistsFromSpotifyTask(MoodyPeriodicTask):
+    run_every = crontab(minute=0, hour=3, day_of_week=0)
+
+    @update_logging_data
+    def run(self, *args, **kwargs):
+        auth_records = SpotifyUserAuth.objects.all()
+
+        logger.info(
+            'Starting run to refresh top artists for {} auth records'.format(auth_records.count()),
+            extra={'fingerprint': auto_fingerprint('refresh_top_artists', **kwargs)}
+        )
+
+        for auth in auth_records:
+            UpdateTopArtistsFromSpotifyTask().delay(auth.pk)
