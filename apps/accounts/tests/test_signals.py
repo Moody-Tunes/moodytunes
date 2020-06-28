@@ -2,7 +2,7 @@ from unittest import mock
 
 from django.test import TestCase
 
-from accounts.models import UserSongVote
+from accounts.models import SpotifyUserAuth, UserSongVote
 from libs.tests.helpers import MoodyUtil
 from tunes.models import Emotion
 
@@ -72,10 +72,16 @@ class TestUpdateSpotifyTopArtistsSignal(TestCase):
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.delay')
     def test_task_is_only_called_on_create(self, mock_task):
         user = MoodyUtil.create_user()
-        auth = MoodyUtil.create_spotify_user_auth(user)
+        data = {
+            'user': user,
+            'spotify_user_id': 'spotify_user',
+            'access_token': 'access_token',
+            'refresh_token': 'refresh_token'
+        }
+
+        auth = SpotifyUserAuth.objects.create(**data)
 
         mock_task.assert_called_once_with(auth.pk)
 
         auth.save()
-
         self.assertEqual(mock_task.call_count, 1)
