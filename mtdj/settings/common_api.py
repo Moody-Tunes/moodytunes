@@ -18,4 +18,5 @@ SPOTIFY = {
     'auth_cache_key_timeout': 60 * 60,  # Authorization token is good for one hour
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
     'auth_user_scopes': ['playlist-modify-public'],
+    'max_top_artists': 50,  # Number of top artists to retrieve for user
 }

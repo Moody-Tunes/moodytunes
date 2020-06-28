@@ -691,6 +691,51 @@ class TestSpotifyClient(TestCase):
             data=json.dumps(expected_data)
         )
 
+    @mock.patch('requests.request')
+    def test_get_user_top_artists(self, mock_request):
+        auth_code = 'spotify-auth-id'
+        response_data = {
+            'items': [
+                {
+                    "name": "Surf Curse",
+                    "popularity": 63,
+                    "type": "artist",
+                    "uri": "spotify:artist:1gl0S9pS0Zw0qfa14rDD3D"
+                },
+                {
+                    "name": "Madlib",
+                    "popularity": 68,
+                    "type": "artist",
+                    "uri": "spotify:artist:5LhTec3c7dcqBvpLRWbMcf"
+                },
+                {
+                    "name": "Elvis Depressedly",
+                    "popularity": 47,
+                    "type": "artist",
+                    "uri": "spotify:artist:5a31Ij1sTxY9LUYVwgBp8m"
+                }
+            ]
+        }
+
+        mock_response = mock.Mock()
+        mock_response.json.return_value = response_data
+        mock_request.return_value = mock_response
+
+        expected_headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+        expected_params = {'limit': 50}
+        expected_response = ['Surf Curse', 'Madlib', 'Elvis Depressedly']
+
+        retrieved_response = self.spotify_client.get_user_top_artists(auth_code)
+
+        self.assertListEqual(retrieved_response, expected_response)
+        mock_request.assert_called_with(
+            'GET',
+            'https://api.spotify.com/v1/me/top/artists',
+            params=expected_params,
+            headers=expected_headers,
+            data=None
+        )
+
     def test_batch_tracks_batches_list(self):
         items = [i for i in range(200)]
         batched_items = self.spotify_client.batch_tracks(items)

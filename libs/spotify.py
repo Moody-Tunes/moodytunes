@@ -567,3 +567,23 @@ class SpotifyClient(object):
         resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
         return resp
+
+    def get_user_top_artists(self, auth_code):
+        """
+        Retrieve the top artists from Spotify for a user
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        """
+        url = '{api_url}/me/top/artists'.format(api_url=settings.SPOTIFY['api_url'])
+
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+        params = {'limit': settings.SPOTIFY['max_top_artists']}
+
+        resp = self._make_spotify_request('GET', url, headers=headers, params=params)
+
+        # Parse the response for the artist name values
+        artists = []
+        for item in resp['items']:
+            artists.append(item['name'])
+
+        return artists
