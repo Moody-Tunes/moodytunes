@@ -128,6 +128,61 @@ class TestGenerateBrowsePlaylist(TestCase):
         self.assertIn(song_from_artist, playlist)
         self.assertNotIn(song_from_other_artist, playlist)
 
+    def test_top_artists_passed_returns_songs_by_top_artists(self):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        song_params = {
+            'energy': .5,
+            'valence': .75,
+            'danceability': .65,
+        }
+
+        for artist in top_artists:
+            MoodyUtil.create_song(artist=artist, **song_params)
+
+        MoodyUtil.create_song(artist='Bum', **song_params)
+
+        expected_playlist = list(Song.objects.filter(artist__in=top_artists))
+        playlist = generate_browse_playlist(
+            song_params['energy'],
+            song_params['valence'],
+            song_params['danceability'],
+            jitter=0,
+            top_artists=top_artists
+        )
+
+        # Sort playlists for comparison as the playlist is shuffled
+        expected_playlist.sort(key=lambda song: song.code)
+        playlist.sort(key=lambda song: song.code)
+
+        self.assertListEqual(expected_playlist, playlist)
+
+    def test_top_artists_passed_returns_default_playlist_if_no_matches_found(self):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        song_params = {
+            'energy': .5,
+            'valence': .75,
+            'danceability': .65,
+        }
+
+        MoodyUtil.create_song(artist='Bum', **song_params)
+        MoodyUtil.create_song(artist='Wack', **song_params)
+        MoodyUtil.create_song(artist='Geek', **song_params)
+
+        expected_playlist = list(Song.objects.exclude(artist__in=top_artists))
+        playlist = generate_browse_playlist(
+            song_params['energy'],
+            song_params['valence'],
+            song_params['danceability'],
+            jitter=0,
+            top_artists=top_artists
+        )
+
+        # Sort playlists for comparison as the playlist is shuffled
+        expected_playlist.sort(key=lambda song: song.code)
+        playlist.sort(key=lambda song: song.code)
+
+        self.assertListEqual(expected_playlist, playlist)
+
 
 class TestCachedPlaylistManager(TestCase):
     @classmethod

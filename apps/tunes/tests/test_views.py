@@ -145,6 +145,21 @@ class TestBrowseView(TestCase):
         self.assertEqual(called_valence, emotion_valence)
         self.assertEqual(called_danceability, emotion_danceability)
 
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_browse_request_uses_user_top_artists_when_provided(self, mock_generate_playlist):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        auth = MoodyUtil.create_spotify_user_auth(self.user)
+        auth.top_artists = top_artists
+        auth.save()
+
+        params = {'emotion': Emotion.HAPPY}
+        self.api_client.get(self.url, data=params)
+
+        call_kwargs = mock_generate_playlist.mock_calls[0][2]
+        called_top_artists = call_kwargs['top_artists']
+
+        self.assertListEqual(called_top_artists, top_artists)
+
     def test_playlist_excludes_previously_voted_songs(self):
         voted_song = MoodyUtil.create_song()
         not_voted_song = MoodyUtil.create_song()

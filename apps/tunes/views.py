@@ -92,6 +92,14 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 valence = user_emotion.valence
                 danceability = user_emotion.danceability
 
+        # If user has a SpotifyUserAuth record that has data for their top artists,
+        # include those artists in generate request
+        top_artists = None
+        user_auth = getattr(self.request.user, 'spotifyuserauth', None)
+
+        if user_auth:
+            top_artists = user_auth.top_artists
+
         logger.info(
             'Generating {} browse playlist for user {}'.format(
                 self.cleaned_data['emotion'],
@@ -109,6 +117,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'danceability': danceability,
                 'artist': artist,
                 'jitter': jitter,
+                'top_artists': top_artists,
             }
         )
 
@@ -120,6 +129,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             limit=limit,
             jitter=jitter,
             artist=artist,
+            top_artists=top_artists,
             songs=queryset
         )
 
