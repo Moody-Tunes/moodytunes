@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.test import TestCase
 from django.utils import timezone
 
-from accounts.models import MoodyUser, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
@@ -203,6 +203,42 @@ class TestSpotifyUserAuth(TestCase):
 
         with self.assertRaises(SpotifyException):
             user_auth.refresh_access_token()
+
+    def test_get_and_refresh_spotify_user_auth_record_happy_path(self):
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        retrieved_user_auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(user_auth.id)
+
+        self.assertEqual(user_auth.pk, retrieved_user_auth.pk)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_get_and_refresh_spotify_user_auth_record_refreshes_access_token_if_needed(self, mock_refresh_access_token):
+        refresh_access_token = 'mock:spotify:access:token'
+        mock_refresh_access_token.return_value = refresh_access_token
+
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        user_auth.last_refreshed = timezone.now() - timedelta(days=7)
+        user_auth.save()
+
+        SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(user_auth.id)
+
+        mock_refresh_access_token.assert_called_once_with(user_auth.refresh_token)
+
+    def test_get_and_refresh_spotify_user_auth_record_with_missing_record_raises_exception(self):
+        invalid_auth_id = 999999
+
+        with self.assertRaises(SpotifyUserAuth.DoesNotExist):
+            SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(invalid_auth_id)
+
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_get_and_refresh_spotify_user_auth_record_raises_spotify_exception(self, mock_refresh_access_token):
+        mock_refresh_access_token.side_effect = SpotifyException
+
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        user_auth.last_refreshed = timezone.now() - timedelta(days=7)
+        user_auth.save()
+
+        with self.assertRaises(SpotifyException):
+            SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(user_auth.id)
 
 
 class TestUserSongVote(TestCase):

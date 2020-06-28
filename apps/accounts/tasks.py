@@ -112,40 +112,12 @@ class UpdateTopArtistsFromSpotify(MoodyBaseTask):
     default_retry_delay = 60 * 15
 
     @update_logging_data
-    def get_and_refresh_spotify_user_auth_record(self, auth_id, **kwargs):
-        """
-        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
-        the access token is expired
-
-        :param auth_id: (int) Primary key for SpotifyUserAuth record
-
-        :return: (SpotifyUserAuth)
-        """
-        try:
-            auth = SpotifyUserAuth.objects.get(pk=auth_id)
-        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
-            logger.error(
-                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
-            )
-
-            raise
-
-        if auth.should_update_access_token:
-            try:
-                auth.refresh_access_token()
-            except SpotifyException:
-                logger.warning(
-                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
-                )
-                self.retry()
-
-        return auth
-
-    @update_logging_data
     def run(self, auth_id, *args, **kwargs):
-        auth = self.get_and_refresh_spotify_user_auth_record(auth_id)
+        try:
+            auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
+        except SpotifyException:
+            return self.retry()
+
         spotify_client_identifier = 'update_spotify_top_artists_{}'.format(auth.spotify_user_id)
         spotify = SpotifyClient(identifier=spotify_client_identifier)
 

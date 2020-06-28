@@ -1,10 +1,12 @@
+from datetime import timedelta
 from unittest import mock
 
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.test import TestCase
+from django.utils import timezone
 
-from accounts.models import MoodyUser, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
     CreateUserEmotionRecordsForUserTask,
@@ -105,3 +107,21 @@ class TestUpdateTopArtistsFromSpotify(TestCase):
         UpdateTopArtistsFromSpotify().run(self.auth.id)
 
         mock_retry.assert_called_once_with()
+
+    def test_get_auth_record_does_not_exists_raises_error(self):
+        invalid_auth_id = 99999
+
+        with self.assertRaises(SpotifyUserAuth.DoesNotExist):
+            UpdateTopArtistsFromSpotify().run(invalid_auth_id)
+
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.retry')
+    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
+        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
+        self.auth.save()
+
+        mock_refresh_access_token.side_effect = SpotifyException
+
+        UpdateTopArtistsFromSpotify().run(self.auth.id)
+
+        mock_retry.assert_called_once()
