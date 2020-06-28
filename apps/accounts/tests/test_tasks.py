@@ -1,10 +1,17 @@
+from unittest import mock
+
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.test import TestCase
 
 from accounts.models import MoodyUser, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
-from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
+from accounts.tasks import (
+    CreateUserEmotionRecordsForUserTask,
+    UpdateTopArtistsFromSpotify,
+    UpdateUserEmotionRecordAttributeTask,
+)
+from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
 from tunes.models import Emotion
@@ -72,3 +79,29 @@ class TestUpdateUserEmotionTask(TestCase):
 
         with self.assertRaises(UserSongVote.DoesNotExist):
             UpdateUserEmotionRecordAttributeTask().run(invalid_vote_pk)
+
+
+class TestUpdateTopArtistsFromSpotify(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+
+    @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
+    def test_happy_path(self, mock_get_top_artists):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        mock_get_top_artists.return_value = top_artists
+
+        UpdateTopArtistsFromSpotify().run(self.auth.id)
+
+        self.auth.refresh_from_db()
+        self.assertListEqual(self.auth.top_artists, top_artists)
+
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.retry')
+    @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
+    def test_spotify_error_on_get_top_artists_causes_task_to_retry(self, mock_get_top_artists, mock_retry):
+        mock_get_top_artists.side_effect = SpotifyException
+
+        UpdateTopArtistsFromSpotify().run(self.auth.id)
+
+        mock_retry.assert_called_once_with()
