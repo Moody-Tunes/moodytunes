@@ -1,8 +1,12 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 
-from accounts.models import UserSongVote
-from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
+from accounts.models import SpotifyUserAuth, UserSongVote
+from accounts.tasks import (
+    CreateUserEmotionRecordsForUserTask,
+    UpdateTopArtistsFromSpotify,
+    UpdateUserEmotionRecordAttributeTask,
+)
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
@@ -29,4 +33,16 @@ post_save.connect(
     update_user_emotion_attributes,
     sender=UserSongVote,
     dispatch_uid='user_song_vote_post_save_update_useremotion_attributes'
+)
+
+
+def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
+    if created:
+        UpdateTopArtistsFromSpotify().delay(instance.pk)
+
+
+post_save.connect(
+    update_spotify_top_artists,
+    sender=SpotifyUserAuth,
+    dispatch_uid='spotify_user_auth_post_save_update_top_artist'
 )

@@ -66,3 +66,16 @@ class TestUpdateUserAttributesSignal(TestCase):
         vote.delete()
 
         mock_update.assert_called_once()
+
+
+class TestUpdateSpotifyTopArtistsSignal(TestCase):
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotify.delay')
+    def test_task_is_only_called_on_create(self, mock_task):
+        user = MoodyUtil.create_user()
+        auth = MoodyUtil.create_spotify_user_auth(user)
+
+        mock_task.assert_called_once_with(auth.pk)
+
+        auth.save()
+
+        self.assertEqual(mock_task.call_count, 1)
