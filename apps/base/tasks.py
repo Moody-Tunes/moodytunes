@@ -3,7 +3,6 @@ from logging import getLogger
 
 from celery.schedules import crontab
 from celery.task import PeriodicTask, Task
-from celery.utils.time import get_exponential_backoff_interval
 from django.conf import settings
 from django.core.management import call_command
 
@@ -32,21 +31,7 @@ class MoodyBaseTask(Task):
                 try:
                     return self._orig_run(*args, **kwargs)
                 except self.autoretry_for as exc:
-                    if 'countdown' not in self.retry_kwargs:
-                        countdown = get_exponential_backoff_interval(
-                            factor=self.retry_backoff,
-                            retries=self.request.retries,
-                            maximum=self.retry_backoff_max,
-                            full_jitter=self.retry_jitter,
-                        )
-
-                        retry_kwargs = self.retry_kwargs.copy()
-                        retry_kwargs.update({'countdown': countdown})
-                    else:
-                        retry_kwargs = self.retry_kwargs
-
-                    retry_kwargs.update({'exc': exc})
-                    raise self.retry(**retry_kwargs)
+                    raise self.retry(exc=exc)
 
             self._orig_run, self.run = self.run, run
 
