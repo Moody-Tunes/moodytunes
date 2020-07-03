@@ -15,8 +15,8 @@ logger = getLogger(__name__)
 class MoodyBaseTask(Task):
     abstract = True
 
-    autoretry_for = ()
     max_retries = 3
+    autoretry_for = ()
 
     # Add autoretry behavior for a defined tuple of exceptions to retry on
     # From https://github.com/celery/celery/issues/4684#issuecomment-547861259

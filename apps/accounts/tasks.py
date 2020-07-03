@@ -110,9 +110,7 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
 
 class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
-    max_retries = 3
     default_retry_delay = 60 * 15
-
     autoretry_for = (SpotifyException,)
 
     @update_logging_data

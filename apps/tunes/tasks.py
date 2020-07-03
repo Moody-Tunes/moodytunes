@@ -13,9 +13,7 @@ logger = getLogger(__name__)
 class CreateSongsFromSpotifyTask(MoodyPeriodicTask):
     run_every = crontab(minute=0, hour=1, day_of_week=0)
 
-    max_retries = 3
     default_retry_delay = 60 * 15
-
     autoretry_for = (CommandError,)
 
     def run(self, *args, **kwargs):

@@ -11,9 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class FetchSongFromSpotifyTask(MoodyBaseTask):
-    max_retries = 3
     default_retry_delay = 60 * 15
-
     autoretry_for = (SpotifyException,)
 
     @update_logging_data
@@ -58,9 +56,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
-    max_retries = 3
     default_retry_delay = 60 * 15
-
     autoretry_for = (SpotifyException,)
 
     @update_logging_data
