@@ -1,3 +1,5 @@
+import random
+import string
 from unittest import mock
 
 from django.conf import settings
@@ -182,6 +184,35 @@ class TestGenerateBrowsePlaylist(TestCase):
         playlist.sort(key=lambda song: song.code)
 
         self.assertListEqual(expected_playlist, playlist)
+
+    def test_playlist_includes_songs_from_other_artists_if_top_artist_playlist_is_less_than_limit(self):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        song_params = {
+            'energy': .5,
+            'valence': .75,
+            'danceability': .65,
+        }
+
+        top_artist_song = MoodyUtil.create_song(artist=top_artists[0], **song_params)
+
+        # Create songs from other artists
+        for _ in range(10):
+            artist = ''.join([random.choice(string.ascii_letters) for _ in range(10)])
+            MoodyUtil.create_song(artist=artist, **song_params)
+
+        limit = 5
+
+        playlist = generate_browse_playlist(
+            song_params['energy'],
+            song_params['valence'],
+            song_params['danceability'],
+            jitter=0,
+            top_artists=top_artists,
+            limit=limit
+        )
+
+        self.assertEqual(len(playlist), limit)
+        self.assertIn(top_artist_song, playlist)
 
 
 class TestCachedPlaylistManager(TestCase):

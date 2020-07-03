@@ -90,6 +90,18 @@ def generate_browse_playlist(
         top_artists_playlist = [song for song in playlist if song.artist in top_artists]
 
         if top_artists_playlist:
+
+            # If playlist filtered by top artists contains fewer songs than the limit,
+            # try to fill it out with songs from other artists. This ensures we don't
+            # return a small playlist if the top artist playlist is skimpy
+            if limit and len(top_artists_playlist) < limit:
+                filler_song_count = limit - len(top_artists_playlist)
+
+                # Exclude songs that have already been added to the top artist playlist
+                # to avoid duplicates
+                playlist_without_top_artist_songs = [song for song in playlist if song not in top_artists_playlist]
+                top_artists_playlist.extend(playlist_without_top_artist_songs[:filler_song_count])
+
             playlist = top_artists_playlist
 
     # Shuffle playlist to ensure freshness
