@@ -129,7 +129,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
 
 
 class TestRefreshTopArtistsFromSpotifyTask(TestCase):
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay')
     def test_happy_path(self, mock_update_top_artist_task):
         user_1 = MoodyUtil.create_user(username='test1')
         user_2 = MoodyUtil.create_user(username='test2')
