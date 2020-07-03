@@ -37,22 +37,19 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         track_data = client.get_attributes_for_track(spotify_code)
         song_data = client.get_audio_features_for_tracks([track_data])[0]
 
-        if song_data:
-            # Decode track data name/artist from unicode to string
-            song_data['name'] = song_data['name'].decode('utf-8')
-            song_data['artist'] = song_data['artist'].decode('utf-8')
-            _, created = Song.objects.get_or_create(code=song_data['code'], defaults=song_data)
+        # Decode track data name/artist from unicode to string
+        song_data['name'] = song_data['name'].decode('utf-8')
+        song_data['artist'] = song_data['artist'].decode('utf-8')
+        Song.objects.create(**song_data)
 
-            if created:
-                logger.info(
-                    'Created song {} in database'.format(spotify_code),
-                    extra={'fingerprint': auto_fingerprint('created_song', **kwargs)},
-                )
-            else:
-                logger.info(
-                    'Did not create song {} in database, song already exists'.format(spotify_code),
-                    extra={'fingerprint': auto_fingerprint('song_already_exists', **kwargs)},
-                )
+        logger.info(
+            'Created song {} in database'.format(spotify_code),
+            extra={
+                'fingerprint': auto_fingerprint('created_song', **kwargs),
+                'song_data': song_data,
+                'username': username,
+            }
+        )
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
