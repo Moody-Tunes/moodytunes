@@ -75,7 +75,7 @@ class SpotifyUserAuth(BaseModel):
     Represent a mapping of a user in our system to a Spotify account.
     Used to authenticate on behalf of a user when connecting with the Spotify API.
     """
-    user = models.OneToOneField(MoodyUser, on_delete=models.PROTECT)
+    user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
     spotify_user_id = models.CharField(max_length=50, unique=True)
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
