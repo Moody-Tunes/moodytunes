@@ -24,6 +24,7 @@ from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Emotion
 
@@ -132,6 +133,7 @@ class CreateUserView(View):
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
+    @update_logging_data
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
 
@@ -141,7 +143,11 @@ class CreateUserView(View):
             user.set_password(form.cleaned_data['password'])
             user.save()
 
-            logger.info('Created new user: {}'.format(user.username))
+            logger.info(
+                'Created new user: {}'.format(user.username),
+                extra={'fingerprint': auto_fingerprint('created_new_user', **kwargs)}
+            )
+
             messages.info(request, 'Your account has been created.')
 
             return HttpResponseRedirect(reverse('accounts:login'))

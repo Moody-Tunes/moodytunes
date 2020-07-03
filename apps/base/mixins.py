@@ -2,6 +2,7 @@ import copy
 import logging
 
 from base.responses import BadRequest
+from libs.moody_logging import auto_fingerprint, update_logging_data
 
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class ValidateRequestDataMixin(MoodyMixin):
         :param headers: (dict) Request headers to be stripped.
         :return: (dict) Headers with sensitive information from it
         """
-        sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE']
+        sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE', 'HTTP_X_CSRFTOKEN']
         stripped_value = '********'
 
         for name in headers:
@@ -49,7 +50,8 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         return headers
 
-    def _log_bad_request(self, request, serializer):
+    @update_logging_data
+    def _log_bad_request(self, request, serializer, **kwargs):
         """Log information about a request if something fails to validate"""
 
         # Filter HTTP headers from request metadata
@@ -59,11 +61,12 @@ class ValidateRequestDataMixin(MoodyMixin):
 
         request_data = {
             'params': request.GET,
-            'data': request.data if request.data else request.body,
+            'data': request.data,
             'user_id': request.user.id,
             'headers': cleaned_headers,
             'method': request.method,
             'errors': serializer.errors,
+            'fingerprint': auto_fingerprint('bad_request', **kwargs),
         }
 
         logger.warning(

@@ -50,6 +50,13 @@ class Emotion(BaseModel):
         (EXCITED, 'Excited'),
     ]
 
+    EMOTION_NAME_MAP = {
+        MELANCHOLY: 'Melancholy',
+        CALM: 'Calm',
+        HAPPY: 'Happy',
+        EXCITED: 'Excited'
+    }
+
     energy = models.FloatField(validators=[validate_decimal_value])
     valence = models.FloatField(validators=[validate_decimal_value])
     danceability = models.FloatField(validators=[validate_decimal_value], default=0)
@@ -75,6 +82,17 @@ class Emotion(BaseModel):
     def full_name(self):
         """Return human readable name of emotion"""
         return self.get_name_display()
+
+    @staticmethod
+    def get_full_name_from_keyword(name):
+        """
+        Return the full name of the emotion for the given short name
+
+        :param name: (str) Codename for the emotion, one of EMOTION_NAME_CHOICES
+
+        :return: (str)
+        """
+        return Emotion.EMOTION_NAME_MAP.get(name)
 
 
 class Song(BaseModel):

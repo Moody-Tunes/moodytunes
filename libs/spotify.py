@@ -97,6 +97,7 @@ class SpotifyClient(object):
                 url=url,
             ),
             extra={
+                'request_method': method,
                 'params': logging_params,
                 'data': logging_data,
                 'headers': logging_headers
@@ -123,8 +124,8 @@ class SpotifyClient(object):
 
             return response
 
-        except requests.exceptions.HTTPError:
-            response_data = response.json()
+        except requests.exceptions.HTTPError as exc:
+            response = exc.response
 
             self._log(
                 logging.ERROR,
@@ -136,7 +137,7 @@ class SpotifyClient(object):
                     'headers': logging_headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
-                    'response_data': response_data,
+                    'response_data': response.json(),
                 },
                 exc_info=True
             )

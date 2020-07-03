@@ -34,7 +34,7 @@ class Command(MoodyBaseCommand):
             # for the same to be present multiple times with different song codes
             existing_songs = Song.objects.filter(name=track['name'], artist=track['artist'])
             if existing_songs.exists():
-                self.write_to_log_and_output('Song {} by {} already exists in our database'.format(
+                self.stdout.write('Song {} by {} already exists in our database'.format(
                     track['name'],
                     track['artist']
                 ))
@@ -45,16 +45,13 @@ class Command(MoodyBaseCommand):
                 song, created = Song.objects.get_or_create(code=track['code'], defaults=track)
 
                 if created:
-                    msg = 'Created song with code {}'.format(song.code)
-                    self.write_to_log_and_output(msg)
+                    self.stdout.write('Created song with code {}'.format(song.code))
                     success += 1
                 else:
-                    msg = 'Song with code {} already exists'.format(song.code)
-                    self.write_to_log_and_output(msg)
+                    self.stdout.write('Song with code {} already exists'.format(song.code))
                     fail += 1
             except ValidationError:
-                msg = 'ERROR: Could not create song with data: {}'.format(track)
-                self.write_to_log_and_output(msg, output_stream='stderr', log_level=logging.WARNING)
+                self.stderr.write('ERROR: Could not create song with data: {}'.format(track))
                 fail += 1
 
         return success, fail

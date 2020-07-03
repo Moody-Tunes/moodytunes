@@ -65,18 +65,19 @@ class TestValidateRequestDataMixin(TestCase):
             HTTP_HOST='example.com'
         )
         request.user = self.user
-        request.data = ''
+        request.data = {}
 
         expected_request_data = {
             'params': request.GET,
-            'data': request.data.encode(),
+            'data': request.data,
             'user_id': request.user.id,
             'headers': {
                 'HTTP_HOST': 'example.com',
                 'HTTP_COOKIE': '********'
             },
             'method': request.method,
-            'errors': mock_serializer.errors
+            'errors': mock_serializer.errors,
+            'fingerprint': 'base.mixins.ValidateRequestDataMixin._log_bad_request.bad_request',
         }
 
         self.mixin._log_bad_request(request, mock_serializer)

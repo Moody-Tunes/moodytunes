@@ -8,7 +8,7 @@ class TestEmotion(TestCase):
     @classmethod
     def setUpTestData(cls):
         # First we need to delete all Emotions, so we can create our own for
-        # testing purposes. Hard to create new Emotions with the uniquness and
+        # testing purposes. Hard to create new Emotions with the uniqueness and
         # choice lock on the model
         Emotion.objects.all().delete()
 
@@ -49,6 +49,17 @@ class TestEmotion(TestCase):
                 energy=.5,
                 valence=.5
             )
+
+    def test_get_full_name_from_keyword_happy_path(self):
+        name = 'MEL'
+        expected_fullname = 'Melancholy'
+
+        self.assertEqual(Emotion.get_full_name_from_keyword(name), expected_fullname)
+
+    def test_get_full_name_returns_none_for_invalid_name(self):
+        name = 'foo'
+
+        self.assertIsNone(Emotion.get_full_name_from_keyword(name))
 
 
 class TestSong(TestCase):
