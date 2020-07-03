@@ -107,7 +107,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
 
         UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
-        mock_retry.assert_called_once_with()
+        mock_retry.assert_called_once()
 
     def test_get_auth_record_does_not_exists_raises_error(self):
         invalid_auth_id = 99999

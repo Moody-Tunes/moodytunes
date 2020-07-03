@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class FetchSongFromSpotifyTask(MoodyBaseTask):
-    max_retries = 3
     default_retry_delay = 60 * 15
+    autoretry_for = (SpotifyException,)
 
     @update_logging_data
     def run(self, spotify_code, username='anonymous', *args, **kwargs):
@@ -33,18 +33,9 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             return
 
         client = SpotifyClient(identifier=signature)
-        song_data = None
 
-        try:
-            track_data = client.get_attributes_for_track(spotify_code)
-            song_data = client.get_audio_features_for_tracks([track_data])[0]
-        except SpotifyException:
-            logger.warning(
-                'Failed to fetch song data from Spotify. Retrying',
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_song', **kwargs)},
-                exc_info=True
-            )
-            self.retry()
+        track_data = client.get_attributes_for_track(spotify_code)
+        song_data = client.get_audio_features_for_tracks([track_data])[0]
 
         if song_data:
             # Decode track data name/artist from unicode to string
@@ -65,8 +56,8 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
-    max_retries = 3
     default_retry_delay = 60 * 15
+    autoretry_for = (SpotifyException,)
 
     @update_logging_data
     def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify, **kwargs):
@@ -99,20 +90,11 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             })
 
         if playlist_id is None:
-            try:
-                playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
-                logger.info(
-                    'Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name),
-                    extra={'fingerprint': auto_fingerprint('created_spotify_playlist', **kwargs)}
-                )
-
-            except SpotifyException:
-                logger.exception('Error creating playlist for user {}'.format(spotify_user_id), extra={
-                    'fingerprint': auto_fingerprint('failed_creating_playlist', **kwargs),
-                    'spotify_user_id': spotify_user_id,
-                    'playlist_name': playlist_name,
-                })
-                self.retry()
+            playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
+            logger.info(
+                'Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name),
+                extra={'fingerprint': auto_fingerprint('created_spotify_playlist', **kwargs)}
+            )
 
         return playlist_id
 
@@ -127,33 +109,20 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
 
         """
-        try:
-            # Spotify has a limit of 100 songs per request to add songs to a playlist
-            # Break up the total list of songs into batches of 100
-            batched_songs = spotify.batch_tracks(songs)
+        # Spotify has a limit of 100 songs per request to add songs to a playlist
+        # Break up the total list of songs into batches of 100
+        batched_songs = spotify.batch_tracks(songs)
 
-            # First, remove songs from playlist to clear out already existing songs
-            for batch in batched_songs:
-                spotify.delete_songs_from_playlist(auth_code, playlist_id, batch)
+        # First, remove songs from playlist to clear out already existing songs
+        for batch in batched_songs:
+            spotify.delete_songs_from_playlist(auth_code, playlist_id, batch)
 
-            for batch in batched_songs:
-                spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
-
-        except SpotifyException:
-            logger.exception(
-                'Error adding songs to playlist {}'.format(playlist_id), extra={
-                    'fingerprint': auto_fingerprint('failed_adding_songs_to_playlist', **kwargs),
-                    'songs': songs
-                }
-            )
-            self.retry()
+        for batch in batched_songs:
+            spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
 
     @update_logging_data
     def run(self, auth_id, playlist_name, songs, *args, **kwargs):
-        try:
-            auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
-        except SpotifyException:
-            return self.retry()
+        auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
 
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
 
