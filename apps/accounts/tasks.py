@@ -113,12 +113,11 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
+    autoretry_for = (SpotifyException,)
+
     @update_logging_data
     def run(self, auth_id, *args, **kwargs):
-        try:
-            auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
-        except SpotifyException:
-            return self.retry()
+        auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
 
         spotify_client_identifier = 'update_spotify_top_artists_{}'.format(auth.spotify_user_id)
         spotify = SpotifyClient(identifier=spotify_client_identifier)
@@ -128,26 +127,14 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
             extra={'fingerprint': auto_fingerprint('update_spotify_top_artists', **kwargs)}
         )
 
-        try:
-            artists = spotify.get_user_top_artists(auth.access_token)
-            spotify_user_data = auth.spotify_data
-            spotify_user_data.top_artists = artists
-            spotify_user_data.save()
-            logger.info(
-                'Successfully updated top artists for {}'.format(auth.spotify_user_id),
-                extra={'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs)}
-            )
-        except SpotifyException:
-            logger.exception(
-                'Error fetching top artists for {}'.format(auth.spotify_user_id),
-                extra={
-                    'spotify_client_identifier': spotify_client_identifier,
-                    'auth_id': auth.pk,
-                    'fingerprint': auto_fingerprint('failed_update_spotify_top_artists', **kwargs)
-                }
-            )
-
-            self.retry()
+        artists = spotify.get_user_top_artists(auth.access_token)
+        spotify_user_data = auth.spotify_data
+        spotify_user_data.top_artists = artists
+        spotify_user_data.save()
+        logger.info(
+            'Successfully updated top artists for {}'.format(auth.spotify_user_id),
+            extra={'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs)}
+        )
 
 
 class RefreshTopArtistsFromSpotifyTask(MoodyPeriodicTask):
