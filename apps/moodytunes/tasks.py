@@ -14,6 +14,8 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
+    autoretry_for = (SpotifyException,)
+
     @update_logging_data
     def run(self, spotify_code, username='anonymous', *args, **kwargs):
         """
@@ -33,18 +35,9 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             return
 
         client = SpotifyClient(identifier=signature)
-        song_data = None
 
-        try:
-            track_data = client.get_attributes_for_track(spotify_code)
-            song_data = client.get_audio_features_for_tracks([track_data])[0]
-        except SpotifyException:
-            logger.warning(
-                'Failed to fetch song data from Spotify. Retrying',
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_song', **kwargs)},
-                exc_info=True
-            )
-            self.retry()
+        track_data = client.get_attributes_for_track(spotify_code)
+        song_data = client.get_audio_features_for_tracks([track_data])[0]
 
         if song_data:
             # Decode track data name/artist from unicode to string
