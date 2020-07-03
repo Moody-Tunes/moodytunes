@@ -3,6 +3,7 @@ from logging import getLogger
 
 from celery.schedules import crontab
 from celery.task import PeriodicTask, Task
+from celery.utils.time import get_exponential_backoff_interval
 from django.conf import settings
 from django.core.management import call_command
 
@@ -14,6 +15,40 @@ logger = getLogger(__name__)
 
 class MoodyBaseTask(Task):
     abstract = True
+
+    autoretry_for = ()
+    max_retries = 3
+    retry_backoff = True
+    retry_backoff_max = 600
+    retry_jitter = True
+
+    # Add autoretry behavior for a defined tuple of exceptions to retry on
+    # From https://github.com/celery/celery/issues/4684#issuecomment-547861259
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.autoretry_for and not hasattr(self, '_orig_run'):
+            def run(*args, **kwargs):
+                try:
+                    return self._orig_run(*args, **kwargs)
+                except self.autoretry_for as exc:
+                    if 'countdown' not in self.retry_kwargs:
+                        countdown = get_exponential_backoff_interval(
+                            factor=self.retry_backoff,
+                            retries=self.request.retries,
+                            maximum=self.retry_backoff_max,
+                            full_jitter=self.retry_jitter,
+                        )
+
+                        retry_kwargs = self.retry_kwargs.copy()
+                        retry_kwargs.update({'countdown': countdown})
+                    else:
+                        retry_kwargs = self.retry_kwargs
+
+                    retry_kwargs.update({'exc': exc})
+                    raise self.retry(**retry_kwargs)
+
+            self._orig_run, self.run = self.run, run
 
 
 class MoodyPeriodicTask(MoodyBaseTask, PeriodicTask):
