@@ -17,9 +17,6 @@ class MoodyBaseTask(Task):
 
     autoretry_for = ()
     max_retries = 3
-    retry_backoff = True
-    retry_backoff_max = 600
-    retry_jitter = True
 
     # Add autoretry behavior for a defined tuple of exceptions to retry on
     # From https://github.com/celery/celery/issues/4684#issuecomment-547861259
@@ -31,7 +28,7 @@ class MoodyBaseTask(Task):
                 try:
                     return self._orig_run(*args, **kwargs)
                 except self.autoretry_for as exc:
-                    raise self.retry(exc=exc)
+                    self.retry(exc=exc)
 
             self._orig_run, self.run = self.run, run
 
