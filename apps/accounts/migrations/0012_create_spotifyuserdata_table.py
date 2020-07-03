@@ -27,6 +27,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='spotifyuserauth',
             name='spotify_data',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='accounts.SpotifyUserData'),
+            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='accounts.SpotifyUserData'),
         ),
     ]

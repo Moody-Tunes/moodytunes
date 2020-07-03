@@ -80,7 +80,7 @@ class SpotifyUserAuth(BaseModel):
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
-    spotify_data = models.OneToOneField(SpotifyUserData, on_delete=models.CASCADE, null=True)
+    spotify_data = models.OneToOneField(SpotifyUserData, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
