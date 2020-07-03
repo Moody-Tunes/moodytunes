@@ -68,8 +68,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     max_retries = 3
     default_retry_delay = 60 * 15
 
-    autoretry_for = (SpotifyException,)
-
     @update_logging_data
     def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify, **kwargs):
         """
