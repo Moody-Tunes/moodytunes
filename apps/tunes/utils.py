@@ -14,6 +14,7 @@ def generate_browse_playlist(
         limit=None,
         jitter=None,
         artist=None,
+        top_artists=None,
         songs=None
 ):
     """
@@ -34,6 +35,7 @@ def generate_browse_playlist(
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
     :param artist: (str) Optional artist of songs to return
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
+    :param top_artists: (list[str]) Optional array of top artists for user in Spotify to use in search
     :param songs: (QuerySet) Optional queryset of songs to filter
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
@@ -81,8 +83,28 @@ def generate_browse_playlist(
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
 
-    # Shuffle playlist to ensure freshness
     playlist = list(playlist)
+
+    # Filter by user top artists on Spotify if provided
+    if top_artists:
+        top_artists_playlist = [song for song in playlist if song.artist in top_artists]
+
+        if top_artists_playlist:
+
+            # If playlist filtered by top artists contains fewer songs than the limit,
+            # try to fill it out with songs from other artists. This ensures we don't
+            # return a small playlist if the top artist playlist is skimpy
+            if limit and len(top_artists_playlist) < limit:
+                filler_song_count = limit - len(top_artists_playlist)
+
+                # Exclude songs that have already been added to the top artist playlist
+                # to avoid duplicates
+                playlist_without_top_artist_songs = [song for song in playlist if song not in top_artists_playlist]
+                top_artists_playlist.extend(playlist_without_top_artist_songs[:filler_song_count])
+
+            playlist = top_artists_playlist
+
+    # Shuffle playlist to ensure freshness
     random.shuffle(playlist)
 
     if limit:

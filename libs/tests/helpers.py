@@ -2,8 +2,10 @@ import random
 import string
 
 from django.contrib.messages import get_messages
+from django.db.models.signals import post_save
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
+from accounts.signals import update_spotify_top_artists
 from tunes.models import Emotion, Song
 
 
@@ -145,15 +147,22 @@ class MoodyUtil(object):
         return vote
 
     @staticmethod
-    def create_spotify_user_auth(user):
-        auth, _ = SpotifyUserAuth.objects.get_or_create(
-            user=user,
-            defaults={
-                'user': user,
-                'spotify_user_id': 'spotify_user',
-                'access_token': 'access_token',
-                'refresh_token': 'refresh_token'
-            }
-        )
+    def create_spotify_user_auth(
+            user,
+            spotify_user_id='spotify_user',
+            access_token='access_token',
+            refresh_token='refresh_token'
+    ):
+        dispatch_uid = 'spotify_user_auth_post_save_update_top_artist'
+        with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
+            auth, _ = SpotifyUserAuth.objects.get_or_create(
+                user=user,
+                defaults={
+                    'user': user,
+                    'spotify_user_id': spotify_user_id,
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+            )
 
         return auth

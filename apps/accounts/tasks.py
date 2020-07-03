@@ -1,8 +1,11 @@
 from logging import getLogger
 
-from accounts.models import MoodyUser, UserEmotion, UserSongVote
-from base.tasks import MoodyBaseTask
+from celery.schedules import crontab
+
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
+from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
+from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Emotion
 
 
@@ -104,3 +107,60 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'song_danceability': vote.song.danceability,
             }
         )
+
+
+class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
+    max_retries = 3
+    default_retry_delay = 60 * 15
+
+    @update_logging_data
+    def run(self, auth_id, *args, **kwargs):
+        try:
+            auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
+        except SpotifyException:
+            return self.retry()
+
+        spotify_client_identifier = 'update_spotify_top_artists_{}'.format(auth.spotify_user_id)
+        spotify = SpotifyClient(identifier=spotify_client_identifier)
+
+        logger.info(
+            'Updating top artists for {}'.format(auth.spotify_user_id),
+            extra={'fingerprint': auto_fingerprint('update_spotify_top_artists', **kwargs)}
+        )
+
+        try:
+            artists = spotify.get_user_top_artists(auth.access_token)
+            spotify_user_data = auth.spotify_data
+            spotify_user_data.top_artists = artists
+            spotify_user_data.save()
+            logger.info(
+                'Successfully updated top artists for {}'.format(auth.spotify_user_id),
+                extra={'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs)}
+            )
+        except SpotifyException:
+            logger.exception(
+                'Error fetching top artists for {}'.format(auth.spotify_user_id),
+                extra={
+                    'spotify_client_identifier': spotify_client_identifier,
+                    'auth_id': auth.pk,
+                    'fingerprint': auto_fingerprint('failed_update_spotify_top_artists', **kwargs)
+                }
+            )
+
+            self.retry()
+
+
+class RefreshTopArtistsFromSpotifyTask(MoodyPeriodicTask):
+    run_every = crontab(minute=0, hour=3, day_of_week=0)
+
+    @update_logging_data
+    def run(self, *args, **kwargs):
+        auth_records = SpotifyUserAuth.objects.all()
+
+        logger.info(
+            'Starting run to refresh top artists for {} auth records'.format(auth_records.count()),
+            extra={'fingerprint': auto_fingerprint('refresh_top_artists', **kwargs)}
+        )
+
+        for auth in auth_records:
+            UpdateTopArtistsFromSpotifyTask().delay(auth.pk)
