@@ -97,8 +97,8 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         top_artists = None
         user_auth = getattr(self.request.user, 'spotifyuserauth', None)
 
-        if user_auth:
-            top_artists = user_auth.top_artists
+        if user_auth and getattr(user_auth, 'spotify_data', None):
+            top_artists = user_auth.spotify_data.top_artists
 
         logger.info(
             'Generating {} browse playlist for user {}'.format(

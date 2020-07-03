@@ -149,8 +149,9 @@ class TestBrowseView(TestCase):
     def test_browse_request_uses_user_top_artists_when_provided(self, mock_generate_playlist):
         top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
         auth = MoodyUtil.create_spotify_user_auth(self.user)
-        auth.top_artists = top_artists
-        auth.save()
+        spotify_user_data = auth.spotify_data
+        spotify_user_data.top_artists = top_artists
+        spotify_user_data.save()
 
         params = {'emotion': Emotion.HAPPY}
         self.api_client.get(self.url, data=params)

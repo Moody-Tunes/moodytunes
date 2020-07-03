@@ -62,6 +62,14 @@ class MoodyUser(BaseModel, AbstractUser):
         self.save()
 
 
+class SpotifyUserData(BaseModel):
+    """
+    Stores data from Spotify listening habits for a user that we can use to offer
+    a more personalized MoodyTunes experience for a user.
+    """
+    top_artists = ArrayField(models.CharField(max_length=200), default=list)
+
+
 class SpotifyUserAuth(BaseModel):
     """
     Represent a mapping of a user in our system to a Spotify account.
@@ -72,10 +80,16 @@ class SpotifyUserAuth(BaseModel):
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
-    top_artists = ArrayField(models.CharField(max_length=200), default=list)
+    spotify_data = models.OneToOneField(SpotifyUserData, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
+
+    def save(self, *args, **kwargs):
+        if self.spotify_data is None:
+            self.spotify_data = SpotifyUserData.objects.create(spotifyuserauth=self)
+
+        super().save(*args, **kwargs)
 
     @classmethod
     @update_logging_data

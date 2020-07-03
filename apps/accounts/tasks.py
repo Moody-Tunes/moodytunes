@@ -130,8 +130,9 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
 
         try:
             artists = spotify.get_user_top_artists(auth.access_token)
-            auth.top_artists = artists
-            auth.save()
+            spotify_user_data = auth.spotify_data
+            spotify_user_data.top_artists = artists
+            spotify_user_data.save()
             logger.info(
                 'Successfully updated top artists for {}'.format(auth.spotify_user_id),
                 extra={'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs)}

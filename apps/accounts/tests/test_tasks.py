@@ -97,8 +97,8 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
 
         UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
-        self.auth.refresh_from_db()
-        self.assertListEqual(self.auth.top_artists, top_artists)
+        self.auth.spotify_data.refresh_from_db()
+        self.assertListEqual(self.auth.spotify_data.top_artists, top_artists)
 
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
     @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
