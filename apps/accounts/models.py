@@ -64,8 +64,8 @@ class MoodyUser(BaseModel, AbstractUser):
 
 class SpotifyUserData(BaseModel):
     """
-    Stores data from Spotify listening habits for a user that we can use to offer
-    a more personalized MoodyTunes experience for a user.
+    Stores data from Spotify listening habits for a user
+    that we can use to offer a more personalized MoodyTunes experience.
     """
     top_artists = ArrayField(models.CharField(max_length=200), default=list)
 
