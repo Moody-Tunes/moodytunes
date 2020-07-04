@@ -26,8 +26,8 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_features.return_value = [{
             'code': song_code,
-            'name': 'Sickfit'.encode('utf-8'),
-            'artist': 'Madlib'.encode('utf-8'),
+            'name': 'Sickfit',
+            'artist': 'Madlib',
             'valence': .5,
             'energy': .5
         }]
@@ -75,8 +75,8 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_features.return_value = [{
             'code': song_code,
-            'name': 'Sickfit'.encode('utf-8'),
-            'artist': 'Madlib'.encode('utf-8'),
+            'name': 'Sickfit',
+            'artist': 'Madlib',
             'valence': .5,
             'energy': .5
         }]

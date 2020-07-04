@@ -230,8 +230,8 @@ class TestSpotifyClient(TestCase):
         mock_request.return_value = mock_response
 
         expected_return = {
-            'name': 'Glazed'.encode('utf-8'),
-            'artist': 'J Dilla'.encode('utf-8'),
+            'name': 'Glazed',
+            'artist': 'J Dilla',
             'code': 'song-uri'
         }
 
@@ -265,8 +265,8 @@ class TestSpotifyClient(TestCase):
         mock_request.return_value = mock_response
 
         expected_return = {
-            'name': song_name.encode('utf-8'),
-            'artist': song_artist.encode('utf-8'),
+            'name': song_name,
+            'artist': song_artist,
             'code': 'song-uri'
         }
 
@@ -564,8 +564,8 @@ class TestSpotifyClient(TestCase):
         }
 
         expected_song_data = {
-            'name': 'Sickfit'.encode('utf-8'),
-            'artist': 'Madlib'.encode('utf-8'),
+            'name': 'Sickfit',
+            'artist': 'Madlib',
             'code': mock_song_code
         }
 
