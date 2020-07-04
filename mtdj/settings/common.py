@@ -69,11 +69,14 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
+
+    'base.middleware.ShortCircuitMiddleware',
+
+    'django.contrib.messages.middleware.MessageMiddleware',
     'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 # Security middleware definitions
