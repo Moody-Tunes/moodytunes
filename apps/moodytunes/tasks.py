@@ -1,5 +1,7 @@
 import logging
 
+from django.core.exceptions import ValidationError
+
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
@@ -40,16 +42,25 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         # Decode track data name/artist from unicode to string
         song_data['name'] = song_data['name'].decode('utf-8')
         song_data['artist'] = song_data['artist'].decode('utf-8')
-        Song.objects.create(**song_data)
 
-        logger.info(
-            'Created song {} in database'.format(spotify_code),
-            extra={
-                'fingerprint': auto_fingerprint('created_song', **kwargs),
-                'song_data': song_data,
-                'username': username,
-            }
-        )
+        try:
+            Song.objects.create(**song_data)
+
+            logger.info(
+                'Created song {} in database'.format(spotify_code),
+                extra={
+                    'fingerprint': auto_fingerprint('created_song', **kwargs),
+                    'song_data': song_data,
+                    'username': username,
+                }
+            )
+        except ValidationError:
+            logger.warning(
+                'Failed to create song {}, already exists in database'.format(spotify_code),
+                extra={'fingerprint': auto_fingerprint('failed_to_create_song', **kwargs)}
+            )
+
+            raise
 
 
 class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):

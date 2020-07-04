@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest import mock
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -54,6 +55,36 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_attributes.assert_not_called()
         mock_get_features.assert_not_called()
+
+    @mock.patch('tunes.models.Song.objects.create')
+    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    def test_validation_error_on_song_create_raises_exception(
+            self,
+            mock_get_attributes,
+            mock_get_features,
+            mock_song_create
+    ):
+        song_code = 'spotify:track:1234567'
+
+        mock_get_attributes.return_value = {
+            'code': song_code,
+            'name': 'Sickfit',
+            'artist': 'Madlib'
+        }
+
+        mock_get_features.return_value = [{
+            'code': song_code,
+            'name': 'Sickfit'.encode('utf-8'),
+            'artist': 'Madlib'.encode('utf-8'),
+            'valence': .5,
+            'energy': .5
+        }]
+
+        mock_song_create.side_effect = ValidationError('Oops!')
+
+        with self.assertRaises(ValidationError):
+            FetchSongFromSpotifyTask().run(song_code)
 
 
 class TestCreateSpotifyPlaylistFromSongs(TestCase):
