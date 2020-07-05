@@ -235,11 +235,12 @@ class TestBrowseView(TestCase):
         self.assertEqual(called_energy, upvote_song_for_context.energy)
         self.assertEqual(called_valence, upvote_song_for_context.valence)
 
-    @mock.patch('tunes.utils.generate_browse_playlist')
+    @mock.patch('tunes.views.generate_browse_playlist')
     @mock.patch('tunes.utils.CachedPlaylistManager.cache_browse_playlist')
     def test_browse_request_caches_playlist(self, mock_cache, mock_generate_playlist):
         song = MoodyUtil.create_song()
-        mock_generate_playlist.return_value = [song]
+        song_queryset = Song.objects.filter(code=song.code)
+        mock_generate_playlist.return_value = song_queryset
 
         params = {
             'emotion': Emotion.HAPPY,
@@ -252,7 +253,7 @@ class TestBrowseView(TestCase):
 
         mock_cache.assert_called_once_with(
             self.user,
-            [song],
+            song_queryset,
             Emotion.HAPPY,
             'WORK',
             'Working on stuff'

@@ -153,6 +153,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         )
 
         # Sort playlists for comparison as the playlist is shuffled
+        playlist = list(playlist)
         expected_playlist.sort(key=lambda song: song.code)
         playlist.sort(key=lambda song: song.code)
 
@@ -180,6 +181,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         )
 
         # Sort playlists for comparison as the playlist is shuffled
+        playlist = list(playlist)
         expected_playlist.sort(key=lambda song: song.code)
         playlist.sort(key=lambda song: song.code)
 
