@@ -145,6 +145,22 @@ class TestBrowseView(TestCase):
         self.assertEqual(called_valence, emotion_valence)
         self.assertEqual(called_danceability, emotion_danceability)
 
+    @mock.patch('tunes.views.generate_browse_playlist')
+    def test_browse_request_uses_user_top_artists_when_provided(self, mock_generate_playlist):
+        top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
+        auth = MoodyUtil.create_spotify_user_auth(self.user)
+        spotify_user_data = auth.spotify_data
+        spotify_user_data.top_artists = top_artists
+        spotify_user_data.save()
+
+        params = {'emotion': Emotion.HAPPY}
+        self.api_client.get(self.url, data=params)
+
+        call_kwargs = mock_generate_playlist.mock_calls[0][2]
+        called_top_artists = call_kwargs['top_artists']
+
+        self.assertListEqual(called_top_artists, top_artists)
+
     def test_playlist_excludes_previously_voted_songs(self):
         voted_song = MoodyUtil.create_song()
         not_voted_song = MoodyUtil.create_song()
@@ -219,11 +235,12 @@ class TestBrowseView(TestCase):
         self.assertEqual(called_energy, upvote_song_for_context.energy)
         self.assertEqual(called_valence, upvote_song_for_context.valence)
 
-    @mock.patch('tunes.utils.generate_browse_playlist')
+    @mock.patch('tunes.views.generate_browse_playlist')
     @mock.patch('tunes.utils.CachedPlaylistManager.cache_browse_playlist')
     def test_browse_request_caches_playlist(self, mock_cache, mock_generate_playlist):
         song = MoodyUtil.create_song()
-        mock_generate_playlist.return_value = [song]
+        song_queryset = Song.objects.filter(code=song.code)
+        mock_generate_playlist.return_value = song_queryset
 
         params = {
             'emotion': Emotion.HAPPY,
@@ -236,7 +253,7 @@ class TestBrowseView(TestCase):
 
         mock_cache.assert_called_once_with(
             self.user,
-            [song],
+            song_queryset,
             Emotion.HAPPY,
             'WORK',
             'Working on stuff'

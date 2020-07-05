@@ -92,6 +92,14 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 valence = user_emotion.valence
                 danceability = user_emotion.danceability
 
+        # If user has a SpotifyUserAuth record that has data for their top artists,
+        # include those artists in generate request
+        top_artists = None
+        user_auth = getattr(self.request.user, 'spotifyuserauth', None)
+
+        if user_auth and getattr(user_auth, 'spotify_data', None):
+            top_artists = user_auth.spotify_data.top_artists
+
         logger.info(
             'Generating {} browse playlist for user {}'.format(
                 self.cleaned_data['emotion'],
@@ -100,7 +108,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             extra={
                 'fingerprint': auto_fingerprint('generate_browse playlist', **kwargs),
                 'user_id': self.request.user.pk,
-                'emotion': self.cleaned_data['emotion'],
+                'emotion': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
                 'strategy': strategy,
@@ -109,6 +117,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'danceability': danceability,
                 'artist': artist,
                 'jitter': jitter,
+                'top_artists': top_artists,
             }
         )
 
@@ -120,6 +129,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             limit=limit,
             jitter=jitter,
             artist=artist,
+            top_artists=top_artists,
             songs=queryset
         )
 
@@ -234,6 +244,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 ),
                 extra={
                     'vote_data': vote_data,
+                    'emotion': emotion.full_name,
                     'vote_id': vote.pk,
                     'fingerprint': auto_fingerprint('created_new_vote', **kwargs),
                 }
@@ -326,7 +337,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             extra={
                 'fingerprint': auto_fingerprint('generate_emotion_playlist', **kwargs),
                 'user_id': self.request.user.pk,
-                'emotion': self.cleaned_data['emotion'],
+                'emotion': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
                 'artist': self.cleaned_data.get('artist'),

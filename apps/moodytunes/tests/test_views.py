@@ -105,7 +105,7 @@ class TestSpotifyAuthenticationView(TestCase):
         mock_random_string.return_value = random_string
 
         expected_auth_url = 'https://accounts.spotify.com/authorize?client_id={client_id}\
-        &response_type=code&scope=playlist-modify-public\
+        &response_type=code&scope=playlist-modify-public+user-top-read\
         &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state={state}\
         '.format(
             client_id=settings.SPOTIFY['client_id'],
@@ -117,6 +117,7 @@ class TestSpotifyAuthenticationView(TestCase):
         self.assertEqual(resp.context['spotify_auth_url'], expected_auth_url.replace(' ', ''))
 
 
+@mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay', mock.MagicMock)
 class TestSpotifyAuthenticationCallbackView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -163,7 +164,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
     @mock.patch('moodytunes.views.SpotifyClient')
     def test_duplicate_attempts_for_same_moody_user_results_in_success(self, mock_spotify):
-        SpotifyUserAuth.objects.create(
+        MoodyUtil.create_spotify_user_auth(
             user=self.user,
             access_token='test-access-token',
             refresh_token='test-refresh-token',
@@ -189,7 +190,7 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
     @mock.patch('moodytunes.views.SpotifyClient')
     def test_duplicate_attempts_with_different_moody_users_results_in_failure(self, mock_spotify):
-        SpotifyUserAuth.objects.create(
+        MoodyUtil.create_spotify_user_auth(
             user=self.other_user,
             access_token='test-access-token',
             refresh_token='test-refresh-token',

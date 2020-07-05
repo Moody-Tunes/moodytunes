@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest import mock
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -54,6 +55,36 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_attributes.assert_not_called()
         mock_get_features.assert_not_called()
+
+    @mock.patch('tunes.models.Song.objects.create')
+    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    def test_validation_error_on_song_create_raises_exception(
+            self,
+            mock_get_attributes,
+            mock_get_features,
+            mock_song_create
+    ):
+        song_code = 'spotify:track:1234567'
+
+        mock_get_attributes.return_value = {
+            'code': song_code,
+            'name': 'Sickfit',
+            'artist': 'Madlib'
+        }
+
+        mock_get_features.return_value = [{
+            'code': song_code,
+            'name': 'Sickfit'.encode('utf-8'),
+            'artist': 'Madlib'.encode('utf-8'),
+            'valence': .5,
+            'energy': .5
+        }]
+
+        mock_song_create.side_effect = ValidationError('Oops!')
+
+        with self.assertRaises(ValidationError):
+            FetchSongFromSpotifyTask().run(song_code)
 
 
 class TestCreateSpotifyPlaylistFromSongs(TestCase):
@@ -209,18 +240,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         invalid_auth_id = 99999
 
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
-            CreateSpotifyPlaylistFromSongsTask().get_and_refresh_spotify_user_auth_record(invalid_auth_id)
-
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
-    def test_get_auth_record_with_expired_access_token_calls_refresh_method(self, mock_refresh_access_token):
-        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
-        self.auth.save()
-
-        mock_refresh_access_token.return_value = 'spotify_access_token'
-
-        CreateSpotifyPlaylistFromSongsTask().get_and_refresh_spotify_user_auth_record(self.auth.id)
-
-        mock_refresh_access_token.assert_called_once()
+            CreateSpotifyPlaylistFromSongsTask().run(invalid_auth_id, self.playlist_name, self.songs)
 
     @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
@@ -230,6 +250,6 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_refresh_access_token.side_effect = SpotifyException
 
-        CreateSpotifyPlaylistFromSongsTask().get_and_refresh_spotify_user_auth_record(self.auth.id)
+        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()

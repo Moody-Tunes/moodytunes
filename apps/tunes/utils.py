@@ -1,5 +1,3 @@
-import random
-
 from django.conf import settings
 from django.core.cache import cache
 
@@ -14,6 +12,7 @@ def generate_browse_playlist(
         limit=None,
         jitter=None,
         artist=None,
+        top_artists=None,
         songs=None
 ):
     """
@@ -34,6 +33,7 @@ def generate_browse_playlist(
     :param limit: (int) Optional max numbers of songs to return (can return fewer than the limit!)
     :param artist: (str) Optional artist of songs to return
     :param jitter: (float) Optional "shuffle" for the boundary box to give users songs from outside their norm
+    :param top_artists: (list[str]) Optional array of top artists for user in Spotify to use in search
     :param songs: (QuerySet) Optional queryset of songs to filter
 
     :return playlist: (QuerySet) `QuerySet` of `Song` instances for the given parameters
@@ -81,9 +81,22 @@ def generate_browse_playlist(
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
 
-    # Shuffle playlist to ensure freshness
-    playlist = list(playlist)
-    random.shuffle(playlist)
+    playlist = playlist.order_by('?')
+
+    # Filter by user top artists on Spotify if provided
+    if top_artists:
+        top_artists_playlist = playlist.filter(artist__in=top_artists)
+
+        if top_artists_playlist:
+
+            if limit and top_artists_playlist.count() < limit:
+                # If playlist filtered by top artists contains fewer songs than the limit,
+                # fill it out with songs from other artists. This ensures we don't return
+                # a small playlist if the top artist playlist is less than the desired limit
+                filler_track_count = limit - top_artists_playlist.count()
+                top_artists_playlist = top_artists_playlist.union(playlist[:filler_track_count])
+
+            playlist = top_artists_playlist
 
     if limit:
         playlist = playlist[:limit]

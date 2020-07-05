@@ -97,6 +97,7 @@ class SpotifyClient(object):
                 url=url,
             ),
             extra={
+                'request_method': method,
                 'params': logging_params,
                 'data': logging_data,
                 'headers': logging_headers
@@ -123,8 +124,8 @@ class SpotifyClient(object):
 
             return response
 
-        except requests.exceptions.HTTPError:
-            response_data = response.json()
+        except requests.exceptions.HTTPError as exc:
+            response = exc.response
 
             self._log(
                 logging.ERROR,
@@ -136,7 +137,7 @@ class SpotifyClient(object):
                     'headers': logging_headers,
                     'response_code': response.status_code,
                     'response_reason': response.reason,
-                    'response_data': response_data,
+                    'response_data': response.json(),
                 },
                 exc_info=True
             )
@@ -567,3 +568,23 @@ class SpotifyClient(object):
         resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
         return resp
+
+    def get_user_top_artists(self, auth_code):
+        """
+        Retrieve the top artists from Spotify for a user
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        """
+        url = '{api_url}/me/top/artists'.format(api_url=settings.SPOTIFY['api_url'])
+
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
+        params = {'limit': settings.SPOTIFY['max_top_artists']}
+
+        resp = self._make_spotify_request('GET', url, headers=headers, params=params)
+
+        # Parse the response for the artist name values
+        artists = []
+        for item in resp['items']:
+            artists.append(item['name'])
+
+        return artists

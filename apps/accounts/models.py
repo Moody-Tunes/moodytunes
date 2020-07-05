@@ -3,6 +3,7 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
@@ -61,19 +62,67 @@ class MoodyUser(BaseModel, AbstractUser):
         self.save()
 
 
+class SpotifyUserData(BaseModel):
+    """
+    Stores data from Spotify listening habits for a user
+    that we can use to offer a more personalized MoodyTunes experience.
+    """
+    top_artists = ArrayField(models.CharField(max_length=200), default=list)
+
+
 class SpotifyUserAuth(BaseModel):
     """
     Represent a mapping of a user in our system to a Spotify account.
     Used to authenticate on behalf of a user when connecting with the Spotify API.
     """
-    user = models.OneToOneField(MoodyUser, on_delete=models.PROTECT)
+    user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
     spotify_user_id = models.CharField(max_length=50, unique=True)
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
+    spotify_data = models.OneToOneField(SpotifyUserData, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.spotify_user_id)
+
+    def save(self, *args, **kwargs):
+        if self.spotify_data is None:
+            self.spotify_data = SpotifyUserData.objects.create(spotifyuserauth=self)
+
+        super().save(*args, **kwargs)
+
+    @classmethod
+    @update_logging_data
+    def get_and_refresh_spotify_user_auth_record(cls, auth_id, **kwargs):
+        """
+        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
+        the access token is expired
+
+        :param auth_id: (int) Primary key for SpotifyUserAuth record
+
+        :return: (SpotifyUserAuth)
+        """
+        try:
+            auth = SpotifyUserAuth.objects.get(pk=auth_id)
+        except (SpotifyUserAuth.MultipleObjectsReturned, SpotifyUserAuth.DoesNotExist):
+            logger.error(
+                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
+            )
+
+            raise
+
+        if auth.should_update_access_token:
+            try:
+                auth.refresh_access_token()
+            except SpotifyException:
+                logger.warning(
+                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
+                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
+                )
+                raise
+
+        return auth
 
     @property
     def should_update_access_token(self):

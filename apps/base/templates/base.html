@@ -1,6 +1,5 @@
 {% load compress %}
 {% load static %}
-{% load waffle_tags %}
 
 <!DOCTYPE html>
 <html lang="en-US">
@@ -39,10 +38,7 @@
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:browse' %}">Browse</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:suggest' %}">Suggest Song</a>
-
-                    {% flag 'spotify_auth' %}
-                        <a class="navbar-child navbar-user" href="{% url 'moodytunes:export' %}">Export Playlist</a>
-                    {% endflag %}
+                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:export' %}">Export Playlist</a>
                 {% endif %}
             </div>
 			{% if messages %}
