@@ -94,9 +94,7 @@ def generate_browse_playlist(
                 # fill it out with songs from other artists. This ensures we don't return
                 # a small playlist if the top artist playlist is less than the desired limit
                 filler_track_count = limit - top_artists_playlist.count()
-                top_artists_playlist = top_artists_playlist.union(
-                    playlist.exclude(id__in=top_artists_playlist)[:filler_track_count]
-                )
+                top_artists_playlist = top_artists_playlist.union(playlist[:filler_track_count])
 
             playlist = top_artists_playlist
 
