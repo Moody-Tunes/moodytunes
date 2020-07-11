@@ -733,6 +733,13 @@ class TestSpotifyClient(TestCase):
             data=None
         )
 
+    def test_get_code_from_spotify_uri(self):
+        song_code = 'spotify:track:19p0PEnGr6XtRqCYEI8Ucc'
+        expected_code = '19p0PEnGr6XtRqCYEI8Ucc'
+
+        code = self.spotify_client.get_code_from_spotify_uri(song_code)
+        self.assertEqual(code, expected_code)
+
     def test_batch_tracks_batches_list(self):
         items = [i for i in range(200)]
         batched_items = self.spotify_client.batch_tracks(items)

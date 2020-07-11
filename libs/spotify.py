@@ -216,6 +216,19 @@ class SpotifyClient(object):
 
         return resp.get('access_token')
 
+    def get_code_from_spotify_uri(self, code):
+        """
+        Get the Spotify code (alphanumeric value) from the Spotify song URI. Used in requests to Spotify
+        for a track, as Spotify only cares about the alphanumeric value.
+
+        Ex. Given 'spotify:track:19p0PEnGr6XtRqCYEI8Ucc', return '19p0PEnGr6XtRqCYEI8Ucc'
+
+        :param code: (str) Full Spotify URI for a song
+
+        :return: (str) Spotify code for the song
+        """
+        return code.split(':')[2]
+
     def batch_tracks(self, tracks, batch_size=None):
         """
         Some Spotify endpoints have a limit on the number of tracks to send in one request. This method will
@@ -349,7 +362,7 @@ class SpotifyClient(object):
 
             # Construct query params list from track ids in batch
             # Strip spotify:track: from the uri (Spotify just wants the id)
-            track_ids = [track['code'].split(':')[2] for track in batch]
+            track_ids = [self.get_code_from_spotify_uri(track['code']) for track in batch]
             params = {'ids': ','.join([track_id for track_id in track_ids])}
 
             response = self._make_spotify_request('GET', url, params=params)
@@ -465,7 +478,7 @@ class SpotifyClient(object):
             - artist (str)
             - code (str)
         """
-        song_id = uri.split(':')[2]  # Only need the last ID from the URI
+        song_id = self.get_code_from_spotify_uri(uri)
         url = '{api_url}/tracks/{id}'.format(
             api_url=settings.SPOTIFY['api_url'],
             id=song_id
