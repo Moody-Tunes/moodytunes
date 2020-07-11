@@ -295,7 +295,7 @@ class ExportPlayListView(FormView):
 
                 auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
 
-                messages.warning(request, 'Please reauthenticate with Spotify to export your playlist')
+                messages.error(request, 'Please reauthenticate with Spotify to export your playlist')
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
 
