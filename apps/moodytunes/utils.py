@@ -25,4 +25,4 @@ class ExportPlaylistHelper(object):
         if context:
             votes = votes.filter(context=context)
 
-        return filter_duplicate_votes_on_song_from_playlist(votes).values_list('song__code', flat=True)
+        return list(filter_duplicate_votes_on_song_from_playlist(votes).values_list('song__code', flat=True))
