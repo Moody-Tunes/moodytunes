@@ -16,7 +16,7 @@ class ExportPlaylistHelper(object):
 
         :return: (list) List of Spotify song URIs for the playlist to build in Spotify
         """
-        votes = UserSongVote.objects.filter(user=user, emotion__name=emotion, vote=True)
+        votes = UserSongVote.objects.filter(user=user, emotion__name=emotion, vote=True).order_by('-created')
 
         if genre:
             votes = votes.filter(song__genre=genre)
@@ -24,7 +24,7 @@ class ExportPlaylistHelper(object):
         if context:
             votes = votes.filter(context=context)
 
-        songs = votes.order_by('-created').distinct('song__code').values_list('song__code', flat=True)
+        songs = votes.distinct('song__code').values_list('song__code', flat=True)
         songs = list(songs)
 
         return songs
