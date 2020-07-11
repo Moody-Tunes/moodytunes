@@ -18,6 +18,10 @@ class SpotifyException(Exception):
     pass
 
 
+class ClientException(Exception):
+    """Exception to raise in case of error on our end for request"""
+
+
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
     REDACT_VALUE = '**********'
@@ -79,6 +83,9 @@ class SpotifyClient(object):
         :param headers: (dict) Headers to include in request
 
         :return (dict) Response content
+
+        :raises: `SpotifyException` if request was unsuccessful
+        :raises: `ClientException` if unexpected error encountered
         """
 
         if not headers:
@@ -147,7 +154,7 @@ class SpotifyClient(object):
         except Exception:
             self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
-            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
+            raise ClientException('Received unhandled exception requesting {}'.format(url))
 
     def _get_auth_access_token(self):
         """

@@ -6,7 +6,7 @@ from urllib import parse
 from django.test import TestCase
 from requests.exceptions import HTTPError
 
-from libs.spotify import SpotifyClient, SpotifyException
+from libs.spotify import ClientException, SpotifyClient, SpotifyException
 from libs.tests.helpers import generate_random_unicode_string
 
 
@@ -166,14 +166,14 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    def test_make_spotify_request_raises_spotify_exception_on_base_exception(self, mock_auth, mock_request):
+    def test_make_spotify_request_raises_client_exception_on_unhandled_exception(self, mock_auth, mock_request):
         mock_response = mock.Mock()
         mock_response.raise_for_status.side_effect = Exception
 
         mock_auth.return_value = self.auth_code
         mock_request.return_value = mock_response
 
-        with self.assertRaises(SpotifyException):
+        with self.assertRaises(ClientException):
             self.spotify_client._make_spotify_request('GET', '/dummy_endpoint')
 
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
