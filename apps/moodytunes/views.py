@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
@@ -180,7 +181,8 @@ class SpotifyAuthenticationCallbackView(View):
                     user=user,
                     access_token=tokens['access_token'],
                     refresh_token=tokens['refresh_token'],
-                    spotify_user_id=profile_data['id']
+                    spotify_user_id=profile_data['id'],
+                    scopes=settings.SPOTIFY['auth_user_scopes'],
                 )
 
                 logger.info(

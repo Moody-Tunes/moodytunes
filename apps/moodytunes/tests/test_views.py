@@ -154,6 +154,9 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         self.assertRedirects(resp, self.success_url)
         self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
 
+        auth = SpotifyUserAuth.objects.get(user=self.user)
+        self.assertListEqual(auth.scopes, settings.SPOTIFY['auth_user_scopes'])
+
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
 
