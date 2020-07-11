@@ -641,10 +641,8 @@ class TestSpotifyClient(TestCase):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        response_data = {'resp': 'OK'}
 
         mock_response = mock.Mock()
-        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -654,9 +652,8 @@ class TestSpotifyClient(TestCase):
 
         expected_data = {'uris': songs}
 
-        retrieved_response = self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
+        self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'POST',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
@@ -670,10 +667,8 @@ class TestSpotifyClient(TestCase):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        response_data = {'resp': 'OK'}
 
         mock_response = mock.Mock()
-        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -683,9 +678,8 @@ class TestSpotifyClient(TestCase):
 
         expected_data = {'uris': songs}
 
-        retrieved_response = self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
+        self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'DELETE',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),

@@ -225,12 +225,11 @@ class SpotifyClient(object):
 
         :param category: (str) Category ID of a genre in Spotify
         :param num_playlists: (int) Number of playlists to return
+
         :return: (list[dict]) Playlist mappings for the given category
             - name (str): Name of the playlist
             - uri (str): Spotify ID for the playlist
             - user (str): Spotify ID for the playlist owner
-
-        :raises: `SpotifyException` if unable to retrieve playlists for category
         """
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
             api_url=settings.SPOTIFY['api_url'],
@@ -392,7 +391,9 @@ class SpotifyClient(object):
 
         :param code: (str) Authorization code returned from initial request to SPOTIFY['user_auth_url']
 
-        :return: (dict) Access and refresh token for the user: to be saved in the database
+        :return: (dict)
+            - access_token (str)
+            - refresh_token (str)
         """
         data = {
             'grant_type': 'authorization_code',  # Constant; From Spotify documentation
@@ -440,9 +441,7 @@ class SpotifyClient(object):
         url = '{api_url}/me'.format(api_url=settings.SPOTIFY['api_url'])
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
 
-        response = self._make_spotify_request('GET', url, headers=headers)
-
-        return response
+        return self._make_spotify_request('GET', url, headers=headers)
 
     def get_attributes_for_track(self, uri):
         """
@@ -450,7 +449,10 @@ class SpotifyClient(object):
 
         :param uri: (str) URI of song to search for on Spotify
 
-        :return: (dict) Dictionary of data for the song
+        :return: (dict)
+            - name (str)
+            - artist (str)
+            - code (str)
         """
         song_id = uri.split(':')[2]  # Only need the last ID from the URI
         url = '{api_url}/tracks/{id}'.format(
@@ -460,13 +462,11 @@ class SpotifyClient(object):
 
         track = self._make_spotify_request('GET', url)
 
-        payload = {
+        return {
             'name': track['name'],
             'artist': track['artists'][0]['name'],
             'code': uri
         }
-
-        return payload
 
     def get_user_playlists(self, auth_code, spotify_user_id):
         """
@@ -487,9 +487,7 @@ class SpotifyClient(object):
             'Content-Type': 'application/json'
         }
 
-        resp = self._make_spotify_request('GET', url, headers=headers)
-
-        return resp
+        return self._make_spotify_request('GET', url, headers=headers)
 
     def create_playlist(self, auth_code, spotify_user_id, playlist_name):
         """
@@ -541,9 +539,7 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
-
-        return resp
+        self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
 
     def delete_songs_from_playlist(self, auth_code, playlist_id, songs):
         """
@@ -565,15 +561,15 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
-
-        return resp
+        self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
     def get_user_top_artists(self, auth_code):
         """
-        Retrieve the top artists from Spotify for a user
+        Retrieve the top artists from Spotify for a user.
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
+
+        :return: (list(str)) List of top artists for the user from Spotify
         """
         url = '{api_url}/me/top/artists'.format(api_url=settings.SPOTIFY['api_url'])
 
