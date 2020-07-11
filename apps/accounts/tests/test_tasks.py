@@ -89,6 +89,8 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
         cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+        cls.auth.scopes = [settings.SPOTIFY_TOP_ARTIST_READ_SCOPE]
+        cls.auth.save()
 
     @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
     def test_happy_path(self, mock_get_top_artists):
@@ -126,6 +128,13 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
         mock_retry.assert_called_once()
+
+    def test_missing_required_scopes_raises_error(self):
+        self.auth.scopes = []
+        self.auth.save()
+
+        with self.assertRaises(Exception):
+            UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
 
 class TestRefreshTopArtistsFromSpotifyTask(TestCase):
