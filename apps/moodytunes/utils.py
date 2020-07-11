@@ -24,7 +24,7 @@ class ExportPlaylistHelper(object):
         if context:
             votes = votes.filter(context=context)
 
-        songs = votes.distinct('song__code').values_list('song__code', flat=True)
+        songs = votes.order_by('-created').distinct('song__code').values_list('song__code', flat=True)
         songs = list(songs)
 
         return songs
