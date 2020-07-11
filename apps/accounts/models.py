@@ -166,6 +166,17 @@ class SpotifyUserAuth(BaseModel):
 
             raise
 
+    def has_scope(self, scope):
+        """
+        Check if the record has the specified Spotify OAuth scope in its collection of authorized
+        scopes from Spotify.
+
+        :param scope: (str) Desired Spotify OAuth scope
+
+        :return: (bool)
+        """
+        return scope in self.scopes
+
 
 class UserEmotion(BaseModel):
     """
