@@ -1,4 +1,5 @@
 from accounts.models import UserSongVote
+from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 
 
 class ExportPlaylistHelper(object):
@@ -16,7 +17,7 @@ class ExportPlaylistHelper(object):
 
         :return: (list) List of Spotify song URIs for the playlist to build in Spotify
         """
-        votes = UserSongVote.objects.filter(user=user, emotion__name=emotion, vote=True).order_by('-created')
+        votes = UserSongVote.objects.filter(user=user, emotion__name=emotion, vote=True)
 
         if genre:
             votes = votes.filter(song__genre=genre)
@@ -24,7 +25,4 @@ class ExportPlaylistHelper(object):
         if context:
             votes = votes.filter(context=context)
 
-        songs = votes.distinct('song__code').values_list('song__code', flat=True)
-        songs = list(songs)
-
-        return songs
+        return filter_duplicate_votes_on_song_from_playlist(votes).values_list('song__code', flat=True)
