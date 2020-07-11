@@ -1,6 +1,7 @@
 import random
 import string
 
+from django.conf import settings
 from django.contrib.messages import get_messages
 from django.db.models.signals import post_save
 
@@ -161,7 +162,8 @@ class MoodyUtil(object):
                     'user': user,
                     'spotify_user_id': spotify_user_id,
                     'access_token': access_token,
-                    'refresh_token': refresh_token
+                    'refresh_token': refresh_token,
+                    'scopes': settings.SPOTIFY['auth_user_scopes'],
                 }
             )
 

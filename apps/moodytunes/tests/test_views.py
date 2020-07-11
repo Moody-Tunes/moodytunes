@@ -274,8 +274,6 @@ class TestExportView(TestCase):
         cls.url = reverse('moodytunes:export')
 
         cls.spotify_auth = MoodyUtil.create_spotify_user_auth(cls.user)
-        cls.spotify_auth.scopes = [settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE]
-        cls.spotify_auth.save()
 
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)

@@ -1,7 +1,6 @@
 from datetime import timedelta
 from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -118,8 +117,6 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
         cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
-        cls.auth.scopes = [settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE]
-        cls.auth.save()
 
         cls.playlist_name = 'new_playlist'
         cls.songs = ['spotify:track:1']
