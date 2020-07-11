@@ -198,7 +198,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         top_artist_song = MoodyUtil.create_song(artist=top_artists[0], **song_params)
 
         # Create songs from other artists
-        for _ in range(10):
+        for _ in range(5):
             artist = ''.join([random.choice(string.ascii_letters) for _ in range(10)])
             MoodyUtil.create_song(artist=artist, **song_params)
 
