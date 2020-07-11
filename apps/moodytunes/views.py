@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -177,26 +177,27 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Create SpotifyAuth record from data
             try:
-                auth, _ = SpotifyUserAuth.objects.get_or_create(
-                    user=user,
-                    access_token=tokens['access_token'],
-                    refresh_token=tokens['refresh_token'],
-                    spotify_user_id=profile_data['id'],
-                    scopes=settings.SPOTIFY['auth_user_scopes'],
-                )
+                with transaction.atomic():
+                    auth = SpotifyUserAuth.objects.create(
+                        user=user,
+                        access_token=tokens['access_token'],
+                        refresh_token=tokens['refresh_token'],
+                        spotify_user_id=profile_data['id'],
+                        scopes=settings.SPOTIFY['auth_user_scopes'],
+                    )
 
-                logger.info(
-                    'Created SpotifyAuthUser record for user {}'.format(user.username),
-                    extra={
-                        'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs),
-                        'auth_id': auth.pk,
-                        'user_id': user.pk,
-                        'spotify_user_id': profile_data['id'],
-                        'scopes': settings.SPOTIFY['auth_user_scopes'],
-                    }
-                )
+                    logger.info(
+                        'Created SpotifyAuthUser record for user {}'.format(user.username),
+                        extra={
+                            'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs),
+                            'auth_id': auth.pk,
+                            'user_id': user.pk,
+                            'spotify_user_id': profile_data['id'],
+                            'scopes': settings.SPOTIFY['auth_user_scopes'],
+                        }
+                    )
 
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+                    return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
             except IntegrityError:
                 logger.exception(
                     'Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
