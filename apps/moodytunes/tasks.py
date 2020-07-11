@@ -39,10 +39,6 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         track_data = client.get_attributes_for_track(spotify_code)
         song_data = client.get_audio_features_for_tracks([track_data])[0]
 
-        # Decode track data name/artist from unicode to string
-        song_data['name'] = song_data['name'].decode('utf-8')
-        song_data['artist'] = song_data['artist'].decode('utf-8')
-
         try:
             Song.objects.create(**song_data)
 

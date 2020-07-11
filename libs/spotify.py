@@ -305,8 +305,8 @@ class SpotifyClient(object):
                 continue
 
             payload = {
-                'name': track['track']['name'].encode('utf-8'),
-                'artist': track['track']['artists'][0]['name'].encode('utf-8'),
+                'name': track['track']['name'],
+                'artist': track['track']['artists'][0]['name'],
                 'code': uri
             }
 
@@ -461,8 +461,8 @@ class SpotifyClient(object):
         track = self._make_spotify_request('GET', url)
 
         payload = {
-            'name': track['name'].encode('utf-8'),
-            'artist': track['artists'][0]['name'].encode('utf-8'),
+            'name': track['name'],
+            'artist': track['artists'][0]['name'],
             'code': uri
         }
 
