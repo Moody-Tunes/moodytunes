@@ -177,7 +177,7 @@ class SpotifyAuthenticationCallbackView(View):
 
             # Create SpotifyAuth record from data
             try:
-                SpotifyUserAuth.objects.get_or_create(
+                auth = SpotifyUserAuth.objects.get_or_create(
                     user=user,
                     access_token=tokens['access_token'],
                     refresh_token=tokens['refresh_token'],
@@ -187,7 +187,13 @@ class SpotifyAuthenticationCallbackView(View):
 
                 logger.info(
                     'Created SpotifyAuthUser record for user {}'.format(user.username),
-                    extra={'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs)}
+                    extra={
+                        'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs),
+                        'auth_id': auth.pk,
+                        'user_id': user.pk,
+                        'spotify_user_id': profile_data['id'],
+                        'scopes': settings.SPOTIFY['auth_user_scopes'],
+                    }
                 )
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
