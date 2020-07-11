@@ -18,8 +18,14 @@ class SpotifyException(Exception):
     pass
 
 
+class ClientException(Exception):
+    """Exception to raise in case of error on our end for request"""
+
+
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
+    BATCH_SIZE = 100
+
     REDACT_VALUE = '**********'
     REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token', 'access_token']
 
@@ -79,6 +85,9 @@ class SpotifyClient(object):
         :param headers: (dict) Headers to include in request
 
         :return (dict) Response content
+
+        :raises: `SpotifyException` if request was unsuccessful
+        :raises: `ClientException` if unexpected error encountered
         """
 
         if not headers:
@@ -147,7 +156,7 @@ class SpotifyClient(object):
         except Exception:
             self._log(logging.ERROR, 'Received unhandled exception requesting {}'.format(url), exc_info=True)
 
-            raise SpotifyException('Received unhandled exception requesting {}'.format(url))
+            raise ClientException('Received unhandled exception requesting {}'.format(url))
 
     def _get_auth_access_token(self):
         """
@@ -207,16 +216,31 @@ class SpotifyClient(object):
 
         return resp.get('access_token')
 
-    def batch_tracks(self, tracks):
+    def get_code_from_spotify_uri(self, code):
         """
-        Some Spotify endpoints have a limit of 100 tracks for one request. This method will
-        take a list of tracks and create a list of batches for including in Spotify requests
+        Get the Spotify code (alphanumeric value) from the Spotify song URI. Used in requests to Spotify
+        for a track, as Spotify only cares about the alphanumeric value.
 
-        :param tracks: (list) List of tracks
+        Ex. Given 'spotify:track:19p0PEnGr6XtRqCYEI8Ucc', return '19p0PEnGr6XtRqCYEI8Ucc'
 
-        :return: (list[list])
+        :param code: (str) Full Spotify URI for a song
+
+        :return: (str) Spotify code for the song
         """
-        batch_size = 100
+        return code.split(':')[2]
+
+    def batch_tracks(self, tracks, batch_size=None):
+        """
+        Some Spotify endpoints have a limit on the number of tracks to send in one request. This method will
+        take a list of tracks and create a list of batches for including in Spotify requests.
+
+        :param tracks: (list) List of tracks to batch
+        :param batch_size: (int) Optional size of batches to return
+
+        :return: (list[list]) Original list of tracks, batched into lists of `batch_size`
+        """
+        batch_size = batch_size or self.BATCH_SIZE
+
         return [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
 
     def get_playlists_for_category(self, category, num_playlists):
@@ -225,12 +249,11 @@ class SpotifyClient(object):
 
         :param category: (str) Category ID of a genre in Spotify
         :param num_playlists: (int) Number of playlists to return
+
         :return: (list[dict]) Playlist mappings for the given category
             - name (str): Name of the playlist
             - uri (str): Spotify ID for the playlist
             - user (str): Spotify ID for the playlist owner
-
-        :raises: `SpotifyException` if unable to retrieve playlists for category
         """
         url = '{api_url}/browse/categories/{category_id}/playlists'.format(
             api_url=settings.SPOTIFY['api_url'],
@@ -339,7 +362,7 @@ class SpotifyClient(object):
 
             # Construct query params list from track ids in batch
             # Strip spotify:track: from the uri (Spotify just wants the id)
-            track_ids = [track['code'].split(':')[2] for track in batch]
+            track_ids = [self.get_code_from_spotify_uri(track['code']) for track in batch]
             params = {'ids': ','.join([track_id for track_id in track_ids])}
 
             response = self._make_spotify_request('GET', url, params=params)
@@ -392,7 +415,9 @@ class SpotifyClient(object):
 
         :param code: (str) Authorization code returned from initial request to SPOTIFY['user_auth_url']
 
-        :return: (dict) Access and refresh token for the user: to be saved in the database
+        :return: (dict)
+            - access_token (str)
+            - refresh_token (str)
         """
         data = {
             'grant_type': 'authorization_code',  # Constant; From Spotify documentation
@@ -440,9 +465,7 @@ class SpotifyClient(object):
         url = '{api_url}/me'.format(api_url=settings.SPOTIFY['api_url'])
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
 
-        response = self._make_spotify_request('GET', url, headers=headers)
-
-        return response
+        return self._make_spotify_request('GET', url, headers=headers)
 
     def get_attributes_for_track(self, uri):
         """
@@ -450,9 +473,12 @@ class SpotifyClient(object):
 
         :param uri: (str) URI of song to search for on Spotify
 
-        :return: (dict) Dictionary of data for the song
+        :return: (dict)
+            - name (str)
+            - artist (str)
+            - code (str)
         """
-        song_id = uri.split(':')[2]  # Only need the last ID from the URI
+        song_id = self.get_code_from_spotify_uri(uri)
         url = '{api_url}/tracks/{id}'.format(
             api_url=settings.SPOTIFY['api_url'],
             id=song_id
@@ -460,13 +486,11 @@ class SpotifyClient(object):
 
         track = self._make_spotify_request('GET', url)
 
-        payload = {
+        return {
             'name': track['name'],
             'artist': track['artists'][0]['name'],
             'code': uri
         }
-
-        return payload
 
     def get_user_playlists(self, auth_code, spotify_user_id):
         """
@@ -487,9 +511,7 @@ class SpotifyClient(object):
             'Content-Type': 'application/json'
         }
 
-        resp = self._make_spotify_request('GET', url, headers=headers)
-
-        return resp
+        return self._make_spotify_request('GET', url, headers=headers)
 
     def create_playlist(self, auth_code, spotify_user_id, playlist_name):
         """
@@ -541,9 +563,7 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
-
-        return resp
+        self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
 
     def delete_songs_from_playlist(self, auth_code, playlist_id, songs):
         """
@@ -565,15 +585,15 @@ class SpotifyClient(object):
 
         data = {'uris': songs}
 
-        resp = self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
-
-        return resp
+        self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
 
     def get_user_top_artists(self, auth_code):
         """
-        Retrieve the top artists from Spotify for a user
+        Retrieve the top artists from Spotify for a user.
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
+
+        :return: (list(str)) List of top artists for the user from Spotify
         """
         url = '{api_url}/me/top/artists'.format(api_url=settings.SPOTIFY['api_url'])
 

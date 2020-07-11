@@ -6,7 +6,7 @@ from urllib import parse
 from django.test import TestCase
 from requests.exceptions import HTTPError
 
-from libs.spotify import SpotifyClient, SpotifyException
+from libs.spotify import ClientException, SpotifyClient, SpotifyException
 from libs.tests.helpers import generate_random_unicode_string
 
 
@@ -166,14 +166,14 @@ class TestSpotifyClient(TestCase):
 
     @mock.patch('requests.request')
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
-    def test_make_spotify_request_raises_spotify_exception_on_base_exception(self, mock_auth, mock_request):
+    def test_make_spotify_request_raises_client_exception_on_unhandled_exception(self, mock_auth, mock_request):
         mock_response = mock.Mock()
         mock_response.raise_for_status.side_effect = Exception
 
         mock_auth.return_value = self.auth_code
         mock_request.return_value = mock_response
 
-        with self.assertRaises(SpotifyException):
+        with self.assertRaises(ClientException):
             self.spotify_client._make_spotify_request('GET', '/dummy_endpoint')
 
     @mock.patch('libs.spotify.SpotifyClient._get_auth_access_token')
@@ -641,10 +641,8 @@ class TestSpotifyClient(TestCase):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        response_data = {'resp': 'OK'}
 
         mock_response = mock.Mock()
-        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -654,9 +652,8 @@ class TestSpotifyClient(TestCase):
 
         expected_data = {'uris': songs}
 
-        retrieved_response = self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
+        self.spotify_client.add_songs_to_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'POST',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
@@ -670,10 +667,8 @@ class TestSpotifyClient(TestCase):
         auth_code = 'spotify-auth-id'
         playlist_id = 'spotify:playlist:id'
         songs = ['spotify:track:1', 'spotify:track:2']
-        response_data = {'resp': 'OK'}
 
         mock_response = mock.Mock()
-        mock_response.json.return_value = response_data
         mock_request.return_value = mock_response
 
         expected_headers = {
@@ -683,9 +678,8 @@ class TestSpotifyClient(TestCase):
 
         expected_data = {'uris': songs}
 
-        retrieved_response = self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
+        self.spotify_client.delete_songs_from_playlist(auth_code, playlist_id, songs)
 
-        self.assertEqual(retrieved_response, response_data)
         mock_request.assert_called_once_with(
             'DELETE',
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
@@ -739,17 +733,30 @@ class TestSpotifyClient(TestCase):
             data=None
         )
 
+    def test_get_code_from_spotify_uri(self):
+        song_code = 'spotify:track:19p0PEnGr6XtRqCYEI8Ucc'
+        expected_code = '19p0PEnGr6XtRqCYEI8Ucc'
+
+        code = self.spotify_client.get_code_from_spotify_uri(song_code)
+        self.assertEqual(code, expected_code)
+
     def test_batch_tracks_batches_list(self):
         items = [i for i in range(200)]
         batched_items = self.spotify_client.batch_tracks(items)
 
         self.assertEqual(len(batched_items), 2)
 
-    def test_batch_tracks_works_on_lists_with_less_than_batch_size(self):
+    def test_batch_tracks_returns_original_list_if_count_is_less_than_batch_size(self):
         items = [i for i in range(20)]
         batched_items = self.spotify_client.batch_tracks(items)
 
         self.assertEqual(len(batched_items), 1)
+
+    def test_batch_tracks_batches_by_batch_size_if_provided(self):
+        items = [i for i in range(50)]
+        batched_items = self.spotify_client.batch_tracks(items, batch_size=10)
+
+        self.assertEqual(len(batched_items), 5)
 
     def test_sanitize_log_data(self):
         data = {

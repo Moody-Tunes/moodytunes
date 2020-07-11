@@ -80,6 +80,7 @@ class SpotifyUserAuth(BaseModel):
     access_token = EncryptedCharField(max_length=100)
     refresh_token = EncryptedCharField(max_length=100)
     last_refreshed = models.DateTimeField(auto_now_add=True)
+    scopes = ArrayField(models.CharField(max_length=30), default=list)
     spotify_data = models.OneToOneField(SpotifyUserData, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -164,6 +165,17 @@ class SpotifyUserAuth(BaseModel):
             )
 
             raise
+
+    def has_scope(self, scope):
+        """
+        Check if the record has the specified Spotify OAuth scope in its collection of authorized
+        scopes from Spotify.
+
+        :param scope: (str) Desired Spotify OAuth scope
+
+        :return: (bool)
+        """
+        return scope in self.scopes
 
 
 class UserEmotion(BaseModel):

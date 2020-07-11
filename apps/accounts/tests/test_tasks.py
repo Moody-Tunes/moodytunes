@@ -127,6 +127,13 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
 
         mock_retry.assert_called_once()
 
+    def test_missing_required_scopes_raises_error(self):
+        self.auth.scopes = []
+        self.auth.save()
+
+        with self.assertRaises(Exception):
+            UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
+
 
 class TestRefreshTopArtistsFromSpotifyTask(TestCase):
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay')

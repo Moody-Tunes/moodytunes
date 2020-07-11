@@ -2,6 +2,10 @@
 from envparse import env
 
 
+# Spotify OAuth scope constants
+SPOTIFY_PLAYLIST_MODIFY_SCOPE = 'playlist-modify-public'
+SPOTIFY_TOP_ARTIST_READ_SCOPE = 'user-top-read'
+
 # Spotify Definitions
 SPOTIFY = {
     'api_url': env.str('MTDJ_SPOTIFY_API_URL', default='https://api.spotify.com/v1'),
@@ -17,6 +21,6 @@ SPOTIFY = {
     'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/moodytunes/spotify/callback/'),
     'auth_cache_key_timeout': 60 * 60,  # Authorization token is good for one hour
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
-    'auth_user_scopes': ['playlist-modify-public', 'user-top-read'],
+    'auth_user_scopes': [SPOTIFY_PLAYLIST_MODIFY_SCOPE, SPOTIFY_TOP_ARTIST_READ_SCOPE],
     'max_top_artists': 50,  # Number of top artists to retrieve for user
 }

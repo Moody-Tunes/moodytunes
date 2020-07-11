@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from celery.schedules import crontab
+from django.conf import settings
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
@@ -116,6 +117,19 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
     @update_logging_data
     def run(self, auth_id, *args, **kwargs):
         auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
+
+        # Check that user has granted proper scopes to fetch top artists from Spotify
+        if not auth.has_scope(settings.SPOTIFY_TOP_ARTIST_READ_SCOPE):
+            logger.error(
+                'User {} has not granted proper scopes to fetch top artists from Spotify'.format(auth.user.username),
+                extra={
+                    'fingerprint': auto_fingerprint('missing_scopes_for_update_top_artists', **kwargs),
+                    'auth_id': auth.pk,
+                    'scopes': auth.scopes,
+                }
+            )
+
+            raise Exception('Insufficient Spotify scopes to fetch Spotify top artists')
 
         spotify_client_identifier = 'update_spotify_top_artists_{}'.format(auth.spotify_user_id)
         spotify = SpotifyClient(identifier=spotify_client_identifier)

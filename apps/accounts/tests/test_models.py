@@ -240,6 +240,23 @@ class TestSpotifyUserAuth(TestCase):
         with self.assertRaises(SpotifyException):
             SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(user_auth.id)
 
+    def test_has_scopes_returns_true_for_scope_assigned_to_record(self):
+        scope = 'playlist-modify-public'
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        user_auth.scopes = [scope]
+        user_auth.save()
+
+        self.assertTrue(user_auth.has_scope(scope))
+
+    def test_has_scopes_returns_false_for_scope_not_assigned_to_record(self):
+        scope = 'playlist-modify-public'
+        desired_scope = 'user-top-read'
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        user_auth.scopes = [scope]
+        user_auth.save()
+
+        self.assertFalse(user_auth.has_scope(desired_scope))
+
 
 class TestUserSongVote(TestCase):
     @classmethod

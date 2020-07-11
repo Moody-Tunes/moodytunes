@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from accounts.models import SpotifyUserAuth
@@ -127,6 +128,19 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     @update_logging_data
     def run(self, auth_id, playlist_name, songs, *args, **kwargs):
         auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
+
+        # Check that user has granted proper scopes to export playlist to Spotify
+        if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
+            logger.error(
+                'User {} has not granted proper scopes to export playlist to Spotify'.format(auth.user.username),
+                extra={
+                    'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs),
+                    'auth_id': auth.pk,
+                    'scopes': auth.scopes,
+                }
+            )
+
+            raise Exception('Insufficient Spotify scopes to export playlist')
 
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
 

@@ -117,6 +117,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
         cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+
         cls.playlist_name = 'new_playlist'
         cls.songs = ['spotify:track:1']
 
@@ -278,3 +279,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()
+
+    def test_missing_required_scopes_raises_error(self):
+        self.auth.scopes = []
+        self.auth.save()
+
+        with self.assertRaises(Exception):
+            CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
