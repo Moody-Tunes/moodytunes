@@ -24,6 +24,8 @@ class ClientException(Exception):
 
 class SpotifyClient(object):
     """Wrapper around the Spotify API"""
+    BATCH_SIZE = 100
+
     REDACT_VALUE = '**********'
     REDACT_DATA_KEYS = ['Authorization', 'code', 'refresh_token', 'access_token']
 
@@ -214,16 +216,18 @@ class SpotifyClient(object):
 
         return resp.get('access_token')
 
-    def batch_tracks(self, tracks):
+    def batch_tracks(self, tracks, batch_size=None):
         """
-        Some Spotify endpoints have a limit of 100 tracks for one request. This method will
-        take a list of tracks and create a list of batches for including in Spotify requests
+        Some Spotify endpoints have a limit on the number of tracks to send in one request. This method will
+        take a list of tracks and create a list of batches for including in Spotify requests.
 
-        :param tracks: (list) List of tracks
+        :param tracks: (list) List of tracks to batch
+        :param batch_size: (int) Optional size of batches to return
 
-        :return: (list[list])
+        :return: (list[list]) Original list of tracks, batched into lists of `batch_size`
         """
-        batch_size = 100
+        batch_size = batch_size or self.BATCH_SIZE
+
         return [tracks[idx:idx + batch_size] for idx in range(0, len(tracks), batch_size)]
 
     def get_playlists_for_category(self, category, num_playlists):

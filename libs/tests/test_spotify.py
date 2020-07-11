@@ -739,11 +739,17 @@ class TestSpotifyClient(TestCase):
 
         self.assertEqual(len(batched_items), 2)
 
-    def test_batch_tracks_works_on_lists_with_less_than_batch_size(self):
+    def test_batch_tracks_returns_original_list_if_count_is_less_than_batch_size(self):
         items = [i for i in range(20)]
         batched_items = self.spotify_client.batch_tracks(items)
 
         self.assertEqual(len(batched_items), 1)
+
+    def test_batch_tracks_batches_by_batch_size_if_provided(self):
+        items = [i for i in range(50)]
+        batched_items = self.spotify_client.batch_tracks(items, batch_size=10)
+
+        self.assertEqual(len(batched_items), 5)
 
     def test_sanitize_log_data(self):
         data = {
