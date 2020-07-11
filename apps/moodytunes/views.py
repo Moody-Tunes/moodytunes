@@ -273,6 +273,26 @@ class ExportPlayListView(FormView):
 
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
+            # Check that user has the proper scopes from Spotify to do playlist edits
+            if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
+                logger.warning(
+                    'User {} did not grant proper scopes for playlist export. Redirecting to grant scopes'.format(
+                        request.user.username
+                    ),
+                    extra={
+                        'user_id': request.user.pk,
+                        'auth_id': auth.pk,
+                        'scopes': auth.scopes,
+                        'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs)
+                    }
+                )
+
+                auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
+
+                messages.warning(request, 'Please reauthenticate with Spotify to export your playlist')
+
+                return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+
             logger.info(
                 'Exporting {} playlist for user {} to Spotify'.format(emotion_name, request.user.username),
                 extra={

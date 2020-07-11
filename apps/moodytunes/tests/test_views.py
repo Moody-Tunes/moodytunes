@@ -274,6 +274,8 @@ class TestExportView(TestCase):
         cls.url = reverse('moodytunes:export')
 
         cls.spotify_auth = MoodyUtil.create_spotify_user_auth(cls.user)
+        cls.spotify_auth.scopes = [settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE]
+        cls.spotify_auth.save()
 
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -354,3 +356,24 @@ class TestExportView(TestCase):
         msg = 'Please submit a valid request'
 
         self.assertEqual(last_message, msg)
+
+    def test_post_auth_without_proper_scope_is_redirected_to_auth_page(self):
+        # Set up playlist for creation
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name
+        }
+
+        # Clear Spotify OAuth scopes for SpotifyUserAuth record
+        self.spotify_auth.scopes = []
+        self.spotify_auth.save()
+
+        resp = self.client.post(self.url, data)
+
+        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
