@@ -254,12 +254,13 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
             return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
-        except IntegrityError:
+        except IntegrityError as exc:
             logger.warning(
                 'Bad data supplied to VoteView.create from {}'.format(self.request.user.username),
                 extra={
                     'vote_data': vote_data,
                     'fingerprint': auto_fingerprint('bad_vote_data', **kwargs),
+                    'exception_info': exc,
                 }
             )
 
