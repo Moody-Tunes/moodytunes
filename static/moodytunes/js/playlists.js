@@ -90,7 +90,7 @@
 
     function successAddContextToVote(context) {
         let messageContainer = document.getElementById('add-context-success-content');
-        messageContainer.innerText = 'Successfully added ' + context + ' to your song!';
+        messageContainer.innerText = 'Successfully added song to your ' + context.toLowerCase() + ' playlist!';
         showSuccessAddContextModal();
     }
 
