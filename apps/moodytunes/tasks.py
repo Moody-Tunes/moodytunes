@@ -88,11 +88,15 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                     break
 
         except SpotifyException:
-            logger.warning('Error getting playlists for user {}'.format(spotify_user_id), extra={
-                'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
-                'spotify_user_id': spotify_user_id,
-                'playlist_name': playlist_name,
-            })
+            logger.warning(
+                'Error getting playlists for user {}'.format(spotify_user_id),
+                exc_info=True,
+                extra={
+                    'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
+                    'spotify_user_id': spotify_user_id,
+                    'playlist_name': playlist_name,
+                }
+            )
 
         if playlist_id is None:
             playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
