@@ -157,7 +157,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
 
         logger.info(
-            'Exported songs to playlist {} successfully'.format(playlist_name),
+            'Exported songs to playlist {} for user {} successfully'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('success_export_playlist', **kwargs),
                 'songs': songs,
