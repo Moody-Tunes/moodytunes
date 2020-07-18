@@ -1,3 +1,5 @@
+from hmac import compare_digest
+
 from django import forms
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -8,9 +10,10 @@ from accounts.models import MoodyUser, UserEmotion
 def validate_matching_passwords(password, confirm_password):
     """
     Validate that a new password equals the confirmation password
-    :return: Two-tuple of field and ValidationError to add to the form errors field
+
+    :return: Two-tuple of field and ValidationError to add to the form errors field if passwords do not match
     """
-    if password != confirm_password:
+    if not compare_digest(password, confirm_password):
         return (
             'password',
             ValidationError('Please double check your entered password matches your confirmation password')
@@ -27,7 +30,7 @@ class BaseUserForm(forms.Form):
 
     def clean_password(self):
         new_password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password')
+        confirm_password = self.cleaned_data.get('confirm_password', '')
 
         if new_password:
             # Call settings.AUTH_PASSWORD_VALIDATORS on supplied password
