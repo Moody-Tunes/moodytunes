@@ -93,6 +93,7 @@ class MoodyUtil(object):
     Helper class to create and return instances of various model objects
     """
     DEFAULT_USER_PASSWORD = 'test'
+    DEFAULT_USER_USERNAME = 'test'
 
     @staticmethod
     def _generate_song_code():
@@ -118,13 +119,15 @@ class MoodyUtil(object):
             'danceability': danceability
         }
 
-        song, _ = Song.objects.get_or_create(**params)
-
-        return song
+        return Song.objects.create(**params)
 
     @staticmethod
-    def create_user(username='test', password=DEFAULT_USER_PASSWORD, email=None, **kwargs):
-        user, _ = MoodyUser.objects.get_or_create(username=username, defaults=kwargs)
+    def create_user(**kwargs):
+        kwargs.setdefault('username', MoodyUtil.DEFAULT_USER_USERNAME)
+        password = kwargs.get('password', MoodyUtil.DEFAULT_USER_PASSWORD)
+        email = kwargs.get('email')
+
+        user = MoodyUser.objects.create(**kwargs)
         user.set_password(password)
 
         if email:
@@ -136,7 +139,7 @@ class MoodyUtil(object):
 
     @staticmethod
     def create_user_song_vote(user, song, emotion, vote, context='', description=''):
-        vote = UserSongVote.objects.create(
+        return UserSongVote.objects.create(
             user=user,
             song=song,
             emotion=emotion,
@@ -145,26 +148,17 @@ class MoodyUtil(object):
             description=description
         )
 
-        return vote
-
     @staticmethod
-    def create_spotify_user_auth(
-            user,
-            spotify_user_id='spotify_user',
-            access_token='access_token',
-            refresh_token='refresh_token'
-    ):
+    def create_spotify_user_auth(user, **kwargs,):
+        params = {
+            'user': user,
+            'spotify_user_id': kwargs.get('spotify_user_id', 'spotify_user'),
+            'access_token': kwargs.get('access_token', 'spotify_access_token'),
+            'refresh_token': kwargs.get('refresh_token', 'spotify_refresh_token'),
+            'scopes': settings.SPOTIFY['auth_user_scopes'],
+        }
+
+        # Disable signal to update top artists from Spotify when creating user auth record
         dispatch_uid = 'spotify_user_auth_post_save_update_top_artist'
         with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
-            auth, _ = SpotifyUserAuth.objects.get_or_create(
-                user=user,
-                defaults={
-                    'user': user,
-                    'spotify_user_id': spotify_user_id,
-                    'access_token': access_token,
-                    'refresh_token': refresh_token,
-                    'scopes': settings.SPOTIFY['auth_user_scopes'],
-                }
-            )
-
-        return auth
+            return SpotifyUserAuth.objects.create(**params)
