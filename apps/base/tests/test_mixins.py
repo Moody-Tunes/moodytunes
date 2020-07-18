@@ -77,6 +77,7 @@ class TestValidateRequestDataMixin(TestCase):
             },
             'method': request.method,
             'errors': mock_serializer.errors,
+            'view': 'base.mixins.ValidateRequestDataMixin',
             'fingerprint': 'base.mixins.ValidateRequestDataMixin._log_bad_request.bad_request',
         }
 
