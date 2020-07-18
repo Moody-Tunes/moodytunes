@@ -15,7 +15,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
 
@@ -24,6 +23,7 @@ from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
+from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Emotion
@@ -98,20 +98,17 @@ class MoodyPasswordChangeView(PasswordChangeView):
 
 
 @method_decorator(login_required, name='dispatch')
-class UpdateInfoView(View):
+class UpdateInfoView(FormView):
     form_class = UpdateUserForm
     template_name = 'update.html'
 
-    def get(self, request):
+    def get_form_instance(self):
         initial_data = {
             'username': self.request.user.username,
             'email': self.request.user.email
         }
 
-        form = self.form_class(initial=initial_data, user=request.user)
-        context = {'form': form}
-
-        return render(request, self.template_name, context)
+        return self.form_class(initial=initial_data, user=self.request.user)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, user=request.user)
@@ -125,13 +122,9 @@ class UpdateInfoView(View):
             return render(request, self.template_name, {'form': form})
 
 
-class CreateUserView(View):
+class CreateUserView(FormView):
     form_class = CreateUserForm
     template_name = 'create.html'
-
-    def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
