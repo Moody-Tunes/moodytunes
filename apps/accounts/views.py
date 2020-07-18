@@ -168,10 +168,9 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         genre = self.cleaned_data.get('genre')
         artist = self.cleaned_data.get('artist')
 
-        emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.select_related('song').filter(
             user=self.request.user,
-            emotion=emotion,
+            emotion__name=self.cleaned_data['emotion'],
             vote=True
         )
 
@@ -193,7 +192,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'energy': energy,
             'valence': valence,
             'danceability': danceability,
