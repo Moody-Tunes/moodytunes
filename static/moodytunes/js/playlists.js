@@ -102,13 +102,6 @@
     }
 
     function confirmAddContextToVote(songCode, contexts) {
-        let contextChoices = {
-            'PARTY': 'Listening to music at a party',
-            'RELAX': 'Listening to music to relax',
-            'WORK': 'Listening to music while working on a task',
-            'OTHER': 'Doing something else'
-        };
-
         let helpMessage = document.getElementById('add-context-help-text');
         let unavailableMessage = document.getElementById('add-context-unavailable-text');
 
@@ -133,8 +126,8 @@
         } else {
             contexts.forEach( context => {
                 let newOption = document.createElement('option');
-                newOption.appendChild(document.createTextNode(contextChoices[context]));
-                newOption.value = context;
+                newOption.appendChild(document.createTextNode(context.name));
+                newOption.value = context.code;
                 confirmAddContextInput.appendChild(newOption);
             });
         }
@@ -144,12 +137,21 @@
 
     function showContextsToAddForVote() {
         let song = this.dataset.song;
-        let availableContexts = ['PARTY', 'RELAX', 'WORK', 'OTHER'];
+        let availableContexts = [];
 
-        document.MoodyTunesClient.getInfoForVote(song, emotion, function (data) {
-            let contexts = data.contexts;
-            let optionContexts = availableContexts.filter(x => !contexts.includes(x));
-            confirmAddContextToVote(song, optionContexts);
+        document.MoodyTunesClient.getOptions(function (data) {
+            data.contexts.forEach( obj => {
+                if (obj.code !== "") {
+                    availableContexts.push({code: obj.code, name: obj.name});
+                }
+            });
+
+            document.MoodyTunesClient.getInfoForVote(song, emotion, function (data) {
+                let contexts = data.contexts;
+                let optionContexts = availableContexts.filter(context => !contexts.includes(context.code));
+
+                confirmAddContextToVote(song, optionContexts);
+            });
         });
     }
 
