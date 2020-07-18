@@ -158,6 +158,7 @@ GENRE_CHOICES_CACHE_KEY = 'song-genre-choices'
 
 BROWSE_PLAYLIST_CACHE_TIMEOUT = 60 * 10  # 10 minutes
 GENRE_CHOICES_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week
+OPTIONS_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week
 
 AUTH_USER_MODEL = 'accounts.MoodyUser'
 LOGIN_URL = '/accounts/login/'

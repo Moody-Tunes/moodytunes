@@ -4,6 +4,8 @@ import random
 from django.conf import settings
 from django.db import IntegrityError
 from django.http import Http404, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -364,6 +366,7 @@ class OptionView(generics.GenericAPIView):
     """
     serializer_class = OptionsSerializer
 
+    @method_decorator(cache_page(settings.OPTIONS_CACHE_TIMEOUT))
     def get(self, request, *args, **kwargs):
         # Build map of emotions including code name and display name
         emotion_choices = []
