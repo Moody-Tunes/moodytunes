@@ -212,13 +212,14 @@ class TestBrowseView(TestCase):
     def test_playlist_for_context_is_generated_with_upvoted_song_attributes_for_context(self, mock_generate_playlist):
         context = 'WORK'
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(energy=.5, valence=.75, danceability=.50)
-        song2 = MoodyUtil.create_song(energy=.65, valence=.80, danceability=.65)
-        song3 = MoodyUtil.create_song(energy=.75, valence=.95)
+
+        song = MoodyUtil.create_song(energy=.25, valence=.50, danceability=.75)
+        song2 = MoodyUtil.create_song(energy=.75, valence=.50, danceability=.25)
+        song3 = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.25)
 
         MoodyUtil.create_user_song_vote(self.user, song, emotion, True, context=context)
         MoodyUtil.create_user_song_vote(self.user, song2, emotion, True, context=context)
-        MoodyUtil.create_user_song_vote(self.user, song3, emotion, False, context=context)
+        MoodyUtil.create_user_song_vote(self.user, song3, emotion, True)  # Attributes should not be factored in
 
         params = {
             'emotion': emotion.name,
