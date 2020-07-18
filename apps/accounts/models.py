@@ -212,7 +212,18 @@ class UserEmotion(BaseModel):
         upvoted as making them feel this emotion. If the user doesn't have any upvotes for this emotion, the attributes
         will be set to `None` and reset to the emotion defaults in the save() call
         """
-        votes = self.user.usersongvote_set.filter(emotion=self.emotion, vote=True)
+        # Get distinct votes by song, to avoid factoring multiple votes for a song into the emotion average
+        vote_ids = self.user.usersongvote_set.filter(
+            emotion=self.emotion,
+            vote=True
+        ).distinct(
+            'song__code'
+        ).values_list(
+            'id',
+            flat=True
+        )
+
+        votes = UserSongVote.objects.filter(id__in=vote_ids)
 
         vote_data = average(votes, 'song__valence', 'song__energy', 'song__danceability')
         self.valence = vote_data['song__valence__avg']

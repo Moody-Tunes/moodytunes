@@ -884,3 +884,76 @@ class TestOptionsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp.json(), expected_response)
+
+
+class TestVoteInfoView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:vote-info')
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.api_client = APIClient()
+
+    def setUp(self):
+        self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.api_client.logout()
+
+        resp = self.api_client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_happy_path(self):
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['', 'WORK']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)
+
+    def test_endpoint_returns_contexts_for_downvotes(self):
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'PARTY')
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['PARTY', 'WORK']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)
+
+    def test_endpoint_only_returns_contexts_for_specified_song(self):
+        other_song = MoodyUtil.create_song()
+
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, 'PARTY')
+        MoodyUtil.create_user_song_vote(self.user, other_song, self.emotion, True, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['PARTY']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)
