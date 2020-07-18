@@ -168,23 +168,22 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         genre = self.cleaned_data.get('genre')
         artist = self.cleaned_data.get('artist')
 
-        emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.select_related('song').filter(
             user=self.request.user,
-            emotion=emotion,
+            emotion__name=self.cleaned_data['emotion'],
             vote=True
         )
 
+        if context:
+            votes_for_emotion = votes_for_emotion.filter(context=context)
+
+        if genre:
+            votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
+
+        if artist:
+            votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
+
         if votes_for_emotion.exists():
-            if context:
-                votes_for_emotion = votes_for_emotion.filter(context=context)
-
-            if genre:
-                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
-
-            if artist:
-                votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
-
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
             votes_for_emotion_data = average(votes_for_emotion, 'song__valence', 'song__energy', 'song__danceability')
@@ -193,7 +192,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'energy': energy,
             'valence': valence,
             'danceability': danceability,
