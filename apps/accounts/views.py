@@ -183,7 +183,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         if artist:
             votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
 
-        if votes_for_emotion:
+        if votes_for_emotion.exists():
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
             votes_for_emotion_data = average(votes_for_emotion, 'song__valence', 'song__energy', 'song__danceability')
