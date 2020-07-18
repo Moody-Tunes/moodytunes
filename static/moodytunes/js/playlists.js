@@ -109,6 +109,9 @@
             'OTHER': 'Doing something else'
         };
 
+        let helpMessage = document.getElementById('add-context-help-text');
+        let unavailableMessage = document.getElementById('add-context-unavailable-text');
+
         let confirmAddContextButton = document.getElementById('add-context-to-vote-button');
         confirmAddContextButton.dataset.songCode = songCode;
         confirmAddContextButton.addEventListener('click', addContextToVote);
@@ -116,12 +119,25 @@
         let confirmAddContextInput = document.getElementById('add-context-input');
         document.PlaylistCurator.clearChildren(confirmAddContextInput);
 
-        contexts.forEach( context => {
-            let newOption = document.createElement('option');
-            newOption.appendChild(document.createTextNode(contextChoices[context]));
-            newOption.value = context;
-            confirmAddContextInput.appendChild(newOption);
-        });
+        helpMessage.hidden = false;
+        unavailableMessage.hidden = true;
+        confirmAddContextButton.hidden = false;
+        confirmAddContextInput.hidden = false;
+
+        // Display message if there are no available contexts to add to song
+        if (Object.keys(contexts).length === 0) {
+            helpMessage.hidden = true;
+            unavailableMessage.hidden = false;
+            confirmAddContextButton.hidden = true;
+            confirmAddContextInput.hidden = true;
+        } else {
+            contexts.forEach( context => {
+                let newOption = document.createElement('option');
+                newOption.appendChild(document.createTextNode(contextChoices[context]));
+                newOption.value = context;
+                confirmAddContextInput.appendChild(newOption);
+            });
+        }
 
         showConfirmAddContextModal();
     }
