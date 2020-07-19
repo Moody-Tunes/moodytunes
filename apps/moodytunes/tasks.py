@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from accounts.models import SpotifyUserAuth
@@ -38,10 +39,6 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
 
         track_data = client.get_attributes_for_track(spotify_code)
         song_data = client.get_audio_features_for_tracks([track_data])[0]
-
-        # Decode track data name/artist from unicode to string
-        song_data['name'] = song_data['name'].decode('utf-8')
-        song_data['artist'] = song_data['artist'].decode('utf-8')
 
         try:
             Song.objects.create(**song_data)
@@ -91,11 +88,15 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                     break
 
         except SpotifyException:
-            logger.warning('Error getting playlists for user {}'.format(spotify_user_id), extra={
-                'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
-                'spotify_user_id': spotify_user_id,
-                'playlist_name': playlist_name,
-            })
+            logger.warning(
+                'Error getting playlists for user {}'.format(spotify_user_id),
+                exc_info=True,
+                extra={
+                    'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
+                    'spotify_user_id': spotify_user_id,
+                    'playlist_name': playlist_name,
+                }
+            )
 
         if playlist_id is None:
             playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
@@ -132,6 +133,19 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     def run(self, auth_id, playlist_name, songs, *args, **kwargs):
         auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
 
+        # Check that user has granted proper scopes to export playlist to Spotify
+        if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
+            logger.error(
+                'User {} has not granted proper scopes to export playlist to Spotify'.format(auth.user.username),
+                extra={
+                    'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs),
+                    'auth_id': auth.pk,
+                    'scopes': auth.scopes,
+                }
+            )
+
+            raise Exception('Insufficient Spotify scopes to export playlist')
+
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
 
         logger.info(
@@ -147,7 +161,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
 
         logger.info(
-            'Exported songs to playlist {} successfully'.format(playlist_name),
+            'Exported songs to playlist {} for user {} successfully'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('success_export_playlist', **kwargs),
                 'songs': songs,

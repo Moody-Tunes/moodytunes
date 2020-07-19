@@ -66,6 +66,7 @@ class ValidateRequestDataMixin(MoodyMixin):
             'headers': cleaned_headers,
             'method': request.method,
             'errors': serializer.errors,
+            'view': '{}.{}'.format(self.__class__.__module__, self.__class__.__name__),
             'fingerprint': auto_fingerprint('bad_request', **kwargs),
         }
 

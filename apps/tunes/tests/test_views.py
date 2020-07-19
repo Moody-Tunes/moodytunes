@@ -212,14 +212,14 @@ class TestBrowseView(TestCase):
     def test_playlist_for_context_is_generated_with_upvoted_song_attributes_for_context(self, mock_generate_playlist):
         context = 'WORK'
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(energy=.5, valence=.75)
-        upvote_song_for_context = MoodyUtil.create_song(energy=.75, valence=.95)
-        downvote_song_for_context = MoodyUtil.create_song(energy=.6, valence=.75)
-        mock_generate_playlist.return_value = [upvote_song_for_context]
 
-        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
-        MoodyUtil.create_user_song_vote(self.user, upvote_song_for_context, emotion, True, context=context)
-        MoodyUtil.create_user_song_vote(self.user, downvote_song_for_context, emotion, False, context=context)
+        song = MoodyUtil.create_song(energy=.25, valence=.50, danceability=.75)
+        song2 = MoodyUtil.create_song(energy=.75, valence=.50, danceability=.25)
+        song3 = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.25)
+
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True, context=context)
+        MoodyUtil.create_user_song_vote(self.user, song2, emotion, True, context=context)
+        MoodyUtil.create_user_song_vote(self.user, song3, emotion, True)  # Attributes should not be factored in
 
         params = {
             'emotion': emotion.name,
@@ -228,12 +228,20 @@ class TestBrowseView(TestCase):
         }
         self.api_client.get(self.url, data=params)
 
+        votes = UserSongVote.objects.filter(user=self.user, emotion=emotion, context=context, vote=True)
+        attributes_for_votes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
+        expected_valence = attributes_for_votes['song__valence__avg']
+        expected_energy = attributes_for_votes['song__energy__avg']
+        expected_danceability = attributes_for_votes['song__danceability__avg']
+
         call_args = mock_generate_playlist.mock_calls[0][1]
         called_energy = call_args[0]
         called_valence = call_args[1]
+        called_danceability = call_args[2]
 
-        self.assertEqual(called_energy, upvote_song_for_context.energy)
-        self.assertEqual(called_valence, upvote_song_for_context.valence)
+        self.assertEqual(called_valence, expected_valence)
+        self.assertEqual(called_energy, expected_energy)
+        self.assertEqual(called_danceability, expected_danceability)
 
     @mock.patch('tunes.views.generate_browse_playlist')
     @mock.patch('tunes.utils.CachedPlaylistManager.cache_browse_playlist')
@@ -884,3 +892,76 @@ class TestOptionsView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertDictEqual(resp.json(), expected_response)
+
+
+class TestVoteInfoView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('tunes:vote-info')
+        cls.user = MoodyUtil.create_user()
+        cls.song = MoodyUtil.create_song()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.api_client = APIClient()
+
+    def setUp(self):
+        self.api_client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.api_client.logout()
+
+        resp = self.api_client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_happy_path(self):
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['', 'WORK']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)
+
+    def test_endpoint_returns_contexts_for_downvotes(self):
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'PARTY')
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['PARTY', 'WORK']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)
+
+    def test_endpoint_only_returns_contexts_for_specified_song(self):
+        other_song = MoodyUtil.create_song()
+
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, 'PARTY')
+        MoodyUtil.create_user_song_vote(self.user, other_song, self.emotion, True, 'WORK')
+
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        expected_contexts = ['PARTY']
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], expected_contexts)

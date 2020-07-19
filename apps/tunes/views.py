@@ -4,6 +4,8 @@ import random
 from django.conf import settings
 from django.db import IntegrityError
 from django.http import Http404, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -23,6 +25,8 @@ from tunes.serializers import (
     PlaylistSerializer,
     PlaylistSongsRequestSerializer,
     SongSerializer,
+    VoteInfoRequestSerializer,
+    VoteInfoSerializer,
     VoteSongsRequestSerializer,
 )
 from tunes.utils import CachedPlaylistManager, generate_browse_playlist
@@ -252,12 +256,13 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
             return JsonResponse({'status': 'OK'}, status=status.HTTP_201_CREATED)
 
-        except IntegrityError:
+        except IntegrityError as exc:
             logger.warning(
                 'Bad data supplied to VoteView.create from {}'.format(self.request.user.username),
                 extra={
                     'vote_data': vote_data,
                     'fingerprint': auto_fingerprint('bad_vote_data', **kwargs),
+                    'exception_info': exc,
                 }
             )
 
@@ -361,6 +366,7 @@ class OptionView(generics.GenericAPIView):
     """
     serializer_class = OptionsSerializer
 
+    @method_decorator(cache_page(settings.OPTIONS_CACHE_TIMEOUT))
     def get(self, request, *args, **kwargs):
         # Build map of emotions including code name and display name
         emotion_choices = []
@@ -391,3 +397,26 @@ class OptionView(generics.GenericAPIView):
         serializer = self.serializer_class(data=data)
 
         return Response(data=serializer.initial_data)
+
+
+class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
+    """
+    Returns a JSON response of info on votes for a given user, emotion, and song. Currently used to
+    find the different contexts for a song that a user has voted on.
+    """
+
+    serializer_class = VoteInfoSerializer
+
+    get_request_serializer = VoteInfoRequestSerializer
+
+    def get_object(self):
+        contexts = UserSongVote.objects.filter(
+            user=self.request.user,
+            emotion__name=self.cleaned_data['emotion'],
+            song__code=self.cleaned_data['song_code'],
+        ).values_list(
+            'context',
+            flat=True,
+        )
+
+        return {'contexts': contexts}

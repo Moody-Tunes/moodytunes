@@ -6,10 +6,18 @@
     // used in requests for voting on songs
     let emotion;
     let generatePlaylistButton = document.getElementById('generate-playlist');
+
+    let closeDeleteModal = document.getElementById('close-delete-modal');
     let confirmDeleteModal = document.getElementById('delete-confirm-modal');
-    let closeModal = document.getElementById('close-modal');
     let cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
     let confirmDeleteVoteButton = document.getElementById('delete-vote');
+
+    let closeAddContextModal = document.getElementById('close-add-context-modal');
+    let cancelAddContextModal = document.getElementById('cancel-add-context-to-vote-button');
+    let confirmAddContextModal = document.getElementById('add-context-confirm-modal');
+
+    let closeSuccessAddContextModal = document.getElementById('close-add-context-success-modal');
+    let successAddContextModal = document.getElementById('add-context-success-modal');
 
     // Cache options for previous request, used for refreshing playlist on delete of vote
     let lastGenre,
@@ -24,6 +32,22 @@
         confirmDeleteModal.style.display = 'block';
     }
 
+    function hideConfirmAddContextModal() {
+        confirmAddContextModal.style.display = 'none';
+    }
+
+    function showConfirmAddContextModal() {
+        confirmAddContextModal.style.display = 'block';
+    }
+
+    function hideSuccessAddContextModal() {
+        successAddContextModal.style.display = 'none';
+    }
+
+    function showSuccessAddContextModal() {
+        successAddContextModal.style.display = 'block';
+    }
+
     function deleteVote(evt) {
         let song = confirmDeleteVoteButton.dataset.song;
         hideConfirmDeleteModal();
@@ -32,16 +56,42 @@
         });
     }
 
+    function addContextToVote(evt) {
+        hideConfirmAddContextModal();
+
+        let song = this.dataset.songCode;
+        let context = document.getElementById('add-context-input').value;
+
+        document.MoodyTunesClient.postVote(song, emotion, context, '', true, data => {
+            successAddContextToVote(context);
+        });
+    }
+
     function init() {
-        closeModal.addEventListener('click', hideConfirmDeleteModal);
+        closeDeleteModal.addEventListener('click', hideConfirmDeleteModal);
+        closeAddContextModal.addEventListener('click', hideConfirmAddContextModal);
+        closeSuccessAddContextModal.addEventListener('click', hideSuccessAddContextModal);
+
         window.onclick = function (evt) {
             if (evt.target === confirmDeleteModal) {
                 hideConfirmDeleteModal();
+            } else if (evt.target === confirmAddContextModal) {
+                hideConfirmAddContextModal();
+            } else if (evt.target === successAddContextModal) {
+                hideSuccessAddContextModal();
             }
         };
+
+        cancelAddContextModal.addEventListener('click', hideConfirmAddContextModal);
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
+    }
+
+    function successAddContextToVote(context) {
+        let messageContainer = document.getElementById('add-context-success-content');
+        messageContainer.innerText = 'Successfully added song to your ' + context.toLowerCase() + ' playlist!';
+        showSuccessAddContextModal();
     }
 
     function confirmDeleteVote() {
@@ -51,16 +101,86 @@
         showConfirmDeleteModal();
     }
 
-    function createDeleteButton(song) {
-        let buttonContainer = document.createElement('div');
-        buttonContainer.className = 'vote-button-container';
+    function confirmAddContextToVote(songCode, contexts) {
+        let helpMessage = document.getElementById('add-context-help-text');
+        let unavailableMessage = document.getElementById('add-context-unavailable-text');
 
+        let confirmAddContextButton = document.getElementById('add-context-to-vote-button');
+        confirmAddContextButton.dataset.songCode = songCode;
+        confirmAddContextButton.addEventListener('click', addContextToVote);
+
+        let confirmAddContextInput = document.getElementById('add-context-input');
+        document.PlaylistCurator.clearChildren(confirmAddContextInput);
+
+        helpMessage.hidden = false;
+        unavailableMessage.hidden = true;
+        confirmAddContextButton.hidden = false;
+        confirmAddContextInput.hidden = false;
+
+        // Display message if there are no available contexts to add to song
+        if (Object.keys(contexts).length === 0) {
+            helpMessage.hidden = true;
+            unavailableMessage.hidden = false;
+            confirmAddContextButton.hidden = true;
+            confirmAddContextInput.hidden = true;
+        } else {
+            contexts.forEach( context => {
+                let newOption = document.createElement('option');
+                newOption.appendChild(document.createTextNode(context.name));
+                newOption.value = context.code;
+                confirmAddContextInput.appendChild(newOption);
+            });
+        }
+
+        showConfirmAddContextModal();
+    }
+
+    function showContextsToAddForVote() {
+        let song = this.dataset.song;
+        let availableContexts = [];
+
+        document.MoodyTunesClient.getOptions(function (data) {
+            data.contexts.forEach( obj => {
+                if (obj.code !== "") {
+                    availableContexts.push({code: obj.code, name: obj.name});
+                }
+            });
+
+            document.MoodyTunesClient.getInfoForVote(song, emotion, function (data) {
+                let contexts = data.contexts;
+                let optionContexts = availableContexts.filter(context => !contexts.includes(context.code));
+
+                confirmAddContextToVote(song, optionContexts);
+            });
+        });
+    }
+
+    function createDeleteButton(song) {
         let button = document.createElement('button');
         button.className = 'vote-button vote-button-delete';
         button.appendChild(document.createTextNode('Delete'));
         button.dataset.song = song;
         button.addEventListener('click', confirmDeleteVote);
-        buttonContainer.appendChild(button);
+
+        return button;
+    }
+
+    function createAddContextButton(song) {
+        let button = document.createElement('button');
+        button.className = 'vote-button vote-button-context';
+        button.appendChild(document.createTextNode('Add Context'));
+        button.dataset.song = song;
+        button.addEventListener('click', showContextsToAddForVote);
+
+        return button;
+    }
+
+    function createButtons(song) {
+        let buttonContainer = document.createElement('div');
+        buttonContainer.className = 'vote-button-container';
+
+        buttonContainer.appendChild(createDeleteButton(song));
+        buttonContainer.appendChild(createAddContextButton(song));
 
         return buttonContainer
     }
@@ -136,7 +256,7 @@
             descriptionContainer.className = 'song-description-container';
             descriptionContainer.innerText = vote.description;
             songContainer.appendChild(descriptionContainer);
-            songContainer.appendChild(createDeleteButton(song.code));
+            songContainer.appendChild(createButtons(song.code));
 
             playlistContainer.appendChild(songContainer);
         });

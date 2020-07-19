@@ -15,7 +15,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
 
@@ -24,6 +23,7 @@ from accounts.models import MoodyUser, UserSongVote
 from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
+from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Emotion
@@ -98,20 +98,17 @@ class MoodyPasswordChangeView(PasswordChangeView):
 
 
 @method_decorator(login_required, name='dispatch')
-class UpdateInfoView(View):
+class UpdateInfoView(FormView):
     form_class = UpdateUserForm
     template_name = 'update.html'
 
-    def get(self, request):
+    def get_form_instance(self):
         initial_data = {
             'username': self.request.user.username,
             'email': self.request.user.email
         }
 
-        form = self.form_class(initial=initial_data, user=request.user)
-        context = {'form': form}
-
-        return render(request, self.template_name, context)
+        return self.form_class(initial=initial_data, user=self.request.user)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, user=request.user)
@@ -125,13 +122,9 @@ class UpdateInfoView(View):
             return render(request, self.template_name, {'form': form})
 
 
-class CreateUserView(View):
+class CreateUserView(FormView):
     form_class = CreateUserForm
     template_name = 'create.html'
-
-    def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
@@ -168,23 +161,22 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         genre = self.cleaned_data.get('genre')
         artist = self.cleaned_data.get('artist')
 
-        emotion = Emotion.objects.get(name=self.cleaned_data['emotion'])
         votes_for_emotion = UserSongVote.objects.select_related('song').filter(
             user=self.request.user,
-            emotion=emotion,
+            emotion__name=self.cleaned_data['emotion'],
             vote=True
         )
 
+        if context:
+            votes_for_emotion = votes_for_emotion.filter(context=context)
+
+        if genre:
+            votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
+
+        if artist:
+            votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
+
         if votes_for_emotion.exists():
-            if context:
-                votes_for_emotion = votes_for_emotion.filter(context=context)
-
-            if genre:
-                votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
-
-            if artist:
-                votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
-
             votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
 
             votes_for_emotion_data = average(votes_for_emotion, 'song__valence', 'song__energy', 'song__danceability')
@@ -193,7 +185,7 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
             danceability = votes_for_emotion_data['song__danceability__avg']
 
         data = {
-            'emotion_name': emotion.full_name,
+            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'energy': energy,
             'valence': valence,
             'danceability': danceability,

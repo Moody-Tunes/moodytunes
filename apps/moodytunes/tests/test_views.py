@@ -154,6 +154,9 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         self.assertRedirects(resp, self.success_url)
         self.assertTrue(SpotifyUserAuth.objects.filter(user=self.user).exists())
 
+        auth = SpotifyUserAuth.objects.get(user=self.user)
+        self.assertListEqual(auth.scopes, settings.SPOTIFY['auth_user_scopes'])
+
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
 
@@ -351,3 +354,24 @@ class TestExportView(TestCase):
         msg = 'Please submit a valid request'
 
         self.assertEqual(last_message, msg)
+
+    def test_post_auth_without_proper_scope_is_redirected_to_auth_page(self):
+        # Set up playlist for creation
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name
+        }
+
+        # Clear Spotify OAuth scopes for SpotifyUserAuth record
+        self.spotify_auth.scopes = []
+        self.spotify_auth.save()
+
+        resp = self.client.post(self.url, data)
+
+        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())

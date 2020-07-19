@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from accounts.models import SpotifyUserAuth
 from libs.spotify import SpotifyException
-from libs.tests.helpers import MoodyUtil
+from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from tunes.models import Song
 
@@ -26,8 +26,8 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_features.return_value = [{
             'code': song_code,
-            'name': 'Sickfit'.encode('utf-8'),
-            'artist': 'Madlib'.encode('utf-8'),
+            'name': 'Sickfit',
+            'artist': 'Madlib',
             'valence': .5,
             'energy': .5
         }]
@@ -75,8 +75,8 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_get_features.return_value = [{
             'code': song_code,
-            'name': 'Sickfit'.encode('utf-8'),
-            'artist': 'Madlib'.encode('utf-8'),
+            'name': 'Sickfit',
+            'artist': 'Madlib',
             'valence': .5,
             'energy': .5
         }]
@@ -86,12 +86,38 @@ class TestFetchSongFromSpotify(TestCase):
         with self.assertRaises(ValidationError):
             FetchSongFromSpotifyTask().run(song_code)
 
+    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    def test_task_handles_song_with_unicode_data(self, mock_get_attributes, mock_get_features):
+        song_code = 'spotify:track:1234567'
+        song_name = generate_random_unicode_string(10)
+        song_artist = generate_random_unicode_string(10)
+
+        mock_get_attributes.return_value = {
+            'code': song_code,
+            'name': song_name,
+            'artist': song_artist
+        }
+
+        mock_get_features.return_value = [{
+            'code': song_code,
+            'name': song_name,
+            'artist': song_artist,
+            'valence': .5,
+            'energy': .5
+        }]
+
+        FetchSongFromSpotifyTask().run(song_code)
+
+        self.assertTrue(Song.objects.filter(code=song_code).exists())
+
 
 class TestCreateSpotifyPlaylistFromSongs(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
         cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
+
         cls.playlist_name = 'new_playlist'
         cls.songs = ['spotify:track:1']
 
@@ -253,3 +279,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()
+
+    def test_missing_required_scopes_raises_error(self):
+        self.auth.scopes = []
+        self.auth.save()
+
+        with self.assertRaises(Exception):
+            CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)

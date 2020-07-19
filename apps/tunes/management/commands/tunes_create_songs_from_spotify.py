@@ -25,10 +25,6 @@ class Command(MoodyBaseCommand):
         """
         success, fail = 0, 0
         for track in tracks:
-            # Decode track data name/artist from unicode to string
-            track['name'] = track['name'].decode('utf-8')
-            track['artist'] = track['artist'].decode('utf-8')
-
             # Check if song with name and artist already exists in our system
             # For some reason, Spotify codes are not unique across songs and there is a potential
             # for the same to be present multiple times with different song codes

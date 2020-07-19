@@ -8,31 +8,29 @@
 <h1>MoodyTunes</h1>
 <div id="about-site">
     <h3>Overview</h3>
-    <p>Welcome to MoodyTunes! This site is aimed to answer a simply worded, but curious question: How does music affect
-    people's emotions? Through analysis of song metadata and understanding user usage of the site, we can collect data
-    to make an informed guess to an answer to that question, and also help you (the user) better understand your perception
-    of the songs you listen to.</p>
-    <p>Through interacting with the site, you can build playlists of songs that you believe make you feel certain emotions.
-    You start by browsing for songs for a given emotion, like "Happy" or "Melancholy". You can optionally provide a context
-    to grant greater insight to the circumstances involved in your music listening session. This can help you understand
-    the difference in emotion given a certain environment (maybe you find certain songs exciting a party, but calm when
-    you're by yourself.) We automatically add songs you upvote to your playlist for that emotion, so you can quickly view
-    your collection of songs that you believe make you feel a specific emotion.</p>
+    <p>Welcome to MoodyTunes! This site is aimed to answer a simply worded, but curious question: What songs make
+    people feel a desired emotion? Through analysis of song metadata and analyzing user feedback, we can collect data
+    that enables us to better understand how you engage with the songs you listen to.</p>
+    <p>You start by browsing for songs for a given emotion, like "Happy" or "Melancholy". We automatically add songs you
+    upvote to your playlist for that emotion, so you can easily view your collection of songs that you believe make you
+    feel a specific emotion. You can optionally provide a context to grant greater insight to the circumstances involved
+    in your music listening session. This can help you understand the difference in emotion given a certain environment
+    (maybe you find certain songs exciting a party, but calm when you're working on something.)</p>
 </div>
 <div id="about-operation">
     <h3>Operation</h3>
-    <p>The site works by analyzing certain metadata about songs. Currently, we analyze the valence and energy of tracks.
-    We use the <a rel="noreferrer" href="https://developer.spotify.com/documentation/web-api/">Spotify API</a> to gather this information
-    for use in our site operation. Roughly speaking, valence denotes the mood of the song while energy marks the intensity
-    of the song. As you vote on songs for a particular emotion, we use that information to better understand your personal
-    ranges for each emotion. This allows us to suggest songs to use that fit your paticular prefence for an emotion.</p>
+    <p>The site works by analyzing metadata of song's emotional affect. Currently, we analyze the valence, energy,
+    and danceability of tracks. We use the <a rel="noreferrer" href="https://developer.spotify.com/documentation/web-api/">Spotify API</a>
+    to gather this information for use in our site operation. Roughly speaking valence denotes the mood of the song,
+    energy marks the intensity of the song, and danceability indicates how likely the song is to make you move. As you
+    vote on songs for a particular emotion, we use that information to suggest more relevant songs for you as you browse
+    songs for that particular emotion.</p>
 </div>
 <div id="about-privacy">
     <h3>Privacy Policy</h3>
-    <p>Through the course of using the site, we'll track certain pieces of information. For starters, we'll collect a
-    username and (optionally) email address from you. We'll also track your votes for songs you browse (whether or not
-    you vote them as making you feel an emotion) so we can suggest songs that better match your preference for an emotion.
-    If you have any questions about how your data is collected or want to have us purge your information from our records,
-    you can email us your request to our webmaster: {% settings 'WEBMASTER_EMAIL' %}.</p>
+    <p>Through the course of using the site, we'll track your engagement with the songs you vote on. We'll track your
+    votes for songs you browse (whether or not you vote them as making you feel an emotion) so we can suggest songs that
+    better match your preference for an emotion. If you have any questions about how your data is collected or want to
+    have us purge your information from our records, you can email us your request to our webmaster: {% settings 'WEBMASTER_EMAIL' %}.</p>
 </div>
 {% endblock %}

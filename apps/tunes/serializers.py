@@ -34,6 +34,10 @@ class OptionsSerializer(serializers.Serializer):
     context = serializers.ListField()
 
 
+class VoteInfoSerializer(serializers.Serializer):
+    contexts = serializers.ListField()
+
+
 class BrowseSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/browse/"""
 
@@ -77,3 +81,10 @@ class PlaylistSongsRequestSerializer(serializers.Serializer):
     genre = serializers.CharField(max_length=15, required=False)
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
     artist = serializers.CharField(max_length=50, required=False)
+
+
+class VoteInfoRequestSerializer(serializers.Serializer):
+    """Provides validation for /tunes/vote/info/"""
+
+    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
+    song_code = serializers.CharField()
