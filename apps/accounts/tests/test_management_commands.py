@@ -74,3 +74,17 @@ class TestRecoverUserAccount(TestCase):
             log_level=logging.ERROR,
             extra={'exc': exc}
         )
+
+
+@mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
+class TestBackfillSpotifyUserAuthScopes(TestCase):
+    def test_happy_path(self):
+        user = MoodyUtil.create_user()
+        auth = MoodyUtil.create_spotify_user_auth(user)
+        auth.scopes = []
+        auth.save()
+
+        call_command('accounts_backfill_spotify_user_auth_scopes')
+
+        auth.refresh_from_db()
+        self.assertEqual(auth.scopes, settings.SPOTIFY['auth_user_scopes'])
