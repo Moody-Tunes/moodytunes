@@ -260,27 +260,9 @@ class ExportPlayListView(FormView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            playlist_name = form.cleaned_data['playlist_name']
-            emotion_name = form.cleaned_data['emotion']
-            genre = form.cleaned_data['genre']
-            context = form.cleaned_data['context']
-
-            songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
-
-            if not songs:
-                emotion = Emotion.objects.get(name=emotion_name)
-                emotion_fullname = emotion.full_name
-                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
-                    emotion_fullname.lower()
-                )
-
-                messages.error(request, msg)
-
-                return HttpResponseRedirect(reverse('moodytunes:export'))
-
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
-            # Check that user has the proper scopes from Spotify to do playlist edits
+            # Check that user has the proper scopes from Spotify to create playlist
             if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
                 logger.warning(
                     'User {} did not grant proper scopes for playlist export. Redirecting to grant scopes'.format(
@@ -299,6 +281,24 @@ class ExportPlayListView(FormView):
                 messages.error(request, 'Please reauthenticate with Spotify to export your playlist')
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+
+            playlist_name = form.cleaned_data['playlist_name']
+            emotion_name = form.cleaned_data['emotion']
+            genre = form.cleaned_data['genre']
+            context = form.cleaned_data['context']
+
+            songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
+
+            if not songs:
+                emotion = Emotion.objects.get(name=emotion_name)
+                emotion_fullname = emotion.full_name
+                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                    emotion_fullname.lower()
+                )
+
+                messages.error(request, msg)
+
+                return HttpResponseRedirect(reverse('moodytunes:export'))
 
             logger.info(
                 'Exporting {} playlist for user {} to Spotify'.format(emotion_name, request.user.username),
