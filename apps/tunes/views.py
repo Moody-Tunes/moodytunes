@@ -168,12 +168,12 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
 class LastPlaylistView(generics.RetrieveAPIView):
     """
-    Return a JSON response of the cached user playlist if one exists. If a cached playlist is not found,
-    will return a 400 Bad Request.
+    Return a JSON response of the cached user playlist if one exists.
     """
     serializer_class = LastPlaylistSerializer
 
-    def get_object(self):
+    @update_logging_data
+    def get_object(self, **kwargs):
         cached_playlist_manager = CachedPlaylistManager()
         cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist(self.request.user)
 
@@ -199,8 +199,12 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'playlist': playlist
             }
         else:
-            logger.warning('No cached browse playlist found for user {}'.format(self.request.user.username))
-            raise ValidationError({'errors': 'Could not find cached playlist'})
+            logger.warning(
+                'No cached browse playlist found for user {}'.format(self.request.user.username),
+                extra={'fingerprint': auto_fingerprint('no_cached_browse_playlist_found', **kwargs)}
+            )
+
+            raise Http404('No cached browse playlist found')
 
 
 class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):

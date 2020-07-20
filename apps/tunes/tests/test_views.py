@@ -297,15 +297,12 @@ class TestLastPlaylistView(TestCase):
         self.assertEqual(resp_json['context'], cached_data['context'])
 
     @mock.patch('tunes.utils.cache')
-    def test_passing_use_cached_playlist_parameter_returns_bad_request_if_no_playlist_found(self, mock_cache):
+    def test_passing_use_cached_playlist_parameter_returns_404_if_no_playlist_found(self, mock_cache):
         mock_cache.get.return_value = None
-        expected_error = 'Could not find cached playlist'
 
         resp = self.api_client.get(self.url)
-        resp_json = resp.json()
 
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(resp_json['errors'], expected_error)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch('tunes.utils.cache')
     def test_cached_playlist_filters_songs_user_voted_on_for_emotion(self, mock_cache):
