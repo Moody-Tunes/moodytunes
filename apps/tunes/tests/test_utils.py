@@ -221,11 +221,11 @@ class TestCachedPlaylistManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
-        cls.manager = CachedPlaylistManager()
+        cls.manager = CachedPlaylistManager(cls.user)
 
     def test_make_cache_key_returns_expected_cache_key(self):
-        expected_cache_key = 'browse:{}'.format(self.user.username)
-        self.assertEqual(self.manager._make_cache_key(self.user), expected_cache_key)
+        expected_cache_key = 'browse:cached-playlist:{}'.format(self.user.username)
+        self.assertEqual(self.manager._make_cache_key(), expected_cache_key)
 
     @mock.patch('tunes.utils.cache')
     def test_cache_browse_playlist_calls_cache_with_expected_arguments(self, mock_cache):
@@ -236,8 +236,8 @@ class TestCachedPlaylistManager(TestCase):
             'description': '',
             'playlist': Song.objects.all()
         }
-        cache_key = 'browse:{}'.format(self.user.username)
-        self.manager.cache_browse_playlist(self.user, **data)
+        cache_key = 'browse:cached-playlist:{}'.format(self.user.username)
+        self.manager.cache_browse_playlist(**data)
 
         mock_cache.set.assert_called_once_with(cache_key, data, settings.BROWSE_PLAYLIST_CACHE_TIMEOUT)
 
@@ -247,12 +247,12 @@ class TestCachedPlaylistManager(TestCase):
         playlist = Song.objects.all()
         mock_cache.get.return_value = playlist
 
-        returned_playlist = self.manager.retrieve_cached_browse_playlist(self.user)
+        returned_playlist = self.manager.retrieve_cached_browse_playlist()
         self.assertEqual(playlist, returned_playlist)
 
     @mock.patch('tunes.utils.cache')
     def test_retrieve_cached_playlist_returns_None_if_no_playlist_cached(self, mock_cache):
         mock_cache.get.return_value = None
 
-        returned_playlist = self.manager.retrieve_cached_browse_playlist(self.user)
+        returned_playlist = self.manager.retrieve_cached_browse_playlist()
         self.assertIsNone(returned_playlist)
