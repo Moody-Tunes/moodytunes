@@ -260,7 +260,6 @@ class TestBrowseView(TestCase):
         self.api_client.get(self.url, data=params)
 
         mock_cache.assert_called_once_with(
-            self.user,
             song_queryset,
             Emotion.HAPPY,
             'WORK',

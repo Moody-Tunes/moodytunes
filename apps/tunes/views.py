@@ -51,7 +51,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     @update_logging_data
     def filter_queryset(self, queryset, **kwargs):
-        cached_playlist_manager = CachedPlaylistManager()
+        cached_playlist_manager = CachedPlaylistManager(self.request.user)
         jitter = self.cleaned_data.get('jitter')
         limit = self.cleaned_data.get('limit') or self.default_limit
         artist = self.cleaned_data.get('artist')
@@ -138,7 +138,6 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
         cached_playlist_manager.cache_browse_playlist(
-            self.request.user,
             playlist,
             self.cleaned_data['emotion'],
             self.cleaned_data.get('context'),
@@ -174,8 +173,8 @@ class LastPlaylistView(generics.RetrieveAPIView):
 
     @update_logging_data
     def get_object(self, **kwargs):
-        cached_playlist_manager = CachedPlaylistManager()
-        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist(self.request.user)
+        cached_playlist_manager = CachedPlaylistManager(self.request.user)
+        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist()
 
         if cached_playlist:
             emotion = cached_playlist['emotion']
