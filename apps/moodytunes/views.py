@@ -41,8 +41,8 @@ class BrowsePlaylistsView(FormView):
         context = super(BrowsePlaylistsView, self).get_context_data(**kwargs)
 
         # Check if user has a cached browse playlist to retrieve
-        cached_playlist_manager = CachedPlaylistManager()
-        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist(self.request.user)
+        cached_playlist_manager = CachedPlaylistManager(self.request.user)
+        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist()
         context['cached_playlist_exists'] = cached_playlist is not None
 
         return context
