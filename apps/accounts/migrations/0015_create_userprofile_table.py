@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0011_make_spotify_auth_one_to_one_on_user'),
+        ('accounts', '0014_add_spotifyuserauth_scopes'),
     ]
 
     operations = [
