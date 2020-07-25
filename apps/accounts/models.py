@@ -244,6 +244,7 @@ class UserSongVote(BaseModel):
         ('PARTY', 'Listening to music at a party'),
         ('RELAX', 'Listening to music to relax'),
         ('WORK', 'Listening to music while working on a task'),
+        ('EXERCISE', 'Listening to music while exercising'),
         ('OTHER', 'Doing something else')
     ]
 
