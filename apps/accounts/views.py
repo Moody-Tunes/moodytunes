@@ -19,7 +19,7 @@ from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
 from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
@@ -39,8 +39,14 @@ class MoodyLoginView(LoginView):
         redirect_url = super().get_redirect_url()
 
         if not redirect_url:
-            # If no redirect URL provided, redirect to default login redirect
-            return settings.LOGIN_REDIRECT_URL
+            user_has_spotify_auth = False
+
+            # Check if user has authenticated with Spotify, to prompt user to
+            # authenticate if they have not
+            if self.request.user.is_authenticated:
+                user_has_spotify_auth = SpotifyUserAuth.objects.filter(user=self.request.user).exists()
+
+            return f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth={user_has_spotify_auth}'
 
         try:
             # Try to resolve the URL, if it is a valid path in our system it will return
