@@ -41,10 +41,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements/common.txt
       - name: Test with pytest
-        run: pytest
+        run: pytest --cov-report=xml
         env:
           DJANGO_SETTINGS_MODULE: mtdj.settings.test
           MTDJ_ENV_FILE: test
           DJANGO_SECRET_KEY: ${{ secrets.TEST_DJANGO_SECRET_KEY }}
           MTDJ_DATABASE_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
           MTDJ_DATABASE_USER: postgres
+      - name: Check test coverage for diff
+        run: |
+          pip install diff-cover==3.0.1
+          diff-cover coverage.xml --fail-under=80
