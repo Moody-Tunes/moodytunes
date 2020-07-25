@@ -116,6 +116,7 @@ class SpotifyAuthenticationView(TemplateView):
         context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(state)
 
         self.request.session['state'] = state
+        self.request.session['redirect_url'] = self.request.GET.get('redirect_url')
 
         return context
 
@@ -197,7 +198,10 @@ class SpotifyAuthenticationCallbackView(View):
                         }
                     )
 
-                    return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+                    messages.info(request, 'You have successfully authorized Moodytunes with Spotify!')
+                    redirect_url = request.session.get('redirect_url', reverse('moodytunes:spotify-auth-success'))
+
+                    return HttpResponseRedirect(redirect_url)
             except IntegrityError:
                 logger.exception(
                     'Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
@@ -235,7 +239,6 @@ class SpotifyAuthenticationCallbackView(View):
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationSuccessView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        messages.info(self.request, 'You have successfully authorized Moodytunes with Spotify!')
         return reverse('moodytunes:export')
 
 

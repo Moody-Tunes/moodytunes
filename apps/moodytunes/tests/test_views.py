@@ -157,6 +157,29 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
         auth = SpotifyUserAuth.objects.get(user=self.user)
         self.assertListEqual(auth.scopes, settings.SPOTIFY['auth_user_scopes'])
 
+    @mock.patch('moodytunes.views.SpotifyClient')
+    def test_success_redirects_to_supplied_redirect(self, mock_spotify):
+        redirect_url = reverse('accounts:profile')
+        spotify_client = mock.Mock()
+        spotify_client.get_access_and_refresh_tokens.return_value = {
+            'access_token': 'test-access-token',
+            'refresh_token': 'test-refresh-token'
+        }
+
+        spotify_client.get_user_profile.return_value = {'id': 'test-user-id'}
+
+        mock_spotify.return_value = spotify_client
+
+        query_params = {'code': 'test-spotify-code', 'state': self.state}
+
+        session = self.client.session
+        session['redirect_url'] = redirect_url
+        session.save()
+
+        resp = self.client.get(self.url, data=query_params, follow=True)
+
+        self.assertRedirects(resp, redirect_url)
+
     def test_error_in_callback_returns_error_page(self):
         query_params = {'error': 'access_denied', 'state': self.state}
 

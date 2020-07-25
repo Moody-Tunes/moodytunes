@@ -10,7 +10,7 @@
     }
 
     function redirectToSpotifyAuthPage() {
-        window.location.href = window.location.origin + '/moodytunes/spotify/authorize/'
+        window.location.href = window.location.origin + '/moodytunes/spotify/authorize/?redirect_url=' + window.location.origin
     }
 
     let modal = document.getElementById('spotify-auth-modal');
