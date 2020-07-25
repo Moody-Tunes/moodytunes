@@ -19,7 +19,7 @@ from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
 from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin
@@ -141,6 +141,8 @@ class CreateUserView(FormView):
             user.email = form.cleaned_data.get('email')
             user.set_password(form.cleaned_data['password'])
             user.save()
+
+            UserProfile.objects.create(user=user)
 
             logger.info(
                 'Created new user: {}'.format(user.username),

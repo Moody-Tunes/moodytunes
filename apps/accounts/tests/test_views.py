@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from accounts.models import MoodyUser, UserSongVote
+from accounts.models import MoodyUser, UserProfile, UserSongVote
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from libs.utils import average
 from tunes.models import Emotion
@@ -175,6 +175,7 @@ class TestCreateUserView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, reverse('accounts:login'))
         self.assertTrue(MoodyUser.objects.filter(username=user_data['username']).exists())
+        self.assertTrue(UserProfile.objects.filter(user__username=user_data['username']).exists())
 
     def test_creating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
