@@ -27,6 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
@@ -51,5 +53,4 @@ jobs:
           MTDJ_DATABASE_USER: postgres
       - name: Check test coverage for diff
         run: |
-          git fetch origin master:refs/remotes/origin/master
           diff-cover coverage.xml --fail-under=80
