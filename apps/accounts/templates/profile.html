@@ -10,11 +10,13 @@
     {% endcompress %}
     {% compress js %}
         <script src="{% static 'moodytunes/js/client.js' %}" defer></script>
+        <script src="{% static 'moodytunes/js/curator.js' %}" defer></script>
         <script src="{% static 'accounts/js/spotify_auth_prompt.js' %}" defer></script>
     {% endcompress %}
 {% endblock %}
 
 {% block content %}
+<div id="config" data-csrf-token="{{ csrf_token }}"></div>
 <h1>Profile</h1>
 {% localtime on %}
 <p>Hello {{ user.username }}! You last logged in {{ user.last_login|date:"M d, Y" }} at {{ user.last_login|date:"f A e" }}</p>
