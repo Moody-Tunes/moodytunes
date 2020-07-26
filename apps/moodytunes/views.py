@@ -199,7 +199,7 @@ class SpotifyAuthenticationCallbackView(View):
                     )
 
                     messages.info(request, 'You have successfully authorized Moodytunes with Spotify!')
-                    redirect_url = request.session.get('redirect_url', reverse('moodytunes:spotify-auth-success'))
+                    redirect_url = request.session.get('redirect_url') or reverse('moodytunes:spotify-auth-success')
 
                     return HttpResponseRedirect(redirect_url)
             except IntegrityError:
