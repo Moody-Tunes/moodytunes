@@ -11,12 +11,12 @@ from django.contrib.auth.views import (
     PasswordResetView,
 )
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic.base import RedirectView, TemplateView
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
@@ -232,4 +232,4 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
 
         user_profile.save()
 
-        return HttpResponse(status=status.HTTP_200_OK)
+        return JsonResponse({'status': 'OK'})
