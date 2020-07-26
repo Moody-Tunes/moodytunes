@@ -9,6 +9,7 @@
         <link rel="stylesheet" type="text/less" href="{% static 'accounts/less/profile.less' %}">
     {% endcompress %}
     {% compress js %}
+        <script src="{% static 'moodytunes/js/client.js' %}" defer></script>
         <script src="{% static 'accounts/js/spotify_auth_prompt.js' %}" defer></script>
     {% endcompress %}
 {% endblock %}

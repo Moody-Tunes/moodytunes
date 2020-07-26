@@ -80,6 +80,18 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=False')
 
+    def test_context_sets_has_spotify_auth_to_false_for_rejected_spotify_auth(self):
+        MoodyUtil.create_user_profile(self.user, has_rejected_spotify_auth=True)
+
+        data = {
+            'username': self.user.username,
+            'password': MoodyUtil.DEFAULT_USER_PASSWORD
+        }
+
+        resp = self.client.post(self.url, data=data)
+
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=True')
+
 
 class TestLogoutView(TestCase):
     @classmethod
