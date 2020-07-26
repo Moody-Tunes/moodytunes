@@ -11,18 +11,24 @@ from django.contrib.auth.views import (
     PasswordResetView,
 )
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic.base import RedirectView, TemplateView
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
 from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
-from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
+from accounts.serializers import (
+    AnalyticsRequestSerializer,
+    AnalyticsSerializer,
+    UserProfileRequestSerializer,
+    UserProfileSerializer,
+)
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
-from base.mixins import GetRequestValidatorMixin
+from base.mixins import GetRequestValidatorMixin, PatchRequestValidatorMixin
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
@@ -201,3 +207,23 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         }
 
         return data
+
+
+class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
+    serializer_class = UserProfileSerializer
+
+    patch_request_serializer = UserProfileRequestSerializer
+
+    def get_object(self):
+        user_profile = get_object_or_404(UserProfile, user=self.request.user)
+        return user_profile
+
+    def update(self, request, *args, **kwargs):
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+
+        for name, value in self.cleaned_data.items():
+            setattr(user_profile, name, value)
+
+        user_profile.save()
+
+        return HttpResponse(status=status.HTTP_200_OK)

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.messages import get_messages
 from django.db.models.signals import post_save
 
-from accounts.models import MoodyUser, SpotifyUserAuth, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
 from accounts.signals import update_spotify_top_artists
 from tunes.models import Emotion, Song
 
@@ -136,6 +136,11 @@ class MoodyUtil(object):
         user.save()
 
         return user
+
+    @staticmethod
+    def create_user_profile(user, **kwargs):
+        params = {**{'user': user}, **kwargs}
+        return UserProfile.objects.create(**params)
 
     @staticmethod
     def create_user_song_vote(user, song, emotion, vote, context='', description=''):
