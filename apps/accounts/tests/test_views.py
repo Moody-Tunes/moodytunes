@@ -9,6 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
+from waffle.testutils import override_switch
 
 from accounts.models import MoodyUser, UserProfile, UserSongVote
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
@@ -35,6 +36,7 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, next)
 
+    @override_switch('show_spotify_auth_prompt', active=True)
     def test_login_redirect_to_default(self):
         data = {
             'username': self.user.username,
@@ -58,6 +60,7 @@ class TestLoginView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_false_for_existing_auth_record(self):
         MoodyUtil.create_spotify_user_auth(self.user)
 
@@ -70,6 +73,7 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+    @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
         data = {
             'username': self.user.username,
@@ -80,9 +84,21 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
+    @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_false_to_for_rejected_spotify_auth(self):
         MoodyUtil.create_user_profile(self.user, has_rejected_spotify_auth=True)
 
+        data = {
+            'username': self.user.username,
+            'password': MoodyUtil.DEFAULT_USER_PASSWORD
+        }
+
+        resp = self.client.post(self.url, data=data)
+
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    @override_switch('show_spotify_auth_prompt', active=False)
+    def test_context_sets_show_spotify_auth_false_when_switch_is_not_active(self):
         data = {
             'username': self.user.username,
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
