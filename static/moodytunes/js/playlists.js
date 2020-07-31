@@ -12,6 +12,9 @@
     let cancelDeleteVoteButton = document.getElementById('cancel-delete-vote');
     let confirmDeleteVoteButton = document.getElementById('delete-vote');
 
+    let closeSuccessDeleteModal = document.getElementById('close-delete-success-modal');
+    let successDeleteModal = document.getElementById('delete-success-modal');
+
     let closeAddContextModal = document.getElementById('close-add-context-modal');
     let cancelAddContextModal = document.getElementById('cancel-add-context-to-vote-button');
     let confirmAddContextModal = document.getElementById('add-context-confirm-modal');
@@ -30,6 +33,14 @@
 
     function showConfirmDeleteModal() {
         confirmDeleteModal.style.display = 'block';
+    }
+
+    function hideSuccessDeleteModal() {
+        successDeleteModal.style.display = 'none';
+    }
+
+    function showSuccessDeleteModal() {
+        successDeleteModal.style.display = 'block';
     }
 
     function hideConfirmAddContextModal() {
@@ -52,6 +63,9 @@
         let song = confirmDeleteVoteButton.dataset.song;
         hideConfirmDeleteModal();
         document.MoodyTunesClient.deleteVote(song, emotion, lastContext, data => {
+            let messageContainer = document.getElementById('delete-success-content');
+            messageContainer.innerText = 'Successfully deleted song from your playlist!';
+            showSuccessDeleteModal();
             getEmotionPlaylist(evt);
         });
     }
@@ -71,6 +85,7 @@
         closeDeleteModal.addEventListener('click', hideConfirmDeleteModal);
         closeAddContextModal.addEventListener('click', hideConfirmAddContextModal);
         closeSuccessAddContextModal.addEventListener('click', hideSuccessAddContextModal);
+        closeSuccessDeleteModal.addEventListener('click', hideSuccessDeleteModal);
 
         window.onclick = function (evt) {
             if (evt.target === confirmDeleteModal) {
@@ -79,6 +94,8 @@
                 hideConfirmAddContextModal();
             } else if (evt.target === successAddContextModal) {
                 hideSuccessAddContextModal();
+            } else if (evt.target === successDeleteModal) {
+                hideSuccessDeleteModal();
             }
         };
 
