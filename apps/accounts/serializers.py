@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from accounts.models import UserSongVote
+from accounts.models import UserProfile, UserSongVote
 from tunes.models import Emotion
 
 
@@ -17,3 +17,18 @@ class AnalyticsRequestSerializer(serializers.Serializer):
     emotion = serializers.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     context = serializers.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     artist = serializers.CharField(max_length=50, required=False)
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('has_rejected_spotify_auth', 'user_id')
+
+    def get_user_id(self, obj):
+        return obj.user.pk
+
+
+class UserProfileRequestSerializer(serializers.Serializer):
+    has_rejected_spotify_auth = serializers.BooleanField(required=False)

@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.management.commands.accounts_recover_user_account import Command as RecoverCommand
+from accounts.models import UserProfile
 from libs.tests.helpers import MoodyUtil
 
 
@@ -74,3 +75,12 @@ class TestRecoverUserAccount(TestCase):
             log_level=logging.ERROR,
             extra={'exc': exc}
         )
+
+
+class TestBackfillUserProfileCommand(TestCase):
+    def test_happy_path(self):
+        user = MoodyUtil.create_user()
+
+        call_command('accounts_backfill_userprofile')
+
+        self.assertTrue(UserProfile.objects.filter(user=user).exists())

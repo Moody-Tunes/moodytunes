@@ -26,7 +26,8 @@ class ValidateRequestDataMixin(MoodyMixin):
     REQUEST_DATA_MAPPING = {
         'GET': 'query_params',
         'POST': 'data',
-        'DELETE': 'data'
+        'DELETE': 'data',
+        'PATCH': 'data',
     }
 
     def __init__(self):
@@ -127,5 +128,15 @@ class DeleteRequestValidatorMixin(ValidateRequestDataMixin):
     def delete(self, request, *args, **kwargs):
         if self._validate_request(request):
             return super(DeleteRequestValidatorMixin, self).delete(request, *args, **kwargs)
+        else:
+            return BadRequest()
+
+
+class PatchRequestValidatorMixin(ValidateRequestDataMixin):
+    patch_request_serializer = None
+
+    def patch(self, request, *args, **kwargs):
+        if self._validate_request(request):
+            return super(PatchRequestValidatorMixin, self).patch(request, *args, **kwargs)
         else:
             return BadRequest()
