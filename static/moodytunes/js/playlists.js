@@ -86,6 +86,14 @@
         cancelDeleteVoteButton.addEventListener('click', hideConfirmDeleteModal);
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
+
+        // Generate browse playlist on enter key press
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                generatePlaylistButton.click();
+            }
+        });
     }
 
     function successAddContextToVote(context) {
