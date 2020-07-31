@@ -297,10 +297,11 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             vote.delete()
 
             logger.info(
-                'Deleted vote for user {} with song {} and emotion {}'.format(
+                'Deleted vote for user {} with song {} and emotion {} and context {}'.format(
                     self.request.user.username,
                     self.cleaned_data['song_code'],
-                    self.cleaned_data['emotion'],
+                    Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
+                    vote.context or 'None',
                 ),
                 extra={
                     'fingerprint': auto_fingerprint('unvote_success', **kwargs),
