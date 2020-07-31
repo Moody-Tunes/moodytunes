@@ -43,7 +43,7 @@ class TestLoginView(TestCase):
 
         resp = self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=False')
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
     def test_login_returns_bad_request_for_invalid_path(self):
         next = '6330599317423175408.owasp.org'
@@ -58,7 +58,7 @@ class TestLoginView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_context_sets_has_spotify_auth_to_true_for_existing_auth_record(self):
+    def test_context_sets_show_spotify_auth_to_false_for_existing_auth_record(self):
         MoodyUtil.create_spotify_user_auth(self.user)
 
         data = {
@@ -68,9 +68,9 @@ class TestLoginView(TestCase):
 
         resp = self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=True')
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
-    def test_context_sets_has_spotify_auth_to_false_for_missing_auth_record(self):
+    def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
         data = {
             'username': self.user.username,
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
@@ -78,9 +78,9 @@ class TestLoginView(TestCase):
 
         resp = self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=False')
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
-    def test_context_sets_has_spotify_auth_to_false_for_rejected_spotify_auth(self):
+    def test_context_sets_show_spotify_auth_false_to_for_rejected_spotify_auth(self):
         MoodyUtil.create_user_profile(self.user, has_rejected_spotify_auth=True)
 
         data = {
@@ -90,7 +90,7 @@ class TestLoginView(TestCase):
 
         resp = self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth=True')
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
 
 class TestLogoutView(TestCase):

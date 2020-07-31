@@ -45,20 +45,20 @@ class MoodyLoginView(LoginView):
         redirect_url = super().get_redirect_url()
 
         if not redirect_url:
-            user_has_spotify_auth = False
+            show_spotify_auth = True
 
             # Check if user has authenticated with Spotify, to prompt user to
             # authenticate if they have not already done so
             if self.request.user.is_authenticated:
-                user_has_spotify_auth = SpotifyUserAuth.objects.filter(user=self.request.user).exists()
+                show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
 
                 # Check if user has explicitly indicated they do not want to
                 # authenticate with Spotify
-                if not user_has_spotify_auth and hasattr(self.request.user, 'userprofile'):
+                if show_spotify_auth and hasattr(self.request.user, 'userprofile'):
                     user_profile = self.request.user.userprofile
-                    user_has_spotify_auth = user_profile.has_rejected_spotify_auth
+                    show_spotify_auth = not user_profile.has_rejected_spotify_auth
 
-            return f'{settings.LOGIN_REDIRECT_URL}?has_spotify_auth={user_has_spotify_auth}'
+            return f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth={show_spotify_auth}'
 
         try:
             # Try to resolve the URL, if it is a valid path in our system it will return

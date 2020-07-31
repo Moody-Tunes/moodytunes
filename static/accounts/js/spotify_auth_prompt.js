@@ -33,7 +33,7 @@
     cancelAddSpotifyAuth.addEventListener('click', declineSpotifyUserAuth);
     confirmAddSpotifyAuth.addEventListener('click', redirectToSpotifyAuthPage);
 
-    if (urlParams.get('has_spotify_auth') === 'False') {
+    if (urlParams.get('show_spotify_auth') === 'True') {
         showModal();
     }
 })();
