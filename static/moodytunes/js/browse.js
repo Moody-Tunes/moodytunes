@@ -12,6 +12,14 @@
         let returnLastPlaylist = document.getElementById('use-cached-playlist');
         generatePlaylistButton.addEventListener('click', getBrowsePlaylist);
         returnLastPlaylist.addEventListener('click', generateLastBrowsePlaylist);
+
+        // Generate browse playlist on enter key press
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                generatePlaylistButton.click();
+            }
+        });
     }
 
     function setUpContextModal() {
