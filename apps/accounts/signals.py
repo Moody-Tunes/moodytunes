@@ -38,7 +38,7 @@ post_save.connect(
 
 def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
     if created:
-        UpdateTopArtistsFromSpotifyTask().delay(instance.pk)
+        UpdateTopArtistsFromSpotifyTask().apply_async((instance.pk,), countdown=30)
 
 
 post_save.connect(
