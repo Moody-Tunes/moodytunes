@@ -34,7 +34,6 @@
     <li><a class="profile-link" href="{% url 'moodytunes:suggest' %}">Suggest A New Song</a></li>
     <li><a class="profile-link" href="{% url 'moodytunes:export' %}">Export Emotion Playlist To Spotify</a></li>
 </ul>
-<<<<<<< HEAD
 <div id="spotify-auth-modal" class="modal" hidden>
     <div class="modal-content">
         <span id="close-spotify-auth-modal" class="close">&times;</span>
@@ -44,8 +43,7 @@
         <button id="decline-spotify-auth">No</button>
     </div>
 </div>
-=======
-    {% if show_onboarding %}
+{% if show_onboarding %}
 <div id="onboarding-start-modal" class="modal">
     <div class="modal-content">
         <span id="close-onboarding-modal" class="close">&times;</span>
