@@ -8,7 +8,16 @@
 
     function hideOnboardingModal() {
         onboardingModal.style.display = 'none';
-        // TODO: Set user `has_completed_onboarding` to True
+    }
+
+    function rejectOnboarding() {
+        let data = {
+            has_completed_onboarding: true
+        };
+
+        document.MoodyTunesClient.updateUserProfile(data, () => {
+            hideOnboardingModal();
+        });
     }
 
     function progressOnboarding() {
@@ -16,6 +25,6 @@
     }
 
     closeOnboardingModalIcon.addEventListener('click', hideOnboardingModal);
-    rejectOnboardingButton.addEventListener('click', hideOnboardingModal);
+    rejectOnboardingButton.addEventListener('click', rejectOnboarding);
     acceptOnboardingButton.addEventListener('click', progressOnboarding);
 })();
