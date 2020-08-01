@@ -165,8 +165,6 @@ class CreateUserView(FormView):
                 extra={'fingerprint': auto_fingerprint('created_new_user', **kwargs)}
             )
 
-            UserProfile.objects.create(user=user)
-
             messages.info(request, 'Your account has been created.')
 
             return HttpResponseRedirect(reverse('accounts:login'))
