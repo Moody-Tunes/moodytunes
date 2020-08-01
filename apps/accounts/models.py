@@ -70,6 +70,7 @@ class UserProfile(BaseModel):
     """
     user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
     has_rejected_spotify_auth = models.BooleanField(default=False)
+    has_completed_onboarding = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -81,14 +82,6 @@ class SpotifyUserData(BaseModel):
     that we can use to offer a more personalized MoodyTunes experience.
     """
     top_artists = ArrayField(models.CharField(max_length=200), default=list)
-
-
-class UserProfile(BaseModel):
-    """
-    Stores information about a given user in our system
-    """
-    user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
-    has_completed_onboarding = models.BooleanField(default=False)
 
 
 class SpotifyUserAuth(BaseModel):
