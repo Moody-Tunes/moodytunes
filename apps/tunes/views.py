@@ -408,7 +408,7 @@ class OptionView(generics.GenericAPIView):
             })
 
         # Retrieve list of song genres
-        genre_choices = Song.objects.all().values_list('genre', flat=True).distinct()
+        genre_choices = list(Song.objects.all().values_list('genre', flat=True).distinct())
 
         data = {
             'emotions': emotion_choices,

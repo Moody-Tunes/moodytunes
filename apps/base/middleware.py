@@ -11,7 +11,7 @@ class ShortCircuitMiddleware(object):
             func = resolve(request.path).func
             response = func(request)
             if not isinstance(response, JsonResponse):
-                response = JsonResponse(response.data, safe=False)
+                response = JsonResponse(response.data, safe=False, status=response.status_code)
 
             return response
         else:
