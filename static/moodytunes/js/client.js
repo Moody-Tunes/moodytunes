@@ -184,6 +184,9 @@
                 emotion: emotion
             };
             this.request('GET', '/tunes/vote/info/', params, {}, callback)
+        },
+        updateUserProfile: function (data, callback) {
+            this.request('PATCH', '/accounts/user_profile/', {}, data, callback);
         }
     };
 })();

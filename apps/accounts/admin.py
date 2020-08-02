@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Q, Count
 
 from accounts.forms import UpdateUserEmotionAttributesForm
-from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserProfile, UserSongVote
 from base.admin import MoodyBaseAdmin
 from tunes.models import Emotion
 
@@ -81,7 +81,16 @@ class SpotifyUserAuthAdmin(MoodyBaseAdmin):
         return False
 
 
+class UserProfileAdmin(MoodyBaseAdmin):
+    list_display = ('user', 'has_rejected_spotify_auth')
+    readonly_fields = ('user', 'has_rejected_spotify_auth')
+
+    def has_add_permission(self, request):
+        return False
+
+
 admin.site.register(MoodyUser, MoodyUserAdmin)
 admin.site.register(UserEmotion, UserEmotionAdmin)
 admin.site.register(UserSongVote, UserSongVoteAdmin)
 admin.site.register(SpotifyUserAuth, SpotifyUserAuthAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)

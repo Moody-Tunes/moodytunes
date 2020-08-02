@@ -62,6 +62,18 @@ class MoodyUser(BaseModel, AbstractUser):
         self.save()
 
 
+class UserProfile(BaseModel):
+    """
+    Stores information about a user in our system. Used to track user preferences for
+    our application.
+    """
+    user = models.OneToOneField(MoodyUser, on_delete=models.CASCADE)
+    has_rejected_spotify_auth = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+
+
 class SpotifyUserData(BaseModel):
     """
     Stores data from Spotify listening habits for a user
@@ -244,6 +256,7 @@ class UserSongVote(BaseModel):
         ('PARTY', 'Listening to music at a party'),
         ('RELAX', 'Listening to music to relax'),
         ('WORK', 'Listening to music while working on a task'),
+        ('EXERCISE', 'Listening to music while exercising'),
         ('OTHER', 'Doing something else')
     ]
 

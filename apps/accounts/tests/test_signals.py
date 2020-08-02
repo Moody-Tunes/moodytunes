@@ -69,7 +69,7 @@ class TestUpdateUserAttributesSignal(TestCase):
 
 
 class TestUpdateSpotifyTopArtistsSignal(TestCase):
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay')
+    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.apply_async')
     def test_task_is_only_called_on_create(self, mock_task):
         user = MoodyUtil.create_user()
         data = {
@@ -81,7 +81,7 @@ class TestUpdateSpotifyTopArtistsSignal(TestCase):
 
         auth = SpotifyUserAuth.objects.create(**data)
 
-        mock_task.assert_called_once_with(auth.pk)
+        mock_task.assert_called_once_with((auth.pk,), countdown=30)
 
         auth.save()
         self.assertEqual(mock_task.call_count, 1)

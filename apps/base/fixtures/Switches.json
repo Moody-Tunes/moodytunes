@@ -1,0 +1,1 @@
+[{"model": "waffle.switch", "pk": 1, "fields": {"name": "show_spotify_auth_prompt", "active": true, "note": "", "created": "2020-08-01T21:50:39Z", "modified": "2020-08-01T21:50:52.960Z"}}]

@@ -1,5 +1,6 @@
 import logging
 
+import waffle
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,18 +12,24 @@ from django.contrib.auth.views import (
     PasswordResetView,
 )
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic.base import RedirectView, TemplateView
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser, UserSongVote
-from accounts.serializers import AnalyticsRequestSerializer, AnalyticsSerializer
+from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
+from accounts.serializers import (
+    AnalyticsRequestSerializer,
+    AnalyticsSerializer,
+    UserProfileRequestSerializer,
+    UserProfileSerializer,
+)
 from accounts.utils import filter_duplicate_votes_on_song_from_playlist
-from base.mixins import GetRequestValidatorMixin
+from base.mixins import GetRequestValidatorMixin, PatchRequestValidatorMixin
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
@@ -39,8 +46,22 @@ class MoodyLoginView(LoginView):
         redirect_url = super().get_redirect_url()
 
         if not redirect_url:
-            # If no redirect URL provided, redirect to default login redirect
-            return settings.LOGIN_REDIRECT_URL
+            show_spotify_auth = False
+
+            if waffle.switch_is_active('show_spotify_auth_prompt'):
+
+                # Check if user has authenticated with Spotify, to prompt user to
+                # authenticate if they have not already done so
+                if self.request.user.is_authenticated:
+                    show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
+
+                    # Check if user has explicitly indicated they do not want to
+                    # authenticate with Spotify
+                    if show_spotify_auth and hasattr(self.request.user, 'userprofile'):
+                        user_profile = self.request.user.userprofile
+                        show_spotify_auth = not user_profile.has_rejected_spotify_auth
+
+            return f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth={show_spotify_auth}'
 
         try:
             # Try to resolve the URL, if it is a valid path in our system it will return
@@ -136,6 +157,8 @@ class CreateUserView(FormView):
             user.set_password(form.cleaned_data['password'])
             user.save()
 
+            UserProfile.objects.create(user=user)
+
             logger.info(
                 'Created new user: {}'.format(user.username),
                 extra={'fingerprint': auto_fingerprint('created_new_user', **kwargs)}
@@ -193,3 +216,23 @@ class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
         }
 
         return data
+
+
+class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
+    serializer_class = UserProfileSerializer
+
+    patch_request_serializer = UserProfileRequestSerializer
+
+    def get_object(self):
+        user_profile = get_object_or_404(UserProfile, user=self.request.user)
+        return user_profile
+
+    def update(self, request, *args, **kwargs):
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+
+        for name, value in self.cleaned_data.items():
+            setattr(user_profile, name, value)
+
+        user_profile.save()
+
+        return JsonResponse({'status': 'OK'})
