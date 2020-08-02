@@ -1,11 +1,14 @@
-from django.utils.deprecation import MiddlewareMixin
+from django.urls import resolve
 
 
-class ShortCircuitMiddleware(MiddlewareMixin):
-    def process_view(self, request, view, view_args, view_kwargs):
-        # Skip further middleware processing if view is in list of views
-        # to short circuit.
-        # TODO: Move to settings
-        if view.__name__ in ['BrowseView']:
-            return view(request, *view_args, **view_kwargs)
-        return None
+class ShortCircuitMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path.startswith('/tunes'):
+            func = resolve(request.path).func
+            response = func(request)
+            return response
+        else:
+            return self.get_response(request)
