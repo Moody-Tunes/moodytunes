@@ -28,12 +28,12 @@ from accounts.serializers import (
     UserProfileRequestSerializer,
     UserProfileSerializer,
 )
-from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import GetRequestValidatorMixin, PatchRequestValidatorMixin
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Emotion
+from tunes.utils import filter_duplicate_votes_on_song_from_playlist
 
 
 logger = logging.getLogger(__name__)
