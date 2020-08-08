@@ -2,6 +2,7 @@ import logging
 import random
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import Http404, JsonResponse
 from django.utils.decorators import method_decorator
@@ -95,13 +96,12 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 valence = user_emotion.valence
                 danceability = user_emotion.danceability
 
-        # If user has a SpotifyUserAuth record that has data for their top artists,
-        # include those artists in generate request
+        # Try to fetch top artists for user from Spotify
         top_artists = None
-        user_auth = getattr(self.request.user, 'spotifyuserauth', None)
-
-        if user_auth and getattr(user_auth, 'spotify_data', None):
-            top_artists = user_auth.spotify_data.top_artists
+        try:
+            top_artists = self.request.user.spotifyuserauth.spotify_data.top_artists
+        except ObjectDoesNotExist:
+            pass
 
         logger.info(
             'Generating {} browse playlist for user {}'.format(
