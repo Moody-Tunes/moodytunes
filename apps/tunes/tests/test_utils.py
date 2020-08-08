@@ -5,9 +5,10 @@ from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 
+from accounts.models import UserSongVote
 from libs.tests.helpers import MoodyUtil
-from tunes.models import Song
-from tunes.utils import CachedPlaylistManager, generate_browse_playlist
+from tunes.models import Emotion, Song
+from tunes.utils import CachedPlaylistManager, filter_duplicate_votes_on_song_from_playlist, generate_browse_playlist
 
 
 class TestGenerateBrowsePlaylist(TestCase):
@@ -256,3 +257,38 @@ class TestCachedPlaylistManager(TestCase):
 
         returned_playlist = self.manager.retrieve_cached_browse_playlist()
         self.assertIsNone(returned_playlist)
+
+
+class TestFilterDuplicateVotesOnSongs(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.song = MoodyUtil.create_song()
+        cls.user = MoodyUtil.create_user()
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
+    def test_filter_removes_duplicate_votes_on_song(self):
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=self.emotion,
+            vote=True
+        )
+
+        UserSongVote.objects.create(
+            user=self.user,
+            song=self.song,
+            emotion=self.emotion,
+            vote=True,
+            context='WORK'
+        )
+
+        user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
+        filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
+
+        self.assertEqual(filtered_votes.count(), 1)
+
+    def test_filter_passed_no_votes_returns_empty_queryset(self):
+        user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
+        filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
+
+        self.assertEqual(filtered_votes.count(), 0)

@@ -11,7 +11,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.models import UserSongVote
-from accounts.utils import filter_duplicate_votes_on_song_from_playlist
 from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
@@ -29,7 +28,7 @@ from tunes.serializers import (
     VoteInfoSerializer,
     VoteSongsRequestSerializer,
 )
-from tunes.utils import CachedPlaylistManager, generate_browse_playlist
+from tunes.utils import CachedPlaylistManager, filter_duplicate_votes_on_song_from_playlist, generate_browse_playlist
 
 
 logger = logging.getLogger(__name__)
