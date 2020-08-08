@@ -12,10 +12,7 @@ django-redis==4.11.0
 django-waffle==0.20.0
 djangorestframework==3.11.0
 envparse==0.2.0
-flake8==3.7.9
 gunicorn==20.0.4
-importanize==0.7.0
-pre-commit==2.3.0
 psycopg2-binary==2.8.4
 python-json-logger==0.1.11
 redis==3.4.1

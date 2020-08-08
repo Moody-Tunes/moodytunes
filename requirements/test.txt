@@ -1,6 +1,7 @@
 -r common.txt
 
 diff-cover==3.0.1
+flake8==3.7.9
 pytest==5.4.1
 pytest-blockage==0.2.2
 pytest-cov==2.8.1
