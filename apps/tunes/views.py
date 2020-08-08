@@ -215,6 +215,8 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
+    serializer_class = SongSerializer
+
     @update_logging_data
     def create(self, request, *args, **kwargs):
         try:
