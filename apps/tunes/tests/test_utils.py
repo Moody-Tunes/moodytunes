@@ -267,25 +267,23 @@ class TestFilterDuplicateVotesOnSongs(TestCase):
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
     def test_filter_removes_duplicate_votes_on_song(self):
-        UserSongVote.objects.create(
-            user=self.user,
-            song=self.song,
-            emotion=self.emotion,
-            vote=True
-        )
-
-        UserSongVote.objects.create(
-            user=self.user,
-            song=self.song,
-            emotion=self.emotion,
-            vote=True,
-            context='WORK'
-        )
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True, context='WORK')
 
         user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
         filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
 
         self.assertEqual(filtered_votes.count(), 1)
+
+    def test_filter_does_not_remove_different_songs(self):
+        other_song = MoodyUtil.create_song()
+        MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, other_song, self.emotion, True)
+
+        user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
+        filtered_votes = filter_duplicate_votes_on_song_from_playlist(user_votes)
+
+        self.assertEqual(filtered_votes.count(), 2)
 
     def test_filter_passed_no_votes_returns_empty_queryset(self):
         user_votes = UserSongVote.objects.filter(user=self.user, emotion=self.emotion)
