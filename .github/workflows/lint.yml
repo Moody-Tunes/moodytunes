@@ -19,7 +19,7 @@ jobs:
       - name: Install flake8
         run: |
           python -m pip install --upgrade pip
-          grep flake8 requirements/common.txt | xargs pip install
+          grep flake8 requirements/test.txt | xargs pip install
       - name: Run flake8
         run: flake8
 
