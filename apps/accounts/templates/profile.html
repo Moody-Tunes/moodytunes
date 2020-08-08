@@ -23,15 +23,15 @@
 {% endlocaltime %}
 <h3>Account Options</h3>
 <ul>
-    <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>
-    <li><a class="profile-link" href={%  url 'accounts:change-password' %}>Change Password</a></li>
+    <a class="profile-link button call-to-action-button" href="{% url 'accounts:update' %}">Update Information</a>
+    <a class="profile-link button call-to-action-button" href={%  url 'accounts:change-password' %}>Change Password</a>
 </ul>
 <h3>MoodyTunes</h3>
 <ul>
-    <li><a class="profile-link" href="{% url 'moodytunes:browse' %}">Browse New Songs</a></li>
-    <li><a class="profile-link" href="{% url 'moodytunes:playlists' %}">View Emotion Playlists</a></li>
-    <li><a class="profile-link" href="{% url 'moodytunes:suggest' %}">Suggest A New Song</a></li>
-    <li><a class="profile-link" href="{% url 'moodytunes:export' %}">Export Emotion Playlist To Spotify</a></li>
+    <a class="profile-link button call-to-action-button" href="{% url 'moodytunes:browse' %}">Browse Songs</a>
+    <a class="profile-link button call-to-action-button" href="{% url 'moodytunes:playlists' %}">View Emotion Playlists</a>
+    <a class="profile-link button call-to-action-button" href="{% url 'moodytunes:suggest' %}">Suggest A New Song</a>
+    <a class="profile-link button call-to-action-button" href="{% url 'moodytunes:export' %}">Export Playlist To Spotify</a>
 </ul>
 <div id="spotify-auth-modal" class="modal" hidden>
     <div class="modal-content">
