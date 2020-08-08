@@ -43,6 +43,7 @@ class SongAdmin(MoodyBaseAdmin):
     list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy', 'danceability')
     readonly_fields = ('code', 'artist', 'name', 'valence', 'energy', 'danceability')
     list_filter = (NullGenreFilter, 'genre')
+    search_fields = ('code', 'name', 'artist')
     form = GenreFormField
 
     def has_add_permission(self, request):
