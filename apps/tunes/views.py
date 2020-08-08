@@ -2,7 +2,6 @@ import logging
 import random
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import Http404, JsonResponse
 from django.utils.decorators import method_decorator
@@ -11,7 +10,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from accounts.models import UserSongVote
+from accounts.models import SpotifyUserData, UserSongVote
 from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
@@ -99,8 +98,9 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         # Try to fetch top artists for user from Spotify
         top_artists = None
         try:
-            top_artists = self.request.user.spotifyuserauth.spotify_data.top_artists
-        except ObjectDoesNotExist:
+            spotify_data = SpotifyUserData.objects.get(spotifyuserauth__user=self.request.user)
+            top_artists = spotify_data.top_artists
+        except SpotifyUserData.DoesNotExist:
             pass
 
         logger.info(
