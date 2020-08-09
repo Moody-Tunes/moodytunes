@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.test import TestCase
 from django.utils import timezone
 
-from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, SpotifyUserData, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
@@ -140,7 +140,7 @@ class TestSpotifyUserAuth(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
 
-    def test_should_updated_access_token_returns_false_for_recently_created_records(self):
+    def test_should_update_access_token_returns_false_for_recently_created_records(self):
         user_auth = MoodyUtil.create_spotify_user_auth(self.user)
         self.assertFalse(user_auth.should_update_access_token)
 
@@ -256,6 +256,15 @@ class TestSpotifyUserAuth(TestCase):
         user_auth.save()
 
         self.assertFalse(user_auth.has_scope(desired_scope))
+
+    def test_spotify_user_data_creation_and_deletion(self):
+        # Test SpotifyUserData record is created on auth record creation
+        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        self.assertTrue(SpotifyUserData.objects.filter(spotifyuserauth__user=self.user).exists())
+
+        # Test SpotifyUserData record is delete on auth record deletion
+        user_auth.delete()
+        self.assertFalse(SpotifyUserData.objects.filter(spotifyuserauth__user=self.user).exists())
 
 
 class TestUserSongVote(TestCase):

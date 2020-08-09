@@ -104,6 +104,13 @@ class SpotifyUserAuth(BaseModel):
 
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # Delete related SpotifyUserData record if it exists
+        if self.spotify_data is not None:
+            self.spotify_data.delete()
+
+        super().delete(*args, **kwargs)
+
     @classmethod
     @update_logging_data
     def get_and_refresh_spotify_user_auth_record(cls, auth_id, **kwargs):
