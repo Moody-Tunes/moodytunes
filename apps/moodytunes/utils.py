@@ -1,5 +1,5 @@
 from accounts.models import UserSongVote
-from accounts.utils import filter_duplicate_votes_on_song_from_playlist
+from tunes.utils import filter_duplicate_votes_on_song_from_playlist
 
 
 class ExportPlaylistHelper(object):
