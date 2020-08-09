@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import RedirectView, TemplateView
-from ratelimit.mixins import RatelimitMixin
+from ratelimit.decorators import ratelimit
 
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
@@ -58,14 +58,11 @@ class EmotionPlaylistsView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class SuggestSongView(RatelimitMixin, FormView):
+class SuggestSongView(FormView):
     template_name = 'suggest.html'
     form_class = SuggestSongForm
 
-    ratelimit_key = 'user'
-    ratelimit_rate = '3/m'
-    ratelimit_method = 'POST'
-
+    @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
     @update_logging_data
     def post(self, request, *args, **kwargs):
         # Check if request is rate limited,
