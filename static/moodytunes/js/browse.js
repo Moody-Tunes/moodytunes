@@ -4,7 +4,8 @@
     // used in requests for voting on songs
     let emotion,
         jitter,
-        genre;
+        genre,
+        artist;
 
     function init() {
         setUpContextModal();
@@ -178,7 +179,6 @@
 
         let context = sessionStorage.context;
         let description = sessionStorage.description;
-        let artist = artistInput && artistInput.value || undefined;
 
         // Only gather values from input on button press for generating browse playlist
         // This will ensure we persist values across refresh requests when the
@@ -187,6 +187,7 @@
             emotion = document.getElementById('id_emotion').value;
             jitter = document.getElementById('id_jitter').value;
             genre = document.getElementById('id_genre').value || undefined;
+            artist = artistInput && artistInput.value || undefined;
         }
 
         document.MoodyTunesClient.getBrowsePlaylist(
