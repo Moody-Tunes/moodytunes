@@ -2,8 +2,9 @@
     // Global variables for API requests to backend
     // Made global to ensure that the same options used in the request are
     // used in requests for voting on songs
-    let emotion;
-    let jitter;
+    let emotion,
+        jitter,
+        genre;
 
     function init() {
         setUpContextModal();
@@ -178,14 +179,14 @@
         let context = sessionStorage.context;
         let description = sessionStorage.description;
         let artist = artistInput && artistInput.value || undefined;
-        let genre = document.getElementById('id_genre').value || undefined;
 
-        // Only gather values from input if request for browse playlist is made
+        // Only gather values from input on button press for generating browse playlist
         // This will ensure we persist values across refresh requests when the
         // user votes on all the songs for their browse playlist
         if (evt && evt.target === generatePlaylistButton) {
             emotion = document.getElementById('id_emotion').value;
             jitter = document.getElementById('id_jitter').value;
+            genre = document.getElementById('id_genre').value || undefined;
         }
 
         document.MoodyTunesClient.getBrowsePlaylist(
