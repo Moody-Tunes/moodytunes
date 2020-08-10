@@ -227,6 +227,7 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
         user_profile = get_object_or_404(UserProfile, user=self.request.user)
         return user_profile
 
+    @update_logging_data
     def update(self, request, *args, **kwargs):
         user_profile = get_object_or_404(UserProfile, user=request.user)
 
@@ -234,5 +235,13 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
             setattr(user_profile, name, value)
 
         user_profile.save()
+
+        logger.info(
+            'Updated UserProfile record for user {}'.format(request.user.username),
+            extra={
+                'fingerprint': auto_fingerprint('updated_user_profile', **kwargs),
+                'request_data': self.cleaned_data,
+            }
+        )
 
         return JsonResponse({'status': 'OK'})
