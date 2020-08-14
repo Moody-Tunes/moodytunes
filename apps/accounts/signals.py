@@ -24,9 +24,9 @@ post_save.connect(
 
 def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
     if created and instance.vote:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.pk)
+        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
     elif not created:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.pk)
+        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
 
 
 post_save.connect(

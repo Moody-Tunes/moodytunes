@@ -3,7 +3,7 @@ from logging import getLogger
 from celery.schedules import crontab
 from django.conf import settings
 
-from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
@@ -54,30 +54,40 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
     @update_logging_data
-    def run(self, vote_id, *args, **kwargs):
+    def run(self, user_id, emotion_id, *args, **kwargs):
         """
-        Update UserEmotion attributes for an upvoted song
+        Update UserEmotion attributes for a given MoodyUser and Emotion
 
-        :param vote_id: (int) Primary key for vote record
+        :param user_id: (int) Primary key for MoodyUser in our system
+        :param emotion_id: (int) Primary key for Emotion in our system
 
         """
         try:
-            vote = UserSongVote.objects.select_related('user', 'emotion', 'song').get(pk=vote_id)
-        except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
+            user = MoodyUser.objects.get(pk=user_id)
+        except (MoodyUser.DoesNotExist, MoodyUser.MultipleObjectsReturned):
             logger.exception(
-                'Unable to fetch UserSongVote with pk={}'.format(vote_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_vote', **kwargs)}
+                'Unable to fetch MoodyUser with pk={}'.format(user_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs)}
+            )
+            raise
+
+        try:
+            emotion = Emotion.objects.get(pk=emotion_id)
+        except (Emotion.DoesNotExist, Emotion.MultipleObjectsReturned):
+            logger.exception(
+                'Unable to fetch Emotion with pk={}'.format(emotion_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_emotion', **kwargs)}
             )
             raise
 
         # We should always call get_or_create to ensure that if we add new emotions, we'll auto
         # create the corresponding UserEmotion record the first time a user votes on a song
         # for the emotion
-        user_emotion, _ = vote.user.useremotion_set.get_or_create(
-            emotion__name=vote.emotion.name,
+        user_emotion, _ = user.useremotion_set.select_related('emotion').get_or_create(
+            emotion=emotion,
             defaults={
-                'user': vote.user,
-                'emotion': vote.emotion
+                'user': user,
+                'emotion': emotion
             }
         )
 
@@ -89,23 +99,19 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
         logger.info(
             'Updated UserEmotion attributes for user {} for emotion {}'.format(
-                vote.user.username,
-                vote.emotion.full_name
+                user.username,
+                emotion.full_name
             ),
             extra={
                 'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
-                'user_id': vote.user.id,
-                'emotion_id': vote.emotion.id,
-                'song_id': vote.song.id,
+                'user_id': user.id,
+                'emotion_id': emotion.id,
                 'old_energy': old_energy,
                 'old_valence': old_valence,
                 'old_danceability': old_danceability,
                 'new_energy': user_emotion.energy,
                 'new_valence': user_emotion.valence,
                 'new_danceability': user_emotion.danceability,
-                'song_energy': vote.song.energy,
-                'song_valence': vote.song.valence,
-                'song_danceability': vote.song.danceability,
             }
         )
 
