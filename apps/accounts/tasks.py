@@ -2,6 +2,7 @@ from logging import getLogger
 
 from celery.schedules import crontab
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
@@ -62,34 +63,27 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
         :param emotion_id: (int) Primary key for Emotion in our system
 
         """
-        try:
-            user = MoodyUser.objects.get(pk=user_id)
-        except (MoodyUser.DoesNotExist, MoodyUser.MultipleObjectsReturned):
-            logger.exception(
-                'Unable to fetch MoodyUser with pk={}'.format(user_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs)}
-            )
-            raise
-
-        try:
-            emotion = Emotion.objects.get(pk=emotion_id)
-        except (Emotion.DoesNotExist, Emotion.MultipleObjectsReturned):
-            logger.exception(
-                'Unable to fetch Emotion with pk={}'.format(emotion_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_emotion', **kwargs)}
-            )
-            raise
-
         # We should always call get_or_create to ensure that if we add new emotions, we'll auto
         # create the corresponding UserEmotion record the first time a user votes on a song
         # for the emotion
-        user_emotion, _ = user.useremotion_set.select_related('emotion').get_or_create(
-            emotion=emotion,
-            defaults={
-                'user': user,
-                'emotion': emotion
-            }
-        )
+        try:
+            user_emotion, _ = UserEmotion.objects.select_related('emotion', 'user').get_or_create(
+                user_id=user_id,
+                emotion_id=emotion_id
+            )
+        except ValidationError as e:
+            logger.exception(
+                'Unable to create UserEmotion record for user_id={} and emotion_id={}'.format(user_id, emotion_id),
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_create_user_emotion', **kwargs),
+                    'error': e.error_dict
+                }
+            )
+
+            raise
+
+        user = user_emotion.user
+        emotion = user_emotion.emotion
 
         old_energy = user_emotion.energy
         old_valence = user_emotion.valence
