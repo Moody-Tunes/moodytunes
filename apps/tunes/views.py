@@ -353,7 +353,8 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         resp.data.update({
             'valence': valence,
             'energy': energy,
-            'danceability': danceability
+            'danceability': danceability,
+            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion'])
         })
 
         return resp
