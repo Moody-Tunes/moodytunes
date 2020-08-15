@@ -228,7 +228,7 @@
             document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
             document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
             document.getElementById('analytics-danceability').innerText = data.danceability && data.danceability.toPrecision(2);
-            document.getElementById('analytics-total-songs').innerText = data.total_songs;
+            document.getElementById('analytics-total-songs').innerText = data.count;
         }
     }
 
@@ -251,6 +251,7 @@
     }
 
     function displayEmotionPlaylist(data) {
+        displayAnalytics(data);
         let playlistContainer = document.getElementById('playlist-display-container');
         let buttonContainer = document.getElementById('playlist-pagination-button-container');
         let noResultsFoundAlert = document.getElementById('alert-no-results');
@@ -318,7 +319,6 @@
         }
 
         document.MoodyTunesClient.getEmotionPlaylist(emotion, genre, context, artist, displayEmotionPlaylist);
-        document.MoodyTunesClient.getUserAnalytics(emotion, genre, context, artist, displayAnalytics);
     }
 
     init();
