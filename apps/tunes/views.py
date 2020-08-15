@@ -323,20 +323,8 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
-    def filter_queryset(self, queryset):
-        if self.cleaned_data.get('genre'):
-            queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
-
-        if self.cleaned_data.get('context'):
-            queryset = queryset.filter(context=self.cleaned_data['context'])
-
-        if self.cleaned_data.get('artist'):
-            queryset = queryset.filter(song__artist__icontains=self.cleaned_data['artist'])
-
-        return filter_duplicate_votes_on_song_from_playlist(queryset)
-
     @update_logging_data
-    def get_queryset(self, **kwargs):
+    def list(self, request, *args, **kwargs):
         logger.info(
             'Generating {} emotion playlist for user {}'.format(
                 self.cleaned_data['emotion'],
@@ -353,6 +341,36 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             }
         )
 
+        resp = super(PlaylistView, self).list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Update response data with analytics for emotion
+        votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
+        valence = votes_for_emotion_data['song__valence__avg']
+        energy = votes_for_emotion_data['song__energy__avg']
+        danceability = votes_for_emotion_data['song__danceability__avg']
+
+        resp.data.update({
+            'valence': valence,
+            'energy': energy,
+            'danceability': danceability
+        })
+
+        return resp
+
+    def filter_queryset(self, queryset):
+        if self.cleaned_data.get('genre'):
+            queryset = queryset.filter(song__genre=self.cleaned_data['genre'])
+
+        if self.cleaned_data.get('context'):
+            queryset = queryset.filter(context=self.cleaned_data['context'])
+
+        if self.cleaned_data.get('artist'):
+            queryset = queryset.filter(song__artist__icontains=self.cleaned_data['artist'])
+
+        return filter_duplicate_votes_on_song_from_playlist(queryset)
+
+    def get_queryset(self):
         queryset = super(PlaylistView, self).get_queryset()
 
         return queryset.filter(
