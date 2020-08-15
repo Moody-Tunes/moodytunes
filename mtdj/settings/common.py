@@ -153,7 +153,7 @@ CACHES = {
     'session': {
         'VERSION': 1,
         'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django.core.cache.backends.filebased.FileBasedCache'),
-        'LOCATION': 'redis://127.0.0.1:6379/3',
+        'LOCATION': env.str('MTDJ_SESSION_CACHE_LOCATION', default='{}/mtdj_cache'.format(tempfile.gettempdir())),
         'OPTIONS': {
             'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
         },
