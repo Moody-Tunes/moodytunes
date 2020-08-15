@@ -150,12 +150,22 @@ CACHES = {
         },
         'KEY_PREFIX': 'mtdj'
     },
+    'session': {
+        'VERSION': 1,
+        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django.core.cache.backends.filebased.FileBasedCache'),
+        'LOCATION': 'redis://127.0.0.1:6379/3',
+        'OPTIONS': {
+            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
+        },
+        'KEY_PREFIX': 'session'
+    },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 
 GENRE_CHOICES_CACHE_KEY = 'song-genre-choices'
+SESSION_CACHE_ALIAS = 'session'
 
 BROWSE_PLAYLIST_CACHE_TIMEOUT = 60 * 10  # 10 minutes
 GENRE_CHOICES_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week
