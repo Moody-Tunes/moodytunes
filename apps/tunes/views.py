@@ -318,7 +318,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     on the songs as making them feel the given emotion.
     """
     serializer_class = PlaylistSerializer
-    queryset = UserSongVote.objects.prefetch_related('emotion', 'song').all()
+    queryset = UserSongVote.objects.all()
     pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
