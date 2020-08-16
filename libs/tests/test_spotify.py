@@ -1,4 +1,3 @@
-import json
 from base64 import b64encode
 from unittest import mock
 from urllib import parse
@@ -45,8 +44,10 @@ class TestSpotifyClient(TestCase):
             'https://accounts.spotify.com/api/token',
             data=expected_request_data,
             headers=expected_headers,
-            params=None
+            params=None,
+            json=None
         )
+
         self.assertEqual(auth, self.auth_code)
 
     @mock.patch('requests.request')
@@ -116,8 +117,10 @@ class TestSpotifyClient(TestCase):
             '/dummy_endpoint',
             params=dummy_params,
             data=dummy_data,
-            headers={'Authorization': 'Bearer {}'.format(self.auth_code)}
+            headers={'Authorization': 'Bearer {}'.format(self.auth_code)},
+            json=None
         )
+
         self.assertDictEqual(resp, dummy_response)
 
     @mock.patch('requests.request')
@@ -137,7 +140,7 @@ class TestSpotifyClient(TestCase):
             '/dummy_endpoint',
             data=dummy_data,
             params=dummy_params,
-            headers=dummy_headers
+            headers=dummy_headers,
         )
 
         mock_request.assert_called_with(
@@ -145,8 +148,10 @@ class TestSpotifyClient(TestCase):
             '/dummy_endpoint',
             params=dummy_params,
             data=dummy_data,
-            headers=dummy_headers
+            headers=dummy_headers,
+            json=None
         )
+
         self.assertDictEqual(resp, dummy_response)
 
     @mock.patch('requests.request')
@@ -496,7 +501,8 @@ class TestSpotifyClient(TestCase):
             'https://accounts.spotify.com/api/token',
             params=None,
             data=expected_request_data,
-            headers=expected_headers
+            headers=expected_headers,
+            json=None
         )
 
         self.assertDictEqual(user_tokens, expected_response_data)
@@ -521,7 +527,8 @@ class TestSpotifyClient(TestCase):
             'https://accounts.spotify.com/api/token',
             params=None,
             headers=expected_headers,
-            data=request_data
+            data=request_data,
+            json=None
         )
 
         self.assertEqual(access_token, expected_response_data['access_token'])
@@ -545,7 +552,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/me',
             headers=expected_headers,
             params=None,
-            data=None
+            data=None,
+            json=None
         )
 
         self.assertDictEqual(profile_data, mock_profile_data)
@@ -599,7 +607,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
             params=None,
             headers=expected_headers,
-            data=None
+            data=None,
+            json=None
         )
 
         self.assertDictEqual(resp, response_data)
@@ -615,10 +624,7 @@ class TestSpotifyClient(TestCase):
         mock_response.json.return_value = {'id': playlist_id}
         mock_request.return_value = mock_response
 
-        expected_headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        expected_headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         expected_data = {
             'name': playlist_name,
@@ -633,7 +639,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id),
             params=None,
             headers=expected_headers,
-            data=json.dumps(expected_data)
+            data=None,
+            json=expected_data
         )
 
     @mock.patch('requests.request')
@@ -645,10 +652,7 @@ class TestSpotifyClient(TestCase):
         mock_response = mock.Mock()
         mock_request.return_value = mock_response
 
-        expected_headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        expected_headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         expected_data = {'uris': songs}
 
@@ -659,7 +663,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
             params=None,
             headers=expected_headers,
-            data=json.dumps(expected_data)
+            data=None,
+            json=expected_data
         )
 
     @mock.patch('requests.request')
@@ -671,10 +676,7 @@ class TestSpotifyClient(TestCase):
         mock_response = mock.Mock()
         mock_request.return_value = mock_response
 
-        expected_headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        expected_headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         expected_data = {'uris': songs}
 
@@ -685,7 +687,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id),
             params=None,
             headers=expected_headers,
-            data=json.dumps(expected_data)
+            data=None,
+            json=expected_data
         )
 
     @mock.patch('requests.request')
@@ -730,7 +733,8 @@ class TestSpotifyClient(TestCase):
             'https://api.spotify.com/v1/me/top/artists',
             params=expected_params,
             headers=expected_headers,
-            data=None
+            data=None,
+            json=None
         )
 
     def test_get_code_from_spotify_uri(self):

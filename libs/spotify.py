@@ -1,5 +1,4 @@
 import copy
-import json
 import logging
 import random
 from base64 import b64encode
@@ -74,7 +73,7 @@ class SpotifyClient(object):
 
         logger.log(level, msg, extra=extra, exc_info=exc_info)
 
-    def _make_spotify_request(self, method, url, params=None, data=None, headers=None):
+    def _make_spotify_request(self, method, url, params=None, data=None, json=None, headers=None):
         """
         Make a request to the Spotify API and return the JSON response
 
@@ -82,6 +81,7 @@ class SpotifyClient(object):
         :param url: (str) URL to send request to
         :param params: (dict) GET query params to add to URL
         :param data: (dict) POST data to send in request
+        :param json: (dict) JSON data to send in request
         :param headers: (dict) Headers to include in request
 
         :return (dict) Response content
@@ -97,6 +97,7 @@ class SpotifyClient(object):
 
         logging_params = copy.deepcopy(params)
         logging_data = copy.deepcopy(data)
+        logging_json = copy.deepcopy(json)
         logging_headers = copy.deepcopy(headers)
 
         self._log(
@@ -109,6 +110,7 @@ class SpotifyClient(object):
                 'request_method': method,
                 'params': logging_params,
                 'data': logging_data,
+                'json': logging_json,
                 'headers': logging_headers
             }
         )
@@ -119,6 +121,7 @@ class SpotifyClient(object):
                 url,
                 params=params,
                 data=data,
+                json=json,
                 headers=headers
             )
             response.raise_for_status()
@@ -142,6 +145,7 @@ class SpotifyClient(object):
                 extra={
                     'request_method': method,
                     'data': logging_data,
+                    'json': logging_json,
                     'params': logging_params,
                     'headers': logging_headers,
                     'response_code': response.status_code,
@@ -529,17 +533,14 @@ class SpotifyClient(object):
             user_id=spotify_user_id
         )
 
-        headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         data = {
             'name': playlist_name,
             'public': True
         }
 
-        resp = self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+        resp = self._make_spotify_request('POST', url, json=data, headers=headers)
 
         return resp['id']
 
@@ -556,14 +557,11 @@ class SpotifyClient(object):
             playlist_id=playlist_id
         )
 
-        headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         data = {'uris': songs}
 
-        self._make_spotify_request('POST', url, headers=headers, data=json.dumps(data))
+        self._make_spotify_request('POST', url, json=data, headers=headers)
 
     def delete_songs_from_playlist(self, auth_code, playlist_id, songs):
         """
@@ -578,14 +576,11 @@ class SpotifyClient(object):
             playlist_id=playlist_id
         )
 
-        headers = {
-            'Authorization': 'Bearer {}'.format(auth_code),
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': 'Bearer {}'.format(auth_code)}
 
         data = {'uris': songs}
 
-        self._make_spotify_request('DELETE', url, headers=headers, data=json.dumps(data))
+        self._make_spotify_request('DELETE', url, json=data, headers=headers)
 
     def get_user_top_artists(self, auth_code):
         """
