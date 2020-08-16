@@ -161,4 +161,4 @@ def filter_duplicate_votes_on_song_from_playlist(user_votes):
     """
     vote_ids = user_votes.distinct('song__code').values_list('id', flat=True)
 
-    return UserSongVote.objects.select_related('emotion', 'song').filter(id__in=vote_ids).order_by('-created')
+    return UserSongVote.objects.select_related('song').filter(id__in=vote_ids).order_by('-created')

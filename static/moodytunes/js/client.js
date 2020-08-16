@@ -117,16 +117,6 @@
             // Used to build options for users to choose from when generating playlists to listen to
             this.request('GET', '/tunes/options/', {}, {}, callback);
         },
-        getUserAnalytics: function(emotion, genre, context, artist, callback) {
-            // Retrieve analytics for users based on what songs they've listened to
-            let params = {
-                emotion: emotion,
-                genre: genre,
-                context: context,
-                artist: artist
-            };
-            this.request('GET', '/accounts/analytics/', params, {}, callback);
-        },
         getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, artist, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
             // their desired emotion
