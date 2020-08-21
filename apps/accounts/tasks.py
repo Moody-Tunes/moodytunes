@@ -2,8 +2,9 @@ from logging import getLogger
 
 from celery.schedules import crontab
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
-from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
+from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.spotify import SpotifyClient, SpotifyException
@@ -54,32 +55,35 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
     @update_logging_data
-    def run(self, vote_id, *args, **kwargs):
+    def run(self, user_id, emotion_id, *args, **kwargs):
         """
-        Update UserEmotion attributes for an upvoted song
+        Update UserEmotion attributes for a given MoodyUser and Emotion
 
-        :param vote_id: (int) Primary key for vote record
+        :param user_id: (int) Primary key for MoodyUser in our system
+        :param emotion_id: (int) Primary key for Emotion in our system
 
         """
-        try:
-            vote = UserSongVote.objects.select_related('user', 'emotion', 'song').get(pk=vote_id)
-        except (UserSongVote.DoesNotExist, UserSongVote.MultipleObjectsReturned):
-            logger.exception(
-                'Unable to fetch UserSongVote with pk={}'.format(vote_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_vote', **kwargs)}
-            )
-            raise
-
         # We should always call get_or_create to ensure that if we add new emotions, we'll auto
         # create the corresponding UserEmotion record the first time a user votes on a song
         # for the emotion
-        user_emotion, _ = vote.user.useremotion_set.get_or_create(
-            emotion__name=vote.emotion.name,
-            defaults={
-                'user': vote.user,
-                'emotion': vote.emotion
-            }
-        )
+        try:
+            user_emotion, _ = UserEmotion.objects.select_related('emotion', 'user').get_or_create(
+                user_id=user_id,
+                emotion_id=emotion_id
+            )
+        except ValidationError as e:
+            logger.exception(
+                'Unable to create UserEmotion record for user_id={} and emotion_id={}'.format(user_id, emotion_id),
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_create_user_emotion', **kwargs),
+                    'error': e.error_dict
+                }
+            )
+
+            raise
+
+        user = user_emotion.user
+        emotion = user_emotion.emotion
 
         old_energy = user_emotion.energy
         old_valence = user_emotion.valence
@@ -89,23 +93,19 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
 
         logger.info(
             'Updated UserEmotion attributes for user {} for emotion {}'.format(
-                vote.user.username,
-                vote.emotion.full_name
+                user.username,
+                emotion.full_name
             ),
             extra={
                 'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
-                'user_id': vote.user.id,
-                'emotion_id': vote.emotion.id,
-                'song_id': vote.song.id,
+                'user_id': user.id,
+                'emotion_id': emotion.id,
                 'old_energy': old_energy,
                 'old_valence': old_valence,
                 'old_danceability': old_danceability,
                 'new_energy': user_emotion.energy,
                 'new_valence': user_emotion.valence,
                 'new_danceability': user_emotion.danceability,
-                'song_energy': vote.song.energy,
-                'song_valence': vote.song.valence,
-                'song_danceability': vote.song.danceability,
             }
         )
 
