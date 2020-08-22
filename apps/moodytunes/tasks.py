@@ -147,7 +147,11 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
             raise Exception('Insufficient Spotify scopes to export playlist')
 
-        spotify = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'], identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
+        spotify = SpotifyClient(
+            settings.SPOTIFY['client_id'],
+            settings.SPOTIFY['secret_key'],
+            identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id)
+        )
 
         logger.info(
             'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.user.username),
