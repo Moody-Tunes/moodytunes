@@ -3,8 +3,8 @@ from unittest import mock
 
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+from spotify_client.exceptions import SpotifyException
 
-from libs.spotify import SpotifyException
 from libs.tests.helpers import generate_random_unicode_string
 from tunes.management.commands.tunes_create_songs_from_spotify import Command as SpotifyCommand
 from tunes.models import Song
@@ -82,7 +82,7 @@ class TestSpotifyCommand(TestCase):
         self.assertEqual(success, 0)
         self.assertEqual(fail, 1)
 
-    @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
+    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
     def test_script_raises_command_error_if_no_tracks_retrieved_spotify_exception(self, mock_spotify_request):
         # We'll raise an exception on the first request to ensure we don't get any tracks back
         mock_spotify_request.side_effect = SpotifyException('Test Spotify Exception')
@@ -90,7 +90,7 @@ class TestSpotifyCommand(TestCase):
         with self.assertRaises(CommandError):
             call_command('tunes_create_songs_from_spotify')
 
-    @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
+    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
     def test_script_raises_command_error_if_no_tracks_retrieved_base_exception(self, mock_spotify_request):
         # We'll raise an exception on the first request to ensure we don't get any tracks back
         mock_spotify_request.side_effect = Exception('Test Exception')
@@ -98,9 +98,9 @@ class TestSpotifyCommand(TestCase):
         with self.assertRaises(CommandError):
             call_command('tunes_create_songs_from_spotify')
 
-    @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
-    @mock.patch('libs.spotify.SpotifyClient.get_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
+    @mock.patch('spotify_client.SpotifyClient.get_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
     def test_spotify_exception_raised_with_some_tracks(self, mock_features, _, mock_playlists):
         # If one category returns some tracks and the next one raises an exception, we should
         # still process the songs we got
@@ -115,9 +115,9 @@ class TestSpotifyCommand(TestCase):
 
         self.assertEqual(Song.objects.count(), 1)
 
-    @mock.patch('libs.spotify.SpotifyClient.get_playlists_for_category')
-    @mock.patch('libs.spotify.SpotifyClient.get_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
+    @mock.patch('spotify_client.SpotifyClient.get_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
     def test_exception_raised_with_some_tracks(self, mock_features, _, mock_playlists):
         # If one category returns some tracks and the next one raises an exception, we should
         # still process the songs we got

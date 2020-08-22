@@ -3,9 +3,10 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management import CommandError
+from spotify_client import SpotifyClient
+from spotify_client.exceptions import SpotifyException
 
 from base.management.commands import MoodyBaseCommand
-from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
 
@@ -58,7 +59,12 @@ class Command(MoodyBaseCommand):
 
         :return: (list(dict)) Track data for saving as Song records
         """
-        spotify = SpotifyClient(identifier=self._unique_id)
+        spotify = SpotifyClient(
+            settings.SPOTIFY['client_id'],
+            settings.SPOTIFY['secret_key'],
+            identifier=self._unique_id
+        )
+
         tracks = []
 
         for category in settings.SPOTIFY['categories']:
