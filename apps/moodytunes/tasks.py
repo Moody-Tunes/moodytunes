@@ -73,7 +73,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param spotify_user_id: (str) Spotify username for the given user
         :param playlist_name: (str) Name of the playlist to be created
-        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
 
         :return: (str)
         """
@@ -116,7 +116,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param songs: (list) Collection of Spotify track URIs to add to playlist
-        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
 
         """
         # Spotify has a limit of 100 songs per request to add songs to a playlist
