@@ -4,17 +4,17 @@ from unittest import mock
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import SpotifyUserAuth
-from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from tunes.models import Song
 
 
 class TestFetchSongFromSpotify(TestCase):
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
-    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_attributes_for_track')
     def test_happy_path(self, mock_get_attributes, mock_get_features):
         song_code = 'spotify:track:1234567'
 
@@ -37,7 +37,7 @@ class TestFetchSongFromSpotify(TestCase):
         self.assertTrue(Song.objects.filter(code=song_code).exists())
 
     @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    @mock.patch('spotify_client.SpotifyClient.get_attributes_for_track')
     def test_task_is_retried_on_spotify_error(self, mock_get_attributes, mock_retry):
         mock_get_attributes.side_effect = SpotifyException
         song_code = 'spotify:track:1234567'
@@ -46,8 +46,8 @@ class TestFetchSongFromSpotify(TestCase):
 
         mock_retry.assert_called_once()
 
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
-    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_attributes_for_track')
     def test_task_does_not_call_spotify_if_song_already_exists(self, mock_get_attributes, mock_get_features):
         song = MoodyUtil.create_song()
 
@@ -57,8 +57,8 @@ class TestFetchSongFromSpotify(TestCase):
         mock_get_features.assert_not_called()
 
     @mock.patch('tunes.models.Song.objects.create')
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
-    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_attributes_for_track')
     def test_validation_error_on_song_create_raises_exception(
             self,
             mock_get_attributes,
@@ -86,8 +86,8 @@ class TestFetchSongFromSpotify(TestCase):
         with self.assertRaises(ValidationError):
             FetchSongFromSpotifyTask().run(song_code)
 
-    @mock.patch('libs.spotify.SpotifyClient.get_audio_features_for_tracks')
-    @mock.patch('libs.spotify.SpotifyClient.get_attributes_for_track')
+    @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
+    @mock.patch('spotify_client.SpotifyClient.get_attributes_for_track')
     def test_task_handles_song_with_unicode_data(self, mock_get_attributes, mock_get_features):
         song_code = 'spotify:track:1234567'
         song_name = generate_random_unicode_string(10)
@@ -121,10 +121,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         cls.playlist_name = 'new_playlist'
         cls.songs = ['spotify:track:1']
 
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_happy_path(
             self,
             mock_get_user_playlists,
@@ -147,10 +147,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
     @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_error_creating_playlist_retries(
             self,
             mock_get_user_playlists,
@@ -168,10 +168,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_retry.assert_called_once()
 
     @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_error_adding_songs_to_playlist_retries(
             self,
             mock_get_user_playlists,
@@ -191,10 +191,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_retry.assert_called_once()
 
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_found_playlist_does_not_create_new_playlist(
             self,
             mock_get_user_playlists,
@@ -211,10 +211,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         mock_create_playlist.assert_not_called()
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_playlist_not_found_creates_new_playlist(
             self,
             mock_get_user_playlists,
@@ -237,10 +237,10 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
-    @mock.patch('libs.spotify.SpotifyClient.delete_songs_from_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.add_songs_to_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.create_playlist')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_playlists')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
     def test_error_finding_playlist_creates_new_playlist(
             self,
             mock_get_user_playlists,
@@ -269,7 +269,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
             CreateSpotifyPlaylistFromSongsTask().run(invalid_auth_id, self.playlist_name, self.songs)
 
     @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
         self.auth.last_refreshed = timezone.now() - timedelta(days=1)
         self.auth.save()
