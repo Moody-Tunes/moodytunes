@@ -5,9 +5,9 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import SpotifyUserAuth
-from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from tunes.models import Emotion
 
