@@ -168,7 +168,7 @@ class TestSpotifyUserAuth(TestCase):
         self.assertEqual(user_auth.access_token, access_token)
         self.assertEqual(user_auth.refresh_token, refresh_token)
 
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('spotify_client.SpotifyClient.refresh_access_token')
     def test_refresh_access_token_happy_path(self, mock_refresh_access_token):
         refresh_access_token = 'mock:spotify:access:token'
         mock_refresh_access_token.return_value = refresh_access_token
@@ -189,7 +189,7 @@ class TestSpotifyUserAuth(TestCase):
         self.assertEqual(user_auth.access_token, refresh_access_token)
         self.assertGreater(user_auth.last_refreshed, old_last_refreshed)
 
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('spotify_client.SpotifyClient.refresh_access_token')
     def test_refresh_access_token_raises_exception(self, mock_refresh_access_token):
         mock_refresh_access_token.side_effect = SpotifyException
 
@@ -210,7 +210,7 @@ class TestSpotifyUserAuth(TestCase):
 
         self.assertEqual(user_auth.pk, retrieved_user_auth.pk)
 
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('spotify_client.SpotifyClient.refresh_access_token')
     def test_get_and_refresh_spotify_user_auth_record_refreshes_access_token_if_needed(self, mock_refresh_access_token):
         refresh_access_token = 'mock:spotify:access:token'
         mock_refresh_access_token.return_value = refresh_access_token
@@ -229,7 +229,7 @@ class TestSpotifyUserAuth(TestCase):
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
             SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(invalid_auth_id)
 
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('spotify_client.SpotifyClient.refresh_access_token')
     def test_get_and_refresh_spotify_user_auth_record_raises_spotify_exception(self, mock_refresh_access_token):
         mock_refresh_access_token.side_effect = SpotifyException
 
