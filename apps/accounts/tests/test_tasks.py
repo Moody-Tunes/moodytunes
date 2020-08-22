@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import TestCase
 from django.utils import timezone
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
@@ -15,7 +16,6 @@ from accounts.tasks import (
     UpdateTopArtistsFromSpotifyTask,
     UpdateUserEmotionRecordAttributeTask,
 )
-from libs.spotify import SpotifyException
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
 from tunes.models import Emotion
@@ -104,7 +104,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         cls.user = MoodyUtil.create_user()
         cls.auth = MoodyUtil.create_spotify_user_auth(cls.user)
 
-    @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
+    @mock.patch('spotify_client.SpotifyClient.get_user_top_artists')
     def test_happy_path(self, mock_get_top_artists):
         top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
         mock_get_top_artists.return_value = top_artists
@@ -115,7 +115,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         self.assertListEqual(self.auth.spotify_data.top_artists, top_artists)
 
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.get_user_top_artists')
+    @mock.patch('spotify_client.SpotifyClient.get_user_top_artists')
     def test_spotify_error_on_get_top_artists_causes_task_to_retry(self, mock_get_top_artists, mock_retry):
         mock_get_top_artists.side_effect = SpotifyException
 
@@ -130,7 +130,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
             UpdateTopArtistsFromSpotifyTask().run(invalid_auth_id)
 
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
-    @mock.patch('libs.spotify.SpotifyClient.refresh_access_token')
+    @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
         self.auth.last_refreshed = timezone.now() - timedelta(days=1)
         self.auth.save()
