@@ -336,7 +336,7 @@ class ExportPlayListView(FormView):
                 }
             )
 
-            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
+            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs, cover_image_filename)
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 

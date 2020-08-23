@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from spotify_client import SpotifyClient
-from spotify_client.exceptions import SpotifyException
+from spotify_client.exceptions import ClientException, SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
@@ -130,7 +130,26 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
 
     @update_logging_data
-    def run(self, auth_id, playlist_name, songs, *args, **kwargs):
+    def upload_cover_image(self, auth_code, playlist_id, cover_image_filename, spotify, **kwargs):
+        """
+        Upload custom cover image for playlist
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify ID of the playlist to be created
+        :param cover_image_filename: (str) Filename of cover image as a file on disk
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
+        """
+        try:
+            spotify.upload_image_to_playlist(auth_code, playlist_id, cover_image_filename)
+        except (SpotifyException, ClientException):
+            logger.warning(
+                'Unable to cover image for playlist {}'.format(playlist_id),
+                extra={'fingerprint': auto_fingerprint('failed_upload_cover_image', **kwargs)},
+                exc_info=True
+            )
+
+    @update_logging_data
+    def run(self, auth_id, playlist_name, songs, cover_image_filename=None, *args, **kwargs):
         auth = SpotifyUserAuth.get_and_refresh_spotify_user_auth_record(auth_id)
 
         # Check that user has granted proper scopes to export playlist to Spotify
@@ -161,6 +180,11 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         )
 
         playlist_id = self.get_or_create_playlist(auth.access_token, auth.spotify_user_id, playlist_name, spotify)
+
+        # Upload cover image for playlist if specified
+        if cover_image_filename:
+            self.upload_cover_image(auth.access_token, playlist_id, cover_image_filename, spotify)
+
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
 
         logger.info(
