@@ -17,4 +17,4 @@ psycopg2-binary==2.8.5
 python-json-logger==0.1.11
 redis==3.5.3
 requests==2.24.0
-spotify-client==1.0.1
+spotify-client==1.1.0
