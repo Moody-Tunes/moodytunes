@@ -21,7 +21,7 @@ class TestCreateSongsFromSpotifyTask(TestCase):
         )
 
     @mock.patch('tunes.tasks.open')
-    @mock.patch('libs.spotify.SpotifyClient._make_spotify_request')
+    @mock.patch('spotify_client.SpotifyClient._make_spotify_request')
     @mock.patch('tunes.tasks.CreateSongsFromSpotifyTask.retry')
     def test_task_retries_if_exception_is_raised(self, mock_retry, mock_spotify_request, mock_open):
         mock_output = mock.Mock()

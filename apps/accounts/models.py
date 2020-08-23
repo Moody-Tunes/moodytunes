@@ -7,11 +7,12 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
+from spotify_client import SpotifyClient
+from spotify_client.exceptions import SpotifyException
 
 from base.models import BaseModel
 from base.validators import validate_decimal_value
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.spotify import SpotifyClient, SpotifyException
 from libs.utils import average
 
 
@@ -157,7 +158,11 @@ class SpotifyUserAuth(BaseModel):
     @update_logging_data
     def refresh_access_token(self, **kwargs):
         """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
-        spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
+        spotify_client = SpotifyClient(
+            settings.SPOTIFY['client_id'],
+            settings.SPOTIFY['secret_key'],
+            identifier='update-access-token:{}'.format(self.user.username)
+        )
 
         try:
             access_token = spotify_client.refresh_access_token(self.refresh_token)

@@ -13,11 +13,12 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import RedirectView, TemplateView
 from ratelimit.decorators import ratelimit
+from spotify_client import SpotifyClient
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.spotify import SpotifyClient, SpotifyException
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
@@ -110,7 +111,12 @@ class SpotifyAuthenticationView(TemplateView):
         context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
         state = get_random_string(length=48)
 
-        context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(state)
+        client = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'])
+        context['spotify_auth_url'] = client.build_spotify_oauth_confirm_link(
+            state,
+            settings.SPOTIFY['auth_user_scopes'],
+            settings.SPOTIFY['auth_redirect_uri']
+        )
 
         self.request.session['state'] = state
         self.request.session['redirect_url'] = self.request.GET.get('redirect_url')
@@ -148,10 +154,14 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
+            spotify_client = SpotifyClient(
+                settings.SPOTIFY['client_id'],
+                settings.SPOTIFY['secret_key'],
+                identifier='spotify_auth_access:{}'.format(user.username),
+            )
 
             try:
-                tokens = spotify_client.get_access_and_refresh_tokens(code)
+                tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
             except SpotifyException:
                 logger.exception(
                     'Unable to get Spotify tokens for user {}'.format(user.username),
