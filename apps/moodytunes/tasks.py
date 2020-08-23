@@ -108,8 +108,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         return playlist_id
 
-    @update_logging_data
-    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify, **kwargs):
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify):
         """
         Call Spotify API to add songs to a playlist
 
