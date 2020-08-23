@@ -1,4 +1,5 @@
 import logging
+import tempfile
 
 from django.conf import settings
 from django.contrib import messages
@@ -267,7 +268,7 @@ class ExportPlayListView(FormView):
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST, request.FILES)
 
         if form.is_valid():
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
@@ -292,6 +293,21 @@ class ExportPlayListView(FormView):
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
 
+            # Handle cover image upload
+            cover_image_filename = None
+
+            if form.cleaned_data.get('cover_image'):
+                cover_image_filename = '{}/{}_{}_{}.jpg'.format(
+                    tempfile.gettempdir(),
+                    request.user.username,
+                    form.cleaned_data['emotion'],
+                    form.cleaned_data['playlist_name'],
+                )
+
+                with open(cover_image_filename, 'wb+') as destination:
+                    for chunk in form.cleaned_data['cover_image'].chunks():
+                        destination.write(chunk)
+
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']
             genre = form.cleaned_data['genre']
@@ -300,10 +316,8 @@ class ExportPlayListView(FormView):
             songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
 
             if not songs:
-                emotion = Emotion.objects.get(name=emotion_name)
-                emotion_fullname = emotion.full_name
                 msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
-                    emotion_fullname.lower()
+                    Emotion.get_full_name_from_keyword(emotion_name).lower()
                 )
 
                 messages.error(request, msg)
