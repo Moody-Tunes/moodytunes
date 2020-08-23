@@ -132,7 +132,8 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     @update_logging_data
     def upload_cover_image(self, auth_code, playlist_id, cover_image_filename, spotify, **kwargs):
         """
-        Upload custom cover image for playlist
+        Upload custom cover image for playlist. If any errors were encountered it will just fail
+        silently.
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
@@ -143,7 +144,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             spotify.upload_image_to_playlist(auth_code, playlist_id, cover_image_filename)
         except (SpotifyException, ClientException):
             logger.warning(
-                'Unable to cover image for playlist {}'.format(playlist_id),
+                'Unable to upload cover image for playlist {}'.format(playlist_id),
                 extra={'fingerprint': auto_fingerprint('failed_upload_cover_image', **kwargs)},
                 exc_info=True
             )
