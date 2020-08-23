@@ -97,4 +97,4 @@ class ExportPlaylistForm(forms.Form):
     playlist_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Playlist Name'}))
     genre = forms.ChoiceField(choices=get_genre_choices, required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
-    cover_image = forms.FileField(required=False)
+    cover_image = forms.ImageField(required=False)

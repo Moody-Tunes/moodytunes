@@ -13,6 +13,7 @@ django-waffle==1.0.0
 djangorestframework==3.11.1
 envparse==0.2.0
 gunicorn==20.0.4
+Pillow==7.2.0
 psycopg2-binary==2.8.5
 python-json-logger==0.1.11
 redis==3.5.3
