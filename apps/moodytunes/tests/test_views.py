@@ -303,12 +303,22 @@ class TestExportView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-    def test_user_with_no_auth_redirect_to_auth_page(self):
+    def test_get_user_with_no_auth_redirect_to_auth_page(self):
         self.client.logout()
         self.client.login(username=self.user_with_no_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+
+    def test_get_auth_without_proper_scope_is_redirected_to_auth_page(self):
+        # Clear Spotify OAuth scopes for SpotifyUserAuth record
+        self.spotify_auth.scopes = []
+        self.spotify_auth.save()
+
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
 
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
     def test_post_request_happy_path(self, mock_task_call):
@@ -417,24 +427,3 @@ class TestExportView(TestCase):
             [song.code],
             expected_image_filename
         )
-
-    def test_post_auth_without_proper_scope_is_redirected_to_auth_page(self):
-        # Set up playlist for creation
-        song = MoodyUtil.create_song()
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
-
-        playlist_name = 'test'
-        data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name
-        }
-
-        # Clear Spotify OAuth scopes for SpotifyUserAuth record
-        self.spotify_auth.scopes = []
-        self.spotify_auth.save()
-
-        resp = self.client.post(self.url, data)
-
-        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
-        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
