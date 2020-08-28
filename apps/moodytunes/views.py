@@ -1,6 +1,7 @@
 import logging
 import tempfile
 
+from PIL import Image
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -304,9 +305,11 @@ class ExportPlayListView(FormView):
                     form.cleaned_data['playlist_name'],
                 )
 
-                with open(cover_image_filename, 'wb+') as destination:
-                    for chunk in form.cleaned_data['cover_image'].chunks():
-                        destination.write(chunk)
+                img = Image.open(form.cleaned_data['cover_image'])
+                img = img.convert('RGB')
+
+                with open(cover_image_filename, 'wb+') as img_file:
+                    img.save(img_file, format='JPEG')
 
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']
