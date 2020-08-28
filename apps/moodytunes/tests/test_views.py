@@ -308,7 +308,7 @@ class TestExportView(TestCase):
 
         self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
 
-    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.delay')
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
     def test_post_request_happy_path(self, mock_task_call):
         # Set up playlist for creation
         song = MoodyUtil.create_song()

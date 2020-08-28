@@ -61,7 +61,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             raise
 
 
-class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
+class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     default_retry_delay = 60 * 15
     autoretry_for = (SpotifyException,)
 

@@ -20,7 +20,7 @@ from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from moodytunes.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
@@ -322,7 +322,7 @@ class ExportPlayListView(FormView):
                 }
             )
 
-            CreateSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
+            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
