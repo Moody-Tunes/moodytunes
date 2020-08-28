@@ -153,10 +153,9 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         )
 
         logger.info(
-            'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.user.username),
+            'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('start_export_playlist', **kwargs),
-                'songs': songs,
                 'auth_id': auth.pk
             }
         )
@@ -168,7 +167,6 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             'Exported songs to playlist {} for user {} successfully'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('success_export_playlist', **kwargs),
-                'songs': songs,
                 'auth_id': auth.pk
             }
         )
