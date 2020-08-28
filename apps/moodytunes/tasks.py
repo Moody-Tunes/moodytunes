@@ -183,7 +183,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         playlist_id = self.get_or_create_playlist(auth.access_token, auth.spotify_user_id, playlist_name, spotify)
 
         # Upload cover image for playlist if specified
-        if cover_image_filename:
+        if auth.has_scope(settings.SPOTIFY_UPLOAD_PLAYLIST_IMAGE) and cover_image_filename:
             self.upload_cover_image(auth.access_token, playlist_id, cover_image_filename, spotify)
 
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
