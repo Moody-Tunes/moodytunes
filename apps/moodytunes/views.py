@@ -275,24 +275,25 @@ class ExportPlayListView(FormView):
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
             # Check that user has the proper scopes from Spotify to create playlist
-            if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
-                logger.warning(
-                    'User {} did not grant proper scopes for playlist export. Redirecting to grant scopes'.format(
-                        request.user.username
-                    ),
-                    extra={
-                        'user_id': request.user.pk,
-                        'auth_id': auth.pk,
-                        'scopes': auth.scopes,
-                        'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs)
-                    }
-                )
+            for scope in settings.SPOTIFY['auth_user_scopes']:
+                if not auth.has_scope(scope):
+                    logger.warning(
+                        'User {} did not grant proper scopes for playlist export. Redirecting to grant scopes'.format(
+                            request.user.username
+                        ),
+                        extra={
+                            'user_id': request.user.pk,
+                            'auth_id': auth.pk,
+                            'scopes': auth.scopes,
+                            'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs)
+                        }
+                    )
 
-                auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
+                    auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
 
-                messages.error(request, 'Please reauthenticate with Spotify to export your playlist')
+                    messages.error(request, 'Please reauthenticate with Spotify to export your playlist')
 
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+                    return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
 
             # Handle cover image upload
             cover_image_filename = None
