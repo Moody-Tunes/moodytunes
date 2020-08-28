@@ -1,4 +1,6 @@
+import os
 import tempfile
+from io import BytesIO
 from unittest import mock
 
 from django.conf import settings
@@ -377,6 +379,44 @@ class TestExportView(TestCase):
         msg = 'Please submit a valid request'
 
         self.assertEqual(last_message, msg)
+
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
+    def test_post_with_image_upload_saves_image(self, mock_task_call):
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        with open('{}/apps/moodytunes/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
+            img = BytesIO(img_file.read())
+            img.name = 'my_cover.jpg'
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name,
+            'cover_image': img
+        }
+
+        expected_image_filename = '{}/{}_{}_{}.jpg'.format(
+            tempfile.gettempdir(),
+            self.user.username,
+            data['emotion'],
+            data['playlist_name'],
+        )
+
+        # Cleanup old cover file if exists
+        if os.path.exists(expected_image_filename):
+            os.unlink(expected_image_filename)
+
+        self.client.post(self.url, data)
+
+        self.assertTrue(os.path.exists(expected_image_filename))
+        mock_task_call.assert_called_once_with(
+            self.spotify_auth.pk,
+            playlist_name,
+            [song.code],
+            expected_image_filename
+        )
 
     def test_post_auth_without_proper_scope_is_redirected_to_auth_page(self):
         # Set up playlist for creation
