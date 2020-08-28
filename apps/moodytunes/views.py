@@ -261,6 +261,7 @@ class ExportPlayListView(FormView):
     template_name = 'export.html'
     form_class = ExportPlaylistForm
 
+    @update_logging_data
     def get(self, request, *args, **kwargs):
         try:
             auth = SpotifyUserAuth.objects.get(user=request.user)
