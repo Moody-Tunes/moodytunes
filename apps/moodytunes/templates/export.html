@@ -18,12 +18,17 @@
     export and  the name of the playlist to be created and it will be added to your Spotify account!</p>
     <form id="export-playlist-form" name="export-playlist-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {{ form.emotion.errors }}
         <p>Emotion: {{ form.emotion }}</p>
+        {{ form.genre.errors }}
         <p>Genre: {{ form.genre }}</p>
+        {{ form.context.errors }}
         <p>Context: {{ form.context }}</p>
+        {{ form.playlist_name.errors }}
         <p>{{ form.playlist_name }}</p>
         {% switch 'add_cover_image_to_export_playlist' %}
             <p id="error-message" class="error-message" hidden>Please submit a file less than 256 kB in size.</p>
+            {{ form.cover_image.errors }}
             <p>{{ form.cover_image }}</p>
         {% endswitch %}
         <button type="submit" class="call-to-action-button">Export Playlist</button>

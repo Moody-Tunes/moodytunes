@@ -347,4 +347,4 @@ class ExportPlayListView(FormView):
 
         else:
             messages.error(request, 'Please submit a valid request')
-            return HttpResponseRedirect(reverse('moodytunes:export'))
+            return render(request, self.template_name, {'form': form})
