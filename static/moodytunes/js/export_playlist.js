@@ -7,6 +7,12 @@
     function validateFileUpload(evt) {
         let maxFileSize = 256;
         let fileInput = document.getElementById('id_cover_image');
+
+        // Early exit; If no file field present allow submission
+        if (fileInput === null) {
+            return;
+        }
+
         let errorMessage = document.getElementById('error-message');
         errorMessage.hidden = true;
 

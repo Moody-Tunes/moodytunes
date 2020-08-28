@@ -1,1 +1,1 @@
-[{"model": "waffle.switch", "pk": 1, "fields": {"name": "show_spotify_auth_prompt", "active": true, "note": "", "created": "2020-08-01T21:50:39Z", "modified": "2020-08-01T21:50:52.960Z"}}]
+[{"model": "waffle.switch", "pk": 1, "fields": {"name": "show_spotify_auth_prompt", "active": true, "note": "", "created": "2020-08-01T21:50:39Z", "modified": "2020-08-01T21:50:52.960Z"}}, {"model": "waffle.switch", "pk": 2, "fields": {"name": "add_cover_image_to_export_playlist", "active": true, "note": "", "created": "2020-08-28T04:49:55Z", "modified": "2020-08-28T04:50:09.530Z"}}]
