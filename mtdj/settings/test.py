@@ -11,6 +11,9 @@ logging.disable(logging.CRITICAL)
 # Disable caching when running unit tests
 CACHES['default'] = CACHES['dummy']
 
+# Set session store to use dummy cache for tests
+SESSION_CACHE_ALIAS = 'default'
+
 DATABASE_BACKUPS_PATH = tempfile.gettempdir()
 
 # We want to make it easy to create test users, so we'll remove the password

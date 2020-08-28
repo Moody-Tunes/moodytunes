@@ -21,19 +21,11 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
-from accounts.serializers import (
-    AnalyticsRequestSerializer,
-    AnalyticsSerializer,
-    UserProfileRequestSerializer,
-    UserProfileSerializer,
-)
-from base.mixins import GetRequestValidatorMixin, PatchRequestValidatorMixin
+from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile
+from accounts.serializers import UserProfileRequestSerializer, UserProfileSerializer
+from base.mixins import PatchRequestValidatorMixin
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.utils import average
-from tunes.models import Emotion
-from tunes.utils import filter_duplicate_votes_on_song_from_playlist
 
 
 logger = logging.getLogger(__name__)
@@ -171,53 +163,6 @@ class CreateUserView(FormView):
             return render(request, self.template_name, {'form': form})
 
 
-class AnalyticsView(GetRequestValidatorMixin, generics.RetrieveAPIView):
-    serializer_class = AnalyticsSerializer
-
-    get_request_serializer = AnalyticsRequestSerializer
-
-    def get_object(self):
-        energy = None
-        valence = None
-        danceability = None
-        context = self.cleaned_data.get('context')
-        genre = self.cleaned_data.get('genre')
-        artist = self.cleaned_data.get('artist')
-
-        votes_for_emotion = UserSongVote.objects.select_related('song').filter(
-            user=self.request.user,
-            emotion__name=self.cleaned_data['emotion'],
-            vote=True
-        )
-
-        if context:
-            votes_for_emotion = votes_for_emotion.filter(context=context)
-
-        if genre:
-            votes_for_emotion = votes_for_emotion.filter(song__genre=genre)
-
-        if artist:
-            votes_for_emotion = votes_for_emotion.filter(song__artist__icontains=artist)
-
-        if votes_for_emotion.exists():
-            votes_for_emotion = filter_duplicate_votes_on_song_from_playlist(votes_for_emotion)
-
-            votes_for_emotion_data = average(votes_for_emotion, 'song__valence', 'song__energy', 'song__danceability')
-            valence = votes_for_emotion_data['song__valence__avg']
-            energy = votes_for_emotion_data['song__energy__avg']
-            danceability = votes_for_emotion_data['song__danceability__avg']
-
-        data = {
-            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
-            'energy': energy,
-            'valence': valence,
-            'danceability': danceability,
-            'total_songs': votes_for_emotion.count()
-        }
-
-        return data
-
-
 class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
     serializer_class = UserProfileSerializer
 
@@ -227,6 +172,7 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
         user_profile = get_object_or_404(UserProfile, user=self.request.user)
         return user_profile
 
+    @update_logging_data
     def update(self, request, *args, **kwargs):
         user_profile = get_object_or_404(UserProfile, user=request.user)
 
@@ -234,5 +180,13 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
             setattr(user_profile, name, value)
 
         user_profile.save()
+
+        logger.info(
+            'Updated UserProfile record for user {}'.format(request.user.username),
+            extra={
+                'fingerprint': auto_fingerprint('updated_user_profile', **kwargs),
+                'request_data': self.cleaned_data,
+            }
+        )
 
         return JsonResponse({'status': 'OK'})

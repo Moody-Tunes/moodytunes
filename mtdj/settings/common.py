@@ -86,6 +86,7 @@ SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_PRELOAD = True  # Include site in HSTS preload list
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_SECURE = True  # Add `secure` flag when setting session cookie
 SESSION_COOKIE_HTTPONLY = True  # Add `HttpOnly` flag when setting session cookie
@@ -149,12 +150,22 @@ CACHES = {
         },
         'KEY_PREFIX': 'mtdj'
     },
+    'session': {
+        'VERSION': 1,
+        'BACKEND': env.str('MTDJ_CACHE_BACKEND', default='django.core.cache.backends.filebased.FileBasedCache'),
+        'LOCATION': env.str('MTDJ_SESSION_CACHE_LOCATION', default='{}/mtdj_cache'.format(tempfile.gettempdir())),
+        'OPTIONS': {
+            'CLIENT_CLASS': env.str('MTDJ_CACHE_CLIENT', default=''),
+        },
+        'KEY_PREFIX': 'session'
+    },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 
 GENRE_CHOICES_CACHE_KEY = 'song-genre-choices'
+SESSION_CACHE_ALIAS = 'session'
 
 BROWSE_PLAYLIST_CACHE_TIMEOUT = 60 * 10  # 10 minutes
 GENRE_CHOICES_CACHE_TIMEOUT = 60 * 60 * 24 * 7  # 1 week

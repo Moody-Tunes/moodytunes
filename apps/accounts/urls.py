@@ -22,6 +22,5 @@ urlpatterns = [
     path('create/', views.CreateUserView.as_view(), name='create'),
 
     # Django Rest Framework endpoints
-    path('analytics/', views.AnalyticsView.as_view(), name='analytics'),
     path('user_profile/', views.UserProfileView.as_view(), name='user-profile'),
 ]

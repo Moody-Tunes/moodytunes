@@ -12,12 +12,13 @@ from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import RedirectView, TemplateView
-from ratelimit.mixins import RatelimitMixin
+from ratelimit.decorators import ratelimit
+from spotify_client import SpotifyClient
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.spotify import SpotifyClient, SpotifyException
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
 from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
@@ -58,14 +59,11 @@ class EmotionPlaylistsView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class SuggestSongView(RatelimitMixin, FormView):
+class SuggestSongView(FormView):
     template_name = 'suggest.html'
     form_class = SuggestSongForm
 
-    ratelimit_key = 'user'
-    ratelimit_rate = '3/m'
-    ratelimit_method = 'POST'
-
+    @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
     @update_logging_data
     def post(self, request, *args, **kwargs):
         # Check if request is rate limited,
@@ -113,7 +111,12 @@ class SpotifyAuthenticationView(TemplateView):
         context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
         state = get_random_string(length=48)
 
-        context['spotify_auth_url'] = SpotifyClient.build_spotify_oauth_confirm_link(state)
+        client = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'])
+        context['spotify_auth_url'] = client.build_spotify_oauth_confirm_link(
+            state,
+            settings.SPOTIFY['auth_user_scopes'],
+            settings.SPOTIFY['auth_redirect_uri']
+        )
 
         self.request.session['state'] = state
         self.request.session['redirect_url'] = self.request.GET.get('redirect_url')
@@ -151,10 +154,14 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
+            spotify_client = SpotifyClient(
+                settings.SPOTIFY['client_id'],
+                settings.SPOTIFY['secret_key'],
+                identifier='spotify_auth_access:{}'.format(user.username),
+            )
 
             try:
-                tokens = spotify_client.get_access_and_refresh_tokens(code)
+                tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
             except SpotifyException:
                 logger.exception(
                     'Unable to get Spotify tokens for user {}'.format(user.username),

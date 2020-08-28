@@ -2,11 +2,12 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from spotify_client import SpotifyClient
+from spotify_client.exceptions import SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from libs.spotify import SpotifyClient, SpotifyException
 from tunes.models import Song
 
 
@@ -35,7 +36,7 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
             )
             return
 
-        client = SpotifyClient(identifier=signature)
+        client = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'], identifier=signature)
 
         track_data = client.get_attributes_for_track(spotify_code)
         song_data = client.get_audio_features_for_tracks([track_data])[0]
@@ -72,7 +73,7 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param spotify_user_id: (str) Spotify username for the given user
         :param playlist_name: (str) Name of the playlist to be created
-        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
 
         :return: (str)
         """
@@ -107,15 +108,14 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         return playlist_id
 
-    @update_logging_data
-    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify, **kwargs):
+    def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify):
         """
         Call Spotify API to add songs to a playlist
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param songs: (list) Collection of Spotify track URIs to add to playlist
-        :param spotify: (libs.spotify.SpotifyClient) Spotify Client instance
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
 
         """
         # Spotify has a limit of 100 songs per request to add songs to a playlist
@@ -146,7 +146,11 @@ class CreateSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
             raise Exception('Insufficient Spotify scopes to export playlist')
 
-        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
+        spotify = SpotifyClient(
+            settings.SPOTIFY['client_id'],
+            settings.SPOTIFY['secret_key'],
+            identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id)
+        )
 
         logger.info(
             'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.user.username),
