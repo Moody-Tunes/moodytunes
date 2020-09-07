@@ -1,9 +1,11 @@
+from io import BytesIO
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase
 
 from libs.tests.helpers import MoodyUtil
-from moodytunes.forms import BrowseForm, PlaylistForm, SuggestSongForm, get_genre_choices
+from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm, get_genre_choices
 from tunes.models import Emotion
 
 
@@ -203,3 +205,89 @@ class TestSuggestSongForm(TestCase):
         form = SuggestSongForm(data)
 
         self.assertFalse(form.is_valid())
+
+
+class TestExportPlaylistForm(TestCase):
+    def test_valid_data(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist'
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_valid_genre_is_valid(self):
+        song = MoodyUtil.create_song()
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+            'genre': song.genre
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_valid_context_is_valid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+            'context': 'WORK'
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_emotion_is_invalid(self):
+        data = {
+            'emotion': 'fake-emotion',
+            'playlist_name': 'test_playlist'
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_playlist_name_is_invalid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'a' * 110  # Max playlist name length is 100 characters
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_genre_is_invalid(self):
+        MoodyUtil.create_song()
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+            'genre': 'fake-genre'
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_context_is_invalid(self):
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+            'context': 'invalid-context'
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_image_upload_is_valid(self):
+        with open('{}/apps/moodytunes/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
+            img = BytesIO(img_file.read())
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+            'cover_image': img
+        }
+
+        form = ExportPlaylistForm(data)
+        self.assertTrue(form.is_valid())
