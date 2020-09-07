@@ -1,7 +1,7 @@
-from io import BytesIO
 from unittest import mock
 
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from libs.tests.helpers import MoodyUtil
@@ -281,13 +281,28 @@ class TestExportPlaylistForm(TestCase):
 
     def test_valid_image_upload_is_valid(self):
         with open('{}/apps/moodytunes/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
-            img = BytesIO(img_file.read())
+            img = SimpleUploadedFile('my_cover.jpg', img_file.read())
 
         data = {
             'emotion': Emotion.HAPPY,
             'playlist_name': 'test_playlist',
-            'cover_image': img
         }
 
-        form = ExportPlaylistForm(data)
+        files = {'cover_image': img}
+
+        form = ExportPlaylistForm(data, files)
         self.assertTrue(form.is_valid())
+
+    def test_invalid_image_upload_is_invalid(self):
+        with open('{}/apps/moodytunes/tests/fixtures/hack.php'.format(settings.BASE_DIR), 'rb') as hack_file:
+            hack = SimpleUploadedFile('hack.php', hack_file.read())
+
+        data = {
+            'emotion': Emotion.HAPPY,
+            'playlist_name': 'test_playlist',
+        }
+
+        files = {'cover_image': hack}
+
+        form = ExportPlaylistForm(data, files)
+        self.assertFalse(form.is_valid())
