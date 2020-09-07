@@ -299,6 +299,22 @@ class ExportPlayListView(FormView):
         if form.is_valid():
             auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
+            playlist_name = form.cleaned_data['playlist_name']
+            emotion_name = form.cleaned_data['emotion']
+            genre = form.cleaned_data['genre']
+            context = form.cleaned_data['context']
+
+            songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
+
+            if not songs:
+                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                    Emotion.get_full_name_from_keyword(emotion_name).lower()
+                )
+
+                messages.error(request, msg)
+
+                return HttpResponseRedirect(reverse('moodytunes:export'))
+
             # Handle cover image upload
             cover_image_filename = None
 
@@ -315,22 +331,6 @@ class ExportPlayListView(FormView):
 
                 with open(cover_image_filename, 'wb+') as img_file:
                     img.save(img_file, format='JPEG')
-
-            playlist_name = form.cleaned_data['playlist_name']
-            emotion_name = form.cleaned_data['emotion']
-            genre = form.cleaned_data['genre']
-            context = form.cleaned_data['context']
-
-            songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
-
-            if not songs:
-                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
-                    Emotion.get_full_name_from_keyword(emotion_name).lower()
-                )
-
-                messages.error(request, msg)
-
-                return HttpResponseRedirect(reverse('moodytunes:export'))
 
             logger.info(
                 'Exporting {} playlist for user {} to Spotify'.format(emotion_name, request.user.username),
