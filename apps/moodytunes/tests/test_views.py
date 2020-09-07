@@ -408,7 +408,7 @@ class TestExportView(TestCase):
         }
 
         expected_image_filename = '{}/{}_{}_{}.jpg'.format(
-            tempfile.gettempdir(),
+            settings.IMAGE_FILE_UPLOAD_PATH,
             self.user.username,
             data['emotion'],
             data['playlist_name'],

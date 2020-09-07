@@ -1,5 +1,4 @@
 import logging
-import tempfile
 
 from PIL import Image
 from django.conf import settings
@@ -320,7 +319,7 @@ class ExportPlayListView(FormView):
 
             if form.cleaned_data.get('cover_image'):
                 cover_image_filename = '{}/{}_{}_{}.jpg'.format(
-                    tempfile.gettempdir(),
+                    settings.IMAGE_FILE_UPLOAD_PATH,
                     request.user.username,
                     form.cleaned_data['emotion'],
                     form.cleaned_data['playlist_name'],

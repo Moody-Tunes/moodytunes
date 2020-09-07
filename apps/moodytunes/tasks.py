@@ -1,4 +1,5 @@
 import logging
+import os
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -142,6 +143,12 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         """
         try:
             spotify.upload_image_to_playlist(auth_code, playlist_id, cover_image_filename)
+
+            # Try to delete cover image file from disk
+            try:
+                os.unlink(cover_image_filename)  # pragma: no cover
+            except FileNotFoundError:
+                pass
         except (SpotifyException, ClientException):
             logger.warning(
                 'Unable to upload cover image for playlist {}'.format(playlist_id),

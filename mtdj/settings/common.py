@@ -140,6 +140,8 @@ DATABASE_BACKUP_TARGETS = [
     'tunes.Song',
 ]
 
+IMAGE_FILE_UPLOAD_PATH = env.str('MTDJ_IMAGE_FILE_UPLOAD_PATH', default=tempfile.gettempdir())
+
 CACHES = {
     'default': {
         'VERSION': env.int('MTDJ_CACHE_VERSION', default=1),
