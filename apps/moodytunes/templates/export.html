@@ -2,19 +2,35 @@
 
 {% load compress %}
 {% load static %}
+{% load waffle_tags %}
 
 {% block title %}Export Playlist{% endblock %}
+
+{% block superhead %}
+    {% compress js %}
+        <script src="{% static 'moodytunes/js/export_playlist.js' %}" defer></script>
+    {% endcompress %}
+{% endblock %}
 
 {% block content %}
     <h1>Export Playlist</h1>
     <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the emotion of the playlist you want to
     export and  the name of the playlist to be created and it will be added to your Spotify account!</p>
-    <form name="export-playlist-form" method="post">
+    <form id="export-playlist-form" name="export-playlist-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {{ form.emotion.errors }}
         <p>Emotion: {{ form.emotion }}</p>
+        {{ form.genre.errors }}
         <p>Genre: {{ form.genre }}</p>
+        {{ form.context.errors }}
         <p>Context: {{ form.context }}</p>
+        {{ form.playlist_name.errors }}
         <p>{{ form.playlist_name }}</p>
+        {% switch 'add_cover_image_to_export_playlist' %}
+            <p id="error-message" class="error-message" hidden>Please submit a file less than 256 kB in size.</p>
+            {{ form.cover_image.errors }}
+            <p>{{ form.cover_image }}</p>
+        {% endswitch %}
         <button type="submit" class="call-to-action-button">Export Playlist</button>
     </form>
 {% endblock %}

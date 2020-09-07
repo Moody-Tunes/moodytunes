@@ -4,7 +4,7 @@ from unittest import mock
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from spotify_client.exceptions import SpotifyException
+from spotify_client.exceptions import ClientException, SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
@@ -261,6 +261,105 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
             self.playlist_name
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_upload_image_for_playlist_called_if_image_provided(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_upload_cover_image.assert_called_once_with(self.auth.access_token, playlist_id, cover_image_filename)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_playlist_is_exported_if_upload_image_raises_spotify_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_upload_cover_image.side_effect = SpotifyException
+
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_playlist_is_exported_if_upload_image_raises_client_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_upload_cover_image.side_effect = ClientException
+
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_upload_image_for_playlist_not_called_if_user_does_not_have_proper_scope(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_get_user_playlists.return_value = {'items': []}
+
+        self.auth.scopes = ["playlist-modify-public", "user-top-read"]
+        self.auth.save()
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_upload_cover_image.assert_not_called()
 
     def test_get_auth_record_does_not_exists_raises_error(self):
         invalid_auth_id = 99999
