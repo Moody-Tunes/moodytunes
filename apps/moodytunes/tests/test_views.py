@@ -421,9 +421,34 @@ class TestExportView(TestCase):
         self.client.post(self.url, data)
 
         self.assertTrue(os.path.exists(expected_image_filename))
+
         mock_task_call.assert_called_once_with(
             self.spotify_auth.pk,
             playlist_name,
             [song.code],
             expected_image_filename
         )
+
+    def test_post_with_invalid_image_upload_displays_error(self):
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        with open('{}/apps/moodytunes/tests/fixtures/hack.php'.format(settings.BASE_DIR), 'rb') as hack_file:
+            hack = BytesIO(hack_file.read())
+            hack.name = 'hack.php'
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name,
+            'cover_image': hack
+        }
+
+        resp = self.client.post(self.url, data)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Please submit a valid request'
+
+        self.assertEqual(last_message, msg)
