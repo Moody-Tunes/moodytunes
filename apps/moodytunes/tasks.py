@@ -143,12 +143,6 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         """
         try:
             spotify.upload_image_to_playlist(auth_code, playlist_id, cover_image_filename)
-
-            # Try to delete cover image file from disk
-            try:
-                os.unlink(cover_image_filename)  # pragma: no cover
-            except FileNotFoundError:
-                pass
         except (SpotifyException, ClientException):
             logger.warning(
                 'Unable to upload cover image for playlist {}'.format(playlist_id),
@@ -194,6 +188,18 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             self.upload_cover_image(auth.access_token, playlist_id, cover_image_filename, spotify)
 
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
+
+        # Delete cover image file from disk if present
+        #
+        # Do this after uploading songs to playlist to keep image file on disk
+        # in case of errors with uploading songs to playlist to ensure that if
+        # we need to retry because of errors with adding/deleting songs in playlist
+        # that we still have the image file on disk for retries.
+        if cover_image_filename:
+            try:
+                os.unlink(cover_image_filename)  # pragma: no cover
+            except FileNotFoundError:
+                pass
 
         logger.info(
             'Exported songs to playlist {} for user {} successfully'.format(playlist_name, auth.spotify_user_id),
