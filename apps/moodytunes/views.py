@@ -1,5 +1,6 @@
 import logging
 
+from PIL import Image
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -20,7 +21,7 @@ from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from moodytunes.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from moodytunes.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 from tunes.utils import CachedPlaylistManager
@@ -259,38 +260,43 @@ class ExportPlayListView(FormView):
     template_name = 'export.html'
     form_class = ExportPlaylistForm
 
+    @update_logging_data
     def get(self, request, *args, **kwargs):
-        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+        try:
+            auth = SpotifyUserAuth.objects.get(user=request.user)
+        except SpotifyUserAuth.DoesNotExist:
             return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
 
-        return super(ExportPlayListView, self).get(request, *args, **kwargs)
-
-    @update_logging_data
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            auth = get_object_or_404(SpotifyUserAuth, user=request.user)
-
-            # Check that user has the proper scopes from Spotify to create playlist
-            if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):
-                logger.warning(
-                    'User {} did not grant proper scopes for playlist export. Redirecting to grant scopes'.format(
+        # Check that user has the proper scopes from Spotify to create playlist
+        for scope in settings.SPOTIFY['auth_user_scopes']:
+            if not auth.has_scope(scope):
+                logger.info(
+                    'User {} does not have proper scopes for playlist export. Redirecting to grant scopes'.format(
                         request.user.username
                     ),
                     extra={
                         'user_id': request.user.pk,
                         'auth_id': auth.pk,
                         'scopes': auth.scopes,
+                        'expected_scopes': settings.SPOTIFY['auth_user_scopes'],
                         'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs)
                     }
                 )
 
                 auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
 
-                messages.error(request, 'Please reauthenticate with Spotify to export your playlist')
+                messages.info(request, 'Please reauthenticate with Spotify to export your playlist')
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+
+        return super(ExportPlayListView, self).get(request, *args, **kwargs)
+
+    @update_logging_data
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+
+        if form.is_valid():
+            auth = get_object_or_404(SpotifyUserAuth, user=request.user)
 
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']
@@ -300,15 +306,30 @@ class ExportPlayListView(FormView):
             songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
 
             if not songs:
-                emotion = Emotion.objects.get(name=emotion_name)
-                emotion_fullname = emotion.full_name
                 msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
-                    emotion_fullname.lower()
+                    Emotion.get_full_name_from_keyword(emotion_name).lower()
                 )
 
                 messages.error(request, msg)
 
                 return HttpResponseRedirect(reverse('moodytunes:export'))
+
+            # Handle cover image upload
+            cover_image_filename = None
+
+            if form.cleaned_data.get('cover_image'):
+                cover_image_filename = '{}/{}_{}_{}.jpg'.format(
+                    settings.IMAGE_FILE_UPLOAD_PATH,
+                    request.user.username,
+                    form.cleaned_data['emotion'],
+                    form.cleaned_data['playlist_name'],
+                )
+
+                img = Image.open(form.cleaned_data['cover_image'])
+                img = img.convert('RGB')
+
+                with open(cover_image_filename, 'wb+') as img_file:
+                    img.save(img_file, format='JPEG')
 
             logger.info(
                 'Exporting {} playlist for user {} to Spotify'.format(emotion_name, request.user.username),
@@ -322,7 +343,7 @@ class ExportPlayListView(FormView):
                 }
             )
 
-            CreateSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs)
+            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs, cover_image_filename)
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
@@ -330,4 +351,4 @@ class ExportPlayListView(FormView):
 
         else:
             messages.error(request, 'Please submit a valid request')
-            return HttpResponseRedirect(reverse('moodytunes:export'))
+            return render(request, self.template_name, {'form': form})

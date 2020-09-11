@@ -4,11 +4,11 @@ from unittest import mock
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from spotify_client.exceptions import SpotifyException
+from spotify_client.exceptions import ClientException, SpotifyException
 
 from accounts.models import SpotifyUserAuth
 from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
-from moodytunes.tasks import CreateSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from moodytunes.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
 from tunes.models import Song
 
 
@@ -137,7 +137,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         playlist_id = 'spotify:playlist:id'
         mock_create_playlist.return_value = playlist_id
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_create_playlist.assert_called_once_with(
             self.auth.access_token,
@@ -146,7 +146,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
-    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
@@ -163,11 +163,11 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_create_playlist.side_effect = SpotifyException
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()
 
-    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
@@ -187,7 +187,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_add_songs_to_playlist.side_effect = SpotifyException
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()
 
@@ -205,7 +205,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         playlist_id = 'spotify:playlist:id'
         mock_get_user_playlists.return_value = {'items': [{'name': self.playlist_name, 'id': playlist_id}]}
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_get_user_playlists.assert_called_once_with(self.auth.access_token, self.auth.spotify_user_id)
         mock_create_playlist.assert_not_called()
@@ -227,7 +227,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_create_playlist.return_value = playlist_id
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_get_user_playlists.assert_called_once_with(self.auth.access_token, self.auth.spotify_user_id)
         mock_create_playlist.assert_called_once_with(
@@ -253,7 +253,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         playlist_id = 'spotify:playlist:id'
         mock_create_playlist.return_value = playlist_id
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_create_playlist.assert_called_once_with(
             self.auth.access_token,
@@ -262,13 +262,112 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_upload_image_for_playlist_called_if_image_provided(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_upload_cover_image.assert_called_once_with(self.auth.access_token, playlist_id, cover_image_filename)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_playlist_is_exported_if_upload_image_raises_spotify_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_upload_cover_image.side_effect = SpotifyException
+
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_playlist_is_exported_if_upload_image_raises_client_exception(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_upload_cover_image.side_effect = ClientException
+
+        mock_get_user_playlists.return_value = {'items': []}
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
+
+    @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
+    @mock.patch('spotify_client.SpotifyClient.create_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
+    def test_upload_image_for_playlist_not_called_if_user_does_not_have_proper_scope(
+            self,
+            mock_get_user_playlists,
+            mock_create_playlist,
+            mock_add_songs_to_playlist,
+            mock_delete_songs_from_playlist,
+            mock_upload_cover_image
+    ):
+        cover_image_filename = 'cover_image.jpg'
+        mock_get_user_playlists.return_value = {'items': []}
+
+        self.auth.scopes = ["playlist-modify-public", "user-top-read"]
+        self.auth.save()
+
+        playlist_id = 'spotify:playlist:id'
+        mock_create_playlist.return_value = playlist_id
+
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs, cover_image_filename)
+
+        mock_upload_cover_image.assert_not_called()
+
     def test_get_auth_record_does_not_exists_raises_error(self):
         invalid_auth_id = 99999
 
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
-            CreateSpotifyPlaylistFromSongsTask().run(invalid_auth_id, self.playlist_name, self.songs)
+            ExportSpotifyPlaylistFromSongsTask().run(invalid_auth_id, self.playlist_name, self.songs)
 
-    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.retry')
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
         self.auth.last_refreshed = timezone.now() - timedelta(days=1)
@@ -276,7 +375,7 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
         mock_refresh_access_token.side_effect = SpotifyException
 
-        CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+        ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
 
         mock_retry.assert_called_once()
 
@@ -285,4 +384,4 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         self.auth.save()
 
         with self.assertRaises(Exception):
-            CreateSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
+            ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)

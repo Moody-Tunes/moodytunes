@@ -10,7 +10,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from accounts.models import UserSongVote
+from accounts.models import SpotifyUserData, UserSongVote
 from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
@@ -95,13 +95,13 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 valence = user_emotion.valence
                 danceability = user_emotion.danceability
 
-        # If user has a SpotifyUserAuth record that has data for their top artists,
-        # include those artists in generate request
+        # Try to fetch top artists for user from Spotify
         top_artists = None
-        user_auth = getattr(self.request.user, 'spotifyuserauth', None)
-
-        if user_auth and getattr(user_auth, 'spotify_data', None):
-            top_artists = user_auth.spotify_data.top_artists
+        try:
+            spotify_data = SpotifyUserData.objects.get(spotifyuserauth__user=self.request.user)
+            top_artists = spotify_data.top_artists
+        except SpotifyUserData.DoesNotExist:
+            pass
 
         logger.info(
             'Generating {} browse playlist for user {}'.format(

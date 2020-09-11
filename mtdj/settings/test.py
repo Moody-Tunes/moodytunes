@@ -15,6 +15,7 @@ CACHES['default'] = CACHES['dummy']
 SESSION_CACHE_ALIAS = 'default'
 
 DATABASE_BACKUPS_PATH = tempfile.gettempdir()
+IMAGE_FILE_UPLOAD_PATH = tempfile.gettempdir()
 
 # We want to make it easy to create test users, so we'll remove the password
 # validators when running tests

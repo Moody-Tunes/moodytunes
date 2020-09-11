@@ -1,4 +1,6 @@
+import os
 import tempfile
+from io import BytesIO
 from unittest import mock
 
 from django.conf import settings
@@ -105,7 +107,7 @@ class TestSpotifyAuthenticationView(TestCase):
         mock_random_string.return_value = random_string
 
         expected_auth_url = 'https://accounts.spotify.com/authorize?client_id={client_id}\
-        &response_type=code&scope=playlist-modify-public+user-top-read\
+        &response_type=code&scope=playlist-modify-public+user-top-read+ugc-image-upload\
         &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state={state}\
         '.format(
             client_id=settings.SPOTIFY['client_id'],
@@ -301,14 +303,24 @@ class TestExportView(TestCase):
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-    def test_user_with_no_auth_redirect_to_auth_page(self):
+    def test_get_user_with_no_auth_redirect_to_auth_page(self):
         self.client.logout()
         self.client.login(username=self.user_with_no_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
 
-    @mock.patch('moodytunes.tasks.CreateSpotifyPlaylistFromSongsTask.delay')
+    def test_get_auth_without_proper_scope_is_redirected_to_auth_page(self):
+        # Clear Spotify OAuth scopes for SpotifyUserAuth record
+        self.spotify_auth.scopes = []
+        self.spotify_auth.save()
+
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
+
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
     def test_post_request_happy_path(self, mock_task_call):
         # Set up playlist for creation
         song = MoodyUtil.create_song()
@@ -378,23 +390,65 @@ class TestExportView(TestCase):
 
         self.assertEqual(last_message, msg)
 
-    def test_post_auth_without_proper_scope_is_redirected_to_auth_page(self):
-        # Set up playlist for creation
+    @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
+    def test_post_with_image_upload_saves_image(self, mock_task_call):
         song = MoodyUtil.create_song()
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
         MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
 
+        with open('{}/apps/moodytunes/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
+            img = BytesIO(img_file.read())
+            img.name = 'my_cover.jpg'
+
         playlist_name = 'test'
         data = {
             'playlist_name': playlist_name,
-            'emotion': emotion.name
+            'emotion': emotion.name,
+            'cover_image': img
         }
 
-        # Clear Spotify OAuth scopes for SpotifyUserAuth record
-        self.spotify_auth.scopes = []
-        self.spotify_auth.save()
+        expected_image_filename = '{}/{}_{}_{}.jpg'.format(
+            settings.IMAGE_FILE_UPLOAD_PATH,
+            self.user.username,
+            data['emotion'],
+            data['playlist_name'],
+        )
+
+        # Cleanup old cover file if exists
+        if os.path.exists(expected_image_filename):
+            os.unlink(expected_image_filename)
+
+        self.client.post(self.url, data)
+
+        self.assertTrue(os.path.exists(expected_image_filename))
+
+        mock_task_call.assert_called_once_with(
+            self.spotify_auth.pk,
+            playlist_name,
+            [song.code],
+            expected_image_filename
+        )
+
+    def test_post_with_invalid_image_upload_displays_error(self):
+        song = MoodyUtil.create_song()
+        emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+
+        with open('{}/apps/moodytunes/tests/fixtures/hack.php'.format(settings.BASE_DIR), 'rb') as hack_file:
+            hack = BytesIO(hack_file.read())
+            hack.name = 'hack.php'
+
+        playlist_name = 'test'
+        data = {
+            'playlist_name': playlist_name,
+            'emotion': emotion.name,
+            'cover_image': hack
+        }
 
         resp = self.client.post(self.url, data)
 
-        self.assertRedirects(resp, reverse('moodytunes:spotify-auth'))
-        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user).exists())
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Please submit a valid request'
+
+        self.assertEqual(last_message, msg)

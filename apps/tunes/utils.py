@@ -57,12 +57,9 @@ def generate_browse_playlist(
         danceability_upper_limit += jitter
 
     params = {
-        'energy__gte': energy_lower_limit,
-        'energy__lte': energy_upper_limit,
-        'valence__gte': valence_lower_limit,
-        'valence__lte': valence_upper_limit,
-        'danceability__gte': danceability_lower_limit,
-        'danceability__lte': danceability_upper_limit
+        'energy__range': (energy_lower_limit, energy_upper_limit),
+        'valence__range': (valence_lower_limit, valence_upper_limit),
+        'danceability__range': (danceability_lower_limit, danceability_upper_limit),
     }
 
     # Use a singular attribute for generating browse playlist if specified
