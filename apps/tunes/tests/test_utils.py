@@ -41,12 +41,9 @@ class TestGenerateBrowsePlaylist(TestCase):
         danceability_upper_limit = danceability + jitter
 
         songs_mock.filter.assert_called_once_with(
-            energy__gte=energy_lower_limit,
-            energy__lte=energy_upper_limit,
-            valence__gte=valence_lower_limit,
-            valence__lte=valence_upper_limit,
-            danceability__gte=danceability_lower_limit,
-            danceability__lte=danceability_upper_limit
+            energy__range=(energy_lower_limit, energy_upper_limit),
+            valence__range=(valence_lower_limit, valence_upper_limit),
+            danceability__range=(danceability_lower_limit, danceability_upper_limit),
         )
 
     def test_no_jitter_query_uses_params_passed(self):
@@ -59,12 +56,9 @@ class TestGenerateBrowsePlaylist(TestCase):
         generate_browse_playlist(energy, valence, danceability, songs=songs_mock)
 
         songs_mock.filter.assert_called_once_with(
-            energy__gte=energy,
-            energy__lte=energy,
-            valence__gte=valence,
-            valence__lte=valence,
-            danceability__gte=danceability,
-            danceability__lte=danceability,
+            energy__range=(energy, energy),
+            valence__range=(valence, valence),
+            danceability__range=(danceability, danceability),
         )
 
     def test_limit_on_playlist(self):
@@ -92,10 +86,7 @@ class TestGenerateBrowsePlaylist(TestCase):
         energy_lower_limit = energy - jitter
         energy_upper_limit = energy + jitter
 
-        songs_mock.filter.assert_called_once_with(
-            energy__gte=energy_lower_limit,
-            energy__lte=energy_upper_limit,
-        )
+        songs_mock.filter.assert_called_once_with(energy__range=(energy_lower_limit, energy_upper_limit))
 
     def test_invalid_strategy_passed_raises_exception(self):
         songs_mock = mock.MagicMock()
