@@ -158,11 +158,7 @@ class SpotifyUserAuth(BaseModel):
     @update_logging_data
     def refresh_access_token(self, **kwargs):
         """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
-        spotify_client = SpotifyClient(
-            settings.SPOTIFY['client_id'],
-            settings.SPOTIFY['secret_key'],
-            identifier='update-access-token:{}'.format(self.user.username)
-        )
+        spotify_client = SpotifyClient(identifier='update-access-token:{}'.format(self.user.username))
 
         try:
             access_token = spotify_client.refresh_access_token(self.refresh_token)
