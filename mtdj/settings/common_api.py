@@ -1,5 +1,6 @@
 # API Keys/Credentials get stored here
 from envparse import env
+from spotify_client.config import Config
 
 
 # Spotify OAuth scope constants
@@ -20,3 +21,5 @@ SPOTIFY = {
     'auth_user_scopes': [SPOTIFY_PLAYLIST_MODIFY_SCOPE, SPOTIFY_TOP_ARTIST_READ_SCOPE, SPOTIFY_UPLOAD_PLAYLIST_IMAGE],
     'max_top_artists': 50,  # Number of top artists to retrieve for user
 }
+
+Config.configure(SPOTIFY['client_id'], SPOTIFY['secret_key'])
