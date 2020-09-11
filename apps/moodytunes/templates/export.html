@@ -27,9 +27,12 @@
         {{ form.playlist_name.errors }}
         <p>{{ form.playlist_name }}</p>
         {% switch 'add_cover_image_to_export_playlist' %}
-            <p id="error-message" class="error-message" hidden>Please submit a file less than 256 kB in size.</p>
-            {{ form.cover_image.errors }}
-            <p>{{ form.cover_image }}</p>
+            <div class="form-group">
+                <p id="error-message" class="error-message" hidden>Please submit a file less than 256 kB in size.</p>
+                {{ form.cover_image.errors }}
+                <p>Cover Image</p>
+                <p>{{ form.cover_image }}</p>
+            </div>
         {% endswitch %}
         <button type="submit" class="call-to-action-button">Export Playlist</button>
     </form>
