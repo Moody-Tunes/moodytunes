@@ -2,6 +2,8 @@
 
 import logging
 
+from spotify_client.config import Config
+
 from .common import *
 
 
@@ -39,3 +41,5 @@ SPOTIFY.update({
     'secret_key': 'test-spotify-secret_key',
     'auth_redirect_uri': 'https://moodytunes.vm/moodytunes/spotify/callback/'
 })
+
+Config.configure(SPOTIFY['client_id'], SPOTIFY['client_id'])

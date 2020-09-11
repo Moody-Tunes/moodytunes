@@ -59,11 +59,7 @@ class Command(MoodyBaseCommand):
 
         :return: (list(dict)) Track data for saving as Song records
         """
-        spotify = SpotifyClient(
-            settings.SPOTIFY['client_id'],
-            settings.SPOTIFY['secret_key'],
-            identifier=self._unique_id
-        )
+        spotify = SpotifyClient(identifier=self._unique_id)
 
         tracks = []
 

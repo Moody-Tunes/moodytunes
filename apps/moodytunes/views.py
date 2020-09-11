@@ -112,7 +112,7 @@ class SpotifyAuthenticationView(TemplateView):
         context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
         state = get_random_string(length=48)
 
-        client = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'])
+        client = SpotifyClient()
         context['spotify_auth_url'] = client.build_spotify_oauth_confirm_link(
             state,
             settings.SPOTIFY['auth_user_scopes'],
@@ -155,11 +155,7 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(
-                settings.SPOTIFY['client_id'],
-                settings.SPOTIFY['secret_key'],
-                identifier='spotify_auth_access:{}'.format(user.username),
-            )
+            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
 
             try:
                 tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
