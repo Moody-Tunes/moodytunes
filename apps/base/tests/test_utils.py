@@ -5,7 +5,7 @@ from rest_framework import serializers
 from base.utils import build_documentation_for_request_serializer
 
 
-class TestRequestSerializer(serializers.Serializer):
+class DummyRequestSerializer(serializers.Serializer):
     foo = serializers.CharField(help_text='Test Char Field')
     bar = serializers.IntegerField(required=False, help_text='Test Int Field')
 
@@ -30,7 +30,7 @@ class TestBuildDocumentationForRequestSerializer(TestCase):
             description='Test Int Field'
         )
 
-        schema = build_documentation_for_request_serializer(TestRequestSerializer, location)
+        schema = build_documentation_for_request_serializer(DummyRequestSerializer, location)
         fields = schema._manual_fields
 
         self.assertEqual(fields[0], expected_foo_schema)
