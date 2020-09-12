@@ -106,10 +106,25 @@ class DeleteVoteRequestSerializer(serializers.Serializer):
 class PlaylistSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/playlist/"""
 
-    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
-    genre = serializers.CharField(max_length=15, required=False)
-    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
-    artist = serializers.CharField(max_length=50, required=False)
+    emotion = CleanedChoiceField(
+        Emotion.EMOTION_NAME_CHOICES,
+        help_text='Emotion of playlist to view. Must be one of Emotion.EMOTION_NAME_CHOICES'
+    )
+    genre = serializers.CharField(
+        max_length=15,
+        required=False,
+        help_text='Filter emotion playlist for songs in given genre.'
+    )
+    context = CleanedChoiceField(
+        UserSongVote.CONTEXT_CHOICES,
+        required=False,
+        help_text='Return songs for the emotion the user has upvoted for a given context.'
+    )
+    artist = serializers.CharField(
+        max_length=50,
+        required=False,
+        help_text='Filter emotion playlist for songs by given artist.'
+    )
 
 
 class VoteInfoRequestSerializer(serializers.Serializer):

@@ -329,6 +329,10 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
+    if settings.DEBUG:  # pragma: no cover
+        from base.utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(PlaylistSongsRequestSerializer, 'query')
+
     @update_logging_data
     def list(self, request, *args, **kwargs):
         logger.info(
