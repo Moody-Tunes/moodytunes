@@ -30,7 +30,7 @@ if settings.DEBUG:
     if 'rest_framework_swagger' in settings.INSTALLED_APPS:
         from rest_framework_swagger.views import get_swagger_view
 
-        schema_view = get_swagger_view(title='API Docs')
+        schema_view = get_swagger_view(title='API Docs', patterns=urlpatterns)
 
         urlpatterns = [
             path('docs/', schema_view, name='docs')
