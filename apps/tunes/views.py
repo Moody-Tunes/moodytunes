@@ -48,6 +48,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = BrowseSongsRequestSerializer
 
+    if settings.DEBUG:  # pragma: no cover
+        from base.utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
+
     @update_logging_data
     def filter_queryset(self, queryset, **kwargs):
         cached_playlist_manager = CachedPlaylistManager(self.request.user)

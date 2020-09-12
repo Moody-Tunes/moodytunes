@@ -41,13 +41,42 @@ class VoteInfoSerializer(serializers.Serializer):
 class BrowseSongsRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/browse/"""
 
-    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
-    artist = serializers.CharField(max_length=50, required=False)
-    genre = serializers.CharField(max_length=15, required=False)
-    jitter = serializers.FloatField(min_value=0, max_value=1, required=False)
-    limit = serializers.IntegerField(max_value=25, required=False)
-    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
-    description = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    emotion = CleanedChoiceField(
+        Emotion.EMOTION_NAME_CHOICES,
+        help_text='Emotion to use for generating browse playlist. Must be one of Emotion.EMOTION_NAME_CHOICES'
+    )
+    artist = serializers.CharField(
+        max_length=50,
+        required=False,
+        help_text='Filter browse playlist for songs by given artist.'
+    )
+    genre = serializers.CharField(
+        max_length=15,
+        required=False,
+        help_text='Filter browse playlist for songs in given genre.'
+    )
+    jitter = serializers.FloatField(
+        min_value=0,
+        max_value=1,
+        required=False,
+        help_text='Amount to push query values for when looking up songs by their emotion attributes.'
+    )
+    limit = serializers.IntegerField(
+        max_value=25,
+        required=False,
+        help_text='Number of songs to return in playlist.'
+    )
+    context = CleanedChoiceField(
+        UserSongVote.CONTEXT_CHOICES,
+        required=False,
+        help_text='Context for user listening session.'
+    )
+    description = serializers.CharField(
+        max_length=100,
+        required=False,
+        allow_blank=True,
+        help_text='Description for user listening session.'
+    )
 
 
 class VoteSongsRequestSerializer(serializers.Serializer):
