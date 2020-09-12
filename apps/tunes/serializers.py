@@ -130,5 +130,8 @@ class PlaylistSongsRequestSerializer(serializers.Serializer):
 class VoteInfoRequestSerializer(serializers.Serializer):
     """Provides validation for /tunes/vote/info/"""
 
-    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
-    song_code = serializers.CharField()
+    emotion = CleanedChoiceField(
+        Emotion.EMOTION_NAME_CHOICES,
+        help_text='Emotion of votes for songs. Must be one of Emotion.EMOTION_NAME_CHOICES'
+    )
+    song_code = serializers.CharField(help_text='Spotify song URI that the user has voted on.')

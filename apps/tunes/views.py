@@ -441,6 +441,10 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
 
     get_request_serializer = VoteInfoRequestSerializer
 
+    if settings.DEBUG:  # pragma: no cover
+        from base.utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(VoteInfoRequestSerializer, 'query')
+
     def get_object(self):
         contexts = UserSongVote.objects.filter(
             user=self.request.user,
