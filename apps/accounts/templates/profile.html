@@ -24,7 +24,9 @@
 <h3>Account Options</h3>
 <ul>
     <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>
-    <li><a class="profile-link" href={%  url 'accounts:change-password' %}>Change Password</a></li>
+    <li><a class="profile-link" href={% url 'accounts:change-password' %}>Change Password</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:spotify-auth' %}">Authenticate With Spotify</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:spotify-auth-revoke'%}">Revoke Spotify Authentication</a></li>
 </ul>
 <h3>MoodyTunes</h3>
 <ul>
@@ -38,8 +40,8 @@
         <span id="close-spotify-auth-modal" class="close">&times;</span>
         <h2>Login With Spotify</h2>
         <p>Would you like to login with Spotify? It will allow us to suggest songs for you based on you Spotify listening habits</p>
-        <button id="decline-spotify-auth">No</button>
         <button id="accept-spotify-auth" class="call-to-action-button">Yes</button>
+        <button id="decline-spotify-auth">No</button>
     </div>
 </div>
 {% endblock %}

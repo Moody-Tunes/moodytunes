@@ -252,6 +252,40 @@ class SpotifyAuthenticationFailureView(TemplateView):
 
 
 @method_decorator(login_required, name='dispatch')
+class RevokeSpotifyAuthView(TemplateView):
+    template_name = 'revoke_spotify_auth.html'
+
+    def get(self, request, *args, **kwargs):
+        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
+            return HttpResponseRedirect(reverse('accounts:profile'))
+
+        return super().get(request, *args, **kwargs)
+
+    @update_logging_data
+    def post(self, request, *args, **kwargs):
+        try:
+            auth = SpotifyUserAuth.objects.select_related('spotify_data').get(user=request.user)
+        except SpotifyUserAuth.DoesNotExist:
+            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
+            return HttpResponseRedirect(reverse('accounts:profile'))
+
+        auth_id = auth.pk
+        auth.delete()
+
+        logger.info(
+            'Deleted SpotifyUserAuth for user {}'.format(request.user.username),
+            extra={
+                'fingerprint': auto_fingerprint('revoked_spotify_auth', **kwargs),
+                'auth_id': auth_id
+            }
+        )
+
+        messages.info(request, 'We have deleted your Spotify data from Moodytunes')
+        return HttpResponseRedirect(reverse('accounts:profile'))
+
+
+@method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
     template_name = 'export.html'
     form_class = ExportPlaylistForm
