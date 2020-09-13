@@ -24,7 +24,9 @@
 <h3>Account Options</h3>
 <ul>
     <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>
-    <li><a class="profile-link" href={%  url 'accounts:change-password' %}>Change Password</a></li>
+    <li><a class="profile-link" href={% url 'accounts:change-password' %}>Change Password</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:spotify-auth' %}">Authenticate With Spotify</a></li>
+    <li><a class="profile-link" href="{% url 'moodytunes:spotify-auth-revoke'%}">Revoke Spotify Authentication</a></li>
 </ul>
 <h3>MoodyTunes</h3>
 <ul>
@@ -32,7 +34,6 @@
     <li><a class="profile-link" href="{% url 'moodytunes:playlists' %}">View Emotion Playlists</a></li>
     <li><a class="profile-link" href="{% url 'moodytunes:suggest' %}">Suggest A New Song</a></li>
     <li><a class="profile-link" href="{% url 'moodytunes:export' %}">Export Emotion Playlist To Spotify</a></li>
-    <li><a class="profile-link" href="{% url 'moodytunes:spotify-auth-revoke'%}">Revoke Spotify Integration</a></li>
 </ul>
 <div id="spotify-auth-modal" class="modal" hidden>
     <div class="modal-content">
