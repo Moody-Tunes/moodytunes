@@ -12,5 +12,6 @@ urlpatterns = [
     path('spotify/authorize/', views.SpotifyAuthenticationView.as_view(), name='spotify-auth'),
     path('spotify/callback/', views.SpotifyAuthenticationCallbackView.as_view(), name='spotify-auth-callback'),
     path('spotify/success/', views.SpotifyAuthenticationSuccessView.as_view(), name='spotify-auth-success'),
-    path('spotify/failure/', views.SpotifyAuthenticationFailureView.as_view(), name='spotify-auth-failure')
+    path('spotify/failure/', views.SpotifyAuthenticationFailureView.as_view(), name='spotify-auth-failure'),
+    path('spotify/revoke/', views.RevokeSpotifyAuthView.as_view(), name='spotify-auth-revoke'),
 ]
