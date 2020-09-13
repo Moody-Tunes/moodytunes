@@ -1,9 +1,7 @@
-from datetime import timedelta
 from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import timezone
 from spotify_client.exceptions import ClientException, SpotifyException
 
 from accounts.models import SpotifyUserAuth
@@ -369,10 +367,14 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
-    def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
-        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
-        self.auth.save()
-
+    @mock.patch('accounts.models.SpotifyUserAuth.should_update_access_token')
+    def test_get_auth_record_error_on_refresh_access_tokens_retries(
+            self,
+            mock_should_update_access_token,
+            mock_refresh_access_token,
+            mock_retry
+    ):
+        mock_should_update_access_token.return_value = True
         mock_refresh_access_token.side_effect = SpotifyException
 
         ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
