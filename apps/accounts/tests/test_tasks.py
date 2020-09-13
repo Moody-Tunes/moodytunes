@@ -1,13 +1,12 @@
-from datetime import timedelta
 from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import TestCase
-from django.utils import timezone
 from spotify_client.exceptions import SpotifyException
 
+from accounts.exceptions import InsufficientSpotifyScopesError
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
@@ -131,10 +130,14 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
 
     @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.retry')
     @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
-    def test_get_auth_record_error_on_refresh_access_tokens_retries(self, mock_refresh_access_token, mock_retry):
-        self.auth.last_refreshed = timezone.now() - timedelta(days=1)
-        self.auth.save()
-
+    @mock.patch('accounts.models.SpotifyUserAuth.should_refresh_access_token')
+    def test_get_auth_record_error_on_refresh_access_token_retries(
+            self,
+            mock_should_refresh_access_token,
+            mock_refresh_access_token,
+            mock_retry
+    ):
+        mock_should_refresh_access_token.return_value = True
         mock_refresh_access_token.side_effect = SpotifyException
 
         UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
@@ -145,7 +148,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         self.auth.scopes = []
         self.auth.save()
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(InsufficientSpotifyScopesError):
             UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
 
