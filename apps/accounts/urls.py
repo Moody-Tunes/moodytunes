@@ -7,7 +7,7 @@ urlpatterns = [
     # Authentication views
     path('login/', views.MoodyLoginView.as_view(), name='login'),
     path('logout/', views.MoodyLogoutView.as_view(), name='logout'),
-    path('password_change', views.MoodyPasswordChangeView.as_view(), name='change-password'),
+    path('password_change/', views.MoodyPasswordChangeView.as_view(), name='change-password'),
     path('reset_password/', views.MoodyPasswordResetView.as_view(), name='reset-password'),
     path(
         'reset_password/<uidb64>/<token>/',
