@@ -22,4 +22,5 @@ SPOTIFY = {
     'max_top_artists': 50,  # Number of top artists to retrieve for user
 }
 
+# Configure SpotifyClient with authentication credentials
 Config.configure(SPOTIFY['client_id'], SPOTIFY['secret_key'])

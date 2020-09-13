@@ -2,8 +2,6 @@
 
 import logging
 
-from spotify_client.config import Config
-
 from .common import *
 
 
@@ -42,4 +40,6 @@ SPOTIFY.update({
     'auth_redirect_uri': 'https://moodytunes.vm/moodytunes/spotify/callback/'
 })
 
+# Configure SpotifyClient with authentication credentials
+# Need to call this again to configure client to use test credentials
 Config.configure(SPOTIFY['client_id'], SPOTIFY['client_id'])
