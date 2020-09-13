@@ -111,7 +111,7 @@ class TestFetchSongFromSpotify(TestCase):
         self.assertTrue(Song.objects.filter(code=song_code).exists())
 
 
-class TestCreateSpotifyPlaylistFromSongs(TestCase):
+class TestExportSpotifyPlaylistFromSongs(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = MoodyUtil.create_user()
