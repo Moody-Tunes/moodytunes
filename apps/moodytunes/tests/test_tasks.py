@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from spotify_client.exceptions import ClientException, SpotifyException
 
+from accounts.exceptions import InsufficientSpotifyScopesError
 from accounts.models import SpotifyUserAuth
 from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from moodytunes.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
@@ -385,5 +386,5 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
         self.auth.scopes = []
         self.auth.save()
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(InsufficientSpotifyScopesError):
             ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)

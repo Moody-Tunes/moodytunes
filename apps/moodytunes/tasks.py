@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import ClientException, SpotifyException
 
+from accounts.exceptions import InsufficientSpotifyScopesError
 from accounts.models import SpotifyUserAuth
 from base.tasks import MoodyBaseTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
@@ -165,7 +166,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                 }
             )
 
-            raise Exception('Insufficient Spotify scopes to export playlist')
+            raise InsufficientSpotifyScopesError('Insufficient Spotify scopes to export playlist')
 
         spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
 

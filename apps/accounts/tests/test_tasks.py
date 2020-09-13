@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.utils import timezone
 from spotify_client.exceptions import SpotifyException
 
+from accounts.exceptions import InsufficientSpotifyScopesError
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion, UserSongVote
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from accounts.tasks import (
@@ -145,7 +146,7 @@ class TestUpdateTopArtistsFromSpotifyTask(TestCase):
         self.auth.scopes = []
         self.auth.save()
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(InsufficientSpotifyScopesError):
             UpdateTopArtistsFromSpotifyTask().run(self.auth.id)
 
 
