@@ -265,7 +265,7 @@ class RevokeSpotifyAuthView(TemplateView):
     @update_logging_data
     def post(self, request, *args, **kwargs):
         try:
-            auth = SpotifyUserAuth.objects.get(user=request.user)
+            auth = SpotifyUserAuth.objects.select_related('spotify_data').get(user=request.user)
         except SpotifyUserAuth.DoesNotExist:
             messages.error(request, 'You have not authorized MoodyTunes with Spotify')
             return HttpResponseRedirect(reverse('accounts:profile'))
