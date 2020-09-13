@@ -368,14 +368,14 @@ class TestCreateSpotifyPlaylistFromSongs(TestCase):
 
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
-    @mock.patch('accounts.models.SpotifyUserAuth.should_update_access_token')
+    @mock.patch('accounts.models.SpotifyUserAuth.should_refresh_access_token')
     def test_get_auth_record_error_on_refresh_access_token_retries(
             self,
-            mock_should_update_access_token,
+            mock_should_refresh_access_token,
             mock_refresh_access_token,
             mock_retry
     ):
-        mock_should_update_access_token.return_value = True
+        mock_should_refresh_access_token.return_value = True
         mock_refresh_access_token.side_effect = SpotifyException
 
         ExportSpotifyPlaylistFromSongsTask().run(self.auth.id, self.playlist_name, self.songs)
