@@ -1,3 +1,5 @@
+'use strict';
+
 (function IIFE() {
     // Global variables for API requests to backend
     // Made global to ensure that the same options used in the request are

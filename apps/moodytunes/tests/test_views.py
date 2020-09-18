@@ -9,7 +9,7 @@ from django.urls import reverse
 from rest_framework import status
 from spotify_client.exceptions import SpotifyException
 
-from accounts.models import SpotifyUserAuth
+from accounts.models import SpotifyUserAuth, SpotifyUserData
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
 from tunes.models import Emotion
 
@@ -289,6 +289,59 @@ class TestSpotifyAuthenticationCallbackView(TestCase):
 
         self.assertRedirects(resp, self.failure_url)
         self.assertEqual(last_message, 'We were unable to retrieve your Spotify profile. Please try again.')
+
+
+class TestRevokeSpotifyAuthView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_without_auth = MoodyUtil.create_user(username='user-no-auth')
+        cls.user_with_auth = MoodyUtil.create_user(username='user-with-auth')
+        cls.url = reverse('moodytunes:spotify-auth-revoke')
+        cls.redirect_url = reverse('accounts:profile')
+
+    def test_get_request_for_user_without_auth_is_redirected_to_profile_page(self):
+        self.client.login(username=self.user_without_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        resp = self.client.get(self.url)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.redirect_url)
+        self.assertEqual(last_message, 'You have not authorized MoodyTunes with Spotify')
+
+    def test_post_request_for_user_without_auth_is_redirected_to_profile_page(self):
+        self.client.login(username=self.user_without_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        resp = self.client.post(self.url)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.redirect_url)
+        self.assertEqual(last_message, 'You have not authorized MoodyTunes with Spotify')
+
+    def test_get_request_for_user_with_auth_displays_revoke_page(self):
+        MoodyUtil.create_spotify_user_auth(self.user_with_auth)
+        self.client.login(username=self.user_with_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(resp, 'revoke_spotify_auth.html')
+
+    def test_post_request_for_user_with_auth_deletes_spotify_data(self):
+        MoodyUtil.create_spotify_user_auth(self.user_with_auth)
+        self.client.login(username=self.user_with_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.post(self.url)
+
+        self.assertFalse(SpotifyUserAuth.objects.filter(user=self.user_with_auth).exists())
+        self.assertFalse(SpotifyUserData.objects.filter(spotifyuserauth__user=self.user_with_auth).exists())
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+
+        self.assertRedirects(resp, self.redirect_url)
+        self.assertEqual(last_message, 'We have deleted your Spotify data from Moodytunes')
 
 
 class TestExportView(TestCase):

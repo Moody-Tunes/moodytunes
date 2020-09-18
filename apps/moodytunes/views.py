@@ -112,7 +112,7 @@ class SpotifyAuthenticationView(TemplateView):
         context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
         state = get_random_string(length=48)
 
-        client = SpotifyClient(settings.SPOTIFY['client_id'], settings.SPOTIFY['secret_key'])
+        client = SpotifyClient()
         context['spotify_auth_url'] = client.build_spotify_oauth_confirm_link(
             state,
             settings.SPOTIFY['auth_user_scopes'],
@@ -155,11 +155,7 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(
-                settings.SPOTIFY['client_id'],
-                settings.SPOTIFY['secret_key'],
-                identifier='spotify_auth_access:{}'.format(user.username),
-            )
+            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
 
             try:
                 tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
@@ -253,6 +249,40 @@ class SpotifyAuthenticationSuccessView(RedirectView):
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class RevokeSpotifyAuthView(TemplateView):
+    template_name = 'revoke_spotify_auth.html'
+
+    def get(self, request, *args, **kwargs):
+        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
+            return HttpResponseRedirect(reverse('accounts:profile'))
+
+        return super().get(request, *args, **kwargs)
+
+    @update_logging_data
+    def post(self, request, *args, **kwargs):
+        try:
+            auth = SpotifyUserAuth.objects.select_related('spotify_data').get(user=request.user)
+        except SpotifyUserAuth.DoesNotExist:
+            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
+            return HttpResponseRedirect(reverse('accounts:profile'))
+
+        auth_id = auth.pk
+        auth.delete()
+
+        logger.info(
+            'Deleted SpotifyUserAuth for user {}'.format(request.user.username),
+            extra={
+                'fingerprint': auto_fingerprint('revoked_spotify_auth', **kwargs),
+                'auth_id': auth_id
+            }
+        )
+
+        messages.info(request, 'We have deleted your Spotify data from Moodytunes')
+        return HttpResponseRedirect(reverse('accounts:profile'))
 
 
 @method_decorator(login_required, name='dispatch')

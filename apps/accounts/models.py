@@ -133,7 +133,7 @@ class SpotifyUserAuth(BaseModel):
 
             raise
 
-        if auth.should_update_access_token:
+        if auth.should_refresh_access_token:
             try:
                 auth.refresh_access_token()
             except SpotifyException:
@@ -146,23 +146,20 @@ class SpotifyUserAuth(BaseModel):
         return auth
 
     @property
-    def should_update_access_token(self):
+    def should_refresh_access_token(self):
         """
-        Spotify access tokens are good for one hour. If the access token has not been updated in this time period,
-        indicate that the access token should be updated
-        :return: (bool) True if the access token has been updated since the last hour, False if not
+        Determine if the access token for the record is still valid. Spotify considers access tokens
+        that are older than one hour expired and are not accepted for API requests.
+
+        :return: (bool)
         """
         spotify_auth_timeout = timezone.now() - timedelta(seconds=settings.SPOTIFY['auth_user_token_timeout'])
         return self.last_refreshed < spotify_auth_timeout
 
     @update_logging_data
     def refresh_access_token(self, **kwargs):
-        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth records"""
-        spotify_client = SpotifyClient(
-            settings.SPOTIFY['client_id'],
-            settings.SPOTIFY['secret_key'],
-            identifier='update-access-token:{}'.format(self.user.username)
-        )
+        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth record"""
+        spotify_client = SpotifyClient(identifier='refresh-access-token:{}'.format(self.user.username))
 
         try:
             access_token = spotify_client.refresh_access_token(self.refresh_token)

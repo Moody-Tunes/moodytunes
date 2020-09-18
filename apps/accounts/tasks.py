@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
+from accounts.exceptions import InsufficientSpotifyScopesError
 from accounts.models import MoodyUser, SpotifyUserAuth, UserEmotion
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
@@ -130,14 +131,10 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
                 }
             )
 
-            raise Exception('Insufficient Spotify scopes to fetch Spotify top artists')
+            raise InsufficientSpotifyScopesError('Insufficient Spotify scopes to fetch Spotify top artists')
 
         spotify_client_identifier = 'update_spotify_top_artists_{}'.format(auth.spotify_user_id)
-        spotify = SpotifyClient(
-            settings.SPOTIFY['client_id'],
-            settings.SPOTIFY['secret_key'],
-            identifier=spotify_client_identifier
-        )
+        spotify = SpotifyClient(identifier=spotify_client_identifier)
 
         logger.info(
             'Updating top artists for {}'.format(auth.spotify_user_id),
