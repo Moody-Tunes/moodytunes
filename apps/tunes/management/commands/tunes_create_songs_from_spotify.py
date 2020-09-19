@@ -50,6 +50,26 @@ class Command(MoodyBaseCommand):
 
         return success, fail
 
+    def parse_tracks_from_search_response(self, resp):
+        """
+        Given a response from a search request, return the needed data from the tracks to create
+        Song records in our system
+
+        :param resp: (dict) Response from a SpotifyClient::search call
+
+        :return: (list[dict])
+        """
+        tracks = []
+
+        for track in resp['tracks']['items']:
+            tracks.append({
+                'name': track['name'],
+                'code': track['uri'],
+                'artist': track['artists'][0]['name']
+            })
+
+        return tracks
+
     @update_logging_data
     def get_tracks_from_spotify(self, **kwargs):
         """
@@ -62,65 +82,21 @@ class Command(MoodyBaseCommand):
         tracks = []
 
         for category in settings.SPOTIFY['categories']:
-            songs_from_category = 0
-
             try:
-                playlists = spotify.get_playlists_for_category(category, settings.SPOTIFY['max_playlist_from_category'])
-                self.logger.info(
-                    'Got {} playlists for category: {}'.format(len(playlists), category),
-                    extra={
-                        'fingerprint': auto_fingerprint('retrieved_playlists_for_category', **kwargs),
-                        'command_id': self._unique_id
-                    }
-                )
+                search_response = spotify.search('genre:"{}"'.format(category), 'track')
+                raw_tracks = self.parse_tracks_from_search_response(search_response)
+                complete_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
-                for playlist in playlists:
-                    if songs_from_category < settings.SPOTIFY['max_songs_from_category']:
-                        num_tracks = settings.SPOTIFY['max_songs_from_category'] - songs_from_category
-                        self.logger.info(
-                            'Calling Spotify API to get {} track(s) for playlist {}'.format(
-                                num_tracks,
-                                playlist['name']
-                            ),
-                            extra={
-                                'fingerprint': auto_fingerprint('get_tracks_from_playlist', **kwargs),
-                                'tracks_to_retrieve': num_tracks,
-                                'command_id': self._unique_id
-                            }
-                        )
+                # Set genre for each track to the category used in search
+                for track in complete_tracks:
+                    track.update({'genre': category})
 
-                        raw_tracks = spotify.get_songs_from_playlist(playlist, num_tracks)
+                tracks.extend(complete_tracks)
 
-                        self.logger.info(
-                            'Calling Spotify API to get feature data for {} tracks'.format(len(raw_tracks)),
-                            extra={
-                                'fingerprint': auto_fingerprint('get_feature_data_for_tracks', **kwargs),
-                                'command_id': self._unique_id
-                            }
-                        )
-
-                        complete_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
-
-                        # Add genre information to each track. We can use the category search term as the genre
-                        # for songs found for that category
-                        for track in complete_tracks:
-                            track.update({'genre': category})
-
-                        self.logger.info(
-                            'Got {} tracks from {}'.format(len(complete_tracks), playlist['name']),
-                            extra={
-                                'fingerprint': auto_fingerprint('retrieved_tracks_from_playlist', **kwargs),
-                                'command_id': self._unique_id
-                            }
-                        )
-
-                        tracks.extend(complete_tracks)
-                        songs_from_category += len(complete_tracks)
-
-                self.write_to_log_and_output(
-                    'Finished processing {} tracks for category: {}'.format(songs_from_category, category),
-                    extra={'fingerprint': auto_fingerprint('processed_tracks_for_category', **kwargs)}
-                )
+                self.write_to_log_and_output('Finished processing {} tracks for category: {}'.format(
+                    len(complete_tracks),
+                    category
+                ))
 
             except SpotifyException as exc:
                 self.write_to_log_and_output(
