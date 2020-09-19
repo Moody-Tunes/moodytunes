@@ -78,51 +78,81 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
         self.assertEqual(success, 0)
         self.assertEqual(fail, 1)
 
-    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
-    def test_script_raises_command_error_if_no_tracks_retrieved_spotify_exception(self, mock_spotify_request):
-        # We'll raise an exception on the first request to ensure we don't get any tracks back
-        mock_spotify_request.side_effect = SpotifyException('Test Spotify Exception')
+    @mock.patch('spotify_client.SpotifyClient.search')
+    def test_script_raises_command_error_if_no_tracks_retrieved_spotify_exception(self, mock_search):
+        mock_search.side_effect = SpotifyException('Test Spotify Exception')
 
         with self.assertRaises(CommandError):
             call_command('tunes_create_songs_from_spotify')
 
-    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
-    def test_script_raises_command_error_if_no_tracks_retrieved_base_exception(self, mock_spotify_request):
-        # We'll raise an exception on the first request to ensure we don't get any tracks back
-        mock_spotify_request.side_effect = Exception('Test Exception')
+    @mock.patch('spotify_client.SpotifyClient.search')
+    def test_script_raises_command_error_if_no_tracks_retrieved_base_exception(self, mock_search):
+        mock_search.side_effect = Exception('Test Exception')
 
         with self.assertRaises(CommandError):
             call_command('tunes_create_songs_from_spotify')
 
-    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
-    @mock.patch('spotify_client.SpotifyClient.get_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
-    def test_spotify_exception_raised_with_some_tracks(self, mock_features, _, mock_playlists):
-        # If one category returns some tracks and the next one raises an exception, we should
-        # still process the songs we got
-        mock_playlists.return_value = [{'user': 'two-tone-killer', 'name': 'Beetz.remote', 'uri': 'some-code'}]
-
-        mock_features.side_effect = [
-            [self.track_data],
+    @mock.patch('spotify_client.SpotifyClient.search')
+    def test_spotify_exception_raised_with_some_tracks_creates_songs_from_retrieved_tracks(
+            self,
+            mock_search,
+            mock_get_audio_features
+    ):
+        mock_search.side_effect = [
+            {
+                'tracks': {
+                    'items': [{
+                        'artists': [{'name': 'Drake'}],
+                        'name': 'ROCKSTAR (feat. Roddy Ricch)',
+                        'uri': 'spotify:track:7ytR5pFWmSjzHJIeQkgog4'
+                    }]
+                }
+            },
             SpotifyException('Test Spotify Exception')
         ]
+
+        mock_get_audio_features.return_value = [{
+            'name': 'ROCKSTAR (feat. Roddy Ricch)',
+            'code': 'spotify:track:7ytR5pFWmSjzHJIeQkgog4',
+            'artist': 'Drake',
+            'valence': .50,
+            'energy': .50,
+            'danceability': .50
+        }]
 
         call_command('tunes_create_songs_from_spotify')
 
         self.assertEqual(Song.objects.count(), 1)
 
-    @mock.patch('spotify_client.SpotifyClient.get_playlists_for_category')
-    @mock.patch('spotify_client.SpotifyClient.get_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.get_audio_features_for_tracks')
-    def test_exception_raised_with_some_tracks(self, mock_features, _, mock_playlists):
-        # If one category returns some tracks and the next one raises an exception, we should
-        # still process the songs we got
-        mock_playlists.return_value = [{'user': 'two-tone-killer', 'name': 'Beetz.remote', 'uri': 'some-code'}]
-
-        mock_features.side_effect = [
-            [self.track_data],
-            Exception('Test Exception')
+    @mock.patch('spotify_client.SpotifyClient.search')
+    def test_exception_raised_with_some_tracks_creates_songs_from_retrieved_tracks(
+            self,
+            mock_search,
+            mock_get_audio_features
+    ):
+        mock_search.side_effect = [
+            {
+                'tracks': {
+                    'items': [{
+                        'artists': [{'name': 'Drake'}],
+                        'name': 'ROCKSTAR (feat. Roddy Ricch)',
+                        'uri': 'spotify:track:7ytR5pFWmSjzHJIeQkgog4'
+                    }]
+                }
+            },
+            Exception('Test Spotify Exception')
         ]
+
+        mock_get_audio_features.return_value = [{
+            'name': 'ROCKSTAR (feat. Roddy Ricch)',
+            'code': 'spotify:track:7ytR5pFWmSjzHJIeQkgog4',
+            'artist': 'Drake',
+            'valence': .50,
+            'energy': .50,
+            'danceability': .50
+        }]
 
         call_command('tunes_create_songs_from_spotify')
 
