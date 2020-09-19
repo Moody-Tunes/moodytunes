@@ -50,7 +50,7 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
 
 
 class BackupDatabaseTask(MoodyPeriodicTask):
-    run_every = crontab(minute=0, hour=3, day_of_week=0)
+    run_every = crontab(minute=0, hour=4, day_of_week=0)
 
     def delete_old_backups(self):
         for backup_file in os.listdir(settings.DATABASE_BACKUPS_PATH):
