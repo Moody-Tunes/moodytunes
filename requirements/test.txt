@@ -7,3 +7,4 @@ pytest-blockage==0.2.2
 pytest-cov==2.10.1
 pytest-django==3.10.0
 pytest-random-order==1.0.4
+pytest-xdist==2.1.0
