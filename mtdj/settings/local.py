@@ -26,6 +26,9 @@ LOGGING['handlers'].update({
     },
 })
 
+# Add django-extensions to install apps
+INSTALLED_APPS.append('django_extensions')
+
 # Django debug toolbar configuration
 INSTALLED_APPS.append('debug_toolbar')
 MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
