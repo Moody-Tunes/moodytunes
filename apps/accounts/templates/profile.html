@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load compress %}
-{% load tz %}
 {% load static %}
 
 {% block superhead %}
@@ -18,9 +17,7 @@
 {% block content %}
 <div id="config" data-csrf-token="{{ csrf_token }}"></div>
 <h1>Profile</h1>
-{% localtime on %}
-<p>Hello {{ user.username }}! You last logged in {{ user.last_login|date:"M d, Y" }} at {{ user.last_login|date:"f A e" }}</p>
-{% endlocaltime %}
+<p>Hello {{ user.username }}!</p>
 <h3>Account Options</h3>
 <ul>
     <li><a class="profile-link" href="{% url 'accounts:update' %}">Update Information</a></li>

@@ -46,7 +46,6 @@ THIRD_PARTY_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_hosts',
-    'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
     'waffle',
@@ -70,7 +69,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
 ]
