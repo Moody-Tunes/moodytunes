@@ -47,20 +47,37 @@ class MultipleMethodSchema(AutoSchema):
     for the view to an instance of this class and pass the request serializers to the constructor.
     """
 
-    def __init__(self, post_request_serializer, delete_request_serializer):
+    def __init__(
+            self,
+            get_request_serializer=None,
+            post_request_serializer=None,
+            delete_request_serializer=None,
+            patch_request_serializer=None
+    ):
+        self.get_request_serializer = get_request_serializer
         self.post_request_serializer = post_request_serializer
         self.delete_request_serializer = delete_request_serializer
+        self.patch_request_serializer = patch_request_serializer
+
+        self.get_location = 'query'
+        self.post_location = self.delete_location = self.patch_location = 'form'
 
         super().__init__()
 
     def get_manual_fields(self, path, method):
         extra_fields = []
 
-        if method == 'POST':
-            schema = build_documentation_for_request_serializer(self.post_request_serializer, 'form')
+        if method == 'GET' and self.get_request_serializer:
+            schema = build_documentation_for_request_serializer(self.get_request_serializer, self.get_location)
             extra_fields = schema._manual_fields
-        elif method == 'DELETE':
-            schema = build_documentation_for_request_serializer(self.delete_request_serializer, 'form')
+        elif method == 'POST' and self.post_request_serializer:
+            schema = build_documentation_for_request_serializer(self.post_request_serializer, self.post_location)
+            extra_fields = schema._manual_fields
+        elif method == 'DELETE' and self.delete_request_serializer:
+            schema = build_documentation_for_request_serializer(self.delete_request_serializer, self.delete_location)
+            extra_fields = schema._manual_fields
+        elif method == 'PATCH' and self.patch_request_serializer:
+            schema = build_documentation_for_request_serializer(self.patch_request_serializer, self.patch_location)
             extra_fields = schema._manual_fields
 
         manual_fields = super().get_manual_fields(path, method)

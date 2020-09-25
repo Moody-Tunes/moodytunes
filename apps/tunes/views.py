@@ -224,7 +224,10 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
     if settings.DEBUG:  # pragma: no cover
         from base.utils import MultipleMethodSchema
-        schema = MultipleMethodSchema(VoteSongsRequestSerializer, DeleteVoteRequestSerializer)
+        schema = MultipleMethodSchema(
+            post_request_serializer=VoteSongsRequestSerializer,
+            delete_request_serializer=DeleteVoteRequestSerializer
+        )
 
     @update_logging_data
     def create(self, request, *args, **kwargs):
