@@ -38,12 +38,12 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/common.txt') }}
-      - name: Install dependencies
+      - name: Install tox
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements/test.txt
-      - name: Test with pytest
-        run: pytest --cov-report=xml
+          pip install tox==3.20.0
+      - name: Test with pytest and write coverage to XML file
+        run: tox -- --cov-report=xml
         env:
           DJANGO_SETTINGS_MODULE: mtdj.settings.test
           MTDJ_ENV_FILE: test
