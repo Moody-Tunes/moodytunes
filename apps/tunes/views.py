@@ -37,8 +37,8 @@ logger = logging.getLogger(__name__)
 class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     Return a JSON response of Song records that match a given input query params.
-    The main thing that should be passed is an `emotion_name`, which denotes the emotion
-    of the songs that the user wants to feel.
+    The main thing that should be passed is `emotion`, which is the mood in our
+    system the user desires to feel.
     """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
