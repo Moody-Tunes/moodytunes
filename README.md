@@ -111,3 +111,30 @@ You can verify the status through the command by entering
 To halt the daemon, enter
 
 `sudo systemctl stop {process_name}`
+
+### Adding Dependencies
+
+We use [pip-compile-multi](https://pip-compile-multi.readthedocs.io/en/latest/index.html) for generating a lock file of
+dependencies to install for our application. This will ensure we pin the versions of our dependencies (and versions for dependencies of dependencies!)
+in our application to guarantee reproducibility between builds. To add a dependency or to update a dependency version,
+change the corresponding `ini` file in our requirements directory, then generate the lock file of dependency versions.
+
+For example, if we wanted to add the `BeautifulSoup4` package to our application at version `4.9.1`, we would add the
+following line to our `common.ini` file:
+
+```
+BeautifulSoup4==4.9.1
+```
+
+Then, we would run the `tox` command to generate the lock files:
+
+```
+tox -e lock-requirements
+```
+
+This will generate a `common.txt` file in our requirements directory. Commit both the `common.ini` file and `common.txt`
+file to version control and push them.
+
+To ensure we keep the lock file in sync with the requirements `ini` file, we run a check to ensure that the dependency
+`ini` files have been locked when opening a PR. If this check fails, you probably need to run the lock step to ensure the
+dependency lock file has been properly generated.
