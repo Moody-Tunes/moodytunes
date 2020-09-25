@@ -212,10 +212,10 @@ class LastPlaylistView(generics.RetrieveAPIView):
 
 class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):
     """
-    POST: Register a new `UserSongVote` for the given request user, song, and emotion; denotes whether or not the song
-    made the user feel that emotion.
-    DELETE: Unregister a `UserSongVote` for the given request user, song, and emotion; marks the song as not making the
-    user feel that emotion.
+    post: Register a new `UserSongVote` for the given request user, song, and emotion. Optionally include information
+    about listening context and description for context.
+
+    delete: Unregister all `UserSongVote` records for the given request user, song, and emotion.
     """
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
