@@ -16,12 +16,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install flake8
+      - name: Install tox
         run: |
           python -m pip install --upgrade pip
-          grep flake8 requirements/test.txt | xargs pip install
+          pip install tox==3.20.0
       - name: Run flake8
-        run: flake8
+        run: tox -e flake8
 
   pre-commit:
     name: Run pre-commit
@@ -50,3 +50,20 @@ jobs:
       - uses: pre-commit/action@v1.1.1
         with:
           extra_args: --files ${{ env.FILES }}
+
+  requirements-lock-verify:
+    name: Verify lock file is in sync with dependency list
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install tox
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox==3.20.0
+      - name: Run pip-compile-multi verify
+        run: tox -e verify-requirements
