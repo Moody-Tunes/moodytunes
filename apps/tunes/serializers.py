@@ -82,11 +82,23 @@ class BrowseSongsRequestSerializer(serializers.Serializer):
 class VoteSongsRequestSerializer(serializers.Serializer):
     """Provides validation for POST /tunes/vote/"""
 
-    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
-    song_code = serializers.CharField()
-    vote = serializers.BooleanField()
-    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
-    description = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    emotion = CleanedChoiceField(
+        Emotion.EMOTION_NAME_CHOICES,
+        help_text='Emotion of vote for song. Must be one of Emotion.EMOTION_NAME_CHOICES'
+    )
+    song_code = serializers.CharField(help_text='Spotify song URI for the song to vote on.')
+    vote = serializers.BooleanField(help_text='Whether or not user thinks the song makes them feel the desired mood.')
+    context = CleanedChoiceField(
+        UserSongVote.CONTEXT_CHOICES,
+        required=False,
+        help_text='Context for user listening session.'
+    )
+    description = serializers.CharField(
+        max_length=100,
+        required=False,
+        allow_blank=True,
+        help_text='Description for user listening session.'
+    )
 
     def validate_description(self, value):
         if value and not re.match(r"^[a-zA-Z0-9_.?!, ]*$", value):
@@ -98,9 +110,16 @@ class VoteSongsRequestSerializer(serializers.Serializer):
 class DeleteVoteRequestSerializer(serializers.Serializer):
     """Provides validation for DELETE /tunes/vote/"""
 
-    emotion = CleanedChoiceField(Emotion.EMOTION_NAME_CHOICES)
-    song_code = serializers.CharField()
-    context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
+    emotion = CleanedChoiceField(
+        Emotion.EMOTION_NAME_CHOICES,
+        help_text='Emotion of vote to delete. Must be one of Emotion.EMOTION_NAME_CHOICES'
+    )
+    song_code = serializers.CharField(help_text='Spotify song URI for the vote to delete.')
+    context = CleanedChoiceField(
+        UserSongVote.CONTEXT_CHOICES,
+        required=False,
+        help_text='Context for user listening session.'
+    )
 
 
 class PlaylistSongsRequestSerializer(serializers.Serializer):
@@ -135,3 +154,7 @@ class VoteInfoRequestSerializer(serializers.Serializer):
         help_text='Emotion of votes for songs. Must be one of Emotion.EMOTION_NAME_CHOICES'
     )
     song_code = serializers.CharField(help_text='Spotify song URI that the user has voted on.')
+
+
+class EmptyResponseSerializer(serializers.Serializer):
+    pass

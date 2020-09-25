@@ -19,6 +19,7 @@ from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
+    EmptyResponseSerializer,
     LastPlaylistSerializer,
     OptionsSerializer,
     PlaylistSerializer,
@@ -219,7 +220,11 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
-    serializer_class = SongSerializer
+    serializer_class = EmptyResponseSerializer
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.utils import MultipleMethodSchema
+        schema = MultipleMethodSchema(VoteSongsRequestSerializer, DeleteVoteRequestSerializer)
 
     @update_logging_data
     def create(self, request, *args, **kwargs):
