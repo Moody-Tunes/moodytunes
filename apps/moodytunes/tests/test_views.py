@@ -422,7 +422,7 @@ class TestExportView(TestCase):
 
         messages = get_messages_from_response(resp)
         last_message = messages[-1]
-        msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+        msg = 'Your {} playlist is empty! Try adding some songs to export the playlist'.format(
             emotion.full_name.lower()
         )
 
