@@ -16,12 +16,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install flake8
+      - name: Install tox
         run: |
           python -m pip install --upgrade pip
-          grep flake8 requirements/test.txt | xargs pip install
+          pip install tox==3.20.0
       - name: Run flake8
-        run: flake8
+        run: tox -e flake8
 
   pre-commit:
     name: Run pre-commit
@@ -61,9 +61,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install pip-compile-multi
+      - name: Install tox
         run: |
           python -m pip install --upgrade pip
-          pip install pip-compile-multi==2.1.0
+          pip install tox==3.20.0
       - name: Run pip-compile-multi verify
-        run: pip-compile-multi verify --in-ext ini
+        run: tox -e verify-requirements
