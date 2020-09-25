@@ -14,12 +14,12 @@
 
 {% block content %}
     <h1>Export Playlist</h1>
-    <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the emotion of the playlist you want to
-    export and  the name of the playlist to be created and it will be added to your Spotify account!</p>
+    <p>Want to save your MoodyTunes playlist to your Spotify Account? Specify the mood of the playlist you want to
+    export and the name of the playlist to be created and it will be added to your Spotify account!</p>
     <form id="export-playlist-form" name="export-playlist-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.emotion.errors }}
-        <p>Emotion: {{ form.emotion }}</p>
+        <p>Mood: {{ form.emotion }}</p>
         {{ form.genre.errors }}
         <p>Genre: {{ form.genre }}</p>
         {{ form.context.errors }}
