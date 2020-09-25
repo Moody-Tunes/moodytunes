@@ -66,4 +66,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install pip-compile-multi==2.1.0
       - name: Run pip-compile-multi verify
-        run: pip-compile-multi verify
+        run: pip-compile-multi verify --in-ext ini
