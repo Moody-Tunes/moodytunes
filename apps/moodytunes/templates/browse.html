@@ -25,14 +25,14 @@
 <div id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
     <button id="use-cached-playlist" {% if not cached_playlist_exists %} disabled {% endif %}>Last Playlist</button>
-    <p>Emotion: {{ form.emotion }}</p>
+    <p>Mood: {{ form.emotion }}</p>
     <p>Genre: {{ form.genre }}</p>
     {% flag 'filter_browse_playlist_by_artist' %}
         <p>Artist: {{ form.artist }}</p>
     {% endflag %}
     <div class="help-tip">
         <p>Jitter is the amount of randomness we use to generate your browse playlist. The higher the value, the more
-            variety there will be in the songs we return. Set this to a higher value to explore more varied songs for your emotion!</p>
+            variety there will be in the songs we return. Set this to a higher value to explore more varied songs for your mood!</p>
     </div>
     <p>Jitter: <span id="jitter-value"></span> {{ form.jitter }} </p>
     <button id="set-context-button">Set Context</button>
