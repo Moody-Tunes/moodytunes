@@ -50,7 +50,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     get_request_serializer = BrowseSongsRequestSerializer
 
     if settings.DEBUG:  # pragma: no cover
-        from base.utils import build_documentation_for_request_serializer
+        from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
 
     @update_logging_data
@@ -223,7 +223,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     serializer_class = EmptyResponseSerializer
 
     if settings.DEBUG:  # pragma: no cover
-        from base.utils import MultipleMethodSchema
+        from base.documentation_utils import MultipleMethodSchema
         schema = MultipleMethodSchema(
             post_request_serializer=VoteSongsRequestSerializer,
             delete_request_serializer=DeleteVoteRequestSerializer
@@ -337,7 +337,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     get_request_serializer = PlaylistSongsRequestSerializer
 
     if settings.DEBUG:  # pragma: no cover
-        from base.utils import build_documentation_for_request_serializer
+        from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(PlaylistSongsRequestSerializer, 'query')
 
     @update_logging_data
@@ -449,7 +449,7 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     get_request_serializer = VoteInfoRequestSerializer
 
     if settings.DEBUG:  # pragma: no cover
-        from base.utils import build_documentation_for_request_serializer
+        from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(VoteInfoRequestSerializer, 'query')
 
     def get_object(self):

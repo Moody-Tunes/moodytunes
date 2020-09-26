@@ -2,7 +2,7 @@ import coreapi
 from django.test import TestCase
 from rest_framework import serializers
 
-from base.utils import MultipleMethodSchema, build_documentation_for_request_serializer
+from base.documentation_utils import MultipleMethodSchema, build_documentation_for_request_serializer
 
 
 class DummyRequestSerializer(serializers.Serializer):

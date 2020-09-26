@@ -176,7 +176,7 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
     http_method_names = ['get', 'patch']
 
     if settings.DEBUG:  # pragma: no cover
-        from base.utils import MultipleMethodSchema
+        from base.documentation_utils import MultipleMethodSchema
         schema = MultipleMethodSchema(
             patch_request_serializer=UserProfileRequestSerializer,
         )
