@@ -9,7 +9,7 @@ from django.utils import timezone
 from spotify_client.exceptions import SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, SpotifyUserData, UserEmotion, UserSongVote
-from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
+from accounts.signals import create_user_emotion_records
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
 from tunes.models import Emotion
@@ -46,22 +46,19 @@ class TestUserEmotion(TestCase):
         song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
         user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
 
-        # Skip the post_save signal on UserSongVote to delay updating the attributes
-        dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
-        with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
-            UserSongVote.objects.create(
-                user=self.user,
-                emotion=emotion,
-                song=song,
-                vote=True
-            )
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=song,
+            vote=True
+        )
 
-            UserSongVote.objects.create(
-                user=self.user,
-                emotion=emotion,
-                song=song2,
-                vote=True
-            )
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=emotion,
+            song=song2,
+            vote=True
+        )
 
         votes = UserSongVote.objects.filter(user=self.user)
 

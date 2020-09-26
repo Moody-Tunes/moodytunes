@@ -2,7 +2,6 @@ from logging import getLogger
 
 from celery.schedules import crontab
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
@@ -51,64 +50,6 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
         logger.info(
             'Created UserEmotion records for user {}'.format(user.username),
             extra={'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs)}
-        )
-
-
-class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
-
-    @update_logging_data
-    def run(self, user_id, emotion_id, *args, **kwargs):
-        """
-        Update UserEmotion attributes for a given MoodyUser and Emotion
-
-        :param user_id: (int) Primary key for MoodyUser in our system
-        :param emotion_id: (int) Primary key for Emotion in our system
-
-        """
-        # We should always call get_or_create to ensure that if we add new emotions, we'll auto
-        # create the corresponding UserEmotion record the first time a user votes on a song
-        # for the emotion
-        try:
-            user_emotion, _ = UserEmotion.objects.select_related('emotion', 'user').get_or_create(
-                user_id=user_id,
-                emotion_id=emotion_id
-            )
-        except ValidationError as e:
-            logger.exception(
-                'Unable to create UserEmotion record for user_id={} and emotion_id={}'.format(user_id, emotion_id),
-                extra={
-                    'fingerprint': auto_fingerprint('failed_to_create_user_emotion', **kwargs),
-                    'error': e.error_dict
-                }
-            )
-
-            raise
-
-        user = user_emotion.user
-        emotion = user_emotion.emotion
-
-        old_energy = user_emotion.energy
-        old_valence = user_emotion.valence
-        old_danceability = user_emotion.danceability
-
-        user_emotion.update_attributes()
-
-        logger.info(
-            'Updated UserEmotion attributes for user {} for emotion {}'.format(
-                user.username,
-                emotion.full_name
-            ),
-            extra={
-                'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **kwargs),
-                'user_id': user.id,
-                'emotion_id': emotion.id,
-                'old_energy': old_energy,
-                'old_valence': old_valence,
-                'old_danceability': old_danceability,
-                'new_energy': user_emotion.energy,
-                'new_valence': user_emotion.valence,
-                'new_danceability': user_emotion.danceability,
-            }
         )
 
 

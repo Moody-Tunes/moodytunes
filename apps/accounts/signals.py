@@ -1,12 +1,8 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 
-from accounts.models import SpotifyUserAuth, UserSongVote
-from accounts.tasks import (
-    CreateUserEmotionRecordsForUserTask,
-    UpdateTopArtistsFromSpotifyTask,
-    UpdateUserEmotionRecordAttributeTask,
-)
+from accounts.models import SpotifyUserAuth
+from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateTopArtistsFromSpotifyTask
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
@@ -19,20 +15,6 @@ post_save.connect(
     create_user_emotion_records,
     sender=settings.AUTH_USER_MODEL,
     dispatch_uid='user_post_save_create_useremotion_records'
-)
-
-
-def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
-    if created and instance.vote:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
-    elif not created:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
-
-
-post_save.connect(
-    update_user_emotion_attributes,
-    sender=UserSongVote,
-    dispatch_uid='user_song_vote_post_save_update_useremotion_attributes'
 )
 
 

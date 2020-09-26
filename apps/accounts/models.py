@@ -286,6 +286,47 @@ class UserSongVote(BaseModel):
     def __str__(self):
         return '{} - {} - {}'.format(self.user, self.song, self.emotion)
 
+    @update_logging_data
+    def save(self, *args, **kwargs):
+        log_data = {
+            'func_name': kwargs.pop('func_name'),
+            'class_name': kwargs.pop('class_name')
+        }
+
+        super().save(*args, **kwargs)
+
+        user_emotion, _ = UserEmotion.objects.select_related('emotion', 'user').get_or_create(
+            user_id=self.user_id,
+            emotion_id=self.emotion_id
+        )
+
+        user = user_emotion.user
+        emotion = user_emotion.emotion
+
+        old_energy = user_emotion.energy
+        old_valence = user_emotion.valence
+        old_danceability = user_emotion.danceability
+
+        user_emotion.update_attributes()
+
+        logger.info(
+            'Updated UserEmotion attributes for user {} for emotion {}'.format(
+                user.username,
+                emotion.full_name
+            ),
+            extra={
+                'fingerprint': auto_fingerprint('updated_user_emotion_attributes', **log_data),
+                'user_id': user.id,
+                'emotion_id': emotion.id,
+                'old_energy': old_energy,
+                'old_valence': old_valence,
+                'old_danceability': old_danceability,
+                'new_energy': user_emotion.energy,
+                'new_valence': user_emotion.valence,
+                'new_danceability': user_emotion.danceability,
+            }
+        )
+
     def delete(self, *args, **kwargs):
         # We don't actually want to delete these records, so just set the vote value to false
         self.vote = False
