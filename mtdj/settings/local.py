@@ -37,6 +37,9 @@ MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 INSTALLED_APPS.append('silk')
 
+# Add Django Rest Framework Swagger for API documentation
+INSTALLED_APPS.append('rest_framework_swagger')
+
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 LOGGING['root']['handlers'].append('console')
 LOGGING['root']['level'] = 'DEBUG'

@@ -19,6 +19,7 @@ from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
+    EmptyResponseSerializer,
     LastPlaylistSerializer,
     OptionsSerializer,
     PlaylistSerializer,
@@ -37,8 +38,8 @@ logger = logging.getLogger(__name__)
 class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     Return a JSON response of Song records that match a given input query params.
-    The main thing that should be passed is an `emotion_name`, which denotes the emotion
-    of the songs that the user wants to feel.
+    The main thing that should be passed is `emotion`, which is the mood in our
+    system the user desires to feel.
     """
     serializer_class = SongSerializer
     queryset = Song.objects.all()
@@ -47,6 +48,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     default_limit = 9
 
     get_request_serializer = BrowseSongsRequestSerializer
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.documentation_utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
 
     @update_logging_data
     def filter_queryset(self, queryset, **kwargs):
@@ -207,13 +212,22 @@ class LastPlaylistView(generics.RetrieveAPIView):
 
 class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.CreateAPIView, generics.DestroyAPIView):
     """
-    POST: Register a new `UserSongVote` for the given request user, song, and emotion; denotes whether or not the song
-    made the user feel that emotion.
-    DELETE: Unregister a `UserSongVote` for the given request user, song, and emotion; marks the song as not making the
-    user feel that emotion.
+    post: Register a new `UserSongVote` for the given request user, song, and emotion. Optionally include information
+    about listening context and description for context.
+
+    delete: Unregister all `UserSongVote` records for the given request user, song, and emotion.
     """
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
+
+    serializer_class = EmptyResponseSerializer
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.documentation_utils import MultipleMethodSchema
+        schema = MultipleMethodSchema(
+            post_request_serializer=VoteSongsRequestSerializer,
+            delete_request_serializer=DeleteVoteRequestSerializer
+        )
 
     @update_logging_data
     def create(self, request, *args, **kwargs):
@@ -314,14 +328,17 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
 class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
-    Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
-    on the songs as making them feel the given emotion.
+    Returns a JSON response of songs that the user has voted as making them feel a desired emotion.
     """
     serializer_class = PlaylistSerializer
     queryset = UserSongVote.objects.all()
     pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.documentation_utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(PlaylistSongsRequestSerializer, 'query')
 
     @update_logging_data
     def list(self, request, *args, **kwargs):
@@ -430,6 +447,10 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     serializer_class = VoteInfoSerializer
 
     get_request_serializer = VoteInfoRequestSerializer
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.documentation_utils import build_documentation_for_request_serializer
+        schema = build_documentation_for_request_serializer(VoteInfoRequestSerializer, 'query')
 
     def get_object(self):
         contexts = UserSongVote.objects.filter(
