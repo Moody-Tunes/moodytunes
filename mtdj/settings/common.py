@@ -43,11 +43,9 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'compressor',
-    'django_extensions',
     'django_celery_beat',
     'django_celery_results',
     'django_hosts',
-    'easy_timezones',
     'encrypted_model_fields',
     'rest_framework',
     'waffle',
@@ -71,7 +69,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'easy_timezones.middleware.EasyTimezoneMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
 ]
@@ -256,7 +253,10 @@ REST_FRAMEWORK = {
     },
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': (
+        'rest_framework.schemas.coreapi.AutoSchema'
+    ),
 }
 
 LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)

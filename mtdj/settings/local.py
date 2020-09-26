@@ -26,6 +26,9 @@ LOGGING['handlers'].update({
     },
 })
 
+# Add django-extensions to install apps
+INSTALLED_APPS.append('django_extensions')
+
 # Django debug toolbar configuration
 INSTALLED_APPS.append('debug_toolbar')
 MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
@@ -33,6 +36,9 @@ MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 # Django silk profiler configuration
 MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 INSTALLED_APPS.append('silk')
+
+# Add Django Rest Framework Swagger for API documentation
+INSTALLED_APPS.append('rest_framework_swagger')
 
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 LOGGING['root']['handlers'].append('console')

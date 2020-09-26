@@ -336,7 +336,7 @@ class ExportPlayListView(FormView):
             songs = ExportPlaylistHelper.get_export_playlist_for_user(request.user, emotion_name, genre, context)
 
             if not songs:
-                msg = 'Your {} playlist is empty! Try adding some songs to save the playlist'.format(
+                msg = 'Your {} playlist is empty! Try adding some songs to export the playlist'.format(
                     Emotion.get_full_name_from_keyword(emotion_name).lower()
                 )
 
