@@ -164,9 +164,22 @@ class CreateUserView(FormView):
 
 
 class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
+    """
+    get: Retrieve the UserProfile data for the request user
+
+    patch: Update the UserProfile record with provided data for the request user
+    """
     serializer_class = UserProfileSerializer
 
     patch_request_serializer = UserProfileRequestSerializer
+
+    http_method_names = ['get', 'patch']
+
+    if settings.DEBUG:  # pragma: no cover
+        from base.utils import MultipleMethodSchema
+        schema = MultipleMethodSchema(
+            patch_request_serializer=UserProfileRequestSerializer,
+        )
 
     def get_object(self):
         user_profile = get_object_or_404(UserProfile, user=self.request.user)
