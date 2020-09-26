@@ -328,8 +328,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
 
 class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
-    Returns a JSON response of songs that the user has voted as making them feel a particular emotion (they have voted
-    on the songs as making them feel the given emotion.
+    Returns a JSON response of songs that the user has voted as making them feel a desired emotion.
     """
     serializer_class = PlaylistSerializer
     queryset = UserSongVote.objects.all()
