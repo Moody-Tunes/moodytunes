@@ -12,11 +12,9 @@ from accounts.management.commands.accounts_recover_user_account import Command a
 from libs.tests.helpers import MoodyUtil
 
 
-@mock.patch('django.core.management.base.OutputWrapper', mock.MagicMock)
-class TestRecoverUserAccount(TestCase):
-
+class TestRecoverUserAccountCommand(TestCase):
     @mock.patch('accounts.models.MoodyUser.objects.make_random_password')
-    def test_happy_patch(self, mock_generate_password):
+    def test_happy_path(self, mock_generate_password):
         user = MoodyUtil.create_user()
         password = '12345'
         mock_generate_password.return_value = password
