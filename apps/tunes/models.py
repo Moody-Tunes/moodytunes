@@ -63,7 +63,6 @@ class Emotion(BaseModel):
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,
-        db_index=True,
         unique=True
     )
 
@@ -105,7 +104,7 @@ class Song(BaseModel):
     artist = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     genre = models.CharField(max_length=20, blank=True, default='')
-    code = models.CharField(max_length=36, db_index=True, unique=True)
+    code = models.CharField(max_length=36, unique=True)
     valence = models.FloatField(validators=[validate_decimal_value])
     energy = models.FloatField(validators=[validate_decimal_value])
     danceability = models.FloatField(validators=[validate_decimal_value], default=0)
