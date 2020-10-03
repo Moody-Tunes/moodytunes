@@ -63,7 +63,6 @@ class Emotion(BaseModel):
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,
-        db_index=True,
         unique=True
     )
 
