@@ -109,6 +109,13 @@
                 }).then((json) => {
                     callback(json);
                 }).catch(error => {
+                    // If the error is an object, in the case of errors when `fetch` cannot
+                    // connect to the server, convert it to a helpful message for user.
+                    // Otherwise it displays a "TypeError" message which is confusing.
+                    if (typeof(error) === 'object') {
+                        error = HttpStatusErrorMap[502];
+                    }
+
                     document.PlaylistCurator.displayAPIErrors(error);
             });
         },
