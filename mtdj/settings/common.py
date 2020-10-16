@@ -357,3 +357,4 @@ GEOIP2_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.mmdb')
 
 # Strategies for generating browse playlist
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
+BROWSE_JITTER = .05
