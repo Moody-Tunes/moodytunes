@@ -352,9 +352,6 @@ LOGGING = {
     },
 }
 
-# GeoIP Database files
-GEOIP2_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.mmdb')
-
 # BrowseView settings
 BROWSE_DEFAULT_JITTER = .05
 BROWSE_DEFAULT_LIMIT = 9
