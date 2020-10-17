@@ -353,6 +353,6 @@ LOGGING = {
 }
 
 # BrowseView settings
-BROWSE_DEFAULT_JITTER = .05
-BROWSE_DEFAULT_LIMIT = 9
+BROWSE_DEFAULT_JITTER = env.float('MTDJ_BROWSE_DEFAULT_JITTER', default=0.05)
+BROWSE_DEFAULT_LIMIT = env.int('MTDJ_BROWSE_DEFAULT_LIMIT', default=9)
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
