@@ -47,7 +47,7 @@ class BrowseForm(forms.Form):
         required=False,
         min_value=0,
         max_value=0.5,
-        widget=RangeInput(attrs={'step': .05, 'class': 'slider', 'value': .15})
+        widget=RangeInput(attrs={'step': .05, 'class': 'slider', 'value': settings.BROWSE_DEFAULT_JITTER})
     )
 
     def __init__(self, *args, **kwargs):

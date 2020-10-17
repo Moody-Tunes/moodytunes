@@ -352,8 +352,7 @@ LOGGING = {
     },
 }
 
-# GeoIP Database files
-GEOIP2_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.mmdb')
-
-# Strategies for generating browse playlist
+# BrowseView settings
+BROWSE_DEFAULT_JITTER = env.float('MTDJ_BROWSE_DEFAULT_JITTER', default=0.05)
+BROWSE_DEFAULT_LIMIT = env.int('MTDJ_BROWSE_DEFAULT_LIMIT', default=9)
 BROWSE_PLAYLIST_STRATEGIES = ['energy', 'valence', 'danceability']
