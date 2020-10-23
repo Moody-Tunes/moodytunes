@@ -13,6 +13,7 @@ def log_failed_login_attempt(credentials, request, **kwargs):
     """
     username = credentials['username']
     ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+    host = request.host.name
 
     logger.warning(
         'Failed login attempt for {}'.format(username),
@@ -20,5 +21,6 @@ def log_failed_login_attempt(credentials, request, **kwargs):
             'fingerprint': 'accounts.utils.log_failed_login_attempt',
             'username': username,
             'ip_address': ip_address,
+            'host': host
         }
     )

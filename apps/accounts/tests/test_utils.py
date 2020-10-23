@@ -10,10 +10,12 @@ class TestLogFailedLoginAttempt(TestCase):
     def test_log_failed_login_attempt(self, mock_logger):
         username = 'test'
         ip_address = '1.2.3.4'
+        host = 'www'
 
         credentials = {'username': username}
         request = mock.Mock()
         request.META = {'HTTP_X_FORWARDED_FOR': ip_address}
+        request.host.name = host
 
         log_failed_login_attempt(credentials, request)
 
@@ -23,5 +25,6 @@ class TestLogFailedLoginAttempt(TestCase):
                 'fingerprint': 'accounts.utils.log_failed_login_attempt',
                 'username': username,
                 'ip_address': ip_address,
+                'host': host,
             }
         )
