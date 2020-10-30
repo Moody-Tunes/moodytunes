@@ -114,7 +114,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 self.request.user.username,
             ),
             extra={
-                'fingerprint': auto_fingerprint('generate_browse playlist', **kwargs),
+                'fingerprint': auto_fingerprint('generate_browse_playlist', **kwargs),
                 'user_id': self.request.user.pk,
                 'emotion': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
                 'genre': self.cleaned_data.get('genre'),
