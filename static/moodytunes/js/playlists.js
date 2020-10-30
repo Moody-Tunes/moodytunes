@@ -293,7 +293,7 @@
                 firstLink = null;
 
             if (previousLink) {
-                firstLink = previousLink.replace(/page=[1-9]*/, '')
+                firstLink = previousLink.replace(/&page=[1-9]*/, '')
             }
 
             buttonContainer.appendChild(createPaginationButton(firstLink, 'first'));
