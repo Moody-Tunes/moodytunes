@@ -14,25 +14,17 @@ from tunes.models import Emotion, Song
 default_option = [('', '-----------')]
 
 
-def get_genre_choices(user=None):
+def get_genre_choices():
     """
     Return genre choices for form field.
 
-    :param user: (MoodyUser) If present, will only return genres from songs user has upvoted
-
     :return: (list[tuples]) List of options for genre field in forms
     """
-    if user:
-        genres = UserSongVote.objects.filter(
-            user=user,
-            vote=True
-        ).values_list('song__genre', flat=True).distinct()
+    if cache.get(settings.GENRE_CHOICES_CACHE_KEY):
+        genres = cache.get(settings.GENRE_CHOICES_CACHE_KEY)
     else:
-        if cache.get(settings.GENRE_CHOICES_CACHE_KEY):
-            genres = cache.get(settings.GENRE_CHOICES_CACHE_KEY)
-        else:
-            genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
-            cache.set(settings.GENRE_CHOICES_CACHE_KEY, genres, settings.GENRE_CHOICES_CACHE_TIMEOUT)
+        genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
+        cache.set(settings.GENRE_CHOICES_CACHE_KEY, genres, settings.GENRE_CHOICES_CACHE_TIMEOUT)
 
     return default_option + [(genre, genre.split('_')[0].capitalize()) for genre in genres if genre]
 
@@ -59,16 +51,9 @@ class BrowseForm(forms.Form):
 
 class PlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
-    genre = forms.ChoiceField(choices=(), required=False)
+    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     artist = forms.CharField(max_length=50, required=False)
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
-        super(PlaylistForm, self).__init__(*args, **kwargs)
-
-        # Limit genre choices to those of songs the user has previously upvoted
-        self.fields['genre'].choices = get_genre_choices(user=user)
 
 
 class SuggestSongForm(forms.Form):
