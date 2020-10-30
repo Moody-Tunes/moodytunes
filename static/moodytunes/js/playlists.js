@@ -289,22 +289,12 @@
 
         // Add buttons to retrieve paginated responses
         if (nextLink || previousLink) {
-            let lastLink = null,
-                firstLink = null;
-
-            if (previousLink) {
-                firstLink = previousLink.replace(/&page=[1-9]*/, '')
-            }
+            let firstLink = data.first_page;
+            let lastLink = data.last_page;
 
             buttonContainer.appendChild(createPaginationButton(firstLink, 'first'));
-
             buttonContainer.appendChild(createPaginationButton(previousLink, 'previous'));
             buttonContainer.appendChild(createPaginationButton(nextLink, 'next'));
-
-            if (nextLink) {
-                lastLink = nextLink.replace(/page=[1-9]*/, 'page=last');
-            }
-
             buttonContainer.appendChild(createPaginationButton(lastLink, 'last'));
         }
     }

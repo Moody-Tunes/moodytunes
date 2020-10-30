@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 
 from django.conf import settings
 from django.db import IntegrityError
@@ -358,6 +359,15 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         )
 
         resp = super(PlaylistView, self).list(request, *args, **kwargs)
+
+        first_page = last_page = None
+
+        if resp.data['previous']:
+            first_page = re.sub(r'&page=[1-9]*', '', resp.data['previous'])
+
+        if resp.data['next']:
+            last_page = re.sub(r'page=[1-9]*', 'page=last', resp.data['next'])
+
         queryset = self.filter_queryset(self.get_queryset())
 
         # Update response data with analytics for emotion
@@ -370,7 +380,9 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             'valence': valence,
             'energy': energy,
             'danceability': danceability,
-            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion'])
+            'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
+            'first_page': first_page,
+            'last_page': last_page,
         })
 
         return resp

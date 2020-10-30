@@ -1,4 +1,5 @@
 import random
+import re
 import string
 from unittest import mock
 
@@ -886,6 +887,32 @@ class TestPlaylistView(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)  # We should only see the song once in the response
+
+    def test_first_and_last_page_links_are_populated_on_paginated_response(self):
+        for _ in range(30):
+            song = MoodyUtil.create_song()
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {'emotion': self.emotion.name, 'page': 2}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['first_page'], re.sub(r'&page=2', '', resp.wsgi_request.build_absolute_uri()))
+        self.assertEqual(resp_data['last_page'], re.sub(r'page=3', 'page=last', resp_data['next']))
+
+    def test_first_and_last_page_links_are_not_populated_on_non_paginated_response(self):
+        for _ in range(5):
+            song = MoodyUtil.create_song()
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {'emotion': self.emotion.name}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIsNone(resp_data['first_page'])
+        self.assertIsNone(resp_data['last_page'])
 
 
 class TestOptionsView(TestCase):
