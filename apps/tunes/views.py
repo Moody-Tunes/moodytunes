@@ -15,7 +15,6 @@ from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, P
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Emotion, Song
-from tunes.paginators import PlaylistPaginator
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
@@ -46,6 +45,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     default_jitter = settings.BROWSE_DEFAULT_JITTER
     default_limit = settings.BROWSE_DEFAULT_LIMIT
+    pagination_class = None
 
     get_request_serializer = BrowseSongsRequestSerializer
 
@@ -332,7 +332,6 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
     """
     serializer_class = PlaylistSerializer
     queryset = UserSongVote.objects.all()
-    pagination_class = PlaylistPaginator
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
