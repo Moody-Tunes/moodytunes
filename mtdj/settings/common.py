@@ -257,6 +257,8 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': (
         'rest_framework.schemas.coreapi.AutoSchema'
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': env.int('MTDJ_BROWSE_DEFAULT_LIMIT', default=9),
 }
 
 LOGGING_DIR = env.str('DJANGO_APP_LOG_DIR', default=BASE_DIR)
