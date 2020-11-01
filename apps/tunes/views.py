@@ -363,10 +363,10 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         first_page = last_page = None
 
         if resp.data['previous']:
-            first_page = re.sub(r'&page=[1-9]*', '', resp.data['previous'])
+            first_page = re.sub(r'&page=[0-9]*', '', resp.data['previous'])
 
         if resp.data['next']:
-            last_page = re.sub(r'page=[1-9]*', 'page=last', resp.data['next'])
+            last_page = re.sub(r'page=[0-9]*', 'page=last', resp.data['next'])
 
         queryset = self.filter_queryset(self.get_queryset())
 
