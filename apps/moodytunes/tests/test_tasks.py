@@ -121,6 +121,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         cls.songs = ['spotify:track:1']
 
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
     @mock.patch('spotify_client.SpotifyClient.get_user_playlists')
@@ -145,6 +146,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -166,6 +168,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
 
         mock_retry.assert_called_once()
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -190,6 +193,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
 
         mock_retry.assert_called_once()
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
@@ -210,6 +214,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         mock_create_playlist.assert_not_called()
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
@@ -236,6 +241,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.create_playlist')
@@ -261,6 +267,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         )
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -284,6 +291,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
 
         mock_upload_cover_image.assert_called_once_with(self.auth.access_token, playlist_id, cover_image_filename)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -309,6 +317,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
 
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -334,6 +343,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
 
         mock_add_songs_to_playlist.assert_called_once_with(self.auth.access_token, playlist_id, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('spotify_client.SpotifyClient.upload_image_to_playlist')
     @mock.patch('spotify_client.SpotifyClient.delete_songs_from_playlist')
     @mock.patch('spotify_client.SpotifyClient.add_songs_to_playlist')
@@ -366,6 +376,7 @@ class TestExportSpotifyPlaylistFromSongs(TestCase):
         with self.assertRaises(SpotifyUserAuth.DoesNotExist):
             ExportSpotifyPlaylistFromSongsTask().run(invalid_auth_id, self.playlist_name, self.songs)
 
+    @mock.patch('spotify_client.SpotifyClient.get_all_songs_from_user_playlist', mock.Mock(return_value=[]))
     @mock.patch('moodytunes.tasks.ExportSpotifyPlaylistFromSongsTask.retry')
     @mock.patch('accounts.models.SpotifyUserAuth.refresh_access_token')
     @mock.patch('accounts.models.SpotifyUserAuth.should_refresh_access_token')
