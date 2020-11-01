@@ -110,6 +110,22 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
 
         return playlist_id
 
+    def delete_all_songs_from_playlist(self, auth_code, playlist_id, spotify):
+        """
+        Delete all the songs from the given playlist, to ensure we end up with a
+        playlist that only contains the songs to be added from MoodyTunes
+
+        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param playlist_id: (str) Spotify ID of the playlist to be created
+        :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
+        """
+        songs = spotify.get_all_songs_from_user_playlist(auth_code, playlist_id)
+
+        batched_songs = spotify.batch_tracks(songs)
+
+        for batch in batched_songs:
+            spotify.delete_songs_from_playlist(auth_code, playlist_id, batch)
+
     def add_songs_to_playlist(self, auth_code, playlist_id, songs, spotify):
         """
         Call Spotify API to add songs to a playlist
@@ -118,15 +134,10 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param songs: (list) Collection of Spotify track URIs to add to playlist
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
-
         """
         # Spotify has a limit of 100 songs per request to add songs to a playlist
         # Break up the total list of songs into batches of 100
         batched_songs = spotify.batch_tracks(songs)
-
-        # First, remove songs from playlist to clear out already existing songs
-        for batch in batched_songs:
-            spotify.delete_songs_from_playlist(auth_code, playlist_id, batch)
 
         for batch in batched_songs:
             spotify.add_songs_to_playlist(auth_code, playlist_id, batch)
@@ -184,6 +195,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         if auth.has_scope(settings.SPOTIFY_UPLOAD_PLAYLIST_IMAGE) and cover_image_filename:
             self.upload_cover_image(auth.access_token, playlist_id, cover_image_filename, spotify)
 
+        self.delete_all_songs_from_playlist(auth.access_token, playlist_id, spotify)
         self.add_songs_to_playlist(auth.access_token, playlist_id, songs, spotify)
 
         # Delete cover image file from disk if present
