@@ -48,8 +48,6 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
-        env:
-          -
       - uses: pre-commit/action@v1.1.1
         with:
           extra_args: --files ${{ env.FILES }}
