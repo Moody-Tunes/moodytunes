@@ -40,16 +40,17 @@ jobs:
           repo-token: ${{ github.token }}
       - name: Set changed files environment variable
         run: |
-          echo "::set-env name=FILES::${{ steps.changed-files.outputs.files_created }} ${{ steps.changed-files.outputs.files_updated }}"
+          echo "FILES=${{ steps.changed-files.outputs.files_created }} ${{ steps.changed-files.outputs.files_updated }}" >> $GITHUB_ENV
       - name: set PY
-        run: echo "::set-env name=PY::$(python -VV | sha256sum | cut -d' ' -f1)"
+        run: |
+          echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit|$PY|${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v1.1.1
         with:
-          extra_args: --files ${{ env.FILES }}
+          extra_args: --files $FILES
 
   requirements-lock-verify:
     name: Verify lock file is in sync with dependency list
