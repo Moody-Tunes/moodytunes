@@ -25,6 +25,6 @@ class TestLogFailedLoginAttempt(TestCase):
                 'fingerprint': 'accounts.utils.log_failed_login_attempt',
                 'username': username,
                 'ip_address': ip_address,
-                'host': host,
+                'application_host': host,
             }
         )
