@@ -1,5 +1,4 @@
 import random
-import re
 import string
 from unittest import mock
 
@@ -898,8 +897,8 @@ class TestPlaylistView(TestCase):
         resp_data = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_data['first_page'], re.sub(r'&page=2', '', resp.wsgi_request.build_absolute_uri()))
-        self.assertEqual(resp_data['last_page'], re.sub(r'page=3', 'page=last', resp_data['next']))
+        self.assertEqual(resp_data['first_page'], 'http://testserver/tunes/playlist/?emotion=HPY')
+        self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
 
     def test_first_and_last_page_links_are_not_populated_on_non_paginated_response(self):
         for _ in range(5):
@@ -913,6 +912,58 @@ class TestPlaylistView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIsNone(resp_data['first_page'])
         self.assertIsNone(resp_data['last_page'])
+
+    def test_first_and_last_page_links_are_populated_on_paginated_response_with_zeros_in_previous_page(self):
+        for _ in range(100):
+            song = MoodyUtil.create_song()
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {'emotion': self.emotion.name, 'page': 11}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['first_page'], 'http://testserver/tunes/playlist/?emotion=HPY')
+        self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
+
+    def test_first_and_last_page_links_are_populated_on_paginated_response_with_zeros_in_next_page(self):
+        for _ in range(100):
+            song = MoodyUtil.create_song()
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {'emotion': self.emotion.name, 'page': 9}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['first_page'], 'http://testserver/tunes/playlist/?emotion=HPY')
+        self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
+
+    def test_first_and_last_page_links_contain_genre_when_provided(self):
+        for _ in range(30):
+            song = MoodyUtil.create_song(genre='hiphop')
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {'emotion': self.emotion.name, 'page': 2, 'genre': 'hiphop'}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['first_page'], 'http://testserver/tunes/playlist/?emotion=HPY&genre=hiphop')
+        self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&genre=hiphop&page=last')
+
+    def test_first_and_last_page_links_contain_context_when_provided(self):
+        for _ in range(30):
+            song = MoodyUtil.create_song()
+            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True, context='WORK')
+
+        data = {'emotion': self.emotion.name, 'page': 2, 'context': 'WORK'}
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['first_page'], 'http://testserver/tunes/playlist/?context=WORK&emotion=HPY')
+        self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?context=WORK&emotion=HPY&page=last')
 
 
 class TestOptionsView(TestCase):
