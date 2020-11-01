@@ -106,6 +106,27 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+    @mock.patch('accounts.utils.logger')
+    def test_failed_login_calls_log_failed_login(self, mock_failed_login_logger):
+        ip_address = '192.168.0.201'
+
+        data = {
+            'username': self.user.username,
+            'password': 'wrong-password'
+        }
+
+        self.client.post(self.url, data=data, HTTP_X_FORWARDED_FOR=ip_address)
+
+        mock_failed_login_logger.warning.assert_called_once_with(
+            'Failed login attempt for {}'.format(self.user.username),
+            extra={
+                'fingerprint': 'accounts.utils.log_failed_login_attempt',
+                'username': self.user.username,
+                'ip_address': ip_address,
+                'application_host': 'www',
+            }
+        )
+
 
 class TestLogoutView(TestCase):
     @classmethod

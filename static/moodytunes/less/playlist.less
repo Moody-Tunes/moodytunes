@@ -16,16 +16,22 @@
 }
 
 #playlist-pagination-button-container {
-    margin-left: 40%;
-    margin-top: 10px;
-    margin-bottom: 25px;
+    margin: 10px auto 15px;
+    display: flex;
+    justify-content: center;
+
+    .first-button, .last-button {
+        color: @pureWhite;
+        background: @aquaBlue;
+    }
 
     .previous-button {
-        margin-right: 10px;
+        margin-left: 10px;
     }
 
     .next-button {
         margin-left: 10px;
+        margin-right: 10px;
     }
 }
 
