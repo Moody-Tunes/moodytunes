@@ -113,13 +113,18 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     def delete_all_songs_from_playlist(self, auth_code, playlist_id, spotify):
         """
         Delete all the songs from the given playlist, to ensure we end up with a
-        playlist that only contains the songs to be added from MoodyTunes
+        playlist that only contains the songs to be added from the MoodyTunes
+        playlist to be exported
 
         :param auth_code: (str) SpotifyUserAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
         """
         songs = spotify.get_all_songs_from_user_playlist(auth_code, playlist_id)
+
+        # Early exit; if no songs are in the playlist then skip clearing the playlist
+        if not songs:
+            return
 
         batched_songs = spotify.batch_tracks(songs)
 
