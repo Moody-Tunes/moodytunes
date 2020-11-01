@@ -47,10 +47,12 @@ jobs:
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit|$PY|${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+        env:
+          -
       - uses: pre-commit/action@v1.1.1
         with:
-          extra_args: --files $FILES
+          extra_args: --files ${{ env.FILES }}
 
   requirements-lock-verify:
     name: Verify lock file is in sync with dependency list
