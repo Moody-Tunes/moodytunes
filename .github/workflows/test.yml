@@ -42,6 +42,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.20.0
+      - name: Check if previous coverage file exists
+        run: |
+          [[ -f coverage.xml ]] && echo 'Coverage file exists' || echo 'Coverage file does not exist'
       - name: Test with pytest and write coverage to XML file
         run: tox -e test-cov-xml
         env:
