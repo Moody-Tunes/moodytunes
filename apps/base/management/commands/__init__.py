@@ -18,7 +18,7 @@ class MoodyBaseCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._unique_id = uuid.uuid4()  # Include in logs for audit trail
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(self.__class__.__module__)  # Set up logger with name of command module
 
     def write_to_log_and_output(self, msg, output_stream='stdout', log_level=logging.INFO, extra=None):
         """
