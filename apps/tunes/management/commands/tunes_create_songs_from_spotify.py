@@ -7,6 +7,7 @@ from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
 from base.management.commands import MoodyBaseCommand
+from libs.moody_logging import auto_fingerprint, update_logging_data
 from tunes.models import Song
 
 
@@ -21,8 +22,9 @@ class Command(MoodyBaseCommand):
         """
         Given a list of parameters for Song records, create the objects in the database.
 
-        :param tracks: (list) List of dictionaries containing data to store for Song objects
-        :return: (tuple(int, int)) Number of tracks successfully processed and failed to process
+        :param tracks: (list[dict]) List of dictionaries containing data to store for Song records
+
+        :return: (tuple(int, int)) Number of songs successfully saved and number of songs failed to save
         """
         success, fail = 0, 0
         for track in tracks:
@@ -53,13 +55,14 @@ class Command(MoodyBaseCommand):
 
         return success, fail
 
-    def get_tracks_from_spotify(self):
+    @update_logging_data
+    def get_tracks_from_spotify(self, **kwargs):
         """
         Request, format, and return tracks from Spotify's API.
 
         :return: (list(dict)) Track data for saving as Song records
         """
-        spotify = SpotifyClient(identifier=self._unique_id)
+        spotify = SpotifyClient(identifier='create_songs_from_spotify-{}'.format(self._unique_id))
 
         tracks = []
 
@@ -68,26 +71,39 @@ class Command(MoodyBaseCommand):
 
             try:
                 playlists = spotify.get_playlists_for_category(category, settings.SPOTIFY['max_playlist_from_category'])
-                self.logger.info('{} - Got {} playlists for category: {}'.format(
-                    self._unique_id,
-                    len(playlists),
-                    category
-                ))
+                self.logger.info(
+                    'Got {} playlists for category: {}'.format(len(playlists), category),
+                    extra={
+                        'fingerprint': auto_fingerprint('retrieved_playlists_for_category', **kwargs),
+                        'command_id': self._unique_id
+                    }
+                )
 
                 for playlist in playlists:
                     if songs_from_category < settings.SPOTIFY['max_songs_from_category']:
                         num_tracks = settings.SPOTIFY['max_songs_from_category'] - songs_from_category
-                        self.logger.info('{} - Calling Spotify API to get {} track(s) for playlist {}'.format(
-                            self._unique_id,
-                            num_tracks,
-                            playlist['uri']
-                        ))
+                        self.logger.info(
+                            'Calling Spotify API to get {} track(s) for playlist {}'.format(
+                                num_tracks,
+                                playlist['name']
+                            ),
+                            extra={
+                                'fingerprint': auto_fingerprint('get_tracks_from_playlist', **kwargs),
+                                'tracks_to_retrieve': num_tracks,
+                                'command_id': self._unique_id
+                            }
+                        )
+
                         raw_tracks = spotify.get_songs_from_playlist(playlist, num_tracks)
 
-                        self.logger.info('{} - Calling Spotify API to get feature data for {} tracks'.format(
-                            self._unique_id,
-                            len(raw_tracks)
-                        ))
+                        self.logger.info(
+                            'Calling Spotify API to get feature data for {} tracks'.format(len(raw_tracks)),
+                            extra={
+                                'fingerprint': auto_fingerprint('get_feature_data_for_tracks', **kwargs),
+                                'command_id': self._unique_id
+                            }
+                        )
+
                         complete_tracks = spotify.get_audio_features_for_tracks(raw_tracks)
 
                         # Add genre information to each track. We can use the category search term as the genre
@@ -95,26 +111,29 @@ class Command(MoodyBaseCommand):
                         for track in complete_tracks:
                             track.update({'genre': category})
 
-                        self.logger.info('{} - Got {} tracks from {}'.format(
-                            self._unique_id,
-                            len(complete_tracks),
-                            playlist['name']
-                        ))
+                        self.logger.info(
+                            'Got {} tracks from {}'.format(len(complete_tracks), playlist['name']),
+                            extra={
+                                'fingerprint': auto_fingerprint('retrieved_tracks_from_playlist', **kwargs),
+                                'command_id': self._unique_id
+                            }
+                        )
 
                         tracks.extend(complete_tracks)
                         songs_from_category += len(complete_tracks)
 
-                self.write_to_log_and_output('Finished processing {} tracks for category: {}'.format(
-                    songs_from_category,
-                    category
-                ))
+                self.write_to_log_and_output(
+                    'Finished processing {} tracks for category: {}'.format(songs_from_category, category),
+                    extra={'fingerprint': auto_fingerprint('processed_tracks_for_category', **kwargs)}
+                )
 
             except SpotifyException as exc:
                 self.write_to_log_and_output(
                     'Error connecting to Spotify! Exception detail: {}. '
                     'Got {} track(s) successfully.'.format(exc, len(tracks)),
                     output_stream='stderr',
-                    log_level=logging.WARNING
+                    log_level=logging.WARNING,
+                    extra={'fingerprint': auto_fingerprint('caught_spotify_exception', **kwargs)}
                 )
 
                 break
@@ -124,15 +143,20 @@ class Command(MoodyBaseCommand):
                     'Unhandled exception when collecting songs from Spotify! Exception detail: {}. '
                     'Got {} track(s) successfully.'.format(exc, len(tracks)),
                     output_stream='stderr',
-                    log_level=logging.ERROR
+                    log_level=logging.ERROR,
+                    extra={'fingerprint': auto_fingerprint('caught_unhandled_exception', **kwargs)}
                 )
 
                 break
 
         return tracks
 
+    @update_logging_data
     def handle(self, *args, **options):
-        self.write_to_log_and_output('Starting run to create songs from Spotify')
+        self.write_to_log_and_output(
+            'Starting run to create songs from Spotify',
+            extra={'fingerprint': auto_fingerprint('start_create_songs_from_spotify', **options)}
+        )
 
         tracks = self.get_tracks_from_spotify()
 
@@ -142,18 +166,29 @@ class Command(MoodyBaseCommand):
             self.write_to_log_and_output(
                 'Failed to fetch any tracks from Spotify',
                 output_stream='stderr',
-                log_level=logging.WARNING
+                log_level=logging.WARNING,
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_tracks_from_spotify', **options)}
             )
 
             raise CommandError('Failed to fetch any songs from Spotify')
 
-        self.write_to_log_and_output('Got {} tracks from Spotify'.format(len(tracks)))
+        self.write_to_log_and_output(
+            'Got {} tracks from Spotify'.format(len(tracks)),
+            extra={
+                'fingerprint': auto_fingerprint('fetched_tracks_from_spotify', **options),
+                'fetched_tracks': len(tracks)
+            }
+        )
 
         succeeded, failed = self.save_songs_to_database(tracks)
 
-        self.write_to_log_and_output('Saved {} songs to database'.format(succeeded))
-        self.write_to_log_and_output('Failed to process {} songs'.format(failed))
-
-        self.stdout.write('Done!')
+        self.write_to_log_and_output(
+            'Finished run to create songs from Spotify',
+            extra={
+                'fingerprint': auto_fingerprint('finish_create_songs_from_spotify', **options),
+                'saved_tracks': succeeded,
+                'failed_tracks': failed
+            }
+        )
 
         return 'Created Songs: {}'.format(succeeded)
