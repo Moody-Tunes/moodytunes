@@ -223,7 +223,7 @@ class SpotifyAuthenticationCallbackView(View):
                 'User {} failed Spotify Oauth confirmation'.format(request.user.username),
                 extra={
                     'fingerprint': auto_fingerprint('user_rejected_oauth_confirmation', **kwargs),
-                    'error': request.GET['error']
+                    'spotify_oauth_error': request.GET['error']
                 }
             )
 
