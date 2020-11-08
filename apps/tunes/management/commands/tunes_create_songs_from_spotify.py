@@ -14,10 +14,6 @@ from tunes.models import Song
 class Command(MoodyBaseCommand):
     help = 'Management command to fetch and create songs from Spotify API'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.logger = logging.getLogger(__name__)
-
     def save_songs_to_database(self, tracks):
         """
         Given a list of parameters for Song records, create the objects in the database.
