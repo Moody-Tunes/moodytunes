@@ -56,11 +56,7 @@ class BrowseForm(forms.Form):
 class PlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     genre = forms.ChoiceField(choices=get_genre_choices, required=False)
-    context = forms.ChoiceField(
-        choices=UserSongVote.CONTEXT_CHOICES,
-        required=False,
-        widget=forms.widgets.Select(attrs={'class': 'select-context-input'})
-    )
+    context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     artist = forms.CharField(max_length=50, required=False)
 
 
