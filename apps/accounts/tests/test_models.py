@@ -1,3 +1,4 @@
+import random
 from datetime import timedelta
 from unittest import mock
 
@@ -12,7 +13,7 @@ from accounts.models import MoodyUser, SpotifyUserAuth, SpotifyUserData, UserEmo
 from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
-from tunes.models import Emotion
+from tunes.models import Emotion, Song
 
 
 class TestUserEmotion(TestCase):
@@ -42,9 +43,17 @@ class TestUserEmotion(TestCase):
 
     def test_update_attributes_sets_values_to_average_of_upvoted_songs(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.45)
-        song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
-        user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
+        song = MoodyUtil.create_song(
+            energy=round(random.random(), 2),
+            valence=round(random.random(), 2),
+            danceability=round(random.random(), 2)
+        )
+        song2 = MoodyUtil.create_song(
+            energy=round(random.random(), 2),
+            valence=round(random.random(), 2),
+            danceability=round(random.random(), 2)
+        )
+        user_emotion = UserEmotion.objects.create(user=self.user, emotion=emotion)
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
         dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
@@ -63,17 +72,17 @@ class TestUserEmotion(TestCase):
                 vote=True
             )
 
-        votes = UserSongVote.objects.filter(user=self.user)
+        songs = Song.objects.filter(pk__in=[song.pk, song2.pk])
 
-        expected_attributes = average(votes, 'song__valence', 'song__energy', 'song__danceability')
-        expected_valence = expected_attributes['song__valence__avg']
-        expected_energy = expected_attributes['song__energy__avg']
-        expected_danceability = expected_attributes['song__danceability__avg']
+        expected_attributes = average(songs, 'valence', 'energy', 'danceability')
+        expected_valence = expected_attributes['valence__avg']
+        expected_energy = expected_attributes['energy__avg']
+        expected_danceability = expected_attributes['danceability__avg']
 
-        user_emot.update_attributes()
-        self.assertEqual(user_emot.energy, expected_energy)
-        self.assertEqual(user_emot.valence, expected_valence)
-        self.assertEqual(user_emot.danceability, expected_danceability)
+        user_emotion.update_attributes()
+        self.assertEqual(user_emotion.energy, expected_energy)
+        self.assertEqual(user_emotion.valence, expected_valence)
+        self.assertEqual(user_emotion.danceability, expected_danceability)
 
     def test_update_attributes_sets_values_to_default_if_no_songs_upvoted(self):
         emotion = Emotion.objects.get(name=Emotion.HAPPY)
