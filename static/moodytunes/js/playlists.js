@@ -277,12 +277,13 @@
             songContainer.className = 'song-container';
 
             songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
+            let voteButtons = createButtons(song.code);
+            songContainer.appendChild(voteButtons);
 
             let descriptionContainer = document.createElement('p');
             descriptionContainer.className = 'song-description-container';
             descriptionContainer.innerText = vote.description;
-            songContainer.appendChild(descriptionContainer);
-            songContainer.appendChild(createButtons(song.code));
+            voteButtons.appendChild(descriptionContainer);
 
             playlistContainer.appendChild(songContainer);
         });
