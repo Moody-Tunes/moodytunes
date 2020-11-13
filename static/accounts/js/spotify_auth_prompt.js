@@ -27,13 +27,13 @@
     let closeAddSpotifyAuthModal = document.getElementById('close-spotify-auth-modal');
     let cancelAddSpotifyAuth = document.getElementById('decline-spotify-auth');
     let confirmAddSpotifyAuth = document.getElementById('accept-spotify-auth');
-    let urlParams = new URLSearchParams(window.location.search);
+    let config = document.getElementById('config');
 
     closeAddSpotifyAuthModal.addEventListener('click', hideModal);
     cancelAddSpotifyAuth.addEventListener('click', declineSpotifyUserAuth);
     confirmAddSpotifyAuth.addEventListener('click', redirectToSpotifyAuthPage);
 
-    if (urlParams.get('show_spotify_auth') === 'True') {
+    if (config.dataset.showSpotifyAuthPrompt === 'True') {
         showModal();
     }
 })();

@@ -34,26 +34,26 @@ logger = logging.getLogger(__name__)
 class MoodyLoginView(LoginView):
     template_name = 'login.html'
 
-    def get_redirect_url(self):
-        redirect_url = super().get_redirect_url()
+    def get_success_url(self):
+        redirect_url = self.get_redirect_url()
 
         if not redirect_url:
-            show_spotify_auth = False
+            show_spotify_auth_prompt = False
 
             if waffle.switch_is_active('show_spotify_auth_prompt'):
 
-                # Check if user has authenticated with Spotify, to prompt user to
-                # authenticate if they have not already done so
-                if self.request.user.is_authenticated:
-                    show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
+                # Check if user has previously authenticated with Spotify,
+                # to prompt user to authenticate if they have not already done so
+                show_spotify_auth_prompt = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
 
-                    # Check if user has explicitly indicated they do not want to
-                    # authenticate with Spotify
-                    if show_spotify_auth and hasattr(self.request.user, 'userprofile'):
-                        user_profile = self.request.user.userprofile
-                        show_spotify_auth = not user_profile.has_rejected_spotify_auth
+                # Check if user has explicitly indicated they do not want to
+                # authenticate with Spotify
+                if show_spotify_auth_prompt and hasattr(self.request.user, 'userprofile'):
+                    user_profile = self.request.user.userprofile
+                    show_spotify_auth_prompt = not user_profile.has_rejected_spotify_auth
 
-            return f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth={show_spotify_auth}'
+            self.request.session['show_spotify_auth_prompt'] = show_spotify_auth_prompt
+            return settings.LOGIN_REDIRECT_URL
 
         try:
             # Try to resolve the URL, if it is a valid path in our system it will return

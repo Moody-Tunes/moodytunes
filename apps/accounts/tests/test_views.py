@@ -43,7 +43,7 @@ class TestLoginView(TestCase):
 
         resp = self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL)
 
     def test_login_returns_bad_request_for_invalid_path(self):
         next = '6330599317423175408.owasp.org'
@@ -67,9 +67,9 @@ class TestLoginView(TestCase):
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
         }
 
-        resp = self.client.post(self.url, data=data)
+        self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+        self.assertFalse(self.client.session['show_spotify_auth_prompt'])
 
     @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
@@ -78,9 +78,9 @@ class TestLoginView(TestCase):
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
         }
 
-        resp = self.client.post(self.url, data=data)
+        self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
+        self.assertTrue(self.client.session['show_spotify_auth_prompt'])
 
     @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_false_to_for_rejected_spotify_auth(self):
@@ -91,9 +91,9 @@ class TestLoginView(TestCase):
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
         }
 
-        resp = self.client.post(self.url, data=data)
+        self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+        self.assertFalse(self.client.session['show_spotify_auth_prompt'])
 
     @override_switch('show_spotify_auth_prompt', active=False)
     def test_context_sets_show_spotify_auth_false_when_switch_is_not_active(self):
@@ -102,9 +102,9 @@ class TestLoginView(TestCase):
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
         }
 
-        resp = self.client.post(self.url, data=data)
+        self.client.post(self.url, data=data)
 
-        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+        self.assertFalse(self.client.session['show_spotify_auth_prompt'])
 
     @mock.patch('accounts.utils.logger')
     def test_failed_login_calls_log_failed_login(self, mock_failed_login_logger):

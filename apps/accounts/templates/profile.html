@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-<div id="config" data-csrf-token="{{ csrf_token }}"></div>
+<div id="config" data-csrf-token="{{ csrf_token }}" data-show-spotify-auth-prompt="{{ request.session.show_spotify_auth_prompt }}"></div>
 <h1>Profile</h1>
 <p>Hello {{ user.username }}!</p>
 <h3>Account Options</h3>
