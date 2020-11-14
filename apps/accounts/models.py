@@ -14,6 +14,7 @@ from base.models import BaseModel
 from base.validators import validate_decimal_value
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
+from tunes.models import Song
 
 
 logger = getLogger(__name__)
@@ -234,22 +235,22 @@ class UserEmotion(BaseModel):
         will be set to `None` and reset to the emotion defaults in the save() call
         """
         # Get distinct votes by song, to avoid factoring multiple votes for a song into the emotion average
-        vote_ids = self.user.usersongvote_set.filter(
+        song_codes = self.user.usersongvote_set.filter(
             emotion=self.emotion,
             vote=True
         ).distinct(
             'song__code'
         ).values_list(
-            'id',
+            'song__code',
             flat=True
         )
 
-        votes = UserSongVote.objects.filter(id__in=vote_ids)
+        songs = Song.objects.filter(code__in=song_codes)
 
-        vote_data = average(votes, 'song__valence', 'song__energy', 'song__danceability')
-        self.valence = vote_data['song__valence__avg']
-        self.energy = vote_data['song__energy__avg']
-        self.danceability = vote_data['song__danceability__avg']
+        attributes = average(songs, 'valence', 'energy', 'danceability')
+        self.valence = attributes['valence__avg']
+        self.energy = attributes['energy__avg']
+        self.danceability = attributes['danceability__avg']
 
         self.save()
 
