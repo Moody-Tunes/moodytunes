@@ -75,8 +75,9 @@
 
         let song = this.dataset.songCode;
         let context = document.getElementById('add-context-input').value;
+        let description = document.getElementById('add-description-input').value || '';
 
-        document.MoodyTunesClient.postVote(song, emotion, context, '', true, data => {
+        document.MoodyTunesClient.postVote(song, emotion, context, description, true, data => {
             successAddContextToVote(context);
         });
     }
@@ -104,7 +105,7 @@
         confirmDeleteVoteButton.addEventListener('click', deleteVote);
         generatePlaylistButton.addEventListener('click', getEmotionPlaylist);
 
-        // Generate browse playlist on enter key press
+        // Generate mood playlist on enter key press
         document.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -137,17 +138,23 @@
         let confirmAddContextInput = document.getElementById('add-context-input');
         document.PlaylistCurator.clearChildren(confirmAddContextInput);
 
+        let addDescriptionContainer = document.getElementById('add-description-container');
+        let addDescriptionInput = document.getElementById('add-description-input');
+        addDescriptionInput.value = null;
+
         helpMessage.hidden = false;
         unavailableMessage.hidden = true;
         confirmAddContextButton.hidden = false;
         confirmAddContextInput.hidden = false;
+        addDescriptionContainer.hidden = false;
 
-        // Display message if there are no available contexts to add to song
+        // Display unavailable message if there are no available contexts to add to song
         if (Object.keys(contexts).length === 0) {
             helpMessage.hidden = true;
             unavailableMessage.hidden = false;
             confirmAddContextButton.hidden = true;
             confirmAddContextInput.hidden = true;
+            addDescriptionContainer.hidden = true;
         } else {
             contexts.forEach( context => {
                 let newOption = document.createElement('option');
