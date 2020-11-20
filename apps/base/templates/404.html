@@ -1,9 +1,10 @@
-{% extends 'base.html' %}
-
-{% block title %}Not Found{% endblock %}
-
-{% block content %}
-<h1>Not Found</h1>
-    <p>We couldn't find {{ request_path }} on our site.</p>
-    <p>Try going back to the <a href="{% url 'homepage' %}">homepage</a> and searching there.</p>
-{% endblock %}
+<html lang="en-US">
+    <head>
+        <title>Not Found</title>
+    </head>
+    <body>
+        <h1>Not Found</h1>
+        <p>Oops! We couldn't find that on our site!</p>
+        <p>Try going back to the <a href="/">homepage</a> and searching there.</p>
+    </body>
+</html>
