@@ -331,7 +331,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'gunicorn': {
+        'gunicorn.access': {
             'handlers': ['gunicorn'],
             'level': 'INFO',
             'propagate': False,
