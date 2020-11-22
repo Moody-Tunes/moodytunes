@@ -192,7 +192,7 @@ class TestUpdateView(TestCase):
 
     def test_updating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
-        other_user = MoodyUtil.create_user(username='something-else')
+        other_user = MoodyUtil.create_user(username='something_else')
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         request_data = {'username': other_user.username}
@@ -203,6 +203,23 @@ class TestUpdateView(TestCase):
         self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
         self.assertEqual(MoodyUser.objects.filter(username=other_user.username).count(), 1)
         self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
+
+    def test_updating_user_with_invalid_username_is_rejected(self):
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        request_data = {
+            'username': 'zap" AND "1"="1" --',
+        }
+
+        old_username = user.username
+
+        resp = self.client.post(self.url, data=request_data)
+
+        user.refresh_from_db()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.username, old_username)  # Ensure user username was not updated to bad value
+        self.assertIn(b'Username must only contain letters, numbers and underscores.', resp.content)
 
 
 class TestCreateUserView(TestCase):
@@ -237,6 +254,19 @@ class TestCreateUserView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
         self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
+
+    def test_creating_user_with_invalid_username_is_rejected(self):
+        request_data = {
+            'username': 'zap" AND "1"="1" --',
+            'password': 'superSecret123',
+            'confirm_password': 'superSecret123'
+        }
+
+        resp = self.client.post(self.url, data=request_data)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertFalse(MoodyUser.objects.filter(username=request_data['username']).exists())
+        self.assertIn(b'Username must only contain letters, numbers and underscores.', resp.content)
 
 
 class TestMoodyPasswordResetView(TestCase):

@@ -1,3 +1,4 @@
+import re
 from hmac import compare_digest
 
 from django import forms
@@ -5,6 +6,14 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser, UserEmotion
+
+
+def validate_username(value):
+    """Validate username only contains alphanumeric and underscores characters"""
+    regex = r'^[\w]*$'
+
+    if not re.match(regex, value):
+        raise ValidationError('Username must only contain letters, numbers and underscores.')
 
 
 def validate_matching_passwords(password, confirm_password):
@@ -23,7 +32,7 @@ def validate_matching_passwords(password, confirm_password):
 
 
 class BaseUserForm(forms.Form):
-    username = forms.CharField(max_length=150, required=True)
+    username = forms.CharField(max_length=150, required=True, validators=[validate_username])
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     email = forms.EmailField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
