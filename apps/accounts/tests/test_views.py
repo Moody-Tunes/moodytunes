@@ -221,6 +221,21 @@ class TestUpdateView(TestCase):
         self.assertEqual(user.username, old_username)  # Ensure user username was not updated to bad value
         self.assertIn(b'Username must only contain letters, numbers and underscores.', resp.content)
 
+    def test_updating_user_with_empty_email_deletes_email_value_from_record(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        request_data = {
+            'username': user.username,
+            'email': ''
+        }
+
+        resp = self.client.post(self.url, data=request_data, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, '')
+
 
 class TestCreateUserView(TestCase):
     @classmethod
