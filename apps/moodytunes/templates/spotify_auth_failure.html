@@ -5,4 +5,6 @@
 {% block content %}
     <h1>Failure</h1>
     <p>Your Spotify authentication failed.</p>
+    <a href="{% url 'moodytunes:spotify-auth' %}"><button type="button" class="call-to-action-button">Try Again</button></a>
+    <a href="{% url 'accounts:profile' %}"><button type="button">Cancel</button></a>
 {% endblock %}

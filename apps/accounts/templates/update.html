@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
 
-{% load compress %}
-{% load static %}
-
 {% block title %}Update Account{% endblock %}
 
 {% block content %}
@@ -19,5 +16,6 @@
 	<p>Username: {{ form.username }}</p>
 	<p>Email: {{ form.email }}</p>
 	<button id="submit-button" type="submit" class="call-to-action-button">Update</button>
+    <a href="{% url 'accounts:profile' %}"><button type="button">Cancel</button></a>
 </form>
 {% endblock %}

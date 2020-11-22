@@ -6,4 +6,5 @@
     <h1>Authenticate With Spotify</h1>
     <p>Click the link below to authenticate MoodyTunes with Spotify</p>
     <a href="{{ spotify_auth_url }}"><button class="call-to-action-button">Authenticate</button></a>
+    <a href="{% url 'accounts:profile' %}"><button type="button">Cancel</button></a>
 {% endblock %}
