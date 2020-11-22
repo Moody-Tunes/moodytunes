@@ -1,8 +1,18 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from accounts.forms import BaseUserForm, UpdateUserForm, validate_matching_passwords
+from accounts.forms import BaseUserForm, UpdateUserForm, validate_matching_passwords, validate_username
 from libs.tests.helpers import MoodyUtil
+
+
+class TestValidateUsername(TestCase):
+    def test_valid_username_is_valid(self):
+        resp = validate_username('nick_12345')
+        self.assertIsNone(resp)
+
+    def test_invalid_username_raises_validation_error(self):
+        with self.assertRaises(ValidationError):
+            validate_username('zap" AND "1"="1" --')
 
 
 class TestValidateMatchingPassword(TestCase):
@@ -55,10 +65,20 @@ class TestBaseUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 
-    def test_clean_username_for_taken_username(self):
+    def test_clean_username_for_taken_username_is_invalid(self):
         user = MoodyUtil.create_user()
         data = {
             'username': user.username,
+            'password': '12345',
+            'confirm_password': '12345'
+        }
+
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_username_for_invalid_username_is_invalid(self):
+        data = {
+            'username': 'zap" AND "1"="1" --',
             'password': '12345',
             'confirm_password': '12345'
         }
@@ -77,6 +97,12 @@ class TestUpdateUserForm(TestCase):
 
     def test_clean_username_missing_value_is_invalid(self):
         data = {'username': ''}
+
+        form = UpdateUserForm(data)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_username_for_invalid_username_is_invalid(self):
+        data = {'username': 'zap" AND "1"="1" --'}
 
         form = UpdateUserForm(data)
         self.assertFalse(form.is_valid())
