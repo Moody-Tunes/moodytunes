@@ -88,21 +88,30 @@ class TestBaseUserForm(TestCase):
 
 
 class TestUpdateUserForm(TestCase):
-    def test_clean_password_missing_password_is_valid(self):
-        user = MoodyUtil.create_user()
-        data = {'username': user.username}
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
 
-        form = UpdateUserForm(data, user=user)
+    def test_clean_username_with_same_username_is_valid(self):
+        data = {'username': self.user.username}
+
+        form = UpdateUserForm(data, user=self.user)
+        self.assertTrue(form.is_valid())
+
+    def test_clean_username_with_new_valid_username_is_valid(self):
+        data = {'username': 'testing_update_username'}
+
+        form = UpdateUserForm(data, user=self.user)
         self.assertTrue(form.is_valid())
 
     def test_clean_username_missing_value_is_invalid(self):
         data = {'username': ''}
 
-        form = UpdateUserForm(data)
+        form = UpdateUserForm(data, user=self.user)
         self.assertFalse(form.is_valid())
 
     def test_clean_username_for_invalid_username_is_invalid(self):
         data = {'username': 'zap" AND "1"="1" --'}
 
-        form = UpdateUserForm(data)
+        form = UpdateUserForm(data, user=self.user)
         self.assertFalse(form.is_valid())
