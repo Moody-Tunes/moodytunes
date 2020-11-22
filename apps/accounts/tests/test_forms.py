@@ -86,6 +86,28 @@ class TestBaseUserForm(TestCase):
         form = BaseUserForm(data)
         self.assertFalse(form.is_valid())
 
+    def test_clean_email_valid_value_is_valid(self):
+        data = {
+            'username': 'foo',
+            'password': '12345',
+            'confirm_password': '12345',
+            'email': 'foo@example.com'
+        }
+
+        form = BaseUserForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_clean_email_invalid_value_is_invalid(self):
+        data = {
+            'username': 'foo',
+            'password': '12345',
+            'confirm_password': '12345',
+            'email': 'this-isnt-a-valid-email-address'
+        }
+
+        form = BaseUserForm(data)
+        self.assertFalse(form.is_valid())
+
 
 class TestUpdateUserForm(TestCase):
     @classmethod
@@ -112,6 +134,24 @@ class TestUpdateUserForm(TestCase):
 
     def test_clean_username_for_invalid_username_is_invalid(self):
         data = {'username': 'zap" AND "1"="1" --'}
+
+        form = UpdateUserForm(data, user=self.user)
+        self.assertFalse(form.is_valid())
+
+    def test_clean_email_for_valid_email_is_valid(self):
+        data = {
+            'username': self.user.username,
+            'email': 'foo@example.com'
+        }
+
+        form = UpdateUserForm(data, user=self.user)
+        self.assertTrue(form.is_valid())
+
+    def test_clean_email_for_invalid_email_is_invalid(self):
+        data = {
+            'username': self.user.username,
+            'email': 'this-isnt-an-email-address'
+        }
 
         form = UpdateUserForm(data, user=self.user)
         self.assertFalse(form.is_valid())
