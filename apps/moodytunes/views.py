@@ -64,8 +64,8 @@ class SuggestSongView(FormView):
     @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
     @update_logging_data
     def post(self, request, *args, **kwargs):
-        # Check if request is rate limited,
-        if getattr(request, 'limited', False):
+        # Reject request if user is ratelimited
+        if request.limited:
             logger.warning(
                 'User {} has been rate limited from suggesting songs'.format(request.user.username),
                 extra={
