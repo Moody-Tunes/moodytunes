@@ -1037,6 +1037,18 @@ class TestVoteInfoView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_data['contexts'], expected_contexts)
 
+    def test_endpoint_returns_empty_list_for_song_with_no_votes(self):
+        data = {
+            'emotion': self.emotion.name,
+            'song_code': self.song.code
+        }
+
+        resp = self.api_client.get(self.url, data=data)
+        resp_data = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data['contexts'], [])
+
     def test_endpoint_returns_contexts_for_downvotes(self):
         MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'PARTY')
         MoodyUtil.create_user_song_vote(self.user, self.song, self.emotion, False, 'WORK')
