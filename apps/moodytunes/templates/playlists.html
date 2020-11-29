@@ -21,29 +21,6 @@
 {% block content %}
 <div id="config" data-csrf-token="{{ csrf_token }}"></div>
 <h1>Playlists For Mood</h1>
-<div id="analytics-container">
-    <div class="help-tip">
-    <p>These values represent the different data points we use to analyze what attributes of a song make you feel
-    a desired emotion. All of the attributes go into our algorithm to better suggest songs for you when you want
-    to listen to songs that make you feel some type of way!</p>
-    </div>
-    <table id="analytics-table">
-        <tr>
-            <th>Mood</th>
-            <th>Energy</th>
-            <th>Valence</th>
-            <th>Danceability</th>
-            <th>Total Songs</th>
-        </tr>
-        <tr>
-            <td id="analytics-emotion"></td>
-            <td id="analytics-energy"></td>
-            <td id="analytics-valence"></td>
-            <td id="analytics-danceability"></td>
-            <td id="analytics-total-songs"></td>
-        </tr>
-    </table>
-</div>
 <div id= id="playlist-generator-container">
     {% include 'full_songs_info.html' %}
     <p>Moood: {{ form.emotion }}</p>

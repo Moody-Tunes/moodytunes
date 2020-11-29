@@ -368,18 +368,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         if resp.data['next']:
             last_page = re.sub(r'page=[0-9]*', 'page=last', resp.data['next'])
 
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # Update response data with analytics for emotion
-        votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
-
         resp.data.update({
-            'valence': valence,
-            'energy': energy,
-            'danceability': danceability,
             'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'first_page': first_page,
             'last_page': last_page,

@@ -222,16 +222,6 @@
         return button
     }
 
-    function displayAnalytics(data) {
-        if (!data.errors){
-            document.getElementById('analytics-emotion').innerText = data.emotion_name;
-            document.getElementById('analytics-energy').innerText = data.energy && data.energy.toPrecision(2);
-            document.getElementById('analytics-valence').innerText = data.valence && data.valence.toPrecision(2);
-            document.getElementById('analytics-danceability').innerText = data.danceability && data.danceability.toPrecision(2);
-            document.getElementById('analytics-total-songs').innerText = data.count;
-        }
-    }
-
     function getPaginatedEmotionPlaylist() {
         let url = this.dataset.url;
         let options = {
@@ -251,7 +241,6 @@
     }
 
     function displayEmotionPlaylist(data) {
-        displayAnalytics(data);
         let playlistContainer = document.getElementById('playlist-display-container');
         let buttonContainer = document.getElementById('playlist-pagination-button-container');
         let noResultsFoundAlert = document.getElementById('alert-no-results');

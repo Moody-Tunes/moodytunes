@@ -750,13 +750,8 @@ class TestPlaylistView(TestCase):
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
-        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
-
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_data['results'][0]['song']['code'], self.song.code)
-        self.assertEqual(resp_data['valence'], user_emotion.valence)
-        self.assertEqual(resp_data['energy'], user_emotion.energy)
-        self.assertEqual(resp_data['danceability'], user_emotion.danceability)
 
     def test_downvoted_songs_are_not_returned(self):
         MoodyUtil.create_user_song_vote(user=self.user, song=self.song, emotion=self.emotion, vote=False)
@@ -781,23 +776,9 @@ class TestPlaylistView(TestCase):
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
-        queryset = UserSongVote.objects.filter(
-            user=self.user,
-            emotion=self.emotion,
-            vote=True,
-            song__genre=new_song.genre
-        )
-        votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
-
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)
         self.assertEqual(resp_data['results'][0]['song']['code'], new_song.code)
-        self.assertEqual(resp_data['valence'], valence)
-        self.assertEqual(resp_data['energy'], energy)
-        self.assertEqual(resp_data['danceability'], danceability)
 
     def test_filter_by_context(self):
         expected_song = MoodyUtil.create_song(name='song-with-context')
@@ -826,23 +807,9 @@ class TestPlaylistView(TestCase):
         resp = self.api_client.get(self.url, data=data)
         resp_data = resp.json()
 
-        queryset = UserSongVote.objects.filter(
-            user=self.user,
-            emotion=self.emotion,
-            vote=True,
-            context=context
-        )
-        votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
-
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)
         self.assertEqual(resp_data['results'][0]['song']['code'], expected_song.code)
-        self.assertEqual(resp_data['valence'], valence)
-        self.assertEqual(resp_data['energy'], energy)
-        self.assertEqual(resp_data['danceability'], danceability)
 
     def test_filter_by_artist(self):
         expected_song = MoodyUtil.create_song(artist='Cool Artist')
