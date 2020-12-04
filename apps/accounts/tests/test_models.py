@@ -120,7 +120,7 @@ class TestMoodyUser(TestCase):
     def setUpTestData(cls):
         cls.user = MoodyUser.objects.create(username='test_user')
 
-    def test_update_information(self):
+    def test_update_information_happy_path(self):
         data = {
             'username': 'new_name',
             'foo': 'bar',  # Invalid value, just to ensure method doesn't blow up
@@ -132,6 +132,20 @@ class TestMoodyUser(TestCase):
 
         self.assertEqual(self.user.username, data['username'])
         self.assertEqual(self.user.email, data['email'])
+
+    def test_update_information_clears_email_field_if_unset(self):
+        self.user.email = 'foo@example.com'
+        self.user.save()
+
+        data = {
+            'username': self.user.username,
+            'email': '',
+        }
+
+        self.user.update_information(data)
+        self.user.refresh_from_db()
+
+        self.assertEqual(self.user.email, '')
 
     def test_get_user_emotion_with_valid_emotion_returns_user_emotion_object(self):
         user_emot = self.user.get_user_emotion_record(Emotion.HAPPY)

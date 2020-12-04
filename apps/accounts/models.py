@@ -48,18 +48,15 @@ class MoodyUser(BaseModel, AbstractUser):
         """
         Given a dictionary of CLEAN DATA, update the user information accordingly.
         This method must ONLY be used with clean data and should have keys tied to a Django user model
-        like username, email, password, and the like.
+        like username, email, and the like.
+
         :param data: (dict) Dictionary of data to update for user
         """
         for key, value in data.items():
-            if value:
-                # Need to be careful about dealing with blank values. If we get an attribute that is blank for this
-                # instance (like setting an email for the first time), the value will be "falsey". If we were to do
-                # check like `if attr` it would be False and the attribute not updated. We need to do a direct
-                # comparison to False in order to be sure that the attribute does NOT exist on the MoodyUser model.
-                attr = getattr(self, key, False)
-                if attr is not False:
-                    setattr(self, key, value)
+            # Check that the field exists on the model before updating the attribute, to avoid errors with setting
+            # attributes that are not defined for the model.
+            if hasattr(self, key):
+                setattr(self, key, value)
 
         self.save()
 

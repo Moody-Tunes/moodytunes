@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% load moody_tags %}
-
 {% block title %}Revoke Spotify Authentication{% endblock %}
 
 {% block content %}
@@ -12,5 +10,6 @@
     <form id="revoke-spotify-auth-form" method="post">
         {% csrf_token %}
         <button type="submit" class="warning-button">Revoke</button>
+        <a href="{% url 'accounts:profile' %}"><button type="button">Cancel</button></a>
     </form>
 {% endblock %}

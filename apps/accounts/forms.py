@@ -2,6 +2,7 @@ from hmac import compare_digest
 
 from django import forms
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 
 from accounts.models import MoodyUser, UserEmotion
@@ -23,7 +24,7 @@ def validate_matching_passwords(password, confirm_password):
 
 
 class BaseUserForm(forms.Form):
-    username = forms.CharField(max_length=150, required=True)
+    username = forms.CharField(max_length=150, required=True, validators=[UnicodeUsernameValidator()])
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     email = forms.EmailField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
@@ -61,7 +62,7 @@ class CreateUserForm(BaseUserForm):
 
 class UpdateUserForm(BaseUserForm):
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user')
 
         super().__init__(*args, **kwargs)
 
