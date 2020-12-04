@@ -1,10 +1,9 @@
 import os
-import tempfile
 from io import BytesIO
 from unittest import mock
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from spotify_client.exceptions import SpotifyException
@@ -70,18 +69,10 @@ class TestSuggestSongView(TestCase):
 
         mock_task.assert_not_called()
 
-    # django-ratelimit relies on cache, so we need to use some temporary cache system for tracking requests
-    @override_settings(CACHES={
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '{}/mtdj_cache'.format(tempfile.gettempdir())
-        }
-    })
+    @mock.patch('ratelimit.decorators.is_ratelimited')
     @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay', mock.Mock())
-    def test_requests_are_rate_limited_after_max_requests_processed(self):
-        for _ in range(3):
-            data = {'code': MoodyUtil._generate_song_code()}
-            self.client.post(self.url, data)
+    def test_requests_are_rate_limited_after_max_requests_processed(self, mock_is_ratelimited):
+        mock_is_ratelimited.return_value = True
 
         data = {'code': MoodyUtil._generate_song_code()}
         resp = self.client.post(self.url, data)

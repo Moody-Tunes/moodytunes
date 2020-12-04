@@ -123,6 +123,7 @@ class UpdateInfoView(FormView):
 
         return self.form_class(initial=initial_data, user=self.request.user)
 
+    @update_logging_data
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, user=request.user)
 
@@ -132,6 +133,18 @@ class UpdateInfoView(FormView):
 
             return HttpResponseRedirect(reverse('accounts:profile'))
         else:
+            logger.warning(
+                'Failed to update user info because of invalid data',
+                extra={
+                    'errors': form.errors,
+                    'request_data': {
+                        'username': request.POST.get('username'),
+                        'email': request.POST.get('email')
+                    },
+                    'user_id': request.user.id,
+                    'fingerprint': auto_fingerprint('failed_to_update_user_info', **kwargs)
+                }
+            )
             return render(request, self.template_name, {'form': form})
 
 
@@ -144,10 +157,11 @@ class CreateUserView(FormView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            user = MoodyUser.objects.create(username=form.cleaned_data['username'])
-            user.email = form.cleaned_data.get('email')
-            user.set_password(form.cleaned_data['password'])
-            user.save()
+            user = MoodyUser.objects.create_user(
+                form.cleaned_data['username'],
+                email=form.cleaned_data.get('email'),
+                password=form.cleaned_data['password']
+            )
 
             UserProfile.objects.create(user=user)
 
@@ -160,6 +174,17 @@ class CreateUserView(FormView):
 
             return HttpResponseRedirect(reverse('accounts:login'))
         else:
+            logger.warning(
+                'Failed to create new user because of invalid data',
+                extra={
+                    'errors': form.errors,
+                    'request_data': {
+                        'username': request.POST.get('username'),
+                        'email': request.POST.get('email')
+                    },
+                    'fingerprint': auto_fingerprint('failed_to_create_new_user', **kwargs)
+                }
+            )
             return render(request, self.template_name, {'form': form})
 
 

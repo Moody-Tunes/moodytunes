@@ -173,6 +173,18 @@ class TestUpdateView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, expected_redirect)
 
+    def test_get_request_populates_form_with_initial_user_data(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Ensure that the form's initial data is set to the current data for the user
+        self.assertEqual(resp.context['form'].initial['username'], user.username)
+        self.assertEqual(resp.context['form'].initial['email'], user.email)
+
     def test_happy_path(self):
         user = MoodyUtil.create_user()
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
@@ -192,7 +204,7 @@ class TestUpdateView(TestCase):
 
     def test_updating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
-        other_user = MoodyUtil.create_user(username='something-else')
+        other_user = MoodyUtil.create_user(username='something_else')
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         request_data = {'username': other_user.username}
@@ -203,6 +215,41 @@ class TestUpdateView(TestCase):
         self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
         self.assertEqual(MoodyUser.objects.filter(username=other_user.username).count(), 1)
         self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
+
+    def test_updating_user_with_invalid_username_is_rejected(self):
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        request_data = {
+            'username': 'zap" AND "1"="1" --',
+        }
+
+        old_username = user.username
+
+        resp = self.client.post(self.url, data=request_data)
+
+        user.refresh_from_db()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.username, old_username)  # Ensure user username was not updated to bad value
+        self.assertIn(
+            b'Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.',
+            resp.content
+        )
+
+    def test_updating_user_with_empty_email_deletes_email_value_from_record(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        request_data = {
+            'username': user.username,
+            'email': ''
+        }
+
+        resp = self.client.post(self.url, data=request_data, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, '')
 
 
 class TestCreateUserView(TestCase):
@@ -224,6 +271,12 @@ class TestCreateUserView(TestCase):
         self.assertTrue(MoodyUser.objects.filter(username=user_data['username']).exists())
         self.assertTrue(UserProfile.objects.filter(user__username=user_data['username']).exists())
 
+        # Ensure user can login with their new account
+        request = mock.Mock()
+        request.host.name = 'www'
+        user = authenticate(request, username=user_data['username'], password=user_data['password'])
+        self.assertIsNotNone(user, 'User was not successfully created! Could not authenticate with new user.')
+
     def test_creating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
         request_data = {
@@ -237,6 +290,22 @@ class TestCreateUserView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(MoodyUser.objects.filter(username=user.username).count(), 1)
         self.assertIn(b'This username is already taken. Please choose a different one', resp.content)
+
+    def test_creating_user_with_invalid_username_is_rejected(self):
+        request_data = {
+            'username': 'zap" AND "1"="1" --',
+            'password': 'superSecret123',
+            'confirm_password': 'superSecret123'
+        }
+
+        resp = self.client.post(self.url, data=request_data)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertFalse(MoodyUser.objects.filter(username=request_data['username']).exists())
+        self.assertIn(
+            b'Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.',
+            resp.content
+        )
 
 
 class TestMoodyPasswordResetView(TestCase):
