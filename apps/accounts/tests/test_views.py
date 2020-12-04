@@ -268,6 +268,12 @@ class TestCreateUserView(TestCase):
         self.assertTrue(MoodyUser.objects.filter(username=user_data['username']).exists())
         self.assertTrue(UserProfile.objects.filter(user__username=user_data['username']).exists())
 
+        # Ensure user can login with their new account
+        request = mock.Mock()
+        request.host.name = 'www'
+        user = authenticate(request, username=user_data['username'], password=user_data['password'])
+        self.assertIsNotNone(user, 'User was not successfully created! Could not authenticate with new user.')
+
     def test_creating_user_with_existing_username_is_rejected(self):
         user = MoodyUtil.create_user()
         request_data = {
