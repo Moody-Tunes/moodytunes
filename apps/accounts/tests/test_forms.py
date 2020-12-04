@@ -6,8 +6,23 @@ from libs.tests.helpers import MoodyUtil
 
 
 class TestValidateUsername(TestCase):
-    def test_valid_username_is_valid(self):
+    def test_valid_username_with_only_alphabet_characters_is_valid(self):
+        resp = validate_username('nick')
+        self.assertIsNone(resp)
+
+        resp2 = validate_username('NICK')
+        self.assertIsNone(resp2)
+
+    def test_valid_username_with_alphabet_characters_and_numbers_is_valid(self):
+        resp = validate_username('nick12345')
+        self.assertIsNone(resp)
+
+    def test_valid_username_with_underscore_is_valid(self):
         resp = validate_username('nick_12345')
+        self.assertIsNone(resp)
+
+    def test_valid_username_with_period_is_valid(self):
+        resp = validate_username('n.dibari')
         self.assertIsNone(resp)
 
     def test_invalid_username_raises_validation_error(self):

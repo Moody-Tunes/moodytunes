@@ -9,11 +9,11 @@ from accounts.models import MoodyUser, UserEmotion
 
 
 def validate_username(value):
-    """Validate username only contains alphanumeric and underscores characters"""
-    regex = r'^[\w]*$'
+    """Validate username only contains alphanumeric, underscore, and period characters"""
+    regex = r'^[\w\.]*$'
 
     if not re.match(regex, value):
-        raise ValidationError('Username must only contain letters, numbers and underscores.')
+        raise ValidationError('Username must only contain letters, numbers, periods, and underscores.')
 
 
 def validate_matching_passwords(password, confirm_password):
