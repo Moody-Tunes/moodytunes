@@ -162,6 +162,7 @@ class CreateUserView(FormView):
                 email=form.cleaned_data.get('email'),
                 password=form.cleaned_data['password']
             )
+
             UserProfile.objects.create(user=user)
 
             logger.info(
