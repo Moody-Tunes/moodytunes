@@ -173,6 +173,18 @@ class TestUpdateView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(resp, expected_redirect)
 
+    def test_get_request_populates_form_with_initial_user_data(self):
+        user = MoodyUtil.create_user(email='foo@example.com')
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Ensure that the form's initial data is set to the current data for the user
+        self.assertEqual(resp.context['form'].initial['username'], user.username)
+        self.assertEqual(resp.context['form'].initial['email'], user.email)
+
     def test_happy_path(self):
         user = MoodyUtil.create_user()
         self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
