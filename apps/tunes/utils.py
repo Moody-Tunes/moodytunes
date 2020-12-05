@@ -1,3 +1,5 @@
+import random
+
 from django.conf import settings
 from django.core.cache import cache
 
@@ -79,8 +81,6 @@ def generate_browse_playlist(
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
 
-    playlist = playlist.order_by('?')
-
     # Filter by user top artists on Spotify if provided
     if top_artists:
         top_artists_playlist = playlist.filter(artist__in=top_artists)
@@ -96,6 +96,9 @@ def generate_browse_playlist(
                 top_artists_playlist = top_artists_playlist.union(playlist_minus_top_artists[:filler_track_count])
 
             playlist = top_artists_playlist
+
+    playlist = list(playlist)
+    random.shuffle(playlist)
 
     if limit:
         playlist = playlist[:limit]
