@@ -42,16 +42,9 @@ class MoodyLoginView(LoginView):
 
             if waffle.switch_is_active('show_spotify_auth_prompt'):
 
-                # Check if user has authenticated with Spotify, to prompt user to
-                # authenticate if they have not already done so
                 if self.request.user.is_authenticated:
-                    show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
-
-                    # Check if user has explicitly indicated they do not want to
-                    # authenticate with Spotify
-                    if show_spotify_auth and hasattr(self.request.user, 'userprofile'):
-                        user_profile = self.request.user.userprofile
-                        show_spotify_auth = not user_profile.has_rejected_spotify_auth
+                    if not self.request.user.userprofile.has_rejected_spotify_auth:
+                        show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
 
             return f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth={show_spotify_auth}'
 
