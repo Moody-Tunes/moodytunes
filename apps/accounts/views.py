@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 class MoodyLoginView(LoginView):
     template_name = 'login.html'
+    redirect_authenticated_user = True
 
     def get_redirect_url(self):
         redirect_url = super().get_redirect_url()

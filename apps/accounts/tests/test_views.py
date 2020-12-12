@@ -45,7 +45,15 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
-    def test_login_returns_bad_request_for_invalid_path(self):
+    @override_switch('show_spotify_auth_prompt', active=False)
+    def test_get_login_page_for_authenticated_user_redirects_to_default(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    def test_login_returns_bad_request_for_invalid_redirect_url(self):
         next = '6330599317423175408.owasp.org'
         url = self.url + '?next={}'.format(next)
 
