@@ -46,6 +46,17 @@ class MoodyLoginView(LoginView):
                     if not self.request.user.userprofile.has_rejected_spotify_auth:
                         show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
 
+                        if not show_spotify_auth:
+                            # This means the user has already authenticated with Spotify, but because their
+                            # UserProfile record indicates that they have not rejected to auth with Spotify we will
+                            # continue to do multiple queries to determine their authentication status.
+                            # We should update their profile value here to reflect they have "rejected" to auth
+                            # with Spotify by virtue of them already doing so.
+                            # TODO: Should we rename this field on UserProfile then?
+                            #  Maybe `has_authenticated_with_spotify`?
+                            self.request.user.userprofile.has_rejected_spotify_auth = True
+                            self.request.user.userprofile.save()
+
             return f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth={show_spotify_auth}'
 
         try:

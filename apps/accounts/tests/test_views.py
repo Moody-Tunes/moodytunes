@@ -71,6 +71,10 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+        # Ensure UserProfile record is updated to indicate user has already authenticated with Spotify
+        self.user.userprofile.refresh_from_db()
+        self.assertTrue(self.user.userprofile.has_rejected_spotify_auth)
+
     @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
         data = {
