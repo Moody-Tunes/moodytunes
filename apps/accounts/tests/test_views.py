@@ -345,7 +345,7 @@ class TestMoodyPasswordResetView(TestCase):
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('We have sent a password reset email to the address provided', messages)
+        self.assertIn('We have sent a password reset email to the address provided.', messages)
 
         email_context = {
             'email': 'foo@example.com',
@@ -438,7 +438,7 @@ class TestMoodyPasswordResetDone(TestCase):
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('Please login with your new password', messages)
+        self.assertIn('Please login with your new password.', messages)
 
 
 class TestUserProfileView(APITestCase):
