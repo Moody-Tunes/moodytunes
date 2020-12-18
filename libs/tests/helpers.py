@@ -124,16 +124,13 @@ class MoodyUtil(object):
     @staticmethod
     def create_user(**kwargs):
         kwargs.setdefault('username', MoodyUtil.DEFAULT_USER_USERNAME)
-        password = kwargs.get('password', MoodyUtil.DEFAULT_USER_PASSWORD)
-        email = kwargs.get('email')
+        kwargs.setdefault('password', MoodyUtil.DEFAULT_USER_PASSWORD)
+        create_user_profile = kwargs.pop('create_user_profile', False)
 
-        user = MoodyUser.objects.create(**kwargs)
-        user.set_password(password)
+        user = MoodyUser.objects.create_user(**kwargs)
 
-        if email:
-            user.email = email
-
-        user.save()
+        if create_user_profile:
+            MoodyUtil.create_user_profile(user)
 
         return user
 

@@ -19,7 +19,7 @@ class TestLoginView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('accounts:login')
-        cls.user = MoodyUtil.create_user()
+        cls.user = MoodyUtil.create_user(create_user_profile=True)
 
     def test_login_redirects_to_valid_path(self):
         next = reverse('moodytunes:browse')
@@ -45,7 +45,21 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
-    def test_login_returns_bad_request_for_invalid_path(self):
+    @override_switch('show_spotify_auth_prompt', active=False)
+    def test_get_login_page_for_authenticated_user_redirects_to_default(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    @override_switch('show_spotify_auth_prompt', active=True)
+    def test_get_login_page_for_unauthenticated_user_sets_next_link_to_default(self):
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.context['next'], f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    def test_login_returns_bad_request_for_invalid_redirect_url(self):
         next = '6330599317423175408.owasp.org'
         url = self.url + '?next={}'.format(next)
 
@@ -71,6 +85,10 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+        # Ensure UserProfile record is updated to indicate user has already authenticated with Spotify
+        self.user.userprofile.refresh_from_db()
+        self.assertTrue(self.user.userprofile.has_rejected_spotify_auth)
+
     @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
         data = {
@@ -83,8 +101,9 @@ class TestLoginView(TestCase):
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
     @override_switch('show_spotify_auth_prompt', active=True)
-    def test_context_sets_show_spotify_auth_false_to_for_rejected_spotify_auth(self):
-        MoodyUtil.create_user_profile(self.user, has_rejected_spotify_auth=True)
+    def test_context_sets_show_spotify_auth_to_false_for_rejected_spotify_auth(self):
+        self.user.userprofile.has_rejected_spotify_auth = True
+        self.user.userprofile.save()
 
         data = {
             'username': self.user.username,
@@ -96,7 +115,7 @@ class TestLoginView(TestCase):
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
     @override_switch('show_spotify_auth_prompt', active=False)
-    def test_context_sets_show_spotify_auth_false_when_switch_is_not_active(self):
+    def test_context_sets_show_spotify_auth_to_false_when_switch_is_not_active(self):
         data = {
             'username': self.user.username,
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
