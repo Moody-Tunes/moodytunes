@@ -345,7 +345,7 @@ class TestMoodyPasswordResetView(TestCase):
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('We have sent a password reset email to the address provided', messages)
+        self.assertIn('We have sent a password reset email to the address provided.', messages)
 
         email_context = {
             'email': 'foo@example.com',
@@ -431,14 +431,26 @@ class TestMoodyPasswordResetDone(TestCase):
     def setUpTestData(cls):
         cls.url = reverse('accounts:password-reset-complete')
 
-    def test_happy_path(self):
+    def test_unauthenticated_request_redirects_to_login_page(self):
         expected_redirect = reverse('accounts:login')
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('Please login with your new password', messages)
+        self.assertIn('Please login with your new password.', messages)
+
+    def test_authenticated_request_redirects_to_profile_page(self):
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        expected_redirect = reverse('accounts:profile')
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, expected_redirect)
+
+        messages = get_messages_from_response(resp)
+        self.assertIn('Your password has been updated!', messages)
 
 
 class TestUserProfileView(APITestCase):
