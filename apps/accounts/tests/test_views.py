@@ -53,6 +53,12 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+    @override_switch('show_spotify_auth_prompt', active=True)
+    def test_get_login_page_for_unauthenticated_user_sets_next_link_to_default(self):
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.context['next'], f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
     def test_login_returns_bad_request_for_invalid_redirect_url(self):
         next = '6330599317423175408.owasp.org'
         url = self.url + '?next={}'.format(next)
