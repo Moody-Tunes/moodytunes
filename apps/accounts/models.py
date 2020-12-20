@@ -246,7 +246,7 @@ class UserEmotion(BaseModel):
             flat=True
         )
 
-        song_codes = UserSongVote.objects.filter(
+        song_pks = UserSongVote.objects.filter(
             pk__in=distinct_votes
         ).order_by(
             '-created'
@@ -255,7 +255,7 @@ class UserEmotion(BaseModel):
             flat=True
         )[:candidate_batch_size]
 
-        songs = Song.objects.filter(pk__in=song_codes)
+        songs = Song.objects.filter(pk__in=song_pks)
 
         attributes = average(songs, 'valence', 'energy', 'danceability')
         self.valence = attributes['valence__avg']
