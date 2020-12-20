@@ -225,24 +225,37 @@ class UserEmotion(BaseModel):
 
         super().save(*args, **kwargs)
 
-    def update_attributes(self):
+    def update_attributes(self, candidate_batch_size=None):
         """
-        Update the attributes for this user/emotion mapping to the average of the attributes of the songs the user has
-        upvoted as making them feel this emotion. If the user doesn't have any upvotes for this emotion, the attributes
-        will be set to `None` and reset to the emotion defaults in the save() call
+        Update the attributes for this user/emotion mapping to the average attributes of the most recent songs
+        the user has upvoted as making them feel this emotion. If the user doesn't have any upvotes for this
+        emotion, the attributes will be set to `None` and reset to the emotion defaults in the save() call.
+
+        :param candidate_batch_size: (int) Number of songs to include in batch for calculating new attribute values
         """
-        # Get distinct votes by song, to avoid factoring multiple votes for a song into the emotion average
-        song_codes = self.user.usersongvote_set.filter(
+        if not candidate_batch_size:
+            candidate_batch_size = settings.CANDIDATE_BATCH_SIZE_FOR_USER_EMOTION_ATTRIBUTES_UPDATE
+
+        distinct_votes = self.user.usersongvote_set.filter(
             emotion=self.emotion,
             vote=True
         ).distinct(
-            'song__code'
+            'song__pk',
         ).values_list(
-            'song__code',
+            'pk',
             flat=True
         )
 
-        songs = Song.objects.filter(code__in=song_codes)
+        song_codes = UserSongVote.objects.filter(
+            pk__in=distinct_votes
+        ).order_by(
+            '-created'
+        ).values_list(
+            'song__pk',
+            flat=True
+        )[:candidate_batch_size]
+
+        songs = Song.objects.filter(pk__in=song_codes)
 
         attributes = average(songs, 'valence', 'energy', 'danceability')
         self.valence = attributes['valence__avg']
