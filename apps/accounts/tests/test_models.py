@@ -25,94 +25,100 @@ class TestUserEmotion(TestCase):
         with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
             cls.user = MoodyUtil.create_user(username='test_user')
 
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+
     def test_uniqueness_on_user_emotion_fields(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        UserEmotion.objects.create(user=self.user, emotion=emotion)
+        UserEmotion.objects.create(user=self.user, emotion=self.emotion)
 
         with self.assertRaises(ValidationError):
-            UserEmotion.objects.create(user=self.user, emotion=emotion)
+            UserEmotion.objects.create(user=self.user, emotion=self.emotion)
 
     def test_validate_attributes_raises_error_on_invalid_values(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        user_emotion = UserEmotion.objects.create(user=self.user, emotion=emotion)
+        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
+
+        # Attributes should be floats, integers should be invalid values for updates
+        user_emotion.energy = 12
+        user_emotion.valence = 12
 
         with self.assertRaises(ValidationError):
-            user_emotion.energy = 12
-            user_emotion.valence = 12
             user_emotion.save()
 
-    def test_update_attributes_sets_values_to_average_of_upvoted_songs(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        song = MoodyUtil.create_song(
-            energy=round(random.random(), 2),
-            valence=round(random.random(), 2),
-            danceability=round(random.random(), 2)
-        )
-        song2 = MoodyUtil.create_song(
-            energy=round(random.random(), 2),
-            valence=round(random.random(), 2),
-            danceability=round(random.random(), 2)
-        )
-        user_emotion = UserEmotion.objects.create(user=self.user, emotion=emotion)
+    def test_update_attributes_sets_values_to_average_of_most_recently_upvoted_songs(self):
+        candidate_batch_size = 5
+
+        for _ in range(10):
+            MoodyUtil.create_song(
+                energy=round(random.random(), 2),
+                valence=round(random.random(), 2),
+                danceability=round(random.random(), 2)
+            )
+
+        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
+
+        all_songs = Song.objects.all()
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
         dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
         with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
-            UserSongVote.objects.create(
-                user=self.user,
-                emotion=emotion,
-                song=song,
-                vote=True
-            )
+            for song in all_songs:
+                MoodyUtil.create_user_song_vote(
+                    user=self.user,
+                    emotion=self.emotion,
+                    song=song,
+                    vote=True
+                )
 
-            UserSongVote.objects.create(
+        songs = Song.objects.filter(
+            pk__in=UserSongVote.objects.filter(
                 user=self.user,
-                emotion=emotion,
-                song=song2,
+                emotion=self.emotion,
                 vote=True
-            )
-
-        songs = Song.objects.filter(pk__in=[song.pk, song2.pk])
+            ).order_by(
+                '-created'
+            ).values_list(
+                'song__pk',
+                flat=True
+            )[:candidate_batch_size]
+        )
 
         expected_attributes = average(songs, 'valence', 'energy', 'danceability')
         expected_valence = expected_attributes['valence__avg']
         expected_energy = expected_attributes['energy__avg']
         expected_danceability = expected_attributes['danceability__avg']
 
-        user_emotion.update_attributes()
+        user_emotion.update_attributes(candidate_batch_size=candidate_batch_size)
         self.assertEqual(user_emotion.energy, expected_energy)
         self.assertEqual(user_emotion.valence, expected_valence)
         self.assertEqual(user_emotion.danceability, expected_danceability)
 
     def test_update_attributes_sets_values_to_default_if_no_songs_upvoted(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
         song = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.45)
         song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
-        user_emot = UserEmotion.objects.create(user=self.user, emotion=emotion)
+        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=song,
             vote=True
         )
 
-        UserSongVote.objects.create(
+        MoodyUtil.create_user_song_vote(
             user=self.user,
-            emotion=emotion,
+            emotion=self.emotion,
             song=song2,
             vote=True
         )
 
-        self.user.usersongvote_set.filter(emotion=emotion).update(vote=False)
-        default_emotion_energy = emotion.energy
-        default_emotion_valence = emotion.valence
-        default_emotion_danceability = emotion.danceability
+        self.user.usersongvote_set.filter(emotion=self.emotion).update(vote=False)
+        default_emotion_energy = self.emotion.energy
+        default_emotion_valence = self.emotion.valence
+        default_emotion_danceability = self.emotion.danceability
 
-        user_emot.update_attributes()
-        self.assertEqual(user_emot.energy, default_emotion_energy)
-        self.assertEqual(user_emot.valence, default_emotion_valence)
-        self.assertEqual(user_emot.danceability, default_emotion_danceability)
+        user_emotion.update_attributes()
+        self.assertEqual(user_emotion.energy, default_emotion_energy)
+        self.assertEqual(user_emotion.valence, default_emotion_valence)
+        self.assertEqual(user_emotion.danceability, default_emotion_danceability)
 
 
 class TestMoodyUser(TestCase):
