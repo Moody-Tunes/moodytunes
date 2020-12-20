@@ -21,7 +21,7 @@ class TestUserEmotion(TestCase):
     def setUpTestData(cls):
         # Disable signal that creates UserEmotion records on user creation
         # so we can create ones during testing
-        dispatch_uid = 'user_post_save_create_useremotion_records'
+        dispatch_uid = settings.CREATE_USER_EMOTION_RECORDS_SIGNAL_UID
         with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
             cls.user = MoodyUtil.create_user(username='test_user')
 
@@ -58,7 +58,7 @@ class TestUserEmotion(TestCase):
         all_songs = Song.objects.all()
 
         # Skip the post_save signal on UserSongVote to delay updating the attributes
-        dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
+        dispatch_uid = settings.UPDATE_USER_EMOTION_ATTRIBUTES_SIGNAL_UID
         with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
             for song in all_songs:
                 MoodyUtil.create_user_song_vote(
