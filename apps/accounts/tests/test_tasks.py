@@ -23,25 +23,17 @@ from tunes.models import Emotion
 class TestCreateUserEmotionTask(TestCase):
     @classmethod
     def setUpTestData(cls):
-        dispatch_uid = 'user_post_save_create_useremotion_records'
+        dispatch_uid = settings.CREATE_USER_EMOTION_RECORDS_SIGNAL_UID
         with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
             cls.user = MoodyUtil.create_user(username='test_user')
 
     def test_happy_path(self):
         CreateUserEmotionRecordsForUserTask().run(self.user.pk)
 
-        self.user.refresh_from_db()
+        # Ensure we create one UserEmotion record per Emotion record for the user
+        self.assertEqual(self.user.useremotion_set.count(), Emotion.objects.count())
 
-        useremotion_emotion_names = list(self.user.useremotion_set.values_list(
-                'emotion__name',
-                flat=True
-            ).order_by('emotion__name')
-        )
-        emotion_names = list(Emotion.objects.values_list('name', flat=True).order_by('name'))
-
-        self.assertListEqual(useremotion_emotion_names, emotion_names)
-
-    def test_raises_exception_if_user_not_found(self):
+    def test_task_raises_exception_if_user_not_found(self):
         invalid_user_pk = 10000
 
         with self.assertRaises(MoodyUser.DoesNotExist):
@@ -57,7 +49,7 @@ class TestUpdateUserEmotionTask(TestCase):
         cls.song2 = MoodyUtil.create_song(valence=.55, energy=.75)
 
     def test_happy_path(self):
-        dispatch_uid = 'user_song_vote_post_save_update_useremotion_attributes'
+        dispatch_uid = settings.UPDATE_USER_EMOTION_ATTRIBUTES_SIGNAL_UID
         with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
             MoodyUtil.create_user_song_vote(self.user, self.song1, self.emotion, True)
             MoodyUtil.create_user_song_vote(self.user, self.song2, self.emotion, True)

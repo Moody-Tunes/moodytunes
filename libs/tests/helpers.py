@@ -161,6 +161,6 @@ class MoodyUtil(object):
         }
 
         # Disable signal to update top artists from Spotify when creating user auth record
-        dispatch_uid = 'spotify_user_auth_post_save_update_top_artist'
+        dispatch_uid = settings.UPDATE_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
         with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
             return SpotifyUserAuth.objects.create(**params)
