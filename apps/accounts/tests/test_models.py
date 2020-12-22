@@ -10,7 +10,7 @@ from django.utils import timezone
 from spotify_client.exceptions import SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, SpotifyUserData, UserEmotion, UserSongVote
-from accounts.signals import create_user_emotion_records, update_user_emotion_attributes
+from accounts.signals import create_user_emotion_records
 from libs.tests.helpers import MoodyUtil, SignalDisconnect
 from libs.utils import average
 from tunes.models import Emotion, Song
@@ -57,17 +57,24 @@ class TestUserEmotion(TestCase):
 
         all_songs = Song.objects.all()
 
-        # Skip the post_save signal on UserSongVote to delay updating the attributes
-        dispatch_uid = settings.UPDATE_USER_EMOTION_ATTRIBUTES_SIGNAL_UID
-        with SignalDisconnect(post_save, update_user_emotion_attributes, UserSongVote, dispatch_uid):
-            for song in all_songs:
-                MoodyUtil.create_user_song_vote(
-                    user=self.user,
-                    emotion=self.emotion,
-                    song=song,
-                    vote=True
-                )
+        # Use `bulk_create` to make UserSongVote records to skip the signal to update
+        # UserEmotion attributes on UserSongVote creation, so we can manually call it
+        # during the test to ensure it behaves appropriately
+        votes = []
+        for song in all_songs:
+            vote = UserSongVote(
+                user=self.user,
+                emotion=self.emotion,
+                song=song,
+                vote=True
+            )
 
+            votes.append(vote)
+
+        UserSongVote.objects.bulk_create(votes)
+
+        # Get the songs for the most recent upvotes for the emotion by the user
+        # These should be the songs used to calculate the new UserEmotion attributes
         songs = Song.objects.filter(
             pk__in=UserSongVote.objects.filter(
                 user=self.user,
