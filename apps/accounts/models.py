@@ -236,6 +236,8 @@ class UserEmotion(BaseModel):
         if not candidate_batch_size:
             candidate_batch_size = settings.CANDIDATE_BATCH_SIZE_FOR_USER_EMOTION_ATTRIBUTES_UPDATE
 
+        # First, get the distinct upvotes by the user for the emotion.
+        # Avoid factoring in a song more than once if there are multiple upvotes for the song
         distinct_votes = self.user.usersongvote_set.filter(
             emotion=self.emotion,
             vote=True
@@ -246,6 +248,7 @@ class UserEmotion(BaseModel):
             flat=True
         )
 
+        # Next, get the `candidate_batch_size` most recently distinct songs upvoted for the emotion
         song_pks = UserSongVote.objects.filter(
             pk__in=distinct_votes
         ).order_by(
@@ -255,9 +258,11 @@ class UserEmotion(BaseModel):
             flat=True
         )[:candidate_batch_size]
 
+        # Finally, calculate the average emotion attributes for the songs the user has most
+        # recently upvoted for the emotion and set the UserEmotion attributes to the average values
         songs = Song.objects.filter(pk__in=song_pks)
-
         attributes = average(songs, 'valence', 'energy', 'danceability')
+
         self.valence = attributes['valence__avg']
         self.energy = attributes['energy__avg']
         self.danceability = attributes['danceability__avg']
