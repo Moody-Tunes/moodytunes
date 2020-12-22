@@ -24,11 +24,15 @@ class NullGenreFilter(admin.SimpleListFilter):
 
 
 class GenreFormField(forms.ModelForm):
-    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
+    genre = forms.ChoiceField(choices=[], required=False)
 
     class Meta:
         model = Song
         fields = ('genre',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['genre'].choices = get_genre_choices()
 
 
 class EmotionAdmin(MoodyBaseAdmin):

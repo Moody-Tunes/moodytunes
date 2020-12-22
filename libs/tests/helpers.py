@@ -124,16 +124,13 @@ class MoodyUtil(object):
     @staticmethod
     def create_user(**kwargs):
         kwargs.setdefault('username', MoodyUtil.DEFAULT_USER_USERNAME)
-        password = kwargs.get('password', MoodyUtil.DEFAULT_USER_PASSWORD)
-        email = kwargs.get('email')
+        kwargs.setdefault('password', MoodyUtil.DEFAULT_USER_PASSWORD)
+        create_user_profile = kwargs.pop('create_user_profile', False)
 
-        user = MoodyUser.objects.create(**kwargs)
-        user.set_password(password)
+        user = MoodyUser.objects.create_user(**kwargs)
 
-        if email:
-            user.email = email
-
-        user.save()
+        if create_user_profile:
+            MoodyUtil.create_user_profile(user)
 
         return user
 
@@ -164,6 +161,6 @@ class MoodyUtil(object):
         }
 
         # Disable signal to update top artists from Spotify when creating user auth record
-        dispatch_uid = 'spotify_user_auth_post_save_update_top_artist'
+        dispatch_uid = settings.UPDATE_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
         with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
             return SpotifyUserAuth.objects.create(**params)

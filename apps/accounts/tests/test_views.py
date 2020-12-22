@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 from waffle.testutils import override_switch
 
 from accounts.models import MoodyUser, UserProfile
@@ -19,7 +19,7 @@ class TestLoginView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse('accounts:login')
-        cls.user = MoodyUtil.create_user()
+        cls.user = MoodyUtil.create_user(create_user_profile=True)
 
     def test_login_redirects_to_valid_path(self):
         next = reverse('moodytunes:browse')
@@ -45,7 +45,21 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
-    def test_login_returns_bad_request_for_invalid_path(self):
+    @override_switch('show_spotify_auth_prompt', active=False)
+    def test_get_login_page_for_authenticated_user_redirects_to_default(self):
+        self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    @override_switch('show_spotify_auth_prompt', active=True)
+    def test_get_login_page_for_unauthenticated_user_sets_next_link_to_default(self):
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.context['next'], f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
+
+    def test_login_returns_bad_request_for_invalid_redirect_url(self):
         next = '6330599317423175408.owasp.org'
         url = self.url + '?next={}'.format(next)
 
@@ -71,6 +85,10 @@ class TestLoginView(TestCase):
 
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
+        # Ensure UserProfile record is updated to indicate user has already authenticated with Spotify
+        self.user.userprofile.refresh_from_db()
+        self.assertTrue(self.user.userprofile.has_rejected_spotify_auth)
+
     @override_switch('show_spotify_auth_prompt', active=True)
     def test_context_sets_show_spotify_auth_to_true_for_missing_auth_record(self):
         data = {
@@ -83,8 +101,9 @@ class TestLoginView(TestCase):
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=True')
 
     @override_switch('show_spotify_auth_prompt', active=True)
-    def test_context_sets_show_spotify_auth_false_to_for_rejected_spotify_auth(self):
-        MoodyUtil.create_user_profile(self.user, has_rejected_spotify_auth=True)
+    def test_context_sets_show_spotify_auth_to_false_for_rejected_spotify_auth(self):
+        self.user.userprofile.has_rejected_spotify_auth = True
+        self.user.userprofile.save()
 
         data = {
             'username': self.user.username,
@@ -96,7 +115,7 @@ class TestLoginView(TestCase):
         self.assertRedirects(resp, f'{settings.LOGIN_REDIRECT_URL}?show_spotify_auth=False')
 
     @override_switch('show_spotify_auth_prompt', active=False)
-    def test_context_sets_show_spotify_auth_false_when_switch_is_not_active(self):
+    def test_context_sets_show_spotify_auth_to_false_when_switch_is_not_active(self):
         data = {
             'username': self.user.username,
             'password': MoodyUtil.DEFAULT_USER_PASSWORD
@@ -326,7 +345,7 @@ class TestMoodyPasswordResetView(TestCase):
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('We have sent a password reset email to the address provided', messages)
+        self.assertIn('We have sent a password reset email to the address provided.', messages)
 
         email_context = {
             'email': 'foo@example.com',
@@ -412,43 +431,54 @@ class TestMoodyPasswordResetDone(TestCase):
     def setUpTestData(cls):
         cls.url = reverse('accounts:password-reset-complete')
 
-    def test_happy_path(self):
+    def test_unauthenticated_request_redirects_to_login_page(self):
         expected_redirect = reverse('accounts:login')
         resp = self.client.get(self.url)
 
         self.assertRedirects(resp, expected_redirect)
 
         messages = get_messages_from_response(resp)
-        self.assertIn('Please login with your new password', messages)
+        self.assertIn('Please login with your new password.', messages)
+
+    def test_authenticated_request_redirects_to_profile_page(self):
+        user = MoodyUtil.create_user()
+        self.client.login(username=user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+        expected_redirect = reverse('accounts:profile')
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, expected_redirect)
+
+        messages = get_messages_from_response(resp)
+        self.assertIn('Your password has been updated!', messages)
 
 
-class TestUserProfileView(TestCase):
+class TestUserProfileView(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user_with_profile = MoodyUtil.create_user()
         cls.user_without_profile = MoodyUtil.create_user(username='test-no-profile')
-        cls.api_client = APIClient()
         cls.url = reverse('accounts:user-profile')
 
         cls.user_profile = MoodyUtil.create_user_profile(cls.user_with_profile, has_rejected_spotify_auth=False)
 
     def setUp(self):
-        self.api_client.login(username=self.user_with_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        self.client.login(username=self.user_with_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
     def test_unauthenticated_get_request_is_rejected(self):
-        self.api_client.logout()
+        self.client.logout()
 
-        resp = self.api_client.get(self.url)
+        resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthenticated_update_request_is_rejected(self):
-        self.api_client.logout()
+        self.client.logout()
 
-        resp = self.api_client.patch(self.url)
+        resp = self.client.patch(self.url)
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_request_returns_user_profile(self):
-        resp = self.api_client.get(self.url)
+        resp = self.client.get(self.url)
         resp_json = resp.json()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -456,16 +486,16 @@ class TestUserProfileView(TestCase):
         self.assertFalse(resp_json['has_rejected_spotify_auth'])
 
     def test_get_request_for_user_with_no_user_profile_returns_not_found(self):
-        self.api_client.logout()
-        self.api_client.login(username=self.user_without_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        self.client.logout()
+        self.client.login(username=self.user_without_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-        resp = self.api_client.get(self.url)
+        resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_request_updates_user_profile_attributes(self):
         data = {'has_rejected_spotify_auth': True}
 
-        resp = self.api_client.patch(self.url, data)
+        resp = self.client.patch(self.url, data)
         self.user_profile.refresh_from_db()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -474,7 +504,7 @@ class TestUserProfileView(TestCase):
     def test_update_request_with_no_data_does_not_update_user_profile_attributes(self):
         data = {}
 
-        resp = self.api_client.patch(self.url, data)
+        resp = self.client.patch(self.url, data)
         self.user_profile.refresh_from_db()
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -483,15 +513,15 @@ class TestUserProfileView(TestCase):
     def test_update_request_with_invalid_parameters_returns_bad_request(self):
         data = {'has_rejected_spotify_auth': 'foo'}
 
-        resp = self.api_client.patch(self.url, data)
+        resp = self.client.patch(self.url, data)
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_request_for_user_with_no_user_profile_returns_not_found(self):
-        self.api_client.logout()
-        self.api_client.login(username=self.user_without_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+        self.client.logout()
+        self.client.login(username=self.user_without_profile.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
         data = {'has_rejected_spotify_auth': True}
 
-        resp = self.api_client.patch(self.url, data)
+        resp = self.client.patch(self.url, data)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

@@ -20,10 +20,10 @@ def get_genre_choices():
 
     :return: (list[tuples]) List of options for genre field in forms
     """
-    if cache.get(settings.GENRE_CHOICES_CACHE_KEY):
-        genres = cache.get(settings.GENRE_CHOICES_CACHE_KEY)
-    else:
-        genres = Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre')
+    genres = cache.get(settings.GENRE_CHOICES_CACHE_KEY)
+
+    if not genres:
+        genres = list(Song.objects.all().values_list('genre', flat=True).distinct().order_by('genre'))
         cache.set(settings.GENRE_CHOICES_CACHE_KEY, genres, settings.GENRE_CHOICES_CACHE_TIMEOUT)
 
     return default_option + [(genre, genre.split('_')[0].capitalize()) for genre in genres if genre]
@@ -32,7 +32,7 @@ def get_genre_choices():
 class BrowseForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     artist = forms.CharField(max_length=50, required=False)
-    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
+    genre = forms.ChoiceField(choices=[], required=False)
     context = forms.ChoiceField(
         choices=UserSongVote.CONTEXT_CHOICES,
         required=False,
@@ -48,6 +48,7 @@ class BrowseForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['genre'].choices = get_genre_choices()
 
         # Set the initial emotion to a random value to avoid the "default" option being overly selected
         self.fields['emotion'].initial = random.choice(self.fields['emotion'].choices)
@@ -55,9 +56,13 @@ class BrowseForm(forms.Form):
 
 class PlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
-    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
+    genre = forms.ChoiceField(choices=[], required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     artist = forms.CharField(max_length=50, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['genre'].choices = get_genre_choices()
 
 
 class SuggestSongForm(forms.Form):
@@ -84,6 +89,10 @@ class SuggestSongForm(forms.Form):
 class ExportPlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     playlist_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Playlist Name'}))
-    genre = forms.ChoiceField(choices=get_genre_choices, required=False)
+    genre = forms.ChoiceField(choices=[], required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     cover_image = forms.ImageField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['genre'].choices = get_genre_choices()

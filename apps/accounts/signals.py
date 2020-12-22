@@ -20,7 +20,7 @@ def create_user_emotion_records(sender, instance, created, *args, **kwargs):
 post_save.connect(
     create_user_emotion_records,
     sender=settings.AUTH_USER_MODEL,
-    dispatch_uid='user_post_save_create_useremotion_records'
+    dispatch_uid=settings.CREATE_USER_EMOTION_RECORDS_SIGNAL_UID
 )
 
 
@@ -34,7 +34,7 @@ def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
 post_save.connect(
     update_user_emotion_attributes,
     sender=UserSongVote,
-    dispatch_uid='user_song_vote_post_save_update_useremotion_attributes'
+    dispatch_uid=settings.UPDATE_USER_EMOTION_ATTRIBUTES_SIGNAL_UID
 )
 
 
@@ -46,11 +46,11 @@ def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
 post_save.connect(
     update_spotify_top_artists,
     sender=SpotifyUserAuth,
-    dispatch_uid='spotify_user_auth_post_save_update_top_artist'
+    dispatch_uid=settings.UPDATE_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
 )
 
 
 user_login_failed.connect(
     log_failed_login_attempt,
-    dispatch_uid='moody_user_failed_login'
+    dispatch_uid=settings.LOG_MOODY_USER_FAILED_LOGIN_SIGNAL_UID
 )

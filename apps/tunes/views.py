@@ -190,12 +190,13 @@ class LastPlaylistView(generics.RetrieveAPIView):
             # Filter out songs user has already voted on from the playlist
             # for the emotion to prevent double votes on songs
             user_voted_songs = self.request.user.usersongvote_set.filter(
-                    emotion__name=emotion
-                ).values_list(
-                    'song__code', flat=True
+                emotion__name=emotion
+            ).values_list(
+                'song__pk', flat=True
             )
 
-            playlist = [song for song in playlist if song.code not in user_voted_songs]
+            playlist = [song for song in playlist if song.pk not in user_voted_songs]
+
             return {
                 'emotion': emotion,
                 'context': context,
