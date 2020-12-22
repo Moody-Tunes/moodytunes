@@ -2,16 +2,13 @@ import random
 from datetime import timedelta
 from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
 from django.test import TestCase
 from django.utils import timezone
 from spotify_client.exceptions import SpotifyException
 
 from accounts.models import MoodyUser, SpotifyUserAuth, SpotifyUserData, UserEmotion, UserSongVote
-from accounts.signals import create_user_emotion_records
-from libs.tests.helpers import MoodyUtil, SignalDisconnect
+from libs.tests.helpers import MoodyUtil
 from libs.utils import average
 from tunes.models import Emotion, Song
 
@@ -19,22 +16,22 @@ from tunes.models import Emotion, Song
 class TestUserEmotion(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Disable signal that creates UserEmotion records on user creation
-        # so we can create ones during testing
-        dispatch_uid = settings.CREATE_USER_EMOTION_RECORDS_SIGNAL_UID
-        with SignalDisconnect(post_save, create_user_emotion_records, settings.AUTH_USER_MODEL, dispatch_uid):
-            cls.user = MoodyUtil.create_user(username='test_user')
-
+        cls.user = MoodyUtil.create_user()
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
-    def test_uniqueness_on_user_emotion_fields(self):
+    def test_uniqueness_on_user_and_emotion(self):
+        self.user.useremotion_set.all().delete()
+
+        # Create a new UserEmotion record for our user and emotion
         UserEmotion.objects.create(user=self.user, emotion=self.emotion)
 
+        # Ensure that a call to create a new UserEmotion record
+        # for our user and emotion is invalid
         with self.assertRaises(ValidationError):
             UserEmotion.objects.create(user=self.user, emotion=self.emotion)
 
     def test_validate_attributes_raises_error_on_invalid_values(self):
-        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
+        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
 
         # Attributes should be floats, integers should be invalid values for updates
         user_emotion.energy = 12
@@ -44,24 +41,17 @@ class TestUserEmotion(TestCase):
             user_emotion.save()
 
     def test_update_attributes_sets_values_to_average_of_most_recently_upvoted_songs(self):
+        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
         candidate_batch_size = 5
+        votes = []
 
         for _ in range(10):
-            MoodyUtil.create_song(
+            song = MoodyUtil.create_song(
                 energy=round(random.random(), 2),
                 valence=round(random.random(), 2),
                 danceability=round(random.random(), 2)
             )
 
-        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
-
-        all_songs = Song.objects.all()
-
-        # Use `bulk_create` to make UserSongVote records to skip the signal to update
-        # UserEmotion attributes on UserSongVote creation, so we can manually call it
-        # during the test to ensure it behaves appropriately
-        votes = []
-        for song in all_songs:
             vote = UserSongVote(
                 user=self.user,
                 emotion=self.emotion,
@@ -71,6 +61,9 @@ class TestUserEmotion(TestCase):
 
             votes.append(vote)
 
+        # Use `bulk_create` to make UserSongVote records to skip the signal to update
+        # UserEmotion attributes on UserSongVote creation, so we can manually call it
+        # during the test to ensure it behaves appropriately
         UserSongVote.objects.bulk_create(votes)
 
         # Get the songs for the most recent upvotes for the emotion by the user
@@ -98,10 +91,10 @@ class TestUserEmotion(TestCase):
         self.assertEqual(user_emotion.valence, expected_valence)
         self.assertEqual(user_emotion.danceability, expected_danceability)
 
-    def test_update_attributes_sets_values_to_default_if_no_songs_upvoted(self):
+    def test_update_attributes_sets_values_to_emotion_defaults_if_no_songs_upvoted_for_emotion(self):
         song = MoodyUtil.create_song(energy=.50, valence=.75, danceability=.45)
         song2 = MoodyUtil.create_song(energy=.60, valence=.85, danceability=.85)
-        user_emotion = UserEmotion.objects.create(user=self.user, emotion=self.emotion)
+        user_emotion = self.user.get_user_emotion_record(self.emotion.name)
 
         MoodyUtil.create_user_song_vote(
             user=self.user,
@@ -117,15 +110,15 @@ class TestUserEmotion(TestCase):
             vote=True
         )
 
+        # Update the votes to set the vote value to False
         self.user.usersongvote_set.filter(emotion=self.emotion).update(vote=False)
-        default_emotion_energy = self.emotion.energy
-        default_emotion_valence = self.emotion.valence
-        default_emotion_danceability = self.emotion.danceability
 
+        # Call update_attributes directly, because the update call skips the post_save signal
         user_emotion.update_attributes()
-        self.assertEqual(user_emotion.energy, default_emotion_energy)
-        self.assertEqual(user_emotion.valence, default_emotion_valence)
-        self.assertEqual(user_emotion.danceability, default_emotion_danceability)
+
+        self.assertEqual(user_emotion.energy, self.emotion.energy)
+        self.assertEqual(user_emotion.valence, self.emotion.valence)
+        self.assertEqual(user_emotion.danceability, self.emotion.danceability)
 
 
 class TestMoodyUser(TestCase):
