@@ -157,7 +157,7 @@ class SpotifyUserAuth(BaseModel):
     @update_logging_data
     def refresh_access_token(self, **kwargs):
         """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth record"""
-        spotify_client = SpotifyClient(identifier='refresh-access-token:{}'.format(self.user.username))
+        spotify_client = SpotifyClient(identifier='refresh-access-token:{}'.format(self.spotify_user_id))
 
         try:
             access_token = spotify_client.refresh_access_token(self.refresh_token)
@@ -168,18 +168,23 @@ class SpotifyUserAuth(BaseModel):
             self.save()
 
             logger.info(
-                'Refreshed access token for {}'.format(self.user.username),
+                'Refreshed access token for {}'.format(self.spotify_user_id),
                 extra={
                     'fingerprint': auto_fingerprint('success_refresh_access_token', **kwargs),
-                    'moodytunes_username': self.user.username,
-                    'spotify_username': self.spotify_user_id
+                    'spotify_username': self.spotify_user_id,
+                    'auth_id': self.pk
                 }
             )
 
         except SpotifyException:
             logger.warning(
-                'Unable to refresh access token for {}'.format(self.user.username),
-                extra={'fingerprint': auto_fingerprint('failed_refresh_access_token', **kwargs)},
+                'Unable to refresh access token for {}'.format(self.spotify_user_id),
+                extra={
+                    'fingerprint': auto_fingerprint('failed_refresh_access_token', **kwargs),
+                    'spotify_username': self.spotify_user_id,
+                    'auth_id': self.pk,
+                    'user_id': self.user_id
+                },
                 exc_info=True
             )
 
