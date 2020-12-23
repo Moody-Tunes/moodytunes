@@ -69,8 +69,8 @@ class TestUpdateUserAttributesSignal(TestCase):
 
 
 class TestUpdateSpotifyTopArtistsSignal(TestCase):
-    @mock.patch('accounts.tasks.UpdateTopArtistsFromSpotifyTask.delay')
-    def test_task_is_only_called_on_create(self, mock_task):
+    @mock.patch('accounts.signals.on_commit')
+    def test_task_is_only_called_on_create(self, mock_on_commit):
         user = MoodyUtil.create_user()
         data = {
             'user': user,
@@ -81,7 +81,11 @@ class TestUpdateSpotifyTopArtistsSignal(TestCase):
 
         auth = SpotifyUserAuth.objects.create(**data)
 
-        mock_task.assert_called_once_with(auth.pk)
+        # Because we wrap the task call in the `on_commit` method using a lambda,
+        # we lose the reference to the task call itself because it is being called
+        # through an anonymous function. Mocking the `on_commit` call to ensure it
+        # has the proper number of calls works just as well for our purposes
+        mock_on_commit.assert_called_once()
 
         auth.save()
-        self.assertEqual(mock_task.call_count, 1)
+        self.assertEqual(mock_on_commit.call_count, 1)
