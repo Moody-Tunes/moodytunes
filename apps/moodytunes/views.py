@@ -256,7 +256,7 @@ class RevokeSpotifyAuthView(TemplateView):
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
-        auth = SpotifyUserAuth.objects.select_related('spotify_data').get(user=request.user)
+        auth = request.spotify_auth
         auth_id = auth.pk
         auth.delete()
 
@@ -280,7 +280,7 @@ class ExportPlayListView(FormView):
     @update_logging_data
     @method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth')))
     def get(self, request, *args, **kwargs):
-        auth = SpotifyUserAuth.objects.get(user=request.user)
+        auth = request.spotify_auth
 
         # Check that user has the proper scopes from Spotify to create playlist
         for scope in settings.SPOTIFY['auth_user_scopes']:
@@ -312,7 +312,7 @@ class ExportPlayListView(FormView):
         form = self.form_class(request.POST, request.FILES)
 
         if form.is_valid():
-            auth = SpotifyUserAuth.objects.get(user=request.user)
+            auth = request.spotify_auth
 
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']

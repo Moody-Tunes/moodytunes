@@ -14,12 +14,15 @@ def spotify_auth_required(redirect_uri, raise_exc=False):
     def wrapped_view(view_func):
         @functools.wraps(view_func)
         def wrapped(request, *args, **kwargs):
-            if not SpotifyUserAuth.objects.filter(user=request.user).exists():
+            try:
+                auth = SpotifyUserAuth.objects.get(user=request.user)
+                request.spotify_auth = auth  # Cache SpotifyUserAuth record for request
+                return view_func(request, *args, **kwargs)
+            except SpotifyUserAuth.DoesNotExist:
                 if raise_exc:
                     raise Http404()
                 else:
                     messages.info(request, 'You have not authorized MoodyTunes with Spotify')
                     return HttpResponseRedirect(redirect_uri)
-            return view_func(request, *args, **kwargs)
         return wrapped
     return wrapped_view
