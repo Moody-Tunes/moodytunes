@@ -272,13 +272,14 @@ class RevokeSpotifyAuthView(TemplateView):
         return HttpResponseRedirect(reverse('accounts:profile'))
 
 
+@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth')), name='get')
+@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth'), raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
     template_name = 'export.html'
     form_class = ExportPlaylistForm
 
     @update_logging_data
-    @method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth')))
     def get(self, request, *args, **kwargs):
         auth = request.spotify_auth
 
@@ -307,7 +308,6 @@ class ExportPlayListView(FormView):
         return super().get(request, *args, **kwargs)
 
     @update_logging_data
-    @method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth'), raise_exc=True))
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
 
