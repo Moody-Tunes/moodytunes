@@ -132,14 +132,7 @@ class SpotifyUserAuth(BaseModel):
             raise
 
         if auth.should_refresh_access_token:
-            try:
-                auth.refresh_access_token()
-            except SpotifyException:
-                logger.warning(
-                    'Failed to update access token for SpotifyUserAuth with pk={}'.format(auth_id),
-                    extra={'fingerprint': auto_fingerprint('failed_to_update_access_token', **kwargs)},
-                )
-                raise
+            auth.refresh_access_token()
 
         return auth
 
@@ -177,15 +170,14 @@ class SpotifyUserAuth(BaseModel):
             )
 
         except SpotifyException:
-            logger.warning(
+            logger.exception(
                 'Unable to refresh access token for {}'.format(self.spotify_user_id),
                 extra={
                     'fingerprint': auto_fingerprint('failed_refresh_access_token', **kwargs),
                     'spotify_username': self.spotify_user_id,
                     'auth_id': self.pk,
                     'user_id': self.user_id
-                },
-                exc_info=True
+                }
             )
 
             raise
