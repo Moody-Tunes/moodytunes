@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -17,6 +17,7 @@ from ratelimit.decorators import ratelimit
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
+from accounts.decorators import spotify_auth_required
 from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
@@ -248,25 +249,14 @@ class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
 
 
+@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')),  name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class RevokeSpotifyAuthView(TemplateView):
     template_name = 'revoke_spotify_auth.html'
 
-    def get(self, request, *args, **kwargs):
-        if not SpotifyUserAuth.objects.filter(user=request.user).exists():
-            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
-            return HttpResponseRedirect(reverse('accounts:profile'))
-
-        return super().get(request, *args, **kwargs)
-
     @update_logging_data
     def post(self, request, *args, **kwargs):
-        try:
-            auth = SpotifyUserAuth.objects.select_related('spotify_data').get(user=request.user)
-        except SpotifyUserAuth.DoesNotExist:
-            messages.error(request, 'You have not authorized MoodyTunes with Spotify')
-            return HttpResponseRedirect(reverse('accounts:profile'))
-
+        auth = request.spotify_auth
         auth_id = auth.pk
         auth.delete()
 
@@ -282,6 +272,8 @@ class RevokeSpotifyAuthView(TemplateView):
         return HttpResponseRedirect(reverse('accounts:profile'))
 
 
+@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth')), name='get')
+@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth'), raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
     template_name = 'export.html'
@@ -289,10 +281,7 @@ class ExportPlayListView(FormView):
 
     @update_logging_data
     def get(self, request, *args, **kwargs):
-        try:
-            auth = SpotifyUserAuth.objects.get(user=request.user)
-        except SpotifyUserAuth.DoesNotExist:
-            return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+        auth = request.spotify_auth
 
         # Check that user has the proper scopes from Spotify to create playlist
         for scope in settings.SPOTIFY['auth_user_scopes']:
@@ -316,14 +305,14 @@ class ExportPlayListView(FormView):
 
                 return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
 
-        return super(ExportPlayListView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
 
         if form.is_valid():
-            auth = get_object_or_404(SpotifyUserAuth, user=request.user)
+            auth = request.spotify_auth
 
             playlist_name = form.cleaned_data['playlist_name']
             emotion_name = form.cleaned_data['emotion']
