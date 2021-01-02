@@ -146,6 +146,31 @@ class CachedPlaylistManager(object):
         return cache.get(cache_key)
 
 
+class CachedEmotionAttributesManager(object):
+
+    def __init__(self, user):
+        self.user = user
+
+    def _make_cache_key(self, emotion, context):
+        return 'playlist:cached-emotion-playlist:{}:{}:{}'.format(
+            self.user.username,
+            emotion,
+            context
+        )
+
+    def cache_emotion_attributes(self, emotion, context, emotion_attributes):
+        cache_key = self._make_cache_key(emotion, context)
+        cache.set(cache_key, emotion_attributes, 60)
+
+    def get_cached_emotion_attributes(self, emotion, context):
+        cache_key = self._make_cache_key(emotion, context)
+        return cache.get(cache_key)
+
+    def delete_cached_emotion_attributes(self, emotion, context):
+        cache_key = self._make_cache_key(emotion, context)
+        cache.delete(cache_key)
+
+
 def filter_duplicate_votes_on_song_from_playlist(user_votes):
     """
     Filter queryset of UserSongVotes on unique songs (prevent the same song from appearing twice in the playlist
