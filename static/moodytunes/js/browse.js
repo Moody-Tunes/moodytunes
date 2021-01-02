@@ -64,13 +64,19 @@
 
     function setUpJitterInput() {
         let jitterInput = document.getElementById('id_jitter');
-        let jitterOutput = document.getElementById('jitter-value');
-        jitterOutput.innerText = jitterInput.value;
+        let jitterValue = document.getElementById('jitter-value');
+        let maxJitter = Number.parseFloat(jitterInput.max);
 
-        jitterInput.oninput = function () {
-            let jitterValue = Number.parseFloat(this.value);
-            jitterOutput.innerText = jitterValue.toFixed(2);
-        }
+        // Display the jitter value in the form as a percentage of the max jitter
+        // ex: if the jitter value is 0.1, display 20% in the input ((0.1 / 0.5) * 100 = 20)
+        let jitterDisplay = (Number.parseFloat(jitterInput.value) / maxJitter) * 100;
+        jitterValue.innerText = jitterDisplay + '%';
+
+        jitterInput.addEventListener('input', () => {
+            // Update display of jitter value when user adjusts the input slider
+            jitterDisplay = (Number.parseFloat(jitterInput.value) / maxJitter) * 100;
+            jitterValue.innerText = jitterDisplay + '%';
+        });
     }
 
     function generateLastBrowsePlaylist() {
