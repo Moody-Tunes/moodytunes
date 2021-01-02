@@ -22,7 +22,7 @@ def spotify_auth_required(redirect_uri, raise_exc=False):
                 if raise_exc:
                     raise Http404()
                 else:
-                    messages.info(request, 'You have not authorized MoodyTunes with Spotify')
+                    messages.info(request, 'You have not authorized MoodyTunes with Spotify', fail_silently=True)
                     return HttpResponseRedirect(redirect_uri)
         return wrapped
     return wrapped_view
