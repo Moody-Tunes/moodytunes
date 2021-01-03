@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.signals import user_login_failed
 from django.db.models.signals import post_save
+from django.db.transaction import on_commit
 
 from accounts.models import SpotifyUserAuth, UserSongVote
 from accounts.tasks import (
@@ -40,7 +41,7 @@ post_save.connect(
 
 def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
     if created:
-        UpdateTopArtistsFromSpotifyTask().apply_async((instance.pk,), countdown=30)
+        on_commit(lambda: UpdateTopArtistsFromSpotifyTask().delay(instance.pk))
 
 
 post_save.connect(
