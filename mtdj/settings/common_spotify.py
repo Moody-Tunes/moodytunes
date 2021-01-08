@@ -1,4 +1,3 @@
-# API Keys/Credentials get stored here
 from envparse import env
 from spotify_client.config import Config
 
