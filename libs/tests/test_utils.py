@@ -11,7 +11,7 @@ class TestAverage(TestCase):
         cls.song_1 = MoodyUtil.create_song(energy=.5, valence=.75, danceability=.5)
         cls.song_2 = MoodyUtil.create_song(energy=.65, valence=.45, danceability=.75)
 
-    def test_average_computes_proper_average_for_citeria(self):
+    def test_average_computes_proper_average_for_criteria(self):
         collection = Song.objects.all()
         expected_valence = .6
         expected_energy = .57
