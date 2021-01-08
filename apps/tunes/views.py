@@ -152,7 +152,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         return playlist
 
     def get_queryset(self):
-        queryset = super(BrowseView, self).get_queryset()
+        queryset = super().get_queryset()
 
         if self.cleaned_data.get('genre'):
             queryset = queryset.filter(genre=self.cleaned_data['genre'])
@@ -359,7 +359,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
             }
         )
 
-        resp = super(PlaylistView, self).list(request, *args, **kwargs)
+        resp = super().list(request, *args, **kwargs)
 
         first_page = last_page = None
 
@@ -401,7 +401,7 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         return filter_duplicate_votes_on_song_from_playlist(queryset)
 
     def get_queryset(self):
-        queryset = super(PlaylistView, self).get_queryset()
+        queryset = super().get_queryset()
 
         return queryset.filter(
             user=self.request.user,

@@ -29,7 +29,7 @@ class UserEmotionAdmin(MoodyBaseAdmin):
     search_fields = ('user__username',)
 
     def get_queryset(self, request):
-        queryset = super(UserEmotionAdmin, self).get_queryset(request).select_related('user', 'emotion')
+        queryset = super().get_queryset(request).select_related('user', 'emotion')
 
         # Annotate queryset with count of votes for emotion for each user
         queryset = queryset.annotate(

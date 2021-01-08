@@ -107,7 +107,7 @@ class GetRequestValidatorMixin(ValidateRequestDataMixin):
 
     def get(self, request, *args, **kwargs):
         if self._validate_request(request):
-            return super(GetRequestValidatorMixin, self).get(request, *args, **kwargs)
+            return super().get(request, *args, **kwargs)
         else:
             return BadRequest(data={'errors': self.errors})
 
@@ -117,7 +117,7 @@ class PostRequestValidatorMixin(ValidateRequestDataMixin):
 
     def post(self, request, *args, **kwargs):
         if self._validate_request(request):
-            return super(PostRequestValidatorMixin, self).post(request, *args, **kwargs)
+            return super().post(request, *args, **kwargs)
         else:
             return BadRequest()
 
@@ -127,7 +127,7 @@ class DeleteRequestValidatorMixin(ValidateRequestDataMixin):
 
     def delete(self, request, *args, **kwargs):
         if self._validate_request(request):
-            return super(DeleteRequestValidatorMixin, self).delete(request, *args, **kwargs)
+            return super().delete(request, *args, **kwargs)
         else:
             return BadRequest()
 
@@ -137,6 +137,6 @@ class PatchRequestValidatorMixin(ValidateRequestDataMixin):
 
     def patch(self, request, *args, **kwargs):
         if self._validate_request(request):
-            return super(PatchRequestValidatorMixin, self).patch(request, *args, **kwargs)
+            return super().patch(request, *args, **kwargs)
         else:
             return BadRequest()
