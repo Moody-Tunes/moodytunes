@@ -80,7 +80,7 @@ class MoodyLogoutView(LogoutView):
         elif self.request.host.name == 'admin':
             self.next_page = '/'
 
-        return super(MoodyLogoutView, self).get_next_page()
+        return super().get_next_page()
 
 
 class MoodyPasswordResetView(PasswordResetView):

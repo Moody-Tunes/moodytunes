@@ -41,7 +41,7 @@ class BrowsePlaylistsView(FormView):
     form_class = BrowseForm
 
     def get_context_data(self, **kwargs):
-        context = super(BrowsePlaylistsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         # Check if user has a cached browse playlist to retrieve
         cached_playlist_manager = CachedPlaylistManager(self.request.user)
@@ -107,7 +107,7 @@ class SpotifyAuthenticationView(TemplateView):
     template_name = 'spotify_auth.html'
 
     def get_context_data(self, **kwargs):
-        context = super(SpotifyAuthenticationView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         state = get_random_string(length=48)
 
         client = SpotifyClient()
