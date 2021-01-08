@@ -154,14 +154,14 @@ class TestMoodyUser(TestCase):
         self.assertEqual(self.user.email, '')
 
     def test_get_user_emotion_with_valid_emotion_returns_user_emotion_object(self):
-        user_emot = self.user.get_user_emotion_record(Emotion.HAPPY)
+        user_emotion = self.user.get_user_emotion_record(Emotion.HAPPY)
 
-        self.assertIsInstance(user_emot, UserEmotion)
+        self.assertIsInstance(user_emotion, UserEmotion)
 
     def test_get_user_emotion_with_invalid_emotion_returns_none(self):
-        user_emot = self.user.get_user_emotion_record('bad-emotion')
+        user_emotion = self.user.get_user_emotion_record('bad-emotion')
 
-        self.assertIsNone(user_emot)
+        self.assertIsNone(user_emotion)
 
 
 class TestSpotifyUserAuth(TestCase):
@@ -305,7 +305,7 @@ class TestUserSongVote(TestCase):
         cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
 
     def test_deleting_vote_updates_attributes_to_average_of_upvotes(self):
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         test_song = MoodyUtil.create_song(valence=.75, energy=.85)
         test_song_2 = MoodyUtil.create_song(valence=.45, energy=.95)
         test_song_3 = MoodyUtil.create_song(valence=.50, energy=.85)
@@ -324,14 +324,14 @@ class TestUserSongVote(TestCase):
         expected_energy = expected_attributes['song__energy__avg']
         expected_danceability = expected_attributes['song__danceability__avg']
 
-        user_emot.refresh_from_db()
+        user_emotion.refresh_from_db()
 
-        self.assertEqual(user_emot.energy, expected_energy)
-        self.assertEqual(user_emot.valence, expected_valence)
-        self.assertEqual(user_emot.danceability, expected_danceability)
+        self.assertEqual(user_emotion.energy, expected_energy)
+        self.assertEqual(user_emotion.valence, expected_valence)
+        self.assertEqual(user_emotion.danceability, expected_danceability)
 
     def test_deleting_all_votes_updates_attributes_to_defaults(self):
-        user_emot = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
+        user_emotion = self.user.useremotion_set.get(emotion__name=Emotion.HAPPY)
         test_song = MoodyUtil.create_song(valence=.75, energy=.85)
         test_song_2 = MoodyUtil.create_song(valence=.45, energy=.95)
 
@@ -343,12 +343,14 @@ class TestUserSongVote(TestCase):
         # Deleting all upvotes should reset attributes to emotion defaults
         expected_new_energy = self.emotion.energy
         expected_new_valence = self.emotion.valence
+        expected_new_danceability = self.emotion.danceability
 
         vote1.delete()
         vote2.delete()
         vote3.delete()
 
-        user_emot.refresh_from_db()
+        user_emotion.refresh_from_db()
 
-        self.assertEqual(user_emot.energy, expected_new_energy)
-        self.assertEqual(user_emot.valence, expected_new_valence)
+        self.assertEqual(user_emotion.energy, expected_new_energy)
+        self.assertEqual(user_emotion.valence, expected_new_valence)
+        self.assertEqual(user_emotion.danceability, expected_new_danceability)
