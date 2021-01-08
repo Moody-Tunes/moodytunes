@@ -108,7 +108,7 @@ class SpotifyAuthenticationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        state = get_random_string(length=48)
+        state = get_random_string(length=settings.SPOTIFY['session_state_length'])
 
         client = SpotifyClient()
         context['spotify_auth_url'] = client.build_spotify_oauth_confirm_link(
