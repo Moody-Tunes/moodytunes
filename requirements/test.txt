@@ -6,33 +6,136 @@
 #    pip-compile-multi
 #
 -r common.txt
-attrs==20.3.0             # via pytest
-coreapi==2.3.3            # via django-rest-swagger, openapi-codec
-coreschema==0.0.4         # via coreapi
-coverage==5.3             # via pytest-cov
-django-rest-swagger==2.2.0  # via -r requirements/test.ini
-flake8==3.8.3             # via -r requirements/test.ini
-iniconfig==1.1.1          # via pytest
-itypes==1.2.0             # via coreapi
-jinja2==2.11.2            # via coreschema
-markupsafe==1.1.1         # via jinja2
-mccabe==0.6.1             # via flake8
-more-itertools==8.6.0     # via pytest
-openapi-codec==1.3.2      # via django-rest-swagger
-packaging==20.7           # via pytest
-pluggy==0.13.1            # via pytest
-py==1.9.0                 # via pytest
-pycodestyle==2.6.0        # via flake8
-pyflakes==2.2.0           # via flake8
-pyparsing==2.4.7          # via packaging
-pytest-blockage==0.2.2    # via -r requirements/test.ini
-pytest-cov==2.10.1        # via -r requirements/test.ini
-pytest-django==3.10.0     # via -r requirements/test.ini
-pytest-random-order==1.0.4  # via -r requirements/test.ini
-pytest==6.0.2             # via -r requirements/test.ini, pytest-blockage, pytest-cov, pytest-django, pytest-random-order
-simplejson==3.17.2        # via django-rest-swagger
-toml==0.10.2              # via pytest
-uritemplate==3.0.1        # via coreapi
+attrs==20.3.0
+# via pytest
+# via celery
+# via
+#   -r requirements/common.ini
+#   django-celery-beat
+#   django-celery-results
+# via requests
+# via cryptography
+# via requests
+coreapi==2.3.3
+# via
+#   django-rest-swagger
+#   openapi-codec
+coreschema==0.0.4
+# via coreapi
+coverage==5.3.1
+# via pytest-cov
+# via
+#   django-encrypted-model-fields
+#   django-fernet-fields
+# via django-compressor
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+# via -r requirements/common.ini
+django-rest-swagger==2.2.0
+# via -r requirements/test.ini
+# via django-celery-beat
+# via -r requirements/common.ini
+# via
+#   -r requirements/common.ini
+#   django-appconf
+#   django-celery-beat
+#   django-encrypted-model-fields
+#   django-fernet-fields
+#   django-redis
+#   django-timezone-field
+#   djangorestframework
+# via
+#   -r requirements/common.ini
+#   django-rest-swagger
+# via -r requirements/common.ini
+flake8==3.8.3
+# via -r requirements/test.ini
+# via celery
+# via -r requirements/common.ini
+# via requests
+iniconfig==1.1.1
+# via pytest
+itypes==1.2.0
+# via coreapi
+jinja2==2.11.2
+# via coreschema
+# via celery
+markupsafe==1.1.1
+# via jinja2
+mccabe==0.6.1
+# via flake8
+more-itertools==8.6.0
+# via pytest
+openapi-codec==1.3.2
+# via django-rest-swagger
+packaging==20.8
+# via pytest
+# via -r requirements/common.ini
+pluggy==0.13.1
+# via pytest
+# via -r requirements/common.ini
+py==1.10.0
+# via pytest
+pycodestyle==2.6.0
+# via flake8
+# via cffi
+pyflakes==2.2.0
+# via flake8
+pyparsing==2.4.7
+# via packaging
+pytest-blockage==0.2.2
+# via -r requirements/test.ini
+pytest-cov==2.10.1
+# via -r requirements/test.ini
+pytest-django==3.10.0
+# via -r requirements/test.ini
+pytest-random-order==1.0.4
+# via -r requirements/test.ini
+pytest==6.0.2
+# via
+#   -r requirements/test.ini
+#   pytest-blockage
+#   pytest-cov
+#   pytest-django
+#   pytest-random-order
+# via django-celery-beat
+# via python-crontab
+# via -r requirements/common.ini
+# via
+#   celery
+#   django
+#   django-timezone-field
+# via django-compressor
+# via
+#   -r requirements/common.ini
+#   celery
+#   django-redis
+# via
+#   coreapi
+#   spotify-client
+# via django-compressor
+simplejson==3.17.2
+# via django-rest-swagger
+# via
+#   cryptography
+#   django-compressor
+#   django-encrypted-model-fields
+#   python-dateutil
+# via -r requirements/common.ini
+# via django
+toml==0.10.2
+# via pytest
+uritemplate==3.0.1
+# via coreapi
+# via requests
+# via
+#   amqp
+#   celery
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

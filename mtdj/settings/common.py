@@ -56,6 +56,7 @@ OUR_APPS = [
     'accounts',
     'base',
     'moodytunes',
+    'spotify',
     'tunes',
 ]
 
