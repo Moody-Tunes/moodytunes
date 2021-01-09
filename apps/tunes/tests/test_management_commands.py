@@ -14,8 +14,6 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.command = SpotifyCommand()
-        cls.command.stderr = mock.MagicMock()
-        cls.command.stdout = mock.MagicMock()
 
         cls.track_data = {
             'code': 'song-code',
@@ -31,8 +29,7 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
         self.assertEqual(success, 1)
         self.assertEqual(fail, 0)
 
-        song = Song.objects.filter(code=self.track_data['code'])
-        self.assertTrue(song.exists())
+        self.assertTrue(Song.objects.filter(code=self.track_data['code']).exists())
 
     def test_save_songs_to_database_with_unicode_characters(self):
         track_data = {
@@ -48,8 +45,7 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
         self.assertEqual(success, 1)
         self.assertEqual(fail, 0)
 
-        song = Song.objects.filter(code=track_data['code'])
-        self.assertTrue(song.exists())
+        self.assertTrue(Song.objects.filter(code=track_data['code']).exists())
 
     def test_save_songs_to_database_song_already_exists(self):
         Song.objects.create(**self.track_data)
@@ -58,9 +54,10 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
         self.assertEqual(success, 0)
         self.assertEqual(fail, 1)
 
-    def test_save_songs_to_database_same_song_with_different_song_codes(self):
+    def test_save_songs_to_database_same_song_with_different_song_metadata(self):
         dupe_song = copy.deepcopy(self.track_data)
-        dupe_song['code'] = 'some-other-code'
+        dupe_song['artist'] = 'Other Artist'
+        dupe_song['name'] = 'Other Name'
 
         success, fail = self.command.save_songs_to_database([self.track_data, dupe_song])
         songs_for_data = Song.objects.filter(name=self.track_data['name'], artist=self.track_data['artist'])
@@ -73,8 +70,8 @@ class TestCreateSongsFromSpotifyCommand(TestCase):
         # Missing certain fields
         bad_track_data = {
             'code': 'bad-code',
-            'name': b'Kiara',
-            'artist': b'Bonobo',
+            'name': 'Kiara',
+            'artist': 'Bonobo',
         }
 
         success, fail = self.command.save_songs_to_database([bad_track_data])
