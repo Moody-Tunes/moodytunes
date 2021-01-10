@@ -2,6 +2,9 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from spotify_client.exceptions import ClientException, SpotifyException
+
+from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from spotify.exceptions import InsufficientSpotifyScopesError
 from spotify.models import SpotifyAuth
 from spotify.tasks import (
@@ -10,9 +13,6 @@ from spotify.tasks import (
     RefreshTopArtistsFromSpotifyTask,
     UpdateTopArtistsFromSpotifyTask,
 )
-from spotify_client.exceptions import ClientException, SpotifyException
-
-from libs.tests.helpers import MoodyUtil, generate_random_unicode_string
 from tunes.models import Song
 
 

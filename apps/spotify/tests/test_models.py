@@ -3,10 +3,10 @@ from unittest import mock
 
 from django.test import TestCase
 from django.utils import timezone
-from spotify.models import SpotifyAuth
 from spotify_client.exceptions import SpotifyException
 
 from libs.tests.helpers import MoodyUtil
+from spotify.models import SpotifyAuth
 
 
 class TestSpotifyAuth(TestCase):

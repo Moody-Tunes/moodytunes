@@ -6,10 +6,10 @@ from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from spotify.models import SpotifyAuth, SpotifyUserData
 from spotify_client.exceptions import SpotifyException
 
 from libs.tests.helpers import MoodyUtil, get_messages_from_response
+from spotify.models import SpotifyAuth, SpotifyUserData
 from tunes.models import Emotion
 
 

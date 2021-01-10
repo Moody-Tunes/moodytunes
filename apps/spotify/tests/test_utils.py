@@ -1,7 +1,7 @@
 from django.test import TestCase
-from spotify.utils import ExportPlaylistHelper
 
 from libs.tests.helpers import MoodyUtil
+from spotify.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 
 

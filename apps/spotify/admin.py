@@ -1,7 +1,7 @@
 from django.contrib import admin
-from spotify.models import SpotifyAuth
 
 from base.admin import MoodyBaseAdmin
+from spotify.models import SpotifyAuth
 
 
 class SpotifyUserAuthAdmin(MoodyBaseAdmin):

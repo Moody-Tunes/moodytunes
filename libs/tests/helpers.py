@@ -4,11 +4,11 @@ import string
 from django.conf import settings
 from django.contrib.messages import get_messages
 from django.db.models.signals import post_save
-from spotify.models import SpotifyAuth
-from spotify.signals import update_spotify_top_artists as create_spotify_top_artists
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
 from accounts.signals import update_spotify_top_artists
+from spotify.models import SpotifyAuth
+from spotify.signals import update_spotify_top_artists as create_spotify_top_artists
 from tunes.models import Emotion, Song
 
 

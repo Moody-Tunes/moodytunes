@@ -1,9 +1,9 @@
 from django.http.response import Http404, HttpResponse
 from django.test import RequestFactory, TestCase
 from rest_framework import status
-from spotify.decorators import spotify_auth_required
 
 from libs.tests.helpers import MoodyUtil
+from spotify.decorators import spotify_auth_required
 
 
 REDIRECT_URI = '/foo/'

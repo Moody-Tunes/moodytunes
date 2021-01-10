@@ -1,9 +1,9 @@
 from unittest import mock
 
 from django.test import TestCase
-from spotify.models import SpotifyAuth
 
 from libs.tests.helpers import MoodyUtil
+from spotify.models import SpotifyAuth
 
 
 class TestUpdateSpotifyTopArtistsSignal(TestCase):
