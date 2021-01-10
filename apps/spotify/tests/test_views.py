@@ -264,6 +264,7 @@ class TestRevokeSpotifyAuthView(TestCase):
         self.assertRedirects(resp, self.redirect_url)
         self.assertEqual(last_message, 'We have deleted your Spotify data from Moodytunes')
 
+
 class TestExportView(TestCase):
     @classmethod
     def setUpTestData(cls):
