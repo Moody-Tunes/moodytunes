@@ -7,6 +7,8 @@ from django.db.models.signals import post_save
 
 from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile, UserSongVote
 from accounts.signals import update_spotify_top_artists
+from spotify.models import SpotifyAuth
+from spotify.signals import update_spotify_top_artists as create_spotify_top_artists
 from tunes.models import Emotion, Song
 
 
@@ -164,3 +166,18 @@ class MoodyUtil(object):
         dispatch_uid = settings.UPDATE_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
         with SignalDisconnect(post_save, update_spotify_top_artists, SpotifyUserAuth, dispatch_uid):
             return SpotifyUserAuth.objects.create(**params)
+
+    @staticmethod
+    def create_spotify_auth(user, **kwargs):
+        params = {
+            'user': user,
+            'spotify_user_id': kwargs.get('spotify_user_id', 'spotify_user'),
+            'access_token': kwargs.get('access_token', 'spotify_access_token'),
+            'refresh_token': kwargs.get('refresh_token', 'spotify_refresh_token'),
+            'scopes': settings.SPOTIFY['auth_user_scopes'],
+        }
+
+        # Disable signal to update top artists from Spotify when creating user auth record
+        dispatch_uid = settings.ADD_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
+        with SignalDisconnect(post_save, create_spotify_top_artists, SpotifyAuth, dispatch_uid):
+            return SpotifyAuth.objects.create(**params)

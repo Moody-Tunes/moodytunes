@@ -17,94 +17,22 @@ from ratelimit.decorators import ratelimit
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
-from accounts.decorators import spotify_auth_required
-from accounts.models import SpotifyUserAuth
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
-from moodytunes.forms import BrowseForm, ExportPlaylistForm, PlaylistForm, SuggestSongForm
-from moodytunes.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
-from moodytunes.utils import ExportPlaylistHelper
+from spotify.decorators import spotify_auth_required
+from spotify.forms import ExportPlaylistForm, SuggestSongForm
+from spotify.models import SpotifyAuth
+from spotify.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from spotify.utils import ExportPlaylistHelper
 from tunes.models import Emotion
-from tunes.utils import CachedPlaylistManager
 
 
 logger = logging.getLogger(__name__)
 
 
-class AboutView(TemplateView):
-    template_name = 'about.html'
-
-
-@method_decorator(login_required, name='dispatch')
-class BrowsePlaylistsView(FormView):
-    template_name = 'browse.html'
-    form_class = BrowseForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Check if user has a cached browse playlist to retrieve
-        cached_playlist_manager = CachedPlaylistManager(self.request.user)
-        cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist()
-        context['cached_playlist_exists'] = cached_playlist is not None
-
-        return context
-
-
-@method_decorator(login_required, name='dispatch')
-class EmotionPlaylistsView(FormView):
-    template_name = 'playlists.html'
-    form_class = PlaylistForm
-
-
-@method_decorator(login_required, name='dispatch')
-class SuggestSongView(FormView):
-    template_name = 'suggest.html'
-    form_class = SuggestSongForm
-
-    @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
-    @update_logging_data
-    def post(self, request, *args, **kwargs):
-        # Reject request if user is ratelimited
-        if request.limited:
-            logger.warning(
-                'User {} has been rate limited from suggesting songs'.format(request.user.username),
-                extra={
-                    'fingerprint': auto_fingerprint('rate_limit_suggest_song', **kwargs),
-                    'user_id': request.user.id
-                }
-            )
-            messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
-            return HttpResponseRedirect(reverse('moodytunes:suggest'))
-
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            code = form.cleaned_data['code']
-            FetchSongFromSpotifyTask().delay(code, username=request.user.username)
-
-            logger.info(
-                'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
-                extra={'fingerprint': auto_fingerprint('added_suggested_song', **kwargs)}
-            )
-            messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
-
-            return HttpResponseRedirect(reverse('moodytunes:suggest'))
-        else:
-            logger.warning(
-                'User {} suggested an invalid song code: {}. Reason: {}'.format(
-                    request.user.username,
-                    request.POST.get('code'),
-                    form.errors['code'][0]
-                ),
-                extra={'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs)}
-            )
-            return render(request, self.template_name, context={'form': form})
-
-
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationView(TemplateView):
-    template_name = 'spotify_auth.html'
+    template_name = 'spotify/spotify_auth.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -147,10 +75,10 @@ class SpotifyAuthenticationCallbackView(View):
             user = request.user
 
             # Early exit: if we already have a SpotifyAuth record for the user, exit
-            if SpotifyUserAuth.objects.filter(user=user).exists():
+            if SpotifyAuth.objects.filter(user=user).exists():
                 messages.info(request, 'You have already authenticated with Spotify!')
 
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-success'))
+                return HttpResponseRedirect(reverse('spotify:spotify-auth-success'))
 
             # Get access and refresh tokens for user
             spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
@@ -164,7 +92,7 @@ class SpotifyAuthenticationCallbackView(View):
                 )
 
                 messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+                return HttpResponseRedirect(reverse('spotify:spotify-auth-failure'))
 
             # Get Spotify username from profile data
             try:
@@ -176,12 +104,12 @@ class SpotifyAuthenticationCallbackView(View):
                 )
 
                 messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+                return HttpResponseRedirect(reverse('spotify:spotify-auth-failure'))
 
             # Create SpotifyAuth record from data
             try:
                 with transaction.atomic():
-                    auth = SpotifyUserAuth.objects.create(
+                    auth = SpotifyAuth.objects.create(
                         user=user,
                         access_token=tokens['access_token'],
                         refresh_token=tokens['refresh_token'],
@@ -190,9 +118,9 @@ class SpotifyAuthenticationCallbackView(View):
                     )
 
                     logger.info(
-                        'Created SpotifyAuthUser record for user {}'.format(user.username),
+                        'Created SpotifyAuth record for user {}'.format(user.username),
                         extra={
-                            'fingerprint': auto_fingerprint('created_spotify_auth_user', **kwargs),
+                            'fingerprint': auto_fingerprint('created_spotify_auth', **kwargs),
                             'auth_id': auth.pk,
                             'user_id': user.pk,
                             'spotify_user_id': profile_data['id'],
@@ -201,12 +129,12 @@ class SpotifyAuthenticationCallbackView(View):
                     )
 
                     messages.info(request, 'You have successfully authorized Moodytunes with Spotify!')
-                    redirect_url = request.session.get('redirect_url') or reverse('moodytunes:spotify-auth-success')
+                    redirect_url = request.session.get('redirect_url') or reverse('spotify:spotify-auth-success')
 
                     return HttpResponseRedirect(redirect_url)
             except IntegrityError:
                 logger.exception(
-                    'Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                    'Failed to create SpotifyAuth record for MoodyUser {} with Spotify username {}'.format(
                         user.username,
                         profile_data['id']
                     ),
@@ -217,7 +145,7 @@ class SpotifyAuthenticationCallbackView(View):
                     profile_data['id']
                 ))
 
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+                return HttpResponseRedirect(reverse('spotify:spotify-auth-failure'))
 
         else:
             logger.warning(
@@ -235,24 +163,24 @@ class SpotifyAuthenticationCallbackView(View):
 
             messages.error(request, error_messages.get(request.GET['error'], request.GET['error']))
 
-            return HttpResponseRedirect(reverse('moodytunes:spotify-auth-failure'))
+            return HttpResponseRedirect(reverse('spotify:spotify-auth-failure'))
 
 
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationSuccessView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('moodytunes:export')
+        return reverse('spotify:export')
 
 
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
-    template_name = 'spotify_auth_failure.html'
+    template_name = 'spotify/spotify_auth_failure.html'
 
 
 @method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')), name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class RevokeSpotifyAuthView(TemplateView):
-    template_name = 'revoke_spotify_auth.html'
+    template_name = 'spotify/revoke_spotify_auth.html'
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
@@ -261,7 +189,7 @@ class RevokeSpotifyAuthView(TemplateView):
         auth.delete()
 
         logger.info(
-            'Deleted SpotifyUserAuth for user {}'.format(request.user.username),
+            'Deleted SpotifyAuth for user {}'.format(request.user.username),
             extra={
                 'fingerprint': auto_fingerprint('revoked_spotify_auth', **kwargs),
                 'auth_id': auth_id
@@ -272,11 +200,11 @@ class RevokeSpotifyAuthView(TemplateView):
         return HttpResponseRedirect(reverse('accounts:profile'))
 
 
-@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth')), name='get')
-@method_decorator(spotify_auth_required(reverse_lazy('moodytunes:spotify-auth'), raise_exc=True), name='post')
+@method_decorator(spotify_auth_required(reverse_lazy('spotify:spotify-auth')), name='get')
+@method_decorator(spotify_auth_required(reverse_lazy('spotify:spotify-auth'), raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
-    template_name = 'export.html'
+    template_name = 'spotify/export.html'
     form_class = ExportPlaylistForm
 
     @update_logging_data
@@ -299,11 +227,11 @@ class ExportPlayListView(FormView):
                     }
                 )
 
-                auth.delete()  # Delete SpotifyUserAuth record to ensure that it can be created with proper scopes
+                auth.delete()  # Delete SpotifyAuth record to ensure that it can be created with proper scopes
 
                 messages.info(request, 'Please reauthenticate with Spotify to export your playlist')
 
-                return HttpResponseRedirect(reverse('moodytunes:spotify-auth'))
+                return HttpResponseRedirect(reverse('spotify:spotify-auth'))
 
         return super().get(request, *args, **kwargs)
 
@@ -328,7 +256,7 @@ class ExportPlayListView(FormView):
 
                 messages.error(request, msg)
 
-                return HttpResponseRedirect(reverse('moodytunes:export'))
+                return HttpResponseRedirect(reverse('spotify:export'))
 
             # Handle cover image upload
             cover_image_filename = None
@@ -363,8 +291,53 @@ class ExportPlayListView(FormView):
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
-            return HttpResponseRedirect(reverse('moodytunes:export'))
+            return HttpResponseRedirect(reverse('spotify:export'))
 
         else:
             messages.error(request, 'Please submit a valid request')
             return render(request, self.template_name, {'form': form})
+
+
+@method_decorator(login_required, name='dispatch')
+class SuggestSongView(FormView):
+    template_name = 'spotify/suggest.html'
+    form_class = SuggestSongForm
+
+    @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
+    @update_logging_data
+    def post(self, request, *args, **kwargs):
+        # Reject request if user is ratelimited
+        if request.limited:
+            logger.warning(
+                'User {} has been rate limited from suggesting songs'.format(request.user.username),
+                extra={
+                    'fingerprint': auto_fingerprint('rate_limit_suggest_song', **kwargs),
+                    'user_id': request.user.id
+                }
+            )
+            messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
+            return HttpResponseRedirect(reverse('spotify:suggest'))
+
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            code = form.cleaned_data['code']
+            FetchSongFromSpotifyTask().delay(code, username=request.user.username)
+
+            logger.info(
+                'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
+                extra={'fingerprint': auto_fingerprint('added_suggested_song', **kwargs)}
+            )
+            messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
+
+            return HttpResponseRedirect(reverse('spotify:suggest'))
+        else:
+            logger.warning(
+                'User {} suggested an invalid song code: {}. Reason: {}'.format(
+                    request.user.username,
+                    request.POST.get('code'),
+                    form.errors['code'][0]
+                ),
+                extra={'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs)}
+            )
+            return render(request, self.template_name, context={'form': form})
