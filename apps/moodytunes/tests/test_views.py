@@ -99,7 +99,7 @@ class TestSpotifyAuthenticationView(TestCase):
 
         expected_auth_url = 'https://accounts.spotify.com/authorize?client_id={client_id}\
         &response_type=code&scope=playlist-modify-public+user-top-read+ugc-image-upload\
-        &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fmoodytunes%2Fspotify%2Fcallback%2F&state={state}\
+        &redirect_uri=https%3A%2F%2Fmoodytunes.vm%2Fspotify%2Fcallback%2F&state={state}\
         '.format(
             client_id=settings.SPOTIFY['client_id'],
             state=random_string

@@ -11,10 +11,11 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from accounts.models import SpotifyUserData, UserSongVote
+from accounts.models import UserSongVote
 from base.mixins import DeleteRequestValidatorMixin, GetRequestValidatorMixin, PostRequestValidatorMixin
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
+from spotify.models import SpotifyUserData
 from tunes.models import Emotion, Song
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
@@ -104,7 +105,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
         # Try to fetch top artists for user from Spotify
         top_artists = None
         try:
-            spotify_data = SpotifyUserData.objects.get(spotifyuserauth__user=self.request.user)
+            spotify_data = SpotifyUserData.objects.get(spotify_auth__user=self.request.user)
             top_artists = spotify_data.top_artists
         except SpotifyUserData.DoesNotExist:
             pass

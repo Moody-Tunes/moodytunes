@@ -73,8 +73,8 @@ class TestLoginView(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     @override_switch('show_spotify_auth_prompt', active=True)
-    def test_context_sets_show_spotify_auth_to_false_for_existing_auth_record(self):
-        MoodyUtil.create_spotify_user_auth(self.user)
+    def test_context_sets_show_spotify_auth_to_false_for_existing_spotify_auth_record(self):
+        MoodyUtil.create_spotify_auth(self.user)
 
         data = {
             'username': self.user.username,

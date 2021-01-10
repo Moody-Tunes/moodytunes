@@ -9,6 +9,7 @@ from rest_framework.test import APITestCase
 from accounts.models import UserSongVote
 from libs.tests.helpers import MoodyUtil
 from libs.utils import average
+from spotify.models import SpotifyUserData
 from tunes.models import Emotion, Song
 from tunes.views import BrowseView
 
@@ -146,10 +147,8 @@ class TestBrowseView(APITestCase):
     @mock.patch('tunes.views.generate_browse_playlist')
     def test_browse_request_uses_user_top_artists_when_provided(self, mock_generate_playlist):
         top_artists = ['Madlib', 'MF DOOM', 'Surf Curse']
-        auth = MoodyUtil.create_spotify_user_auth(self.user)
-        spotify_user_data = auth.spotify_data
-        spotify_user_data.top_artists = top_artists
-        spotify_user_data.save()
+        auth = MoodyUtil.create_spotify_auth(self.user)
+        SpotifyUserData.objects.create(spotify_auth=auth, top_artists=top_artists)
 
         params = {'emotion': Emotion.HAPPY}
         self.client.get(self.url, data=params)
