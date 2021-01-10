@@ -116,7 +116,7 @@ class TestSpotifyAuth(TestCase):
 
     def test_has_scopes_returns_true_for_scope_assigned_to_record(self):
         scope = 'playlist-modify-public'
-        user_auth = MoodyUtil.create_spotify_user_auth(self.user)
+        user_auth = MoodyUtil.create_spotify_auth(self.user)
         user_auth.scopes = [scope]
         user_auth.save()
 

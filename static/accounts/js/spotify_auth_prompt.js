@@ -13,7 +13,7 @@
         window.location.href = window.location.origin + '/spotify/authorize/?redirect_url=' + window.location.origin
     }
 
-    function declineSpotifyUserAuth() {
+    function declineSpotifyAuth() {
         let data = {
             has_rejected_spotify_auth: true
         };
@@ -30,7 +30,7 @@
     let urlParams = new URLSearchParams(window.location.search);
 
     closeAddSpotifyAuthModal.addEventListener('click', hideModal);
-    cancelAddSpotifyAuth.addEventListener('click', declineSpotifyUserAuth);
+    cancelAddSpotifyAuth.addEventListener('click', declineSpotifyAuth);
     confirmAddSpotifyAuth.addEventListener('click', redirectToSpotifyAuthPage);
 
     if (urlParams.get('show_spotify_auth') === 'True') {
