@@ -256,7 +256,7 @@ class ExportPlayListView(FormView):
 
                 messages.error(request, msg)
 
-                return HttpResponseRedirect(reverse('moodytunes:export'))
+                return HttpResponseRedirect(reverse('spotify:export'))
 
             # Handle cover image upload
             cover_image_filename = None
@@ -291,7 +291,7 @@ class ExportPlayListView(FormView):
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
-            return HttpResponseRedirect(reverse('moodytunes:export'))
+            return HttpResponseRedirect(reverse('spotify:export'))
 
         else:
             messages.error(request, 'Please submit a valid request')

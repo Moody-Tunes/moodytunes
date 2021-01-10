@@ -452,7 +452,7 @@ class TestSuggestSongView(TestCase):
 
         mock_task.assert_not_called()
 
-    @mock.patch('moodytunes.tasks.FetchSongFromSpotifyTask.delay')
+    @mock.patch('spotify.tasks.FetchSongFromSpotifyTask.delay')
     def test_task_not_called_for_invalid_code(self, mock_task):
         data = {'code': 'foo'}
         self.client.post(self.url, data)
