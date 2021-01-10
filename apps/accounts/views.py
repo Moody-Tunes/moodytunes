@@ -182,7 +182,7 @@ class CreateUserView(FormView):
 
             messages.info(request, 'Your account has been created.')
 
-            return HttpResponseRedirect(reverse('accounts:login'))
+            return HttpResponseRedirect(settings.LOGIN_URL)
         else:
             logger.warning(
                 'Failed to create new user because of invalid data',

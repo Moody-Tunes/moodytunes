@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load compress %}
+{% load moody_tags %}
 {% load static %}
 
 {% block superhead %}
@@ -14,8 +15,8 @@
     <div id="landing-header" class="landing-section">
         <h3>Welcome to MoodyTunes, the site to find music for your mood!</h3>
         <div id="landing-action-buttons">
-            <a href="{{ login_link }}"><button class="login-button">Login</button></a>
-            <a href="{{ create_account_link }}"><button class="login-button call-to-action-button">Create Account</button></a>
+            <a href="{% settings 'LOGIN_URL' %}"><button>Login</button></a>
+            <a href="{% url 'accounts:create' %}"><button class="call-to-action-button">Create Account</button></a>
         </div>
     </div>
     <div id="landing-about" class="landing-section">
