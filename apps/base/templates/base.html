@@ -37,8 +37,8 @@
                     <a class="navbar-child navbar-user" href="{% url 'accounts:logout' %}">Logout</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:playlists' %}">Playlists</a>
                     <a class="navbar-child navbar-user" href="{% url 'moodytunes:browse' %}">Browse</a>
-                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:suggest' %}">Suggest Song</a>
-                    <a class="navbar-child navbar-user" href="{% url 'moodytunes:export' %}">Export Playlist</a>
+                    <a class="navbar-child navbar-user" href="{% url 'spotify:suggest' %}">Suggest Song</a>
+                    <a class="navbar-child navbar-user" href="{% url 'spotify:export' %}">Export Playlist</a>
                 {% endif %}
             </div>
 			{% if messages %}

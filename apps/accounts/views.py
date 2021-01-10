@@ -21,11 +21,12 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
-from accounts.models import MoodyUser, SpotifyUserAuth, UserProfile
+from accounts.models import MoodyUser, UserProfile
 from accounts.serializers import UserProfileRequestSerializer, UserProfileSerializer
 from base.mixins import PatchRequestValidatorMixin
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
+from spotify.models import SpotifyAuth
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class MoodyLoginView(LoginView):
 
                 if self.request.user.is_authenticated:
                     if not self.request.user.userprofile.has_rejected_spotify_auth:
-                        show_spotify_auth = not SpotifyUserAuth.objects.filter(user=self.request.user).exists()
+                        show_spotify_auth = not SpotifyAuth.objects.filter(user=self.request.user).exists()
 
                         if not show_spotify_auth:
                             # This means the user has already authenticated with Spotify, but because their
