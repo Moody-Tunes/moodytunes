@@ -25,10 +25,9 @@ class Command(MoodyBaseCommand):
         success, fail = 0, 0
         for track in tracks:
             # Check if song with name and artist already exists in our system
-            # For some reason, Spotify codes are not unique across songs and there is a potential
-            # for the same to be present multiple times with different song codes
-            existing_songs = Song.objects.filter(name=track['name'], artist=track['artist'])
-            if existing_songs.exists():
+            # There is the potential for a song by an artist to be present in
+            # Spotify's system multiple times, each with a different Spotify code.
+            if Song.objects.filter(name=track['name'], artist=track['artist']).exists():
                 self.stdout.write('Song {} by {} already exists in our database'.format(
                     track['name'],
                     track['artist']

@@ -7,6 +7,7 @@ from base.views import HomePageView, LandingPageView
 urlpatterns = [
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('moodytunes/', include(('moodytunes.urls', 'moodytunes'), namespace='moodytunes')),
+    path('spotify/', include(('spotify.urls', 'spotify'), namespace='spotify')),
     path('tunes/', include(('tunes.urls', 'tunes'), namespace='tunes')),
     path('landing/', LandingPageView.as_view(), name='landing-page'),
     path('', HomePageView.as_view(), name='homepage')

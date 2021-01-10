@@ -1,4 +1,3 @@
-# API Keys/Credentials get stored here
 from envparse import env
 from spotify_client.config import Config
 
@@ -19,7 +18,8 @@ SPOTIFY = {
     'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/moodytunes/spotify/callback/'),
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
     'auth_user_scopes': [SPOTIFY_PLAYLIST_MODIFY_SCOPE, SPOTIFY_TOP_ARTIST_READ_SCOPE, SPOTIFY_UPLOAD_PLAYLIST_IMAGE],
-    'max_top_artists': 50,  # Number of top artists to retrieve for user
+    'max_top_artists': env.int('MTDJ_SPOTIFY_MAX_TOP_ARTISTS', default=50),
+    'session_state_length': env.int('MTDJ_SPOTIFY_AUTH_STATE_LENGTH', default=48),
 }
 
 # Configure SpotifyClient with authentication credentials

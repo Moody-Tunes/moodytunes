@@ -29,13 +29,12 @@ def build_documentation_for_request_serializer(serializer_class, location):
 
     for name, field in serializer_fields:
         fields.append(coreapi.Field(
-                name,
-                required=field.required,
-                location=location,
-                type=field_class_to_type_map.get(type(field), 'string'),
-                description=field.help_text
-            )
-        )
+            name,
+            required=field.required,
+            location=location,
+            type=field_class_to_type_map.get(type(field), 'string'),
+            description=field.help_text
+        ))
 
     return AutoSchema(manual_fields=fields)
 

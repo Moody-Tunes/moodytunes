@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load compress %}
+{% load static %}
+
+{% block title %}Suggest A Song{% endblock %}
+
+{% block superhead %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/less" href="{% static 'spotify/less/suggest.less' %}">
+    {% endcompress %}
+
+    {% compress js %}
+        <script src="{% static 'spotify/js/suggest.js' %}" defer></script>
+    {% endcompress %}
+{% endblock %}
+
+{% block content %}
+    <h1>Suggest A Song</h1>
+    <p>Want to see a song on our site? Suggest a new song by submitting a Spotify song code in the following field</p>
+    <form name="suggest-song-form" method="post">
+        {% csrf_token %}
+        <p>{{ form.code.errors }}</p>
+        <p>{{ form.code }}</p>
+        <button type="submit" class="call-to-action-button">Suggest Song</button>
+    </form>
+    <button id="show-help">How do I find the song code?</button>
+    <div id="help-container" hidden>
+        <p>You can find the song code by going to the Spotify desktop application, clicking the dots next to the song name,
+        and clicking the Copy Spotify URI from the Share tab. Paste that code into the field and hit the button
+        to suggest your song!</p>
+        <img alt="Copy Spotify URI code from share section" src="{% static 'spotify/imgs/spotify_song_uri.png' %}"/>
+    </div>
+{% endblock %}

@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 from base.templatetags.moody_tags import settings
 
 
-class TestSettingsTempateTag(TestCase):
+class TestSettingsTemplateTag(TestCase):
     @override_settings(TEST_SETTING='test-setting')
     def test_tag_returns_variable_if_found(self):
         ret = settings('TEST_SETTING')
