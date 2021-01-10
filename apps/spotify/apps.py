@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class SpotifyAuthConfig(AppConfig):
+class SpotifyConfig(AppConfig):
     name = 'spotify'
 
     def ready(self):

@@ -1,1 +1,1 @@
-default_app_config = 'spotify.apps.SpotifyAuthConfig'
+default_app_config = 'spotify.apps.SpotifyConfig'
