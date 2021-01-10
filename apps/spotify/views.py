@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationView(TemplateView):
-    template_name = 'spotify/spotify_auth.html'
+    template_name = 'spotify_auth.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -174,13 +174,13 @@ class SpotifyAuthenticationSuccessView(RedirectView):
 
 @method_decorator(login_required, name='dispatch')
 class SpotifyAuthenticationFailureView(TemplateView):
-    template_name = 'spotify/spotify_auth_failure.html'
+    template_name = 'spotify_auth_failure.html'
 
 
 @method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')), name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class RevokeSpotifyAuthView(TemplateView):
-    template_name = 'spotify/revoke_spotify_auth.html'
+    template_name = 'revoke_spotify_auth.html'
 
     @update_logging_data
     def post(self, request, *args, **kwargs):
@@ -204,7 +204,7 @@ class RevokeSpotifyAuthView(TemplateView):
 @method_decorator(spotify_auth_required(reverse_lazy('spotify:spotify-auth'), raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
-    template_name = 'spotify/export.html'
+    template_name = 'export.html'
     form_class = ExportPlaylistForm
 
     @update_logging_data
@@ -300,7 +300,7 @@ class ExportPlayListView(FormView):
 
 @method_decorator(login_required, name='dispatch')
 class SuggestSongView(FormView):
-    template_name = 'spotify/suggest.html'
+    template_name = 'suggest.html'
     form_class = SuggestSongForm
 
     @method_decorator(ratelimit(key='user', rate='3/m', method='POST'))
