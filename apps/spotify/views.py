@@ -14,16 +14,16 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import RedirectView, TemplateView
 from ratelimit.decorators import ratelimit
-from spotify.decorators import spotify_auth_required
-from spotify.forms import ExportPlaylistForm, SuggestSongForm
-from spotify.models import SpotifyAuth
-from spotify.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
-from spotify.utils import ExportPlaylistHelper
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import SpotifyException
 
 from base.views import FormView
 from libs.moody_logging import auto_fingerprint, update_logging_data
+from spotify.decorators import spotify_auth_required
+from spotify.forms import ExportPlaylistForm, SuggestSongForm
+from spotify.models import SpotifyAuth
+from spotify.tasks import ExportSpotifyPlaylistFromSongsTask, FetchSongFromSpotifyTask
+from spotify.utils import ExportPlaylistHelper
 from tunes.models import Emotion
 
 
@@ -134,7 +134,7 @@ class SpotifyAuthenticationCallbackView(View):
                     return HttpResponseRedirect(redirect_url)
             except IntegrityError:
                 logger.exception(
-                    'Failed to create auth record for MoodyUser {} with Spotify username {}'.format(
+                    'Failed to create SpotifyAuth record for MoodyUser {} with Spotify username {}'.format(
                         user.username,
                         profile_data['id']
                     ),

@@ -4,13 +4,13 @@ import os
 from celery.schedules import crontab
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from spotify.exceptions import InsufficientSpotifyScopesError
-from spotify.models import SpotifyAuth, SpotifyUserData
 from spotify_client import SpotifyClient
 from spotify_client.exceptions import ClientException, SpotifyException
 
 from base.tasks import MoodyBaseTask, MoodyPeriodicTask
 from libs.moody_logging import auto_fingerprint, update_logging_data
+from spotify.exceptions import InsufficientSpotifyScopesError
+from spotify.models import SpotifyAuth, SpotifyUserData
 from tunes.models import Song
 
 

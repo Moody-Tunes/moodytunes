@@ -44,19 +44,19 @@ class SpotifyAuth(BaseModel):
     @update_logging_data
     def get_and_refresh_spotify_auth_record(cls, auth_id, **kwargs):
         """
-        Fetch the SpotifyUserAuth record for the given primary key, and refresh if
+        Fetch the SpotifyAuth record for the given primary key, and refresh if
         the access token is expired
 
-        :param auth_id: (int) Primary key for SpotifyUserAuth record
+        :param auth_id: (int) Primary key for SpotifyAuth record
 
-        :return: (SpotifyUserAuth)
+        :return: (SpotifyAuth)
         """
         try:
             auth = cls.objects.get(pk=auth_id)
         except (SpotifyAuth.MultipleObjectsReturned, SpotifyAuth.DoesNotExist):
             logger.error(
-                'Failed to fetch SpotifyUserAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_user_auth', **kwargs)},
+                'Failed to fetch SpotifyAuth with pk={}'.format(auth_id),
+                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_auth', **kwargs)},
             )
 
             raise
@@ -79,7 +79,7 @@ class SpotifyAuth(BaseModel):
 
     @update_logging_data
     def refresh_access_token(self, **kwargs):
-        """Make a call to the Spotify API to refresh the access token for the SpotifyUserAuth record"""
+        """Make a call to the Spotify API to refresh the access token for the SpotifyAuth record"""
         spotify_client = SpotifyClient(identifier='refresh-access-token:{}'.format(self.spotify_user_id))
 
         try:
