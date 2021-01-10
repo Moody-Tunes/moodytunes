@@ -285,7 +285,7 @@ class TestExportView(TestCase):
         self.assertRedirects(resp, reverse('spotify:spotify-auth'))
 
     def test_get_auth_without_proper_scope_is_redirected_to_auth_page(self):
-        # Clear Spotify OAuth scopes for SpotifyUserAuth record
+        # Clear Spotify OAuth scopes for SpotifyAuth record
         self.spotify_auth.scopes = []
         self.spotify_auth.save()
 

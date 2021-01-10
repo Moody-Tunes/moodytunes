@@ -81,7 +81,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         """
         Get the Spotify playlist by name for the user, creating it if it does not exist
 
-        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param auth_code: (str) SpotifyAuth access_token for the given user
         :param spotify_user_id: (str) Spotify username for the given user
         :param playlist_name: (str) Name of the playlist to be created
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
@@ -106,7 +106,6 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                 extra={
                     'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
                     'spotify_user_id': spotify_user_id,
-                    'playlist_name': playlist_name,
                 }
             )
 
@@ -125,7 +124,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         playlist that only contains the songs to be added from the MoodyTunes
         playlist to be exported
 
-        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param auth_code: (str) SpotifyAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
         """
@@ -144,7 +143,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         """
         Call Spotify API to add songs to a playlist
 
-        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param auth_code: (str) SpotifyAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param songs: (list) Collection of Spotify track URIs to add to playlist
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
@@ -162,7 +161,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         Upload custom cover image for playlist. If any errors were encountered it will just fail
         silently.
 
-        :param auth_code: (str) SpotifyUserAuth access_token for the given user
+        :param auth_code: (str) SpotifyAuth access_token for the given user
         :param playlist_id: (str) Spotify ID of the playlist to be created
         :param cover_image_filename: (str) Filename of cover image as a file on disk
         :param spotify: (spotify_client.SpotifyClient) Spotify Client instance
