@@ -15,7 +15,7 @@ SPOTIFY = {
     'max_songs_from_list': env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_LIST', default=10),
     'max_songs_from_category': env.int('MTDJ_SPOTIFY_MAX_SONGS_FROM_CATEGORY', default=25),
     'max_playlist_from_category': env.int('MTDJ_SPOTIFY_MAX_PLAYLISTS_FROM_CATEGORY', default=10),
-    'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/moodytunes/spotify/callback/'),
+    'auth_redirect_uri': env.str('MTDJ_SPOTIFY_REDIRECT_URI', default='https://moodytunes.vm/spotify/callback/'),
     'auth_user_token_timeout': 60 * 60,  # User auth token is good for one hour
     'auth_user_scopes': [SPOTIFY_PLAYLIST_MODIFY_SCOPE, SPOTIFY_TOP_ARTIST_READ_SCOPE, SPOTIFY_UPLOAD_PLAYLIST_IMAGE],
     'max_top_artists': env.int('MTDJ_SPOTIFY_MAX_TOP_ARTISTS', default=50),

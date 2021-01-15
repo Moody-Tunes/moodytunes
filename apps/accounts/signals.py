@@ -1,14 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.signals import user_login_failed
 from django.db.models.signals import post_save
-from django.db.transaction import on_commit
 
-from accounts.models import SpotifyUserAuth, UserSongVote
-from accounts.tasks import (
-    CreateUserEmotionRecordsForUserTask,
-    UpdateTopArtistsFromSpotifyTask,
-    UpdateUserEmotionRecordAttributeTask,
-)
+from accounts.models import UserSongVote
+from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
 from accounts.utils import log_failed_login_attempt
 
 
@@ -36,18 +31,6 @@ post_save.connect(
     update_user_emotion_attributes,
     sender=UserSongVote,
     dispatch_uid=settings.UPDATE_USER_EMOTION_ATTRIBUTES_SIGNAL_UID
-)
-
-
-def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
-    if created:
-        on_commit(lambda: UpdateTopArtistsFromSpotifyTask().delay(instance.pk))
-
-
-post_save.connect(
-    update_spotify_top_artists,
-    sender=SpotifyUserAuth,
-    dispatch_uid=settings.UPDATE_SPOTIFY_DATA_TOP_ARTISTS_SIGNAL_UID
 )
 
 

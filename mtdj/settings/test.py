@@ -37,7 +37,6 @@ COMPRESS_PRECOMPILERS = ()
 SPOTIFY.update({
     'client_id': 'test-spotify-client-id',
     'secret_key': 'test-spotify-secret_key',
-    'auth_redirect_uri': 'https://moodytunes.vm/moodytunes/spotify/callback/'
 })
 
 # Configure SpotifyClient with authentication credentials
