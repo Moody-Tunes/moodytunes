@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import encrypted_model_fields.fields
 
 
 class Migration(migrations.Migration):
@@ -20,8 +19,8 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('spotify_user_id', models.CharField(max_length=50, unique=True)),
-                ('access_token', encrypted_model_fields.fields.EncryptedCharField(max_length=100)),
-                ('refresh_token', encrypted_model_fields.fields.EncryptedCharField(max_length=100)),
+                ('access_token', models.CharField(max_length=100)),
+                ('refresh_token', models.CharField(max_length=100)),
                 ('last_refreshed', models.DateTimeField(auto_now_add=True)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],
