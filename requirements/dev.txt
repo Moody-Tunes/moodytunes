@@ -30,9 +30,7 @@ coreschema==0.0.4
 # via coreapi
 coverage==5.3.1
 # via pytest-cov
-# via
-#   django-encrypted-model-fields
-#   django-fernet-fields
+# via django-fernet-fields
 decorator==4.4.2
 # via ipython
 distlib==0.3.1
@@ -43,7 +41,6 @@ distlib==0.3.1
 # via -r requirements/common.ini
 django-debug-toolbar==2.2
 # via -r requirements/dev.ini
-# via -r requirements/common.ini
 django-extensions==3.0.9
 # via -r requirements/dev.ini
 # via -r requirements/common.ini
@@ -61,7 +58,6 @@ django-silk==4.1.0
 #   django-appconf
 #   django-celery-beat
 #   django-debug-toolbar
-#   django-encrypted-model-fields
 #   django-fernet-fields
 #   django-redis
 #   django-silk
@@ -128,7 +124,7 @@ py==1.10.0
 pycodestyle==2.6.0
 # via autopep8
 # via cffi
-pygments==2.7.3
+pygments==2.7.4
 # via
 #   django-silk
 #   ipython
@@ -174,7 +170,6 @@ simplejson==3.17.2
 # via
 #   cryptography
 #   django-compressor
-#   django-encrypted-model-fields
 #   python-dateutil
 #   tox
 #   virtualenv
@@ -198,7 +193,7 @@ uritemplate==3.0.1
 # via
 #   amqp
 #   celery
-virtualenv==20.2.2
+virtualenv==20.3.1
 # via tox
 wcwidth==0.2.5
 # via prompt-toolkit

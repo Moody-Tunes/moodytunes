@@ -24,11 +24,8 @@ coreschema==0.0.4
 # via coreapi
 coverage==5.3.1
 # via pytest-cov
-# via
-#   django-encrypted-model-fields
-#   django-fernet-fields
+# via django-fernet-fields
 # via django-compressor
-# via -r requirements/common.ini
 # via -r requirements/common.ini
 # via -r requirements/common.ini
 # via -r requirements/common.ini
@@ -44,7 +41,6 @@ django-rest-swagger==2.2.0
 #   -r requirements/common.ini
 #   django-appconf
 #   django-celery-beat
-#   django-encrypted-model-fields
 #   django-fernet-fields
 #   django-redis
 #   django-timezone-field
@@ -124,7 +120,6 @@ simplejson==3.17.2
 # via
 #   cryptography
 #   django-compressor
-#   django-encrypted-model-fields
 #   python-dateutil
 # via -r requirements/common.ini
 # via django
