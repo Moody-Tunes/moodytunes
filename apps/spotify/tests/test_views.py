@@ -265,9 +265,11 @@ class TestRevokeSpotifyAuthView(TestCase):
         self.assertEqual(last_message, 'We have deleted your Spotify data from Moodytunes')
 
 
-class TestExportView(TestCase):
+class TestExportPlayListView(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.emotion = Emotion.objects.get(name=Emotion.HAPPY)
+        cls.test_playlist_name = 'test-playlist'
         cls.user = MoodyUtil.create_user()
         cls.user_with_no_auth = MoodyUtil.create_user(username='no-auth')
         cls.url = reverse('spotify:export')
@@ -296,47 +298,35 @@ class TestExportView(TestCase):
 
     @mock.patch('spotify.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
     def test_post_request_happy_path(self, mock_task_call):
-        # Set up playlist for creation
         song = MoodyUtil.create_song()
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
 
-        playlist_name = 'test'
         data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name
+            'playlist_name': self.test_playlist_name,
+            'emotion': self.emotion.name
         }
 
         self.client.post(self.url, data)
 
-        mock_task_call.assert_called_once()
+        mock_task_call.assert_called_once_with(self.spotify_auth.pk, self.test_playlist_name, [song.code], None)
 
     def test_post_request_with_no_user_auth_returns_not_found(self):
         self.client.logout()
         self.client.login(username=self.user_with_no_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
 
-        # Set up playlist for creation
-        song = MoodyUtil.create_song()
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        MoodyUtil.create_user_song_vote(self.user_with_no_auth, song, emotion, True)
-
-        playlist_name = 'test'
         data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name
+            'playlist_name': self.test_playlist_name,
+            'emotion': self.emotion.name
         }
 
         resp = self.client.post(self.url, data)
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_post_empty_playlist_displays_error(self):
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-
-        playlist_name = 'test'
+    def test_post_request_for_empty_emotion_playlist_displays_error(self):
         data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name
+            'playlist_name': self.test_playlist_name,
+            'emotion': self.emotion.name
         }
 
         resp = self.client.post(self.url, data)
@@ -344,16 +334,32 @@ class TestExportView(TestCase):
         messages = get_messages_from_response(resp)
         last_message = messages[-1]
         msg = 'Your {} playlist is empty! Try adding some songs to export the playlist'.format(
-            emotion.full_name.lower()
+            self.emotion.full_name.lower()
         )
 
         self.assertEqual(last_message, msg)
 
-    def test_post_bad_request_displays_error(self):
-        playlist_name = 'test'
+    def test_post_request_with_invalid_emotion_displays_error(self):
         data = {
-            'playlist_name': playlist_name,
+            'playlist_name': self.test_playlist_name,
             'emotion': 'bad-value'
+        }
+
+        resp = self.client.post(self.url, data)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Please submit a valid request'
+
+        self.assertEqual(last_message, msg)
+
+    def test_post_request_with_invalid_playlist_name_displays_error(self):
+        song = MoodyUtil.create_song()
+        MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        data = {
+            'playlist_name': 'test|timeout /T 15',
+            'emotion': self.emotion.name,
         }
 
         resp = self.client.post(self.url, data)
@@ -367,17 +373,15 @@ class TestExportView(TestCase):
     @mock.patch('spotify.tasks.ExportSpotifyPlaylistFromSongsTask.delay')
     def test_post_with_image_upload_saves_image(self, mock_task_call):
         song = MoodyUtil.create_song()
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
 
         with open('{}/apps/spotify/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
             img = BytesIO(img_file.read())
             img.name = 'my_cover.jpg'
 
-        playlist_name = 'test'
         data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name,
+            'playlist_name': self.test_playlist_name,
+            'emotion': self.emotion.name,
             'cover_image': img
         }
 
@@ -398,25 +402,45 @@ class TestExportView(TestCase):
 
         mock_task_call.assert_called_once_with(
             self.spotify_auth.pk,
-            playlist_name,
+            self.test_playlist_name,
             [song.code],
             expected_image_filename
         )
 
     def test_post_with_invalid_image_upload_displays_error(self):
         song = MoodyUtil.create_song()
-        emotion = Emotion.objects.get(name=Emotion.HAPPY)
-        MoodyUtil.create_user_song_vote(self.user, song, emotion, True)
+        MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
 
         with open('{}/apps/spotify/tests/fixtures/hack.php'.format(settings.BASE_DIR), 'rb') as hack_file:
             hack = BytesIO(hack_file.read())
             hack.name = 'hack.php'
 
-        playlist_name = 'test'
         data = {
-            'playlist_name': playlist_name,
-            'emotion': emotion.name,
+            'playlist_name': self.test_playlist_name,
+            'emotion': self.emotion.name,
             'cover_image': hack
+        }
+
+        resp = self.client.post(self.url, data)
+
+        messages = get_messages_from_response(resp)
+        last_message = messages[-1]
+        msg = 'Please submit a valid request'
+
+        self.assertEqual(last_message, msg)
+
+    def test_post_request_with_invalid_playlist_name_and_cover_image_displays_error(self):
+        song = MoodyUtil.create_song()
+        MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+
+        with open('{}/apps/spotify/tests/fixtures/cat.jpg'.format(settings.BASE_DIR), 'rb') as img_file:
+            img = BytesIO(img_file.read())
+            img.name = 'my_cover.jpg'
+
+        data = {
+            'playlist_name': 'test|timeout /T 15',
+            'emotion': self.emotion.name,
+            'cover_image': img
         }
 
         resp = self.client.post(self.url, data)

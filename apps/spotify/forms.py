@@ -1,15 +1,27 @@
 from django import forms
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import UserSongVote
 from moodytunes.forms import get_genre_choices
 from tunes.models import Emotion, Song
 
 
+class PlaylistNameValidator(validators.RegexValidator):
+    regex = r'^[\w-]+$'
+    message = _('Enter a valid playlist name. This value may contain only letters and -/_ characters.')
+    flags = 0
+
+
 class ExportPlaylistForm(forms.Form):
     emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
-    playlist_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Playlist Name'}))
+    playlist_name = forms.CharField(
+        max_length=100,
+        validators=[PlaylistNameValidator()],
+        widget=forms.TextInput(attrs={'placeholder': 'Playlist Name'})
+    )
     genre = forms.ChoiceField(choices=[], required=False)
     context = forms.ChoiceField(choices=UserSongVote.CONTEXT_CHOICES, required=False)
     cover_image = forms.ImageField(required=False)
