@@ -152,7 +152,8 @@ class UpdateInfoView(FormView):
                         'email': request.POST.get('email')
                     },
                     'user_id': request.user.id,
-                    'fingerprint': auto_fingerprint('failed_to_update_user_info', **kwargs)
+                    'fingerprint': auto_fingerprint('failed_to_update_user_info', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
             return render(request, self.template_name, {'form': form})
@@ -177,7 +178,10 @@ class CreateUserView(FormView):
 
             logger.info(
                 'Created new user: {}'.format(user.username),
-                extra={'fingerprint': auto_fingerprint('created_new_user', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('created_new_user', **kwargs),
+                    'trace_id': request.trace_id,
+                }
             )
 
             messages.info(request, 'Your account has been created.')
@@ -192,9 +196,11 @@ class CreateUserView(FormView):
                         'username': request.POST.get('username'),
                         'email': request.POST.get('email')
                     },
-                    'fingerprint': auto_fingerprint('failed_to_create_new_user', **kwargs)
+                    'fingerprint': auto_fingerprint('failed_to_create_new_user', **kwargs),
+                    'trace_id': request.trace_id
                 }
             )
+
             return render(request, self.template_name, {'form': form})
 
 
@@ -234,6 +240,7 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
             extra={
                 'fingerprint': auto_fingerprint('updated_user_profile', **kwargs),
                 'request_data': self.cleaned_data,
+                'trace_id': request.trace_id
             }
         )
 
