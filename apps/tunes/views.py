@@ -128,6 +128,7 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
                 'artist': artist,
                 'jitter': jitter,
                 'top_artists': top_artists,
+                'trace_id': self.request.trace_id,
             }
         )
 
@@ -207,7 +208,10 @@ class LastPlaylistView(generics.RetrieveAPIView):
         else:
             logger.warning(
                 'No cached browse playlist found for user {}'.format(self.request.user.username),
-                extra={'fingerprint': auto_fingerprint('no_cached_browse_playlist_found', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('no_cached_browse_playlist_found', **kwargs),
+                    'trace_id': self.request.trace_id,
+                }
             )
 
             raise Http404('No cached browse playlist found')
@@ -241,6 +245,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 'Unable to retrieve song with code {}'.format(self.cleaned_data['song_code']),
                 extra={
                     'fingerprint': auto_fingerprint('song_not_found', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -270,6 +275,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                     'emotion': emotion.full_name,
                     'vote_id': vote.pk,
                     'fingerprint': auto_fingerprint('created_new_vote', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -282,6 +288,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                     'vote_data': vote_data,
                     'fingerprint': auto_fingerprint('bad_vote_data', **kwargs),
                     'exception_info': exc,
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -305,8 +312,10 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 extra={
                     'request_data': self.cleaned_data,
                     'fingerprint': auto_fingerprint('unvote_fail_missing_vote', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
+
             raise Http404()
 
         for vote in votes:
@@ -322,7 +331,8 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
                 extra={
                     'fingerprint': auto_fingerprint('unvote_success', **kwargs),
                     'vote_id': vote.pk,
-                    'data': self.cleaned_data
+                    'data': self.cleaned_data,
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -356,7 +366,8 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
                 'genre': self.cleaned_data.get('genre'),
                 'context': self.cleaned_data.get('context'),
                 'artist': self.cleaned_data.get('artist'),
-                'page': self.request.GET.get('page')
+                'page': self.request.GET.get('page'),
+                'trace_id': request.trace_id,
             }
         )
 
