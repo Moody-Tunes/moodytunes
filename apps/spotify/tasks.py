@@ -76,6 +76,10 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     default_retry_delay = 60 * 15
     autoretry_for = (SpotifyException,)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.trace_id = None
+
     @update_logging_data
     def get_or_create_playlist(self, auth_code, spotify_user_id, playlist_name, spotify, **kwargs):
         """
@@ -106,6 +110,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                 extra={
                     'fingerprint': auto_fingerprint('failed_getting_user_playlists', **kwargs),
                     'spotify_user_id': spotify_user_id,
+                    'trace_id': self.trace_id,
                 }
             )
 
@@ -113,7 +118,10 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             playlist_id = spotify.create_playlist(auth_code, spotify_user_id, playlist_name)
             logger.info(
                 'Created playlist for user {} with name {} successfully'.format(spotify_user_id, playlist_name),
-                extra={'fingerprint': auto_fingerprint('created_spotify_playlist', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('created_spotify_playlist', **kwargs),
+                    'trace_id': self.trace_id,
+                }
             )
 
         return playlist_id
@@ -171,12 +179,16 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
         except (SpotifyException, ClientException):
             logger.warning(
                 'Unable to upload cover image for playlist {}'.format(playlist_id),
-                extra={'fingerprint': auto_fingerprint('failed_upload_cover_image', **kwargs)},
+                extra={
+                    'fingerprint': auto_fingerprint('failed_upload_cover_image', **kwargs),
+                    'trace_id': self.trace_id,
+                },
                 exc_info=True
             )
 
     @update_logging_data
     def run(self, auth_id, playlist_name, songs, cover_image_filename=None, *args, **kwargs):
+        self.trace_id = kwargs.get('trace_id', '')
         auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id)
 
         # Check that user has granted proper scopes to export playlist to Spotify
@@ -187,18 +199,20 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
                     'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs),
                     'auth_id': auth.pk,
                     'scopes': auth.scopes,
+                    'trace_id': self.trace_id,
                 }
             )
 
             raise InsufficientSpotifyScopesError('Insufficient Spotify scopes to export playlist')
 
-        spotify = SpotifyClient(identifier='create_spotify_playlist_from_songs_{}'.format(auth.spotify_user_id))
+        spotify = SpotifyClient(identifier='spotify.tasks.ExportSpotifyPlaylistFromSongsTask-{}'.format(self.trace_id))
 
         logger.info(
             'Exporting songs to playlist {} for user {} on Spotify'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('start_export_playlist', **kwargs),
-                'auth_id': auth.pk
+                'auth_id': auth.pk,
+                'trace_id': self.trace_id,
             }
         )
 
@@ -227,7 +241,8 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
             'Exported songs to playlist {} for user {} successfully'.format(playlist_name, auth.spotify_user_id),
             extra={
                 'fingerprint': auto_fingerprint('success_export_playlist', **kwargs),
-                'auth_id': auth.pk
+                'auth_id': auth.pk,
+                'trace_id': self.trace_id,
             }
         )
 
@@ -244,14 +259,19 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
         :param spotify_code: (str) Spotify URI for the song to be created
         :param username: (str) [Optional] Username for the user that requested this song
         """
-        signature = 'spotify.tasks.FetchSongFromSpotifyTask-{}-{}'.format(username, spotify_code)
+        trace_id = kwargs.get('trace_id', '')
+        signature = 'spotify.tasks.FetchSongFromSpotifyTask-{}'.format(trace_id)
 
         # Early exit: if song already exists in our system don't do the work to fetch it
         if Song.objects.filter(code=spotify_code).exists():
             logger.info(
                 'Song with code {} already exists in database'.format(spotify_code),
-                extra={'fingerprint': auto_fingerprint('song_already_exists', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('song_already_exists', **kwargs),
+                    'trace_id': trace_id,
+                }
             )
+
             return
 
         client = SpotifyClient(identifier=signature)
@@ -268,12 +288,16 @@ class FetchSongFromSpotifyTask(MoodyBaseTask):
                     'fingerprint': auto_fingerprint('created_song', **kwargs),
                     'song_data': song_data,
                     'username': username,
+                    'trace_id': trace_id,
                 }
             )
         except ValidationError:
-            logger.warning(
+            logger.exception(
                 'Failed to create song {}, already exists in database'.format(spotify_code),
-                extra={'fingerprint': auto_fingerprint('failed_to_create_song', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_create_song', **kwargs),
+                    'trace_id': trace_id,
+                }
             )
 
             raise

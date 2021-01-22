@@ -302,7 +302,13 @@ class ExportPlayListView(FormView):
                 }
             )
 
-            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs, cover_image_filename)
+            ExportSpotifyPlaylistFromSongsTask().delay(
+                auth.id,
+                playlist_name,
+                songs,
+                cover_image_filename,
+                trace_id=request.trace_id
+            )
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
@@ -338,7 +344,7 @@ class SuggestSongView(FormView):
 
         if form.is_valid():
             code = form.cleaned_data['code']
-            FetchSongFromSpotifyTask().delay(code, username=request.user.username)
+            FetchSongFromSpotifyTask().delay(code, username=request.user.username, trace_id=request.trace_id)
 
             logger.info(
                 'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
