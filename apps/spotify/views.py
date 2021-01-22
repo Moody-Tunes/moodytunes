@@ -82,7 +82,9 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('spotify:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
+            spotify_client = SpotifyClient(
+                identifier='spotify.views.SpotifyAuthenticationCallbackView-{}'.format(request.trace_id)
+            )
 
             try:
                 tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
