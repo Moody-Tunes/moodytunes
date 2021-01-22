@@ -57,6 +57,7 @@ class TestValidateRequestDataMixin(TestCase):
     def test_log_bad_request(self, mock_logger):
         mock_serializer = mock.Mock()
         mock_serializer.errors = 'Some bad data here'
+        trace_id = 'test-trace-id'
 
         request = self.factory.get(
             '/test/',
@@ -65,6 +66,7 @@ class TestValidateRequestDataMixin(TestCase):
             HTTP_HOST='example.com'
         )
         request.user = self.user
+        request.trace_id = trace_id
         request.data = {}
 
         expected_request_data = {
@@ -79,6 +81,7 @@ class TestValidateRequestDataMixin(TestCase):
             'errors': mock_serializer.errors,
             'view': 'base.mixins.ValidateRequestDataMixin',
             'fingerprint': 'base.mixins.ValidateRequestDataMixin._log_bad_request.bad_request',
+            'trace_id': trace_id
         }
 
         self.mixin._log_bad_request(request, mock_serializer)

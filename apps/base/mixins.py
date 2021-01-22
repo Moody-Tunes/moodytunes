@@ -40,6 +40,7 @@ class ValidateRequestDataMixin(MoodyMixin):
         """
         Remove sensitive header information from headers before logging
         :param headers: (dict) Request headers to be stripped.
+
         :return: (dict) Headers with sensitive information from it
         """
         sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE', 'HTTP_X_CSRFTOKEN']
@@ -69,6 +70,7 @@ class ValidateRequestDataMixin(MoodyMixin):
             'errors': serializer.errors,
             'view': '{}.{}'.format(self.__class__.__module__, self.__class__.__name__),
             'fingerprint': auto_fingerprint('bad_request', **kwargs),
+            'trace_id': request.trace_id
         }
 
         logger.warning(
