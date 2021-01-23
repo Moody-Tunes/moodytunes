@@ -2,14 +2,15 @@ from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.base import RedirectView, TemplateView
+from rest_framework import status
 
 
 def not_found_handler(request, exception):
-    return render(request, 'mtdj_404.html', status=404)
+    return render(request, 'mtdj_404.html', status=status.HTTP_404_NOT_FOUND)
 
 
 def server_error_handler(request):
-    return render(request, 'mtdj_500.html', status=500)
+    return render(request, 'mtdj_500.html', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class HomePageView(RedirectView):
