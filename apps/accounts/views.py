@@ -168,11 +168,14 @@ class CreateUserView(FormView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            user = MoodyUser.objects.create_user(
-                form.cleaned_data['username'],
+            user = MoodyUser(
+                username=form.cleaned_data['username'],
                 email=form.cleaned_data.get('email'),
-                password=form.cleaned_data['password']
             )
+
+            user.set_password(form.cleaned_data['password'])
+            user._trace_id = request.trace_id
+            user.save()
 
             UserProfile.objects.create(user=user)
 

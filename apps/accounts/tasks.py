@@ -20,12 +20,17 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
         :param user_id: (int) Primary key for user record
         """
+        trace_id = kwargs.get('trace_id', '')
+
         try:
             user = MoodyUser.objects.get(pk=user_id)
         except (MoodyUser.DoesNotExist, MoodyUser.MultipleObjectsReturned):
             logger.exception(
                 'Unable to fetch MoodyUser with pk={}'.format(user_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs),
+                    'trace_id': trace_id,
+                }
             )
             raise
 
@@ -45,7 +50,10 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
         logger.info(
             'Created UserEmotion records for user {}'.format(user.username),
-            extra={'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs)}
+            extra={
+                'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs),
+                'trace_id': trace_id,
+            }
         )
 
 
