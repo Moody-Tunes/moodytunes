@@ -263,7 +263,10 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
         }
 
         try:
-            vote = UserSongVote.objects.create(**vote_data)
+            vote = UserSongVote(**vote_data)
+            vote._trace_id = request.trace_id
+            vote.save()
+
             logger.info(
                 'Saved vote for user {} voting on song {} for emotion {}'.format(
                     self.request.user.username,
@@ -319,6 +322,7 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
             raise Http404()
 
         for vote in votes:
+            vote._trace_id = request.trace_id
             vote.delete()
 
             logger.info(
