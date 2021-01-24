@@ -6,23 +6,6 @@ from moodytunes.forms import get_genre_choices
 from tunes.models import Emotion, Song
 
 
-class NullGenreFilter(admin.SimpleListFilter):
-    title = 'Has Genre'
-    parameter_name = 'has_genre'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('yes', 'Yes'),
-            ('no', 'No')
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'no':
-            return queryset.filter(genre='')
-        if self.value() == 'yes':
-            return queryset.exclude(genre='')
-
-
 class GenreFormField(forms.ModelForm):
     genre = forms.ChoiceField(choices=[], required=False)
 
@@ -46,7 +29,7 @@ class EmotionAdmin(MoodyBaseAdmin):
 class SongAdmin(MoodyBaseAdmin):
     list_display = ('code', 'genre', 'artist', 'name', 'valence', 'energy', 'danceability')
     readonly_fields = ('code', 'artist', 'name', 'valence', 'energy', 'danceability')
-    list_filter = (NullGenreFilter, 'genre')
+    list_filter = (('genre', admin.EmptyFieldListFilter), 'genre')
     search_fields = ('code', 'name', 'artist')
     form = GenreFormField
 
