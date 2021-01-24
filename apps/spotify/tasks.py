@@ -23,6 +23,7 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
 
     @update_logging_data
     def run(self, auth_id, *args, **kwargs):
+        trace_id = kwargs.get('trace_id', '')
         auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id)
 
         # Check that user has granted proper scopes to fetch top artists from Spotify
@@ -33,6 +34,7 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
                     'fingerprint': auto_fingerprint('missing_scopes_for_update_top_artists', **kwargs),
                     'auth_id': auth.pk,
                     'scopes': auth.scopes,
+                    'trace_id': trace_id,
                 }
             )
 
@@ -43,16 +45,23 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
 
         logger.info(
             'Updating top artists for {}'.format(auth.spotify_user_id),
-            extra={'fingerprint': auto_fingerprint('update_spotify_top_artists', **kwargs)}
+            extra={
+                'fingerprint': auto_fingerprint('update_spotify_top_artists', **kwargs),
+                'trace_id': trace_id,
+            }
         )
 
         artists = spotify.get_user_top_artists(auth.access_token, settings.SPOTIFY['max_top_artists'])
         spotify_user_data, _ = SpotifyUserData.objects.get_or_create(spotify_auth=auth)
         spotify_user_data.top_artists = artists
         spotify_user_data.save()
+
         logger.info(
             'Successfully updated top artists for {}'.format(auth.spotify_user_id),
-            extra={'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs)}
+            extra={
+                'fingerprint': auto_fingerprint('success_update_spotify_top_artists', **kwargs),
+                'trace_id': trace_id,
+            }
         )
 
 

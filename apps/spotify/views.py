@@ -118,13 +118,16 @@ class SpotifyAuthenticationCallbackView(View):
             # Create SpotifyAuth record from data
             try:
                 with transaction.atomic():
-                    auth = SpotifyAuth.objects.create(
+                    auth = SpotifyAuth(
                         user=user,
                         access_token=tokens['access_token'],
                         refresh_token=tokens['refresh_token'],
                         spotify_user_id=profile_data['id'],
                         scopes=settings.SPOTIFY['auth_user_scopes'],
                     )
+
+                    auth._trace_id = request.trace_id
+                    auth.save()
 
                     logger.info(
                         'Created SpotifyAuth record for user {}'.format(user.username),
