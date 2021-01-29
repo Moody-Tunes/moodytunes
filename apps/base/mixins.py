@@ -38,9 +38,12 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     def _clean_headers(self, headers):
         """
-        Remove sensitive header information from headers before logging
+        Helper method to remove sensitive header information from log messages before
+        writing header data to logs.
+
         :param headers: (dict) Request headers to be stripped.
-        :return: (dict) Headers with sensitive information from it
+
+        :return: (dict)
         """
         sensitive_headers = ['HTTP_AUTHORIZATION', 'HTTP_COOKIE', 'HTTP_X_CSRFTOKEN']
         stripped_value = '********'
@@ -53,7 +56,12 @@ class ValidateRequestDataMixin(MoodyMixin):
 
     @update_logging_data
     def _log_bad_request(self, request, serializer, **kwargs):
-        """Log information about a request if something fails to validate"""
+        """
+        Helper method to log information about a bad request to our system.
+
+        :param request: (rest_framework.request.Request) Request object that had failed validation
+        :param serializer: (rest_framework.serializers.Serializer) Serializer object that rejected the request
+        """
 
         # Filter HTTP headers from request metadata
         request_headers = request.META
@@ -69,6 +77,7 @@ class ValidateRequestDataMixin(MoodyMixin):
             'errors': serializer.errors,
             'view': '{}.{}'.format(self.__class__.__module__, self.__class__.__name__),
             'fingerprint': auto_fingerprint('bad_request', **kwargs),
+            'trace_id': request.trace_id
         }
 
         logger.warning(
@@ -77,6 +86,23 @@ class ValidateRequestDataMixin(MoodyMixin):
         )
 
     def _validate_request(self, request):
+        """
+        Wrapper around the django-rest-framework serializer validation to validate the
+        request data against the serializer class specified for the view.
+
+        Returns True if the request validates against the serializer and sets the
+        `cleaned_data` attribute of the request to the validated data,
+        or returns False if the request did not meet the serializer requirements.
+
+        Raises an `AttributeError` if the view does not have a serializer for the
+        request method.
+
+        :param request: (rest_framework.request.Request) Request object to validate against the view serializer
+
+        :return: (bool)
+
+        :raises: (AttributeError)
+        """
         serializer_class = getattr(self, '{}_request_serializer'.format(request.method.lower()), None)
 
         if serializer_class:

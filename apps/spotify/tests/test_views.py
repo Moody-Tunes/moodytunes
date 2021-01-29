@@ -306,9 +306,15 @@ class TestExportPlayListView(TestCase):
             'emotion': self.emotion.name
         }
 
-        self.client.post(self.url, data)
+        resp = self.client.post(self.url, data)
 
-        mock_task_call.assert_called_once_with(self.spotify_auth.pk, self.test_playlist_name, [song.code], None)
+        mock_task_call.assert_called_once_with(
+            self.spotify_auth.pk,
+            self.test_playlist_name,
+            [song.code],
+            None,
+            trace_id=resp.wsgi_request.trace_id
+        )
 
     def test_post_request_with_no_user_auth_returns_not_found(self):
         self.client.logout()
@@ -396,7 +402,7 @@ class TestExportPlayListView(TestCase):
         if os.path.exists(expected_image_filename):
             os.unlink(expected_image_filename)
 
-        self.client.post(self.url, data)
+        resp = self.client.post(self.url, data)
 
         self.assertTrue(os.path.exists(expected_image_filename))
 
@@ -404,7 +410,8 @@ class TestExportPlayListView(TestCase):
             self.spotify_auth.pk,
             self.test_playlist_name,
             [song.code],
-            expected_image_filename
+            expected_image_filename,
+            trace_id=resp.wsgi_request.trace_id
         )
 
     def test_post_with_invalid_image_upload_displays_error(self):
@@ -464,9 +471,13 @@ class TestSuggestSongView(TestCase):
     @mock.patch('spotify.tasks.FetchSongFromSpotifyTask.delay')
     def test_happy_path(self, mock_task):
         data = {'code': 'spotify:track:2E0Y5LQdiqrPDJJoEyfSqC'}
-        self.client.post(self.url, data)
+        resp = self.client.post(self.url, data)
 
-        mock_task.assert_called_once_with('spotify:track:2E0Y5LQdiqrPDJJoEyfSqC', username=self.user.username)
+        mock_task.assert_called_once_with(
+            'spotify:track:2E0Y5LQdiqrPDJJoEyfSqC',
+            username=self.user.username,
+            trace_id=resp.wsgi_request.trace_id
+        )
 
     @mock.patch('spotify.tasks.FetchSongFromSpotifyTask.delay')
     def test_task_not_called_for_duplicate_song(self, mock_task):

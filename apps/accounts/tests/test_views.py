@@ -135,7 +135,7 @@ class TestLoginView(TestCase):
             'password': 'wrong-password'
         }
 
-        self.client.post(self.url, data=data, HTTP_X_FORWARDED_FOR=ip_address)
+        response = self.client.post(self.url, data=data, HTTP_X_FORWARDED_FOR=ip_address)
 
         mock_failed_login_logger.warning.assert_called_once_with(
             'Failed login attempt for {}'.format(self.user.username),
@@ -144,6 +144,7 @@ class TestLoginView(TestCase):
                 'username': self.user.username,
                 'ip_address': ip_address,
                 'application_host': 'www',
+                'trace_id': response.wsgi_request.trace_id
             }
         )
 
