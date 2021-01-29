@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -134,7 +135,7 @@ class TestLoginView(TestCase):
             'password': 'wrong-password'
         }
 
-        self.client.post(self.url, data=data, HTTP_X_FORWARDED_FOR=ip_address)
+        response = self.client.post(self.url, data=data, HTTP_X_FORWARDED_FOR=ip_address)
 
         mock_failed_login_logger.warning.assert_called_once_with(
             'Failed login attempt for {}'.format(self.user.username),
@@ -143,6 +144,7 @@ class TestLoginView(TestCase):
                 'username': self.user.username,
                 'ip_address': ip_address,
                 'application_host': 'www',
+                'trace_id': response.wsgi_request.trace_id
             }
         )
 
@@ -423,7 +425,10 @@ class TestMoodyPasswordResetConfirmView(TestCase):
         resp = self.client.post(reset_url, data=data)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn("The two password fields didn't match.", resp.context['form'].errors['new_password2'])
+        self.assertIn(
+            SetPasswordForm.error_messages['password_mismatch'],
+            resp.context['form'].errors['new_password2']
+        )
 
 
 class TestMoodyPasswordResetDone(TestCase):

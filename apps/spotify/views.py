@@ -64,7 +64,8 @@ class SpotifyAuthenticationCallbackView(View):
                 extra={
                     'session_state': request.session.get('state'),
                     'request_state': request.GET.get('state'),
-                    'fingerprint': auto_fingerprint('invalid_oauth_state', **kwargs)
+                    'fingerprint': auto_fingerprint('invalid_oauth_state', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -81,14 +82,19 @@ class SpotifyAuthenticationCallbackView(View):
                 return HttpResponseRedirect(reverse('spotify:spotify-auth-success'))
 
             # Get access and refresh tokens for user
-            spotify_client = SpotifyClient(identifier='spotify_auth_access:{}'.format(user.username))
+            spotify_client = SpotifyClient(
+                identifier='spotify.views.SpotifyAuthenticationCallbackView-{}'.format(request.trace_id)
+            )
 
             try:
                 tokens = spotify_client.get_access_and_refresh_tokens(code, settings.SPOTIFY['auth_redirect_uri'])
             except SpotifyException:
                 logger.exception(
                     'Unable to get Spotify tokens for user {}'.format(user.username),
-                    extra={'fingerprint': auto_fingerprint('failed_get_spotify_tokens', **kwargs)}
+                    extra={
+                        'fingerprint': auto_fingerprint('failed_get_spotify_tokens', **kwargs),
+                        'trace_id': request.trace_id,
+                    }
                 )
 
                 messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
@@ -100,7 +106,10 @@ class SpotifyAuthenticationCallbackView(View):
             except SpotifyException:
                 logger.exception(
                     'Unable to get Spotify profile for user {}'.format(user.username),
-                    extra={'fingerprint': auto_fingerprint('failed_get_spotify_profile', **kwargs)}
+                    extra={
+                        'fingerprint': auto_fingerprint('failed_get_spotify_profile', **kwargs),
+                        'trace_id': request.trace_id,
+                    }
                 )
 
                 messages.error(request, 'We were unable to retrieve your Spotify profile. Please try again.')
@@ -109,13 +118,16 @@ class SpotifyAuthenticationCallbackView(View):
             # Create SpotifyAuth record from data
             try:
                 with transaction.atomic():
-                    auth = SpotifyAuth.objects.create(
+                    auth = SpotifyAuth(
                         user=user,
                         access_token=tokens['access_token'],
                         refresh_token=tokens['refresh_token'],
                         spotify_user_id=profile_data['id'],
                         scopes=settings.SPOTIFY['auth_user_scopes'],
                     )
+
+                    auth._trace_id = request.trace_id
+                    auth.save()
 
                     logger.info(
                         'Created SpotifyAuth record for user {}'.format(user.username),
@@ -125,6 +137,7 @@ class SpotifyAuthenticationCallbackView(View):
                             'user_id': user.pk,
                             'spotify_user_id': profile_data['id'],
                             'scopes': settings.SPOTIFY['auth_user_scopes'],
+                            'trace_id': request.trace_id,
                         }
                     )
 
@@ -138,7 +151,10 @@ class SpotifyAuthenticationCallbackView(View):
                         user.username,
                         profile_data['id']
                     ),
-                    extra={'fingerprint': auto_fingerprint('failed_to_create_spotify_auth_user', **kwargs)}
+                    extra={
+                        'fingerprint': auto_fingerprint('failed_to_create_spotify_auth_user', **kwargs),
+                        'trace_id': request.trace_id,
+                    }
                 )
 
                 messages.error(request, 'Spotify user {} has already authorized MoodyTunes.'.format(
@@ -152,7 +168,8 @@ class SpotifyAuthenticationCallbackView(View):
                 'User {} failed Spotify Oauth confirmation'.format(request.user.username),
                 extra={
                     'fingerprint': auto_fingerprint('user_rejected_oauth_confirmation', **kwargs),
-                    'spotify_oauth_error': request.GET['error']
+                    'spotify_oauth_error': request.GET['error'],
+                    'trace_id': request.trace_id,
                 }
             )
 
@@ -192,7 +209,8 @@ class RevokeSpotifyAuthView(TemplateView):
             'Deleted SpotifyAuth for user {}'.format(request.user.username),
             extra={
                 'fingerprint': auto_fingerprint('revoked_spotify_auth', **kwargs),
-                'auth_id': auth_id
+                'auth_id': auth_id,
+                'trace_id': request.trace_id,
             }
         )
 
@@ -223,7 +241,8 @@ class ExportPlayListView(FormView):
                         'auth_id': auth.pk,
                         'scopes': auth.scopes,
                         'expected_scopes': settings.SPOTIFY['auth_user_scopes'],
-                        'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs)
+                        'fingerprint': auto_fingerprint('missing_scopes_for_playlist_export', **kwargs),
+                        'trace_id': request.trace_id,
                     }
                 )
 
@@ -283,11 +302,18 @@ class ExportPlayListView(FormView):
                     'context': context,
                     'user_id': request.user.pk,
                     'auth_id': auth.pk,
-                    'fingerprint': auto_fingerprint('export_playlist_to_spotify', **kwargs)
+                    'fingerprint': auto_fingerprint('export_playlist_to_spotify', **kwargs),
+                    'trace_id': request.trace_id,
                 }
             )
 
-            ExportSpotifyPlaylistFromSongsTask().delay(auth.id, playlist_name, songs, cover_image_filename)
+            ExportSpotifyPlaylistFromSongsTask().delay(
+                auth.id,
+                playlist_name,
+                songs,
+                cover_image_filename,
+                trace_id=request.trace_id
+            )
 
             messages.info(request, 'Your playlist has been exported! Check in on Spotify in a little bit to see it')
 
@@ -312,7 +338,8 @@ class SuggestSongView(FormView):
                 'User {} has been rate limited from suggesting songs'.format(request.user.username),
                 extra={
                     'fingerprint': auto_fingerprint('rate_limit_suggest_song', **kwargs),
-                    'user_id': request.user.id
+                    'user_id': request.user.id,
+                    'trace_id': request.trace_id,
                 }
             )
             messages.error(request, 'You have submitted too many suggestions! Try again in a minute')
@@ -322,12 +349,16 @@ class SuggestSongView(FormView):
 
         if form.is_valid():
             code = form.cleaned_data['code']
-            FetchSongFromSpotifyTask().delay(code, username=request.user.username)
+            FetchSongFromSpotifyTask().delay(code, username=request.user.username, trace_id=request.trace_id)
 
             logger.info(
                 'Called task to add suggestion for song {} by user {}'.format(code, request.user.username),
-                extra={'fingerprint': auto_fingerprint('added_suggested_song', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('added_suggested_song', **kwargs),
+                    'trace_id': request.trace_id,
+                }
             )
+
             messages.info(request, 'Your song has been slated to be added! Keep an eye out for it in the future')
 
             return HttpResponseRedirect(reverse('spotify:suggest'))
@@ -338,6 +369,10 @@ class SuggestSongView(FormView):
                     request.POST.get('code'),
                     form.errors['code'][0]
                 ),
-                extra={'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs),
+                    'trace_id': request.trace_id,
+                }
             )
+
             return render(request, self.template_name, context={'form': form})

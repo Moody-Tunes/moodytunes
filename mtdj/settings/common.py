@@ -47,7 +47,6 @@ THIRD_PARTY_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_hosts',
-    'encrypted_model_fields',
     'rest_framework',
     'waffle',
 ]
@@ -64,6 +63,7 @@ INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
+    'base.middleware.AddTraceIdToRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -116,8 +116,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mtdj.wsgi.application'
-
-FIELD_ENCRYPTION_KEY = env.str('MTDJ_ENCRYPTED_FIELDS_KEY', default='__encrypted-field-key-not-set__')
 
 DATABASES = {
     'default': {

@@ -23,9 +23,6 @@ AUTH_PASSWORD_VALIDATORS = []
 
 CELERY_TASK_ALWAYS_EAGER = True
 
-# Test encryption key
-FIELD_ENCRYPTION_KEY = 'kNSxgnDzatFuh89K-NGamVPy3wvbTGjwR9V9al1bnZA='
-
 # Don't send emails when running unit tests
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
