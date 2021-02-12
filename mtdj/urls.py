@@ -4,6 +4,10 @@ from django.urls import include, path
 from base.views import HomePageView, LandingPageView
 
 
+handler404 = 'base.views.not_found_handler'
+handler500 = 'base.views.server_error_handler'
+
+
 urlpatterns = [
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('moodytunes/', include(('moodytunes.urls', 'moodytunes'), namespace='moodytunes')),

@@ -20,12 +20,17 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
         :param user_id: (int) Primary key for user record
         """
+        trace_id = kwargs.get('trace_id', '')
+
         try:
             user = MoodyUser.objects.get(pk=user_id)
         except (MoodyUser.DoesNotExist, MoodyUser.MultipleObjectsReturned):
             logger.exception(
                 'Unable to fetch MoodyUser with pk={}'.format(user_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs)}
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_fetch_user', **kwargs),
+                    'trace_id': trace_id,
+                }
             )
             raise
 
@@ -45,7 +50,10 @@ class CreateUserEmotionRecordsForUserTask(MoodyBaseTask):
 
         logger.info(
             'Created UserEmotion records for user {}'.format(user.username),
-            extra={'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs)}
+            extra={
+                'fingerprint': auto_fingerprint('created_user_emotion_records', **kwargs),
+                'trace_id': trace_id,
+            }
         )
 
 
@@ -60,6 +68,8 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
         :param emotion_id: (int) Primary key for Emotion in our system
 
         """
+        trace_id = kwargs.get('trace_id', '')
+
         # We should always call get_or_create to ensure that if we add new emotions, we'll auto
         # create the corresponding UserEmotion record the first time a user votes on a song
         # for the emotion
@@ -73,7 +83,8 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'Unable to create UserEmotion record for user_id={} and emotion_id={}'.format(user_id, emotion_id),
                 extra={
                     'fingerprint': auto_fingerprint('failed_to_create_user_emotion', **kwargs),
-                    'error': e.error_dict
+                    'error': e.error_dict,
+                    'trace_id': trace_id,
                 }
             )
 
@@ -103,5 +114,6 @@ class UpdateUserEmotionRecordAttributeTask(MoodyBaseTask):
                 'new_energy': user_emotion.energy,
                 'new_valence': user_emotion.valence,
                 'new_danceability': user_emotion.danceability,
+                'trace_id': trace_id,
             }
         )

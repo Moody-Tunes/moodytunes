@@ -63,6 +63,7 @@ INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
+    'base.middleware.AddTraceIdToRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

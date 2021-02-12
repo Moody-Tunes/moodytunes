@@ -21,6 +21,7 @@ def log_failed_login_attempt(credentials, request, **kwargs):
             'fingerprint': 'accounts.utils.log_failed_login_attempt',
             'username': username,
             'ip_address': ip_address,
-            'application_host': host
+            'application_host': host,
+            'trace_id': request.trace_id
         }
     )

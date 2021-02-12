@@ -8,9 +8,11 @@ from accounts.utils import log_failed_login_attempt
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
+    trace_id = getattr(instance, '_trace_id', '')
+
     # Post save signal to create UserEmotion records for a user on creation
     if created and not instance.is_superuser:
-        CreateUserEmotionRecordsForUserTask().delay(instance.pk)
+        CreateUserEmotionRecordsForUserTask().delay(instance.pk, trace_id=trace_id)
 
 
 post_save.connect(
@@ -21,10 +23,12 @@ post_save.connect(
 
 
 def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
+    trace_id = getattr(instance, '_trace_id', '')
+
     if created and instance.vote:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
+        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id, trace_id=trace_id)
     elif not created:
-        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id)
+        UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id, trace_id=trace_id)
 
 
 post_save.connect(

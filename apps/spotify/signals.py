@@ -7,8 +7,10 @@ from spotify.tasks import UpdateTopArtistsFromSpotifyTask
 
 
 def update_spotify_top_artists(sender, instance, created, *args, **kwargs):
+    trace_id = getattr(instance, '_trace_id', '')
+
     if created:
-        on_commit(lambda: UpdateTopArtistsFromSpotifyTask().delay(instance.pk))
+        on_commit(lambda: UpdateTopArtistsFromSpotifyTask().delay(instance.pk, trace_id=trace_id))
 
 
 post_save.connect(

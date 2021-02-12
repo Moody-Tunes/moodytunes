@@ -11,11 +11,13 @@ class TestLogFailedLoginAttempt(TestCase):
         username = 'test'
         ip_address = '1.2.3.4'
         host = 'www'
+        trace_id = 'test-trace-id'
 
         credentials = {'username': username}
         request = mock.Mock()
         request.META = {'HTTP_X_FORWARDED_FOR': ip_address}
         request.host.name = host
+        request.trace_id = trace_id
 
         log_failed_login_attempt(credentials, request)
 
@@ -26,5 +28,6 @@ class TestLogFailedLoginAttempt(TestCase):
                 'username': username,
                 'ip_address': ip_address,
                 'application_host': host,
+                'trace_id': trace_id
             }
         )

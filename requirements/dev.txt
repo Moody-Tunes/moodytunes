@@ -104,7 +104,7 @@ pickleshare==0.7.5
 # via
 #   pytest
 #   tox
-prompt-toolkit==3.0.13
+prompt-toolkit==3.0.14
 # via ipython
 # via -r requirements/common.ini
 ptyprocess==0.7.0
