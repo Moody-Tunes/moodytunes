@@ -32,11 +32,15 @@ if settings.DEBUG:
             path('silk/', include(silk.urls))
         ] + urlpatterns
 
-    if 'rest_framework_swagger' in settings.INSTALLED_APPS:
-        from rest_framework_swagger.views import get_swagger_view
+    if 'drf_yasg' in settings.INSTALLED_APPS:
+        from drf_yasg.views import get_schema_view
+        from drf_yasg import openapi
 
-        schema_view = get_swagger_view(title='API Docs', patterns=urlpatterns)
+        schema_view = get_schema_view(
+            openapi.Info(title='MoodyTunes API', default_version='v1'),
+            patterns=urlpatterns,
+        )
 
         urlpatterns = [
-            path('docs/', schema_view, name='docs')
+            path('docs/', schema_view.with_ui('swagger'), name='docs')
         ] + urlpatterns
