@@ -127,8 +127,9 @@ class Command(MoodyBaseCommand):
                     'Error connecting to Spotify! Exception detail: {}. '
                     'Got {} track(s) successfully.'.format(exc, len(tracks)),
                     output_stream='stderr',
-                    log_level=logging.WARNING,
-                    extra={'fingerprint': auto_fingerprint('caught_spotify_exception', **kwargs)}
+                    log_level=logging.ERROR,
+                    extra={'fingerprint': auto_fingerprint('caught_spotify_exception', **kwargs)},
+                    exc_info=True,
                 )
 
                 break
@@ -139,7 +140,8 @@ class Command(MoodyBaseCommand):
                     'Got {} track(s) successfully.'.format(exc, len(tracks)),
                     output_stream='stderr',
                     log_level=logging.ERROR,
-                    extra={'fingerprint': auto_fingerprint('caught_unhandled_exception', **kwargs)}
+                    extra={'fingerprint': auto_fingerprint('caught_unhandled_exception', **kwargs)},
+                    exc_info=True,
                 )
 
                 break
