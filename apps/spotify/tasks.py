@@ -24,7 +24,7 @@ class UpdateTopArtistsFromSpotifyTask(MoodyBaseTask):
     @update_logging_data
     def run(self, auth_id, *args, **kwargs):
         trace_id = kwargs.get('trace_id', '')
-        auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id)
+        auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id, trace_id=trace_id)
 
         # Check that user has granted proper scopes to fetch top artists from Spotify
         if not auth.has_scope(settings.SPOTIFY_TOP_ARTIST_READ_SCOPE):
@@ -198,7 +198,7 @@ class ExportSpotifyPlaylistFromSongsTask(MoodyBaseTask):
     @update_logging_data
     def run(self, auth_id, playlist_name, songs, cover_image_filename=None, *args, **kwargs):
         self.trace_id = kwargs.get('trace_id', '')
-        auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id)
+        auth = SpotifyAuth.get_and_refresh_spotify_auth_record(auth_id, trace_id=self.trace_id)
 
         # Check that user has granted proper scopes to export playlist to Spotify
         if not auth.has_scope(settings.SPOTIFY_PLAYLIST_MODIFY_SCOPE):

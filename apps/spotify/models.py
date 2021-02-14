@@ -51,18 +51,23 @@ class SpotifyAuth(BaseModel):
 
         :return: (SpotifyAuth)
         """
+        trace_id = kwargs.get('trace_id', '')
+
         try:
             auth = cls.objects.get(pk=auth_id)
         except (SpotifyAuth.MultipleObjectsReturned, SpotifyAuth.DoesNotExist):
             logger.error(
                 'Failed to fetch SpotifyAuth with pk={}'.format(auth_id),
-                extra={'fingerprint': auto_fingerprint('failed_to_fetch_spotify_auth', **kwargs)},
+                extra={
+                    'fingerprint': auto_fingerprint('failed_to_fetch_spotify_auth', **kwargs),
+                    'trace_id': trace_id,
+                },
             )
 
             raise
 
         if auth.should_refresh_access_token:
-            auth.refresh_access_token()
+            auth.refresh_access_token(trace_id=trace_id)
 
         return auth
 
@@ -80,6 +85,7 @@ class SpotifyAuth(BaseModel):
     @update_logging_data
     def refresh_access_token(self, **kwargs):
         """Make a call to the Spotify API to refresh the access token for the SpotifyAuth record"""
+        trace_id = kwargs.get('trace_id', '')
         spotify_client = SpotifyClient(identifier='refresh-access-token:{}'.format(self.spotify_user_id))
 
         try:
@@ -95,7 +101,9 @@ class SpotifyAuth(BaseModel):
                 extra={
                     'fingerprint': auto_fingerprint('success_refresh_access_token', **kwargs),
                     'spotify_username': self.spotify_user_id,
-                    'auth_id': self.pk
+                    'auth_id': self.pk,
+                    'user_id': self.user_id,
+                    'trace_id': trace_id,
                 }
             )
 
@@ -106,7 +114,8 @@ class SpotifyAuth(BaseModel):
                     'fingerprint': auto_fingerprint('failed_refresh_access_token', **kwargs),
                     'spotify_username': self.spotify_user_id,
                     'auth_id': self.pk,
-                    'user_id': self.user_id
+                    'user_id': self.user_id,
+                    'trace_id': trace_id,
                 }
             )
 
