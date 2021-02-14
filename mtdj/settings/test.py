@@ -21,6 +21,9 @@ IMAGE_FILE_UPLOAD_PATH = tempfile.gettempdir()
 # validators when running tests
 AUTH_PASSWORD_VALIDATORS = []
 
+# Use a less secure password hashing algorithm to speed up test runs
+PASSWORD_HASHERS = ['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher']
+
 CELERY_TASK_ALWAYS_EAGER = True
 
 # Don't send emails when running unit tests
