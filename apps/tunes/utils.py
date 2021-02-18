@@ -73,16 +73,15 @@ def generate_browse_playlist(
 
         params = {key: params[key] for key in params if key.startswith(strategy)}
 
-    playlist = songs.filter(**params)
+    playlist = songs.filter(**params).order_by('?')
 
-    # Filter by artist if provided
+    # Filter by artist if provided, skipping over top_artists filter
+    # to ensure we return tracks from specified artist when provided
     if artist:
         playlist = playlist.filter(artist__icontains=artist)
 
-    playlist = playlist.order_by('?')
-
     # Filter by user top artists on Spotify if provided
-    if top_artists:
+    elif top_artists:
         top_artists_playlist = playlist.filter(artist__in=top_artists)
 
         if top_artists_playlist:
