@@ -194,7 +194,8 @@ class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
 
 
-@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')), name='dispatch')
+@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')), name='get')
+@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile'), raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class RevokeSpotifyAuthView(TemplateView):
     template_name = 'revoke_spotify_auth.html'
