@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponseRedirect
 from spotify.models import SpotifyAuth
 
 
-def spotify_auth_required(redirect_uri, raise_exc=False):
+def spotify_auth_required(redirect_uri='', raise_exc=False):
     """
     Decorator to ensure that the request user has authenticated with Spotify,
     redirecting to the specified URI if they are not.

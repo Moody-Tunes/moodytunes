@@ -194,8 +194,8 @@ class SpotifyAuthenticationFailureView(TemplateView):
     template_name = 'spotify_auth_failure.html'
 
 
-@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile')), name='get')
-@method_decorator(spotify_auth_required(reverse_lazy('accounts:profile'), raise_exc=True), name='post')
+@method_decorator(spotify_auth_required(redirect_uri=reverse_lazy('accounts:profile')), name='get')
+@method_decorator(spotify_auth_required(raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class RevokeSpotifyAuthView(TemplateView):
     template_name = 'revoke_spotify_auth.html'
@@ -219,8 +219,8 @@ class RevokeSpotifyAuthView(TemplateView):
         return HttpResponseRedirect(reverse('accounts:profile'))
 
 
-@method_decorator(spotify_auth_required(reverse_lazy('spotify:spotify-auth')), name='get')
-@method_decorator(spotify_auth_required(reverse_lazy('spotify:spotify-auth'), raise_exc=True), name='post')
+@method_decorator(spotify_auth_required(redirect_uri=reverse_lazy('spotify:spotify-auth')), name='get')
+@method_decorator(spotify_auth_required(raise_exc=True), name='post')
 @method_decorator(login_required, name='dispatch')
 class ExportPlayListView(FormView):
     template_name = 'export.html'

@@ -11,12 +11,12 @@ from spotify.decorators import spotify_auth_required
 REDIRECT_URI = '/foo/'
 
 
-@spotify_auth_required(REDIRECT_URI)
+@spotify_auth_required(redirect_uri=REDIRECT_URI)
 def dummy_spotify_auth_required_view(request):
     return HttpResponse()
 
 
-@spotify_auth_required(REDIRECT_URI, raise_exc=True)
+@spotify_auth_required(raise_exc=True)
 def dummy_spotify_auth_required_raise_exc_view(request):
     return HttpResponse()
 
