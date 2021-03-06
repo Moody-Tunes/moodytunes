@@ -220,6 +220,12 @@ class TestRevokeSpotifyAuthView(TestCase):
         cls.url = reverse('spotify:spotify-auth-revoke')
         cls.redirect_url = reverse('accounts:profile')
 
+    def test_unauthenticated_request_is_denied(self):
+        expected_redirect = f'{settings.LOGIN_URL}?next={self.url}'
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, expected_redirect)
+
     def test_get_request_for_user_without_auth_is_redirected_to_profile_page(self):
         self.client.login(username=self.user_without_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
         resp = self.client.get(self.url)
@@ -230,15 +236,11 @@ class TestRevokeSpotifyAuthView(TestCase):
         self.assertRedirects(resp, self.redirect_url)
         self.assertEqual(last_message, 'You have not authorized MoodyTunes with Spotify')
 
-    def test_post_request_for_user_without_auth_is_redirected_to_profile_page(self):
+    def test_post_request_for_user_without_auth_returns_not_found(self):
         self.client.login(username=self.user_without_auth.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
         resp = self.client.post(self.url)
 
-        messages = get_messages_from_response(resp)
-        last_message = messages[-1]
-
-        self.assertRedirects(resp, self.redirect_url)
-        self.assertEqual(last_message, 'You have not authorized MoodyTunes with Spotify')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_request_for_user_with_auth_displays_revoke_page(self):
         MoodyUtil.create_spotify_auth(self.user_with_auth)
@@ -278,6 +280,14 @@ class TestExportPlayListView(TestCase):
 
     def setUp(self):
         self.client.login(username=self.user.username, password=MoodyUtil.DEFAULT_USER_PASSWORD)
+
+    def test_unauthenticated_request_is_denied(self):
+        self.client.logout()
+
+        expected_redirect = f'{settings.LOGIN_URL}?next={self.url}'
+        resp = self.client.get(self.url)
+
+        self.assertRedirects(resp, expected_redirect)
 
     def test_get_user_with_no_auth_redirect_to_auth_page(self):
         self.client.logout()

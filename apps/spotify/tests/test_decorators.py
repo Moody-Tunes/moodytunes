@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.http.response import Http404, HttpResponse
 from django.test import RequestFactory, TestCase
 from rest_framework import status
@@ -9,12 +11,12 @@ from spotify.decorators import spotify_auth_required
 REDIRECT_URI = '/foo/'
 
 
-@spotify_auth_required(REDIRECT_URI)
+@spotify_auth_required(redirect_uri=REDIRECT_URI)
 def dummy_spotify_auth_required_view(request):
     return HttpResponse()
 
 
-@spotify_auth_required(REDIRECT_URI, raise_exc=True)
+@spotify_auth_required(raise_exc=True)
 def dummy_spotify_auth_required_raise_exc_view(request):
     return HttpResponse()
 
@@ -27,6 +29,22 @@ class TestSpotifyAuthRequiredDecorator(TestCase):
         cls.spotify_auth = MoodyUtil.create_spotify_auth(cls.user_with_auth)
 
         cls.factory = RequestFactory()
+
+    def test_decorator_redirects_to_login_url_for_unauthenticated_request(self):
+        request = self.factory.get('/bar/')
+        request.user = AnonymousUser()
+
+        resp = dummy_spotify_auth_required_view(request)
+
+        self.assertEqual(resp.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(resp['Location'], settings.LOGIN_URL)
+
+    def test_decorator_returns_not_found_for_unauthenticated_request(self):
+        request = self.factory.get('/bar/')
+        request.user = AnonymousUser()
+
+        with self.assertRaises(Http404):
+            dummy_spotify_auth_required_raise_exc_view(request)
 
     def test_decorator_calls_view_method_for_user_with_spotify_auth(self):
         request = self.factory.get('/bar/')
