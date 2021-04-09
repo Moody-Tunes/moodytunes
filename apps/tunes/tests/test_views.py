@@ -882,9 +882,14 @@ class TestPlaylistView(APITestCase):
         self.assertEqual(len(resp_data['results']), 1)  # We should only see the song once in the response
 
     def test_first_and_last_page_links_are_populated_on_paginated_response(self):
+        votes = []
+
         for _ in range(30):
             song = MoodyUtil.create_song()
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name, 'page': 2}
         resp = self.client.get(self.url, data=data)
@@ -895,9 +900,14 @@ class TestPlaylistView(APITestCase):
         self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
 
     def test_first_and_last_page_links_are_not_populated_on_non_paginated_response(self):
+        votes = []
+
         for _ in range(5):
             song = MoodyUtil.create_song()
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name}
         resp = self.client.get(self.url, data=data)
@@ -908,9 +918,14 @@ class TestPlaylistView(APITestCase):
         self.assertIsNone(resp_data['last_page'])
 
     def test_first_and_last_page_links_are_populated_on_paginated_response_with_zeros_in_previous_page(self):
+        votes = []
+
         for _ in range(100):
             song = MoodyUtil.create_song()
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name, 'page': 11}
         resp = self.client.get(self.url, data=data)
@@ -921,9 +936,14 @@ class TestPlaylistView(APITestCase):
         self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
 
     def test_first_and_last_page_links_are_populated_on_paginated_response_with_zeros_in_next_page(self):
+        votes = []
+
         for _ in range(100):
             song = MoodyUtil.create_song()
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name, 'page': 9}
         resp = self.client.get(self.url, data=data)
@@ -934,9 +954,14 @@ class TestPlaylistView(APITestCase):
         self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&page=last')
 
     def test_first_and_last_page_links_contain_genre_when_provided(self):
+        votes = []
+
         for _ in range(30):
             song = MoodyUtil.create_song(genre='hiphop')
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True)
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name, 'page': 2, 'genre': 'hiphop'}
         resp = self.client.get(self.url, data=data)
@@ -947,9 +972,14 @@ class TestPlaylistView(APITestCase):
         self.assertEqual(resp_data['last_page'], 'http://testserver/tunes/playlist/?emotion=HPY&genre=hiphop&page=last')
 
     def test_first_and_last_page_links_contain_context_when_provided(self):
+        votes = []
+
         for _ in range(30):
             song = MoodyUtil.create_song()
-            MoodyUtil.create_user_song_vote(self.user, song, self.emotion, True, context='WORK')
+            votes.append(UserSongVote(user=self.user, emotion=self.emotion, song=song, vote=True, context='WORK'))
+
+        # Use bulk_create method to skip updating UserEmotion attributes
+        UserSongVote.objects.bulk_create(votes)
 
         data = {'emotion': self.emotion.name, 'page': 2, 'context': 'WORK'}
         resp = self.client.get(self.url, data=data)
