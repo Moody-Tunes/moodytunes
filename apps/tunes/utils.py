@@ -147,26 +147,57 @@ class CachedPlaylistManager(object):
 
 
 class CachedEmotionAttributesManager(object):
+    """Facilitates caching and retrieving attributes for a user given an and context"""
 
     def __init__(self, user):
         self.user = user
 
     def _make_cache_key(self, emotion, context):
-        return 'playlist:cached-emotion-playlist:{}:{}:{}'.format(
+        """
+        Make a cache key for storing the `Emotion` attributes for a user
+        given the emotion and context
+
+        :return: (str)
+        """
+        return 'playlist:cached-emotion-attributes:{}:{}:{}'.format(
             self.user.username,
             emotion,
             context
         )
 
     def cache_emotion_attributes(self, emotion, context, emotion_attributes):
+        """
+        Cache the UserEmotion attributes of an emotion and context for the
+        given user
+
+        :param emotion: (str) The `Emotion` codename
+        :param context: (str) The `UserSongVote` context
+        :param emotion_attributes: (dict) The average values of the `Emotion` attributes
+        """
         cache_key = self._make_cache_key(emotion, context)
-        cache.set(cache_key, emotion_attributes, 60)
+        cache.set(cache_key, emotion_attributes, settings.PLAYLIST_ATTRIBUTES_CACHE_TIMEOUT)
 
     def get_cached_emotion_attributes(self, emotion, context):
+        """
+        Retrieve the cached `Emotion` attributes for the user given an
+        emotion and context
+
+        :param emotion: (str) The `Emotion` codename
+        :param context: (str) The `UserSongVote` context
+
+        :return: (list|None)
+        """
         cache_key = self._make_cache_key(emotion, context)
         return cache.get(cache_key)
 
     def delete_cached_emotion_attributes(self, emotion, context):
+        """
+        Delete the cached `Emotion` attribute values for the user
+        based on emotion and context
+
+        :param emotion: (str) The `Emotion` codename
+        :param context: (str) The `UserSongVote` context
+        """
         cache_key = self._make_cache_key(emotion, context)
         cache.delete(cache_key)
 
