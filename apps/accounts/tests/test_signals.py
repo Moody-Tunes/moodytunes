@@ -66,3 +66,29 @@ class TestUpdateUserAttributesSignal(TestCase):
         vote.delete()
 
         mock_update.assert_called_once()
+
+    @mock.patch('tunes.utils.CachedEmotionAttributesManager.delete_cached_emotion_attributes')
+    def test_upvoting_song_deletes_cached_emotion_attributes(self, mock_cache_delete):
+        UserSongVote.objects.create(
+            user=self.user,
+            emotion=self.emotion,
+            song=self.song,
+            vote=True
+        )
+
+        mock_cache_delete.assert_called_once_with(self.emotion.name, 'None')
+
+    @mock.patch('tunes.utils.CachedEmotionAttributesManager.delete_cached_emotion_attributes')
+    def test_deleting_vote_deletes_cached_emotion_attributes(self, mock_cache_delete):
+        vote = UserSongVote.objects.create(
+            user=self.user,
+            emotion=self.emotion,
+            song=self.song,
+            vote=True
+        )
+
+        mock_cache_delete.reset_mock()
+
+        vote.delete()
+
+        mock_cache_delete.assert_called_once_with(self.emotion.name, 'None')
