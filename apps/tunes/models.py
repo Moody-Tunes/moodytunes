@@ -1,7 +1,7 @@
 from django.db import models
 
+from base.fields import UnitIntervalField
 from base.models import BaseModel
-from base.validators import validate_decimal_value
 
 
 class Emotion(BaseModel):
@@ -57,9 +57,9 @@ class Emotion(BaseModel):
         EXCITED: 'Excited'
     }
 
-    energy = models.FloatField(validators=[validate_decimal_value])
-    valence = models.FloatField(validators=[validate_decimal_value])
-    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
+    valence = UnitIntervalField()
+    energy = UnitIntervalField()
+    danceability = UnitIntervalField(default=0)
     name = models.CharField(
         max_length=3,
         choices=EMOTION_NAME_CHOICES,
@@ -105,9 +105,9 @@ class Song(BaseModel):
     name = models.CharField(max_length=200)
     genre = models.CharField(max_length=20, blank=True, default='')
     code = models.CharField(max_length=36, unique=True)
-    valence = models.FloatField(validators=[validate_decimal_value])
-    energy = models.FloatField(validators=[validate_decimal_value])
-    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
+    valence = UnitIntervalField()
+    energy = UnitIntervalField()
+    danceability = UnitIntervalField(default=0)
 
     def __str__(self):
         return '{}: {}'.format(self.artist, self.name)

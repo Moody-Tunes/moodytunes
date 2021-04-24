@@ -4,8 +4,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from base.fields import UnitIntervalField
 from base.models import BaseModel
-from base.validators import validate_decimal_value
 from libs.moody_logging import auto_fingerprint, update_logging_data
 from libs.utils import average
 from tunes.models import Song
@@ -76,9 +76,9 @@ class UserEmotion(BaseModel):
     """
     user = models.ForeignKey(MoodyUser, on_delete=models.CASCADE)
     emotion = models.ForeignKey('tunes.Emotion', on_delete=models.CASCADE)
-    energy = models.FloatField(validators=[validate_decimal_value])
-    valence = models.FloatField(validators=[validate_decimal_value])
-    danceability = models.FloatField(validators=[validate_decimal_value], default=0)
+    valence = UnitIntervalField()
+    energy = UnitIntervalField()
+    danceability = UnitIntervalField(default=0)
 
     class Meta:
         unique_together = ('user', 'emotion')
