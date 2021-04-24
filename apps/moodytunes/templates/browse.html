@@ -50,5 +50,16 @@
         <button id="submit-context" class="call-to-action-button">Set Context</button>
     </div>
 </div>
+{% if show_onboarding %}
+<div id="browse-onboarding-start-modal" class="modal">
+    <div class="modal-content">
+        <span id="close-onboarding-modal" class="close">&times;</span>
+        <p>This is the browse songs page. Here you can specify an emotion you want to feel and vote on whether or
+        not the songs returned make you feel that emotion. The more songs you upvote, the smarter our site gets in
+        suggesting songs for your desired emotion!</p>
+        <button id="accept-onboarding-button" class="call-to-action-button">Continue</button>
+    </div>
+</div>
+{% endif %}
 <div id="playlist-display-container"></div>
 {% endblock %}
