@@ -74,7 +74,8 @@ class TestBrowseView(APITestCase):
         }
 
         resp = self.client.get(self.url, data=params)
-        resp_song = resp.json()[0]
+        resp_data = resp.json()['results']
+        resp_song = resp_data[0]
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_song['code'], song.code)
@@ -89,7 +90,8 @@ class TestBrowseView(APITestCase):
         }
 
         resp = self.client.get(self.url, data=params)
-        resp_song = resp.json()[0]
+        resp_data = resp.json()['results']
+        resp_song = resp_data[0]
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_song['code'], expected_song.code)
@@ -105,7 +107,7 @@ class TestBrowseView(APITestCase):
         }
 
         resp = self.client.get(self.url, data=params)
-        resp_data = resp.json()
+        resp_data = resp.json()['results']
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), params['limit'])
@@ -175,7 +177,7 @@ class TestBrowseView(APITestCase):
         }
 
         resp = self.client.get(self.url, data=params)
-        resp_data = resp.json()
+        resp_data = resp.json()['results']
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)
@@ -199,7 +201,7 @@ class TestBrowseView(APITestCase):
         }
 
         resp = self.client.get(self.url, data=params)
-        resp_data = resp.json()
+        resp_data = resp.json()['results']
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data), 1)

@@ -71,7 +71,7 @@
 
             // TODO: How else can we find the CSRF token for the request?
         },
-        request: function(method, endpoint, params, data, callback) {
+        request: function(method, endpoint, params, data, traceId, callback) {
             // Wrapper for making request to MoodyTunes API
             // @method (str): Request method to use in request (GET, POST, DELETE)
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
@@ -81,11 +81,14 @@
             //      -> This is what will consume the data retrieved from the request
             document.PlaylistCurator.clearErrorModal();
             let url = this.buildRequestURL(endpoint, this.stripNullParams(params));
+
+            let requestTraceId = traceId || '';
             let options = {
                 method: method,
                 credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Trace-Id': requestTraceId
                 }
             };
 
@@ -122,7 +125,7 @@
         getOptions: function(callback) {
             // Retrieve options for site interaction (emotions and genres in our system)
             // Used to build options for users to choose from when generating playlists to listen to
-            this.request('GET', '/tunes/options/', {}, {}, callback);
+            this.request('GET', '/tunes/options/', {}, {}, '', callback);
         },
         getBrowsePlaylist: function(emotion, jitter, limit, genre, context, description, artist, callback) {
             // Retrieve a playlist of songs for a user to listen to and decide whether or not they make them feel
@@ -137,11 +140,11 @@
                 artist: artist
             };
 
-            this.request('GET', '/tunes/browse/', params, {}, callback);
+            this.request('GET', '/tunes/browse/', params, {}, '', callback);
         },
         getCachedBrowsePlaylist: function(callback) {
             // Retrieve the last viewed browse playlist for the user
-            this.request('GET', '/tunes/browse/last/', {}, {}, callback);
+            this.request('GET', '/tunes/browse/last/', {}, {}, '', callback);
         },
         getEmotionPlaylist: function(emotion, genre, context, artist, callback) {
             // Retrieve a playlist of songs the user has previously voted as making them feel a desired emotion
@@ -152,9 +155,9 @@
                 artist: artist,
             };
 
-            this.request('GET', '/tunes/playlist/', params, {}, callback);
+            this.request('GET', '/tunes/playlist/', params, {}, '', callback);
         },
-        postVote: function(songCode, emotion, context, description, vote, callback) {
+        postVote: function(songCode, emotion, context, description, vote, traceId, callback) {
             // Register a vote for a song in our system based on whether or not the song makes the user feel
             // the desired emotion
             let data = {
@@ -164,7 +167,7 @@
                 description: description,
                 vote: vote
             };
-            this.request('POST', '/tunes/vote/', {}, data, callback);
+            this.request('POST', '/tunes/vote/', {}, data, traceId, callback);
         },
         deleteVote: function(songCode, emotion, context, callback) {
             // "Unvote" a song the user has previously reported as making them feel the desired emotion
@@ -173,17 +176,17 @@
                 emotion: emotion,
                 context: context,
             };
-            this.request('DELETE', '/tunes/vote/', {}, data, callback);
+            this.request('DELETE', '/tunes/vote/', {}, data, '', callback);
         },
         getInfoForVote: function (songCode, emotion, callback) {
             let params = {
                 song_code: songCode,
                 emotion: emotion
             };
-            this.request('GET', '/tunes/vote/info/', params, {}, callback)
+            this.request('GET', '/tunes/vote/info/', params, {}, '', callback)
         },
         updateUserProfile: function (data, callback) {
-            this.request('PATCH', '/accounts/user_profile/', {}, data, callback);
+            this.request('PATCH', '/accounts/user_profile/', {}, data, '', callback);
         }
     };
 })();
