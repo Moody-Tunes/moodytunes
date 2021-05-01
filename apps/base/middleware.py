@@ -8,7 +8,12 @@ class AddTraceIdToRequestMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        trace_id = self.__generate_trace_id()
+        # Check if trace_id is already present in headers
+        if request.META.get('HTTP_X_TRACE_ID'):
+            trace_id = request.META.get('HTTP_X_TRACE_ID')
+        else:
+            trace_id = self.__generate_trace_id()
+
         request.trace_id = trace_id
 
         return self.get_response(request)

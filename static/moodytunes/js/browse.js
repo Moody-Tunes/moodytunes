@@ -107,8 +107,9 @@
         let description = sessionStorage.description;
         let song = this.dataset.song;
         let vote = this.dataset.vote;
+        let traceId = this.dataset.traceId;
 
-        document.MoodyTunesClient.postVote(song, emotion, context, description, vote, function(data) {
+        document.MoodyTunesClient.postVote(song, emotion, context, description, vote, traceId,function(data) {
             // Disable buttons to prevent double votes for a track
             let songContainer = document.getElementById('song-' + song);
             let voteButtons = songContainer.querySelectorAll('button');
@@ -128,54 +129,57 @@
         })
     }
 
-    function createVoteButton(voteValue, song) {
+    function createVoteButton(voteValue, song, traceId) {
         let button = document.createElement('button');
         button.className = 'vote-button vote-button-' + voteValue;
         let name = voteValue ? 'Yes' : 'No';
         button.appendChild(document.createTextNode(name));
         button.dataset.song = song.code;
         button.dataset.vote = voteValue;
+        button.dataset.traceId = traceId;
         button.addEventListener('click', voteOnSong);
 
         return button
     }
 
-    function createVoteButtons(song) {
+    function createVoteButtons(song, traceId) {
         let buttonContainer = document.createElement('div');
         buttonContainer.className = 'vote-button-container';
 
-        buttonContainer.appendChild(createVoteButton(true, song));
-        buttonContainer.appendChild(createVoteButton(false, song));
+        buttonContainer.appendChild(createVoteButton(true, song, traceId));
+        buttonContainer.appendChild(createVoteButton(false, song, traceId));
 
         return buttonContainer;
     }
 
-    function createSongContainer(song) {
+    function createSongContainer(song, traceId) {
         let songContainer = document.createElement('div');
         songContainer.id = 'song-' + song.code;
         songContainer.className = 'song-container';
 
         songContainer.appendChild(document.PlaylistCurator.createPlayButton(song));
-        songContainer.appendChild(createVoteButtons(song));
+        songContainer.appendChild(createVoteButtons(song, traceId));
 
         return songContainer;
     }
 
     function displayBrowsePlaylist(data) {
+        let songs = data.results;
+        let traceId = data.trace_id;
         let playlistContainer = document.getElementById('playlist-display-container');
         let noResultsFoundAlert = document.getElementById('alert-no-results');
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         document.PlaylistCurator.clearChildren(playlistContainer);
 
-        if (document.PlaylistCurator.isEmptyResult(data.length)) {
+        if (document.PlaylistCurator.isEmptyResult(songs.length)) {
             noResultsFoundAlert.hidden = false;
             return;
         }
 
         // Build playlist from returned data
-        for (const song of data) {
-            playlistContainer.appendChild(createSongContainer(song));
+        for (const song of songs) {
+            playlistContainer.appendChild(createSongContainer(song, traceId));
         }
     }
 
