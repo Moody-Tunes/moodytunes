@@ -221,12 +221,6 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
 
     http_method_names = ['get', 'patch']
 
-    if settings.DEBUG:  # pragma: no cover
-        from base.documentation_utils import MultipleMethodSchema
-        schema = MultipleMethodSchema(
-            patch_request_serializer=UserProfileRequestSerializer,
-        )
-
     @swagger_auto_schema(
         request_body=UserProfileRequestSerializer(),
         responses={status.HTTP_200_OK: json.dumps({'status': 'OK'})}

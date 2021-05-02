@@ -52,10 +52,6 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = BrowseSongsRequestSerializer
 
-    if settings.DEBUG:  # pragma: no cover
-        from base.documentation_utils import build_documentation_for_request_serializer
-        schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
-
     @swagger_auto_schema(query_serializer=BrowseSongsRequestSerializer())
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -232,13 +228,6 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
-    if settings.DEBUG:  # pragma: no cover
-        from base.documentation_utils import MultipleMethodSchema
-        schema = MultipleMethodSchema(
-            post_request_serializer=VoteSongsRequestSerializer,
-            delete_request_serializer=DeleteVoteRequestSerializer
-        )
-
     @swagger_auto_schema(
         request_body=VoteSongsRequestSerializer(),
         responses={status.HTTP_201_CREATED: json.dumps({'status': 'OK'})}
@@ -369,10 +358,6 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
     get_request_serializer = PlaylistSongsRequestSerializer
 
-    if settings.DEBUG:  # pragma: no cover
-        from base.documentation_utils import build_documentation_for_request_serializer
-        schema = build_documentation_for_request_serializer(PlaylistSongsRequestSerializer, 'query')
-
     @swagger_auto_schema(query_serializer=PlaylistSongsRequestSerializer())
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -497,10 +482,6 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     serializer_class = VoteInfoSerializer
 
     get_request_serializer = VoteInfoRequestSerializer
-
-    if settings.DEBUG:  # pragma: no cover
-        from base.documentation_utils import build_documentation_for_request_serializer
-        schema = build_documentation_for_request_serializer(VoteInfoRequestSerializer, 'query')
 
     @swagger_auto_schema(query_serializer=VoteInfoRequestSerializer())
     def get(self, request, *args, **kwargs):
