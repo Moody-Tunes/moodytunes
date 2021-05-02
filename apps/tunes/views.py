@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 import re
@@ -7,6 +8,7 @@ from django.db import IntegrityError
 from django.http import Http404, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -20,7 +22,6 @@ from tunes.models import Emotion, Song
 from tunes.serializers import (
     BrowseSongsRequestSerializer,
     DeleteVoteRequestSerializer,
-    EmptyResponseSerializer,
     LastPlaylistSerializer,
     OptionsSerializer,
     PlaylistSerializer,
@@ -54,6 +55,10 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
     if settings.DEBUG:  # pragma: no cover
         from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
+
+    @swagger_auto_schema(query_serializer=BrowseSongsRequestSerializer())
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     @update_logging_data
     def filter_queryset(self, queryset, **kwargs):
@@ -227,14 +232,26 @@ class VoteView(PostRequestValidatorMixin, DeleteRequestValidatorMixin, generics.
     post_request_serializer = VoteSongsRequestSerializer
     delete_request_serializer = DeleteVoteRequestSerializer
 
-    serializer_class = EmptyResponseSerializer
-
     if settings.DEBUG:  # pragma: no cover
         from base.documentation_utils import MultipleMethodSchema
         schema = MultipleMethodSchema(
             post_request_serializer=VoteSongsRequestSerializer,
             delete_request_serializer=DeleteVoteRequestSerializer
         )
+
+    @swagger_auto_schema(
+        request_body=VoteSongsRequestSerializer(),
+        responses={status.HTTP_201_CREATED: json.dumps({'status': 'OK'})}
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=DeleteVoteRequestSerializer(),
+        responses={status.HTTP_200_OK: json.dumps({'status': 'OK'})}
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
     @update_logging_data
     def create(self, request, *args, **kwargs):
@@ -356,6 +373,10 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(PlaylistSongsRequestSerializer, 'query')
 
+    @swagger_auto_schema(query_serializer=PlaylistSongsRequestSerializer())
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     @update_logging_data
     def list(self, request, *args, **kwargs):
         logger.info(
@@ -433,6 +454,8 @@ class OptionView(generics.GenericAPIView):
     """
     serializer_class = OptionsSerializer
 
+    pagination_class = None
+
     @method_decorator(cache_page(settings.OPTIONS_CACHE_TIMEOUT))
     def get(self, request, *args, **kwargs):
         # Build map of emotions including code name and display name
@@ -471,7 +494,6 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     Returns a JSON response of info on votes for a given user, emotion, and song. Currently used to
     find the different contexts for a song that a user has voted on.
     """
-
     serializer_class = VoteInfoSerializer
 
     get_request_serializer = VoteInfoRequestSerializer
@@ -479,6 +501,10 @@ class VoteInfoView(GetRequestValidatorMixin, generics.RetrieveAPIView):
     if settings.DEBUG:  # pragma: no cover
         from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(VoteInfoRequestSerializer, 'query')
+
+    @swagger_auto_schema(query_serializer=VoteInfoRequestSerializer())
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def get_object(self):
         contexts = UserSongVote.objects.filter(

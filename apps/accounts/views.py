@@ -1,3 +1,4 @@
+import json
 import logging
 
 import waffle
@@ -17,7 +18,8 @@ from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic.base import RedirectView, TemplateView
-from rest_framework import generics
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 
 from accounts.forms import CreateUserForm, UpdateUserForm
@@ -224,6 +226,13 @@ class UserProfileView(PatchRequestValidatorMixin, generics.RetrieveAPIView, gene
         schema = MultipleMethodSchema(
             patch_request_serializer=UserProfileRequestSerializer,
         )
+
+    @swagger_auto_schema(
+        request_body=UserProfileRequestSerializer(),
+        responses={status.HTTP_200_OK: json.dumps({'status': 'OK'})}
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
 
     def get_object(self):
         user_profile = get_object_or_404(UserProfile, user=self.request.user)
