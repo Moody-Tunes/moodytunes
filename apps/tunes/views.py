@@ -30,7 +30,12 @@ from tunes.serializers import (
     VoteInfoSerializer,
     VoteSongsRequestSerializer,
 )
-from tunes.utils import CachedPlaylistManager, filter_duplicate_votes_on_song_from_playlist, generate_browse_playlist
+from tunes.utils import (
+    CachedEmotionAttributesManager,
+    CachedPlaylistManager,
+    filter_duplicate_votes_on_song_from_playlist,
+    generate_browse_playlist,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -388,15 +393,34 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
 
         # Update response data with analytics for emotion
-        votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
+        cached_emotion_attributes_manager = CachedEmotionAttributesManager(request.user)
+
+        emotion_data = cached_emotion_attributes_manager.get_cached_emotion_attributes(
+            self.cleaned_data['emotion'],
+            self.cleaned_data.get('context', 'None')
+        )
+
+        if not emotion_data:
+            votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
+            valence = votes_for_emotion_data['song__valence__avg']
+            energy = votes_for_emotion_data['song__energy__avg']
+            danceability = votes_for_emotion_data['song__danceability__avg']
+            emotion_data = {
+                'valence': valence,
+                'energy': energy,
+                'danceability': danceability
+            }
+
+            cached_emotion_attributes_manager.cache_emotion_attributes(
+                self.cleaned_data['emotion'],
+                self.cleaned_data.get('context', 'None'),
+                emotion_data
+            )
 
         resp.data.update({
-            'valence': valence,
-            'energy': energy,
-            'danceability': danceability,
+            'valence': emotion_data['valence'],
+            'energy': emotion_data['energy'],
+            'danceability': emotion_data['danceability'],
             'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'first_page': first_page,
             'last_page': last_page,

@@ -8,7 +8,12 @@ from django.test import TestCase
 from accounts.models import UserSongVote
 from libs.tests.helpers import MoodyUtil
 from tunes.models import Emotion, Song
-from tunes.utils import CachedPlaylistManager, filter_duplicate_votes_on_song_from_playlist, generate_browse_playlist
+from tunes.utils import (
+    CachedEmotionAttributesManager,
+    CachedPlaylistManager,
+    filter_duplicate_votes_on_song_from_playlist,
+    generate_browse_playlist,
+)
 
 
 class TestGenerateBrowsePlaylist(TestCase):
@@ -248,6 +253,66 @@ class TestCachedPlaylistManager(TestCase):
 
         returned_playlist = self.manager.retrieve_cached_browse_playlist()
         self.assertIsNone(returned_playlist)
+
+
+class TestCachedEmotionAttributesManager(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = MoodyUtil.create_user()
+        cls.manager = CachedEmotionAttributesManager(cls.user)
+        cls.emotion = Emotion.HAPPY
+        cls.context = 'WORK'
+
+    def test_make_cache_key_returns_expected_cache_key(self):
+        expected_cache_key = 'playlist:cached-emotion-attributes:{}:{}:{}'.format(
+            self.user.username,
+            self.emotion,
+            self.context
+        )
+
+        self.assertEqual(self.manager._make_cache_key(self.emotion, self.context), expected_cache_key)
+
+    @mock.patch('tunes.utils.cache')
+    def test_cache_emotion_attributes_calls_cache_with_expected_arguments(self, mock_cache):
+        data = {
+            'valence': .50,
+            'energy': .75,
+            'danceability': .60
+        }
+
+        cache_key = 'playlist:cached-emotion-attributes:{}:{}:{}'.format(
+            self.user.username,
+            self.emotion,
+            self.context
+        )
+
+        self.manager.cache_emotion_attributes(self.emotion, self.context, data)
+
+        mock_cache.set.assert_called_once_with(cache_key, data, settings.PLAYLIST_ATTRIBUTES_CACHE_TIMEOUT)
+
+    @mock.patch('tunes.utils.cache')
+    def test_get_cached_emotion_attributes_returns_cached_attributes(self, mock_cache):
+        attribute_data = {
+            'valence': .50,
+            'energy': .75,
+            'danceability': .60
+        }
+        mock_cache.get.return_value = attribute_data
+
+        returned_attributes = self.manager.get_cached_emotion_attributes(self.emotion, self.context)
+        self.assertEqual(attribute_data, returned_attributes)
+
+    @mock.patch('tunes.utils.cache')
+    def test_delete_cached_emotion_playlist_calls_cache_delete(self, mock_cache):
+        cache_key = 'playlist:cached-emotion-attributes:{}:{}:{}'.format(
+            self.user.username,
+            self.emotion,
+            self.context
+        )
+
+        self.manager.delete_cached_emotion_attributes(self.emotion, self.context)
+
+        mock_cache.delete.assert_called_once_with(cache_key)
 
 
 class TestFilterDuplicateVotesOnSongs(TestCase):

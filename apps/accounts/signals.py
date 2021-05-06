@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from accounts.models import UserSongVote
 from accounts.tasks import CreateUserEmotionRecordsForUserTask, UpdateUserEmotionRecordAttributeTask
 from accounts.utils import log_failed_login_attempt
+from tunes.utils import CachedEmotionAttributesManager
 
 
 def create_user_emotion_records(sender, instance, created, *args, **kwargs):
@@ -26,8 +27,14 @@ def update_user_emotion_attributes(sender, instance, created, *args, **kwargs):
     trace_id = getattr(instance, '_trace_id', '')
 
     if created and instance.vote:
+        cached_attributes_manager = CachedEmotionAttributesManager(instance.user)
+        context = instance.context or 'None'
+        cached_attributes_manager.delete_cached_emotion_attributes(instance.emotion.name, context)
         UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id, trace_id=trace_id)
     elif not created:
+        cached_attributes_manager = CachedEmotionAttributesManager(instance.user)
+        context = instance.context or 'None'
+        cached_attributes_manager.delete_cached_emotion_attributes(instance.emotion.name, context)
         UpdateUserEmotionRecordAttributeTask().delay(instance.user_id, instance.emotion_id, trace_id=trace_id)
 
 
