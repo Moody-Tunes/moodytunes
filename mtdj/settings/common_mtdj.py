@@ -1,6 +1,6 @@
 import tempfile
 
-from envparse import env
+from . import env
 
 
 DATABASE_BACKUPS_PATH = env.str('MTDJ_DATABASE_BACKUPS_PATH', default=tempfile.gettempdir())

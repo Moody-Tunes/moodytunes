@@ -1,5 +1,6 @@
-from envparse import env
 from spotify_client.config import Config
+
+from . import env
 
 
 # Spotify OAuth scope constants
