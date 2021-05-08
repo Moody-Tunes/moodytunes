@@ -2,15 +2,17 @@ import os
 import sys
 import warnings
 
-from envparse import env
+import environ
 
+
+env = environ.Env()
 
 # Load env file
 env_file = os.environ.get('MTDJ_ENV_FILE')
 if not env_file:
     warnings.warn('env file not set, falling back to defaults...')
 
-env.read_envfile(env_file)
+environ.Env.read_env(env_file)
 
 ENV = env.str('ENV', default='__not-set__')
 

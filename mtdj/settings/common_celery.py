@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from envparse import env
+from . import env
 
 
 CELERY_TASK_ALWAYS_EAGER = env.bool('MTDJ_CELERY_TASK_ALWAYS_EAGER', default=False)

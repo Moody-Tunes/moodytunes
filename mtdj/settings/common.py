@@ -1,9 +1,7 @@
 import os
 import tempfile
 
-from envparse import env
-
-from . import BASE_DIR
+from . import BASE_DIR, env
 from .common_celery import *
 from .common_mtdj import *
 from .common_spotify import *
