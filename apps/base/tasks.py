@@ -71,7 +71,13 @@ class BackupDatabaseTask(MoodyPeriodicTask):
                 model_name=model
             )
 
-            logger.info('Writing backup of {} to file {}'.format(model, backup_filename))
+            logger.info(
+                'Writing backup of {} to file {}'.format(model, backup_filename),
+                extra={
+                    'fingerprint': auto_fingerprint('backup_database_model', **kwargs),
+                    'model': model,
+                }
+            )
 
             call_command('dumpdata', model, output=backup_filename)
 
