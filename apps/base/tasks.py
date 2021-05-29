@@ -52,12 +52,34 @@ class ClearExpiredSessionsTask(MoodyPeriodicTask):
 class BackupDatabaseTask(MoodyPeriodicTask):
     run_every = crontab(minute=0, hour=4, day_of_week=0)
 
-    def delete_old_backups(self):
+    @update_logging_data
+    def delete_old_backups(self, **kwargs):
         for backup_file in os.listdir(settings.DATABASE_BACKUPS_PATH):
             if any([backup_file.startswith(model) for model in settings.DATABASE_BACKUP_TARGETS]):
                 backup_filename = os.path.join(settings.DATABASE_BACKUPS_PATH, backup_file)
-                logger.info('Deleting old backup {}'.format(backup_filename))
+                logger.info(
+                    'Deleting old backup {}'.format(backup_filename),
+                    extra={'fingerprint': auto_fingerprint('delete_old_backup', **kwargs)}
+                )
                 os.unlink(backup_filename)
+
+    @update_logging_data
+    def backup_models(self, **kwargs):
+        for model in settings.DATABASE_BACKUP_TARGETS:
+            backup_filename = '{backup_directory}/{model_name}.json'.format(
+                backup_directory=settings.DATABASE_BACKUPS_PATH,
+                model_name=model
+            )
+
+            logger.info(
+                'Writing backup of {} to file {}'.format(model, backup_filename),
+                extra={
+                    'fingerprint': auto_fingerprint('backup_database_model', **kwargs),
+                    'model': model,
+                }
+            )
+
+            call_command('dumpdata', model, output=backup_filename)
 
     """Task to backup mission critical database tables"""
     @update_logging_data
@@ -68,16 +90,7 @@ class BackupDatabaseTask(MoodyPeriodicTask):
         )
 
         self.delete_old_backups()
-
-        for model in settings.DATABASE_BACKUP_TARGETS:
-            backup_filename = '{backup_directory}/{model_name}.json'.format(
-                backup_directory=settings.DATABASE_BACKUPS_PATH,
-                model_name=model
-            )
-
-            logger.info('Writing backup of {} to file {}'.format(model, backup_filename))
-
-            call_command('dumpdata', model, output=backup_filename)
+        self.backup_models()
 
         logger.info(
             'Finished run to backup mission critical database tables',
