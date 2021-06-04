@@ -12,9 +12,9 @@ autopep8==1.5.7
     # via django-silk
 backcall==0.2.0
     # via ipython
-decorator==5.0.7
+decorator==5.0.9
     # via ipython
-distlib==0.3.1
+distlib==0.3.2
     # via virtualenv
 django-debug-toolbar==3.2.1
     # via -r requirements/dev.ini
@@ -54,7 +54,7 @@ tox==3.23.1
     # via -r requirements/dev.ini
 traitlets==5.0.5
     # via ipython
-virtualenv==20.4.6
+virtualenv==20.4.7
     # via tox
 wcwidth==0.2.5
     # via prompt-toolkit
