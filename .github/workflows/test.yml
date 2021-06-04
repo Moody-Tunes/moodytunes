@@ -36,7 +36,7 @@ jobs:
       - name: Cache installed dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.cache/pip
+          path: ${{ GITHUB_WORKSPACE }}/.tox
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/test.txt') }}
       - name: Install tox
         run: |
