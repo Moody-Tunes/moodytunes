@@ -31,7 +31,7 @@
             // Build a URL for making a request to the backend API
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to append to request url
-            // :return (str): Full url for API request
+            // @return (str): Full url for API request
             let requestUrl = new URL(window.location.origin + endpoint);
 
             if (this.checkTruthyObject(params)) {
@@ -47,7 +47,7 @@
         stripNullParams: function (params) {
             // Strips null values from params to ensure that URL doesn't include undefined parameters
             // @params (object): Query params to include in request
-            // :return (object): Same params passed in, minus any keys that have undefined values
+            // @return (object): Same params passed in, minus any keys that have undefined values
             if (this.checkTruthyObject(params)) {
                 for (let key in params) {
                     if (params.hasOwnProperty(key) && params[key] === undefined) {
@@ -77,8 +77,8 @@
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to include in request
             // @data (object): Request data to send (used for POST and DELETE methods)
+            // @traceId (str): Trace ID to include in request headers
             // @callback (function): Callback function to pass retrieved data onto
-            //      -> This is what will consume the data retrieved from the request
             document.PlaylistCurator.clearErrorModal();
             let url = this.buildRequestURL(endpoint, this.stripNullParams(params));
 
@@ -183,7 +183,7 @@
                 song_code: songCode,
                 emotion: emotion
             };
-            this.request('GET', '/tunes/vote/info/', params, {}, '', callback)
+            this.request('GET', '/tunes/vote/info/', params, {}, '', callback);
         },
         updateUserProfile: function (data, callback) {
             this.request('PATCH', '/accounts/user_profile/', {}, data, '', callback);
