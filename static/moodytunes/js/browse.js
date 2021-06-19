@@ -84,7 +84,8 @@
             emotion = data.emotion;
             sessionStorage.context = data.context || '';
             sessionStorage.description = data.description || '';
-            displayBrowsePlaylist(data.playlist);
+            let playlist = {results: data.playlist};
+            displayBrowsePlaylist(playlist);
         });
     }
 
