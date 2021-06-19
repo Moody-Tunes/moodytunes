@@ -208,7 +208,8 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'emotion': emotion,
                 'context': context,
                 'description': description,
-                'playlist': playlist
+                'playlist': playlist,
+                'trace_id': self.request.trace_id,
             }
         else:
             logger.warning(

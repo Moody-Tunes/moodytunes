@@ -84,7 +84,10 @@
             emotion = data.emotion;
             sessionStorage.context = data.context || '';
             sessionStorage.description = data.description || '';
-            let playlist = {results: data.playlist};
+            let playlist = {
+                results: data.playlist,
+                trace_id: data.trace_id
+            };
             displayBrowsePlaylist(playlist);
         });
     }
