@@ -18,6 +18,7 @@ class LastPlaylistSerializer(serializers.Serializer):
     context = CleanedChoiceField(UserSongVote.CONTEXT_CHOICES, required=False)
     description = serializers.CharField(max_length=100, required=False, allow_blank=True)
     playlist = SongSerializer(many=True, read_only=True)
+    trace_id = serializers.CharField(max_length=32)
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
