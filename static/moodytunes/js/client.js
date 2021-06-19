@@ -77,6 +77,7 @@
             // @endpoint (str): Path in the API to make a request (ex /tunes/browse)
             // @params (object): Query parameters to include in request
             // @data (object): Request data to send (used for POST and DELETE methods)
+            // @traceId (str): Trace ID to include in request headers
             // @callback (function): Callback function to pass retrieved data onto
             //      -> This is what will consume the data retrieved from the request
             document.PlaylistCurator.clearErrorModal();
