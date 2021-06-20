@@ -365,14 +365,14 @@ class SuggestSongView(FormView):
             return HttpResponseRedirect(reverse('spotify:suggest'))
         else:
             logger.warning(
-                'User {} suggested an invalid song code: {}. Reason: {}'.format(
+                'User {} suggested an invalid song code: {}'.format(
                     request.user.username,
                     request.POST.get('code'),
-                    form.errors['code'][0]
                 ),
                 extra={
                     'fingerprint': auto_fingerprint('invalid_suggested_song', **kwargs),
                     'trace_id': request.trace_id,
+                    'errors': form.errors,
                 }
             )
 

@@ -47,13 +47,18 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
 
     default_jitter = settings.BROWSE_DEFAULT_JITTER
     default_limit = settings.BROWSE_DEFAULT_LIMIT
-    pagination_class = None
 
     get_request_serializer = BrowseSongsRequestSerializer
 
     if settings.DEBUG:  # pragma: no cover
         from base.documentation_utils import build_documentation_for_request_serializer
         schema = build_documentation_for_request_serializer(BrowseSongsRequestSerializer, 'query')
+
+    def list(self, request, *args, **kwargs):
+        resp = super().list(request, *args, **kwargs)
+        resp.data.update({'trace_id': request.trace_id})
+
+        return resp
 
     @update_logging_data
     def filter_queryset(self, queryset, **kwargs):
@@ -203,7 +208,8 @@ class LastPlaylistView(generics.RetrieveAPIView):
                 'emotion': emotion,
                 'context': context,
                 'description': description,
-                'playlist': playlist
+                'playlist': playlist,
+                'trace_id': self.request.trace_id,
             }
         else:
             logger.warning(

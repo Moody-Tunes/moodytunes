@@ -211,9 +211,9 @@ COMPRESS_PRECOMPILERS = (
    ('text/less', 'node_modules/less/bin/lessc {infile} {outfile}'),
 )
 
-COMPRESS_JS_FILTERS = (
-    'libs.compressors.UglifyJSFilter',
-)
+COMPRESS_FILTERS = {
+    'js': ('libs.compressors.UglifyJSFilter',)
+}
 
 # Email settings
 SYSTEM_EMAIL_ADDRESS = env.str('MTDJ_SYSTEM_EMAIL_ADDRESS', default='ops@moodytunes.us')

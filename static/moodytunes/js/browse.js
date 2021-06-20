@@ -84,7 +84,11 @@
             emotion = data.emotion;
             sessionStorage.context = data.context || '';
             sessionStorage.description = data.description || '';
-            displayBrowsePlaylist(data.playlist);
+            let playlist = {
+                results: data.playlist,
+                trace_id: data.trace_id
+            };
+            displayBrowsePlaylist(playlist);
         });
     }
 
@@ -107,8 +111,9 @@
         let description = sessionStorage.description;
         let song = this.dataset.song;
         let vote = this.dataset.vote;
+        let traceId = sessionStorage.traceId;
 
-        document.MoodyTunesClient.postVote(song, emotion, context, description, vote, function(data) {
+        document.MoodyTunesClient.postVote(song, emotion, context, description, vote, traceId, function(data) {
             // Disable buttons to prevent double votes for a track
             let songContainer = document.getElementById('song-' + song);
             let voteButtons = songContainer.querySelectorAll('button');
@@ -162,19 +167,21 @@
     }
 
     function displayBrowsePlaylist(data) {
+        let songs = data.results;
+        sessionStorage.traceId = data.trace_id;
         let playlistContainer = document.getElementById('playlist-display-container');
         let noResultsFoundAlert = document.getElementById('alert-no-results');
         noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
 
         document.PlaylistCurator.clearChildren(playlistContainer);
 
-        if (document.PlaylistCurator.isEmptyResult(data.length)) {
+        if (document.PlaylistCurator.isEmptyResult(songs.length)) {
             noResultsFoundAlert.hidden = false;
             return;
         }
 
         // Build playlist from returned data
-        for (const song of data) {
+        for (const song of songs) {
             playlistContainer.appendChild(createSongContainer(song));
         }
     }
