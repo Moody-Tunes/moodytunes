@@ -30,13 +30,14 @@ class BaseUserForm(forms.Form):
         validators=[UnicodeUsernameValidator()],
         widget=forms.TextInput(attrs={'autofocus': 'autofocus'})
     )
-    confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
-    password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     email = forms.EmailField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
+    password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
+    confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
 
-    def clean_password(self):
-        new_password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password', '')
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password', '')
 
         if new_password:
             # Call settings.AUTH_PASSWORD_VALIDATORS on supplied password
@@ -46,8 +47,6 @@ class BaseUserForm(forms.Form):
 
             if error:
                 self.add_error(*error)
-
-        return new_password
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
