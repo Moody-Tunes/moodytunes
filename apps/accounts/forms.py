@@ -24,7 +24,12 @@ def validate_matching_passwords(password, confirm_password):
 
 
 class BaseUserForm(forms.Form):
-    username = forms.CharField(max_length=150, required=True, validators=[UnicodeUsernameValidator()], widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        validators=[UnicodeUsernameValidator()],
+        widget=forms.TextInput(attrs={'autofocus': 'autofocus'})
+    )
     confirm_password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     password = forms.CharField(max_length=64, widget=forms.PasswordInput, required=True)
     email = forms.EmailField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
