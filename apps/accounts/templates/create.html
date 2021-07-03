@@ -29,7 +29,7 @@
         <p>
             {{ field.label_tag }} {{ field }}
             {% if field.auto_id == "id_password" %}
-                <img src="{% static 'accounts/imgs/show_password_icon.png' %}" id="show-password"/>
+                <img src="{% static 'accounts/imgs/show_password_icon.png' %}" data-show-password-img="{% static 'accounts/imgs/show_password_icon.png' %}" data-hide-password-img="{% static 'accounts/imgs/hide_password_icon.png' %}" id="show-password"/>
             {% endif %}
         </p>
     {% endfor %}
