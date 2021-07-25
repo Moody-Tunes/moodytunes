@@ -38,7 +38,7 @@ MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 INSTALLED_APPS.append('silk')
 
 # Add Django Rest Framework Swagger for API documentation
-INSTALLED_APPS.append('rest_framework_swagger')
+INSTALLED_APPS.append('drf_yasg')
 
 LOGGING['handlers']['app_file']['level'] = 'DEBUG'
 LOGGING['root']['handlers'].append('console')
