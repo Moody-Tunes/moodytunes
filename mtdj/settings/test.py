@@ -17,6 +17,9 @@ SESSION_CACHE_ALIAS = 'default'
 DATABASE_BACKUPS_PATH = tempfile.gettempdir()
 IMAGE_FILE_UPLOAD_PATH = tempfile.gettempdir()
 
+DEFENDER_BEHIND_REVERSE_PROXY = False
+DEFENDER_USE_CELERY = False
+
 # We want to make it easy to create test users, so we'll remove the password
 # validators when running tests
 AUTH_PASSWORD_VALIDATORS = []
