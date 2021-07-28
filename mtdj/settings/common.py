@@ -82,6 +82,10 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# django-defender settings
+DEFENDER_BEHIND_REVERSE_PROXY = True
+DEFENDER_USE_CELERY = True
+
 # Enable HSTS header for site
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_PRELOAD = True  # Include site in HSTS preload list
@@ -334,6 +338,11 @@ LOGGING = {
         },
         'django_celery_beat': {
             'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'defender': {
+            'handlers': ['app_file'],
             'level': 'INFO',
             'propagate': False,
         },
