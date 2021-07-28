@@ -8,8 +8,12 @@ from accounts.views import MoodyLogoutView
 urlpatterns = [
     path('logout/', MoodyLogoutView.as_view(), name='logout'),
     path(r'', admin.site.urls, name='admin'),
-    path('admin/defender/', include('defender.urls')),
 ]
+
+if 'defender' in settings.INSTALLED_APPS:
+    urlpatterns = [
+        path('admin/defender/', include('defender.urls'))
+    ] + urlpatterns
 
 if settings.DEBUG:
     if 'debug_toolbar' in settings.INSTALLED_APPS:
