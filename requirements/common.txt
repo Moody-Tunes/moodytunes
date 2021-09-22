@@ -44,7 +44,7 @@ django-timezone-field==4.1.2
     # via django-celery-beat
 django-waffle==2.1.0
     # via -r requirements/common.ini
-django==3.1.12
+django==3.1.13
     # via
     #   -r requirements/common.ini
     #   django-appconf
