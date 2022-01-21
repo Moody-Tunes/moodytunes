@@ -30,7 +30,7 @@ gprof2dot==2021.2.21
     # via django-silk
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.18.1
+ipython==7.31.1
     # via -r requirements/dev.ini
 jedi==0.17.2
     # via
