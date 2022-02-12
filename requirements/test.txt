@@ -46,6 +46,13 @@ pyflakes==2.3.1
     # via flake8
 pyparsing==2.4.7
     # via packaging
+pytest==6.0.2
+    # via
+    #   -r requirements/test.ini
+    #   pytest-blockage
+    #   pytest-cov
+    #   pytest-django
+    #   pytest-random-order
 pytest-blockage==0.2.2
     # via -r requirements/test.ini
 pytest-cov==2.10.1
@@ -54,13 +61,6 @@ pytest-django==3.10.0
     # via -r requirements/test.ini
 pytest-random-order==1.0.4
     # via -r requirements/test.ini
-pytest==6.0.2
-    # via
-    #   -r requirements/test.ini
-    #   pytest-blockage
-    #   pytest-cov
-    #   pytest-django
-    #   pytest-random-order
 simplejson==3.17.2
     # via django-rest-swagger
 toml==0.10.2
