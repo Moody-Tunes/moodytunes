@@ -99,7 +99,7 @@ six==1.16.0
     #   python-dateutil
 spotify-client==1.9.0
     # via -r requirements/common.ini
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via django
 urllib3==1.26.5
     # via requests
