@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from libs.tests.helpers import MoodyUtil
+from tunes.models import Emotion
 
 
 class TestBrowsePlaylistsView(TestCase):
@@ -29,3 +30,9 @@ class TestBrowsePlaylistsView(TestCase):
 
         resp = self.client.get(self.url)
         self.assertFalse(resp.context['cached_playlist_exists'])
+
+    def test_emotion_in_query_param_creates_form_with_emotion_field_set_to_param(self):
+        emotion = Emotion.HAPPY
+
+        resp = self.client.get(self.url, data={'emotion': emotion})
+        self.assertEqual(resp.context['form']['emotion'].initial, Emotion.HAPPY)
