@@ -395,14 +395,19 @@ class PlaylistView(GetRequestValidatorMixin, generics.ListAPIView):
 
         # Update response data with analytics for emotion
         votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
+        valence = votes_for_emotion_data['song__valence__avg'] or 0
+        energy = votes_for_emotion_data['song__energy__avg'] or 0
+        danceability = votes_for_emotion_data['song__danceability__avg'] or 0
+
+        # Normalize emotion data as whole numbers
+        normalized_valence = valence * 100
+        normalized_energy = energy * 100
+        normalized_danceability = danceability * 100
 
         resp.data.update({
-            'valence': valence,
-            'energy': energy,
-            'danceability': danceability,
+            'valence': normalized_valence,
+            'energy': normalized_energy,
+            'danceability': normalized_danceability,
             'emotion_name': Emotion.get_full_name_from_keyword(self.cleaned_data['emotion']),
             'first_page': first_page,
             'last_page': last_page,
