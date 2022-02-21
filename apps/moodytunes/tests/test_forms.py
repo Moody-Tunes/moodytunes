@@ -120,6 +120,11 @@ class TestBrowseForm(TestCase):
         form = self.form(data)
         self.assertFalse(form.is_valid())
 
+    def test_form_sets_initial_emotion_to_provided_value(self):
+        form = self.form(initial={'emotion': Emotion.HAPPY})
+
+        self.assertEqual(form['emotion'].initial, Emotion.HAPPY)
+
 
 class TestPlaylistForm(TestCase):
     @classmethod
