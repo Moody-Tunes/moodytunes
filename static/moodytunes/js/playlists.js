@@ -269,10 +269,14 @@
 
         document.PlaylistCurator.clearChildren(playlistContainer);
         document.PlaylistCurator.clearChildren(buttonContainer);
-        noResultsFoundAlert.hidden = true;  // Default to hide alert that no results are displayed
+        document.PlaylistCurator.clearChildren(noResultsFoundAlert);
 
         if (document.PlaylistCurator.isEmptyResult(data.count)) {
-            noResultsFoundAlert.hidden = false;
+            const noResultsFoundLink = document.createElement('a');
+            noResultsFoundLink.href = `${window.location.origin}/moodytunes/browse/?emotion=${document.getElementById('id_emotion').value}`;
+            noResultsFoundLink.innerText = 'No results found. Try browsing for songs from this link!';
+
+            noResultsFoundAlert.appendChild(noResultsFoundLink);
             return;
         }
 
