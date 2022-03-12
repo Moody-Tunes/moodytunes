@@ -65,7 +65,7 @@ idna==2.10
     # via requests
 kombu==4.6.11
     # via celery
-pillow==9.0.0
+pillow==9.0.1
     # via -r requirements/common.ini
 psycopg2-binary==2.8.5
     # via -r requirements/common.ini
