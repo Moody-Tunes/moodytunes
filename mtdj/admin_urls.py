@@ -10,6 +10,11 @@ urlpatterns = [
     path(r'', admin.site.urls, name='admin'),
 ]
 
+if 'defender' in settings.INSTALLED_APPS:
+    urlpatterns = [
+        path('admin/defender/', include('defender.urls'))
+    ] + urlpatterns
+
 if settings.DEBUG:
     if 'debug_toolbar' in settings.INSTALLED_APPS:
         import debug_toolbar

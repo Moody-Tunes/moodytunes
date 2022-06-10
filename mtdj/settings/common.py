@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     'compressor',
     'django_celery_beat',
     'django_celery_results',
+    'defender',
     'django_hosts',
     'rest_framework',
     'waffle',
@@ -69,6 +70,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'defender.middleware.FailedLoginMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'waffle.middleware.WaffleMiddleware',
@@ -79,6 +81,10 @@ MIDDLEWARE = [
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# django-defender settings
+DEFENDER_BEHIND_REVERSE_PROXY = True
+DEFENDER_USE_CELERY = True
 
 # Enable HSTS header for site
 SECURE_HSTS_SECONDS = 31536000  # 1 year
@@ -332,6 +338,11 @@ LOGGING = {
         },
         'django_celery_beat': {
             'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'defender': {
+            'handlers': ['app_file'],
             'level': 'INFO',
             'propagate': False,
         },
