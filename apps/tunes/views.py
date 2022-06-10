@@ -149,6 +149,11 @@ class BrowseView(GetRequestValidatorMixin, generics.ListAPIView):
             songs=queryset
         )
 
+        # Convert playlist to a list to force evaluation of queryset
+        # This helps to cache the playlist as caching a queryset is less performant
+        # than caching a list
+        playlist = list(playlist)
+
         cached_playlist_manager.cache_browse_playlist(
             playlist,
             self.cleaned_data['emotion'],
