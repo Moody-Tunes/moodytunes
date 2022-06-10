@@ -195,10 +195,6 @@ class CreateUserView(FormView):
                 'Failed to create new user because of invalid data',
                 extra={
                     'errors': form.errors,
-                    'request_data': {
-                        'username': request.POST.get('username'),
-                        'email': request.POST.get('email')
-                    },
                     'fingerprint': auto_fingerprint('failed_to_create_new_user', **kwargs),
                     'trace_id': request.trace_id
                 }
