@@ -28,10 +28,7 @@ def get_genre_choices():
 
 
 class BrowseForm(forms.Form):
-    emotion = forms.ChoiceField(
-        choices=Emotion.EMOTION_NAME_CHOICES,
-        initial=random.choice(Emotion.EMOTION_NAME_CHOICES)
-    )
+    emotion = forms.ChoiceField(choices=Emotion.EMOTION_NAME_CHOICES)
     artist = forms.CharField(max_length=50, required=False)
     genre = forms.ChoiceField(choices=[], required=False)
     context = forms.ChoiceField(
@@ -50,6 +47,9 @@ class BrowseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['genre'].choices = get_genre_choices()
+
+        if not self.initial.get('emotion'):
+            self.fields['emotion'].initial = random.choice(self.fields['emotion'].choices)
 
 
 class PlaylistForm(forms.Form):
