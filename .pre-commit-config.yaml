@@ -15,7 +15,7 @@ repos:
       - id: check-json
 
   - repo: https://github.com/miki725/importanize/
-    rev: '0.7'
+    rev: 'master'
     hooks:
     - id: importanize
       args: [--verbose, --config=.importanize.json]
