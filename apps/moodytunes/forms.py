@@ -48,8 +48,8 @@ class BrowseForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['genre'].choices = get_genre_choices()
 
-        # Set the initial emotion to a random value to avoid the "default" option being overly selected
-        self.fields['emotion'].initial = random.choice(self.fields['emotion'].choices)
+        if not self.initial.get('emotion'):
+            self.fields['emotion'].initial = random.choice(self.fields['emotion'].choices)
 
 
 class PlaylistForm(forms.Form):

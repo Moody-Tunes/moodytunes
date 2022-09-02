@@ -21,6 +21,14 @@ class BrowsePlaylistsView(FormView):
     template_name = 'browse.html'
     form_class = BrowseForm
 
+    def get_form_instance(self):
+        emotion = self.request.GET.get('emotion')
+
+        if emotion:
+            return self.form_class(initial={'emotion': emotion})
+        else:
+            return self.form_class()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
