@@ -750,9 +750,9 @@ class TestPlaylistView(APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_data['results'][0]['song']['code'], self.song.code)
-        self.assertEqual(resp_data['valence'], user_emotion.valence)
-        self.assertEqual(resp_data['energy'], user_emotion.energy)
-        self.assertEqual(resp_data['danceability'], user_emotion.danceability)
+        self.assertEqual(resp_data['valence'], user_emotion.valence * 100)
+        self.assertEqual(resp_data['energy'], user_emotion.energy * 100)
+        self.assertEqual(resp_data['danceability'], user_emotion.danceability * 100)
 
     def test_downvoted_songs_are_not_returned(self):
         MoodyUtil.create_user_song_vote(user=self.user, song=self.song, emotion=self.emotion, vote=False)
@@ -784,9 +784,9 @@ class TestPlaylistView(APITestCase):
             song__genre=new_song.genre
         )
         votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
+        valence = votes_for_emotion_data['song__valence__avg'] * 100
+        energy = votes_for_emotion_data['song__energy__avg'] * 100
+        danceability = votes_for_emotion_data['song__danceability__avg'] * 100
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)
@@ -829,9 +829,9 @@ class TestPlaylistView(APITestCase):
             context=context
         )
         votes_for_emotion_data = average(queryset, 'song__valence', 'song__energy', 'song__danceability')
-        valence = votes_for_emotion_data['song__valence__avg']
-        energy = votes_for_emotion_data['song__energy__avg']
-        danceability = votes_for_emotion_data['song__danceability__avg']
+        valence = votes_for_emotion_data['song__valence__avg'] * 100
+        energy = votes_for_emotion_data['song__energy__avg'] * 100
+        danceability = votes_for_emotion_data['song__danceability__avg'] * 100
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_data['results']), 1)
