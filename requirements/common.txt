@@ -16,7 +16,7 @@ celery[redis]==4.4.6
     #   -r requirements/common.ini
     #   django-celery-beat
     #   django-celery-results
-certifi==2020.12.5
+certifi==2022.12.7
     # via requests
 cffi==1.14.5
     # via cryptography
