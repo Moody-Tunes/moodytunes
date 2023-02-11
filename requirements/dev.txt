@@ -28,7 +28,7 @@ filelock==3.0.12
     #   virtualenv
 gprof2dot==2021.2.21
     # via django-silk
-ipython==7.31.1
+ipython==8.10.0
     # via -r requirements/dev.ini
 ipython-genutils==0.2.0
     # via traitlets
