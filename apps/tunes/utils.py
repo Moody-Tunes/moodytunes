@@ -1,3 +1,5 @@
+import random
+
 from django.conf import settings
 from django.core.cache import cache
 
@@ -95,6 +97,9 @@ def generate_browse_playlist(
                 top_artists_playlist = top_artists_playlist.union(playlist_minus_top_artists[:filler_track_count])
 
             playlist = top_artists_playlist
+
+    playlist = list(playlist)
+    random.shuffle(playlist)
 
     if limit:
         playlist = playlist[:limit]
