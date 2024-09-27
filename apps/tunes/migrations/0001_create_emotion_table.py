@@ -2,7 +2,8 @@
 
 from django.db import migrations, models
 
-import tunes.models
+from base.validators import validate_decimal_value
+
 
 class Migration(migrations.Migration):
 
@@ -19,8 +20,8 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(choices=[('MEL', 'Melancholy'), ('CLM', 'Calm'), ('HPY', 'Happy'), ('EXC', 'Excited')], db_index=True, max_length=3, unique=True)),
-                ('energy', models.FloatField(validators=[tunes.models.validate_decimal_value])),
-                ('valence', models.FloatField(validators=[tunes.models.validate_decimal_value])),
+                ('energy', models.FloatField(validators=[validate_decimal_value])),
+                ('valence', models.FloatField(validators=[validate_decimal_value])),
             ],
             options={
                 'abstract': False,
