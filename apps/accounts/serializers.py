@@ -16,3 +16,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserProfileRequestSerializer(serializers.Serializer):
     has_rejected_spotify_auth = serializers.BooleanField(required=False)
+    has_completed_onboarding = serializers.BooleanField(required=False)

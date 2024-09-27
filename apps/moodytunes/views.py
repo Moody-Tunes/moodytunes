@@ -29,6 +29,9 @@ class BrowsePlaylistsView(FormView):
         cached_playlist = cached_playlist_manager.retrieve_cached_browse_playlist()
         context['cached_playlist_exists'] = cached_playlist is not None
 
+        # Enable onboarding workflow if requested
+        context['show_onboarding'] = self.request.GET.get('onboarding')
+
         return context
 
 
